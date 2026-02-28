@@ -4,8 +4,8 @@ Let me pick the toothpaste for you
 0. Clone repository to `~/tpm` and make it
 1. Define available toothpastes in CSV format file with path `~/tpm/toothpastes`
 see `~/tpm/toothpastes.sample` for format details
-2. Put TPM in daily crontab or task scheduler task to run it daily(or twice a day)
-3. Enjoy machine doing it for you
+3. Put TPM in daily crontab or task scheduler task to run it daily(or twice a day)
+4. Enjoy machine doing it for you
 
 Tiny simple terminal console program with maximum utility
 
@@ -34,3 +34,12 @@ by picking it from predefined available toothpastes linked list using total epoc
 
 `-s [counter value]` set total toothpaste picks counter
 
+## Toothpastes List CSV format sample
+```
+Index, Brand string, Tube mass grams, Rating
+0,Paste 1,100,85
+1,Paste 2,50,90
+2,Paste 3,150,100
+3,Paste 4,50,100
+4,Nothing,0,0
+```
