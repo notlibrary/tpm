@@ -1,4 +1,4 @@
-##TPM Toothpaste Picking Manager
+## TPM Toothpaste Picking Manager
 Let me pick the toothpaste for you
 0. Clone repository to ~/tpm and make it
 1. Define available toothpastes in CSV format file with path `~/tpm/toothpastes`
@@ -8,7 +8,7 @@ see `~/tpm/toothpastes.sample` for format details
 
 Tiny simple terminal console program with maximum utility
 
-##Sample terminal output from verbose mode:
+## Sample terminal output from verbose mode:
 ```
 Good Morning Welcome to toothpaste picking manager
 Already picked today
@@ -19,7 +19,7 @@ Press any key to continue . . .
 Basically it automatically answers the question "What toothpaste I should use today?"
 by picking it from predefined available toothpastes linked list using total epoch days mod total available toothpastes as list index
  
-##Command line options
+## Command line options
 	`-v` more verbose pick(default)
 	`-x` perform random pick
 	`-q` more quiet pick
