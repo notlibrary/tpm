@@ -1,5 +1,6 @@
 ## TPM Toothpaste Picking Manager
 Let me pick the toothpaste for you
+
 0. Clone repository to ~/tpm and make it
 1. Define available toothpastes in CSV format file with path `~/tpm/toothpastes`
 see `~/tpm/toothpastes.sample` for format details
