@@ -22,15 +22,15 @@ by picking it from predefined available toothpastes linked list using total epoc
  
 ## Command line options
 
-`-v` more verbose pick(default)
+`-v` more verbose toothpaste pick(default)
 
-`-x` perform random pick
+`-x` perform random toothpaste pick
 
-`-q` more quiet pick
+`-q` more quiet toothpaste pick
 
 `-l` list available toothpastes
 
-`-r` reset total picks counter
+`-r` reset total toothpaste picks counter
 
-`-s [counter value]` set total picks counter
+`-s [counter value]` set total toothpaste picks counter
 
