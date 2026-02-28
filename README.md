@@ -21,10 +21,10 @@ Basically it automatically answers the question "What toothpaste I should use to
 by picking it from predefined available toothpastes linked list using total epoch days mod total available toothpastes as list index
  
 ## Command line options
-	`-v` more verbose pick(default)
-	`-x` perform random pick
-	`-q` more quiet pick
-	`-l` list available toothpastes
-	`-r` reset total picks counter
-	`-s [counter value]` set total picks counter
+`-v` more verbose pick(default)
+`-x` perform random pick
+`-q` more quiet pick
+`-l` list available toothpastes
+`-r` reset total picks counter
+`-s [counter value]` set total picks counter
 
