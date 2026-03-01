@@ -8,11 +8,15 @@
 #include "prng64_xrp32.h"
 
 #ifdef _WIN32
-#include "getopt.h"
-#include "getopt.c"
 #include <windows.h>
+#include <winbase.h>
 #include <shlobj.h>
 #include <direct.h>
+#include <Lmcons.h>
+#define STATIC_GETOPT
+#include "getopt.h"
+#include "getopt.c"
+#pragma comment(lib, "advapi32.lib")
 #else
 #include <unistd.h>
 #include <sys/types.h>
@@ -29,6 +33,9 @@
 #define MAX_PATH 256
 #define MAX_LINE_LENGTH 1024
 #define COMMENT_CHAR '#'
+#ifndef UNLEN
+#define UNLEN 256
+#endif
 
 typedef struct
 {
@@ -359,6 +366,36 @@ get_user_home_dir()
     return home_dir;
 }
 
+int 
+get_current_username(char* buffer, size_t buffer_size) {
+
+#ifdef _WIN32
+    DWORD len = (DWORD)buffer_size;
+    if (GetUserName(buffer, &len)) {
+        return 0; 
+    }
+    return -1; 
+#else
+    uid_t uid = geteuid();
+    struct passwd *pw = getpwuid(uid);
+    if (pw != NULL) {
+        strncpy(buffer, pw->pw_name, buffer_size);
+        buffer[buffer_size - 1] = '\0';
+        return 0; 
+    }
+    
+	const char* user_env = getenv("LOGNAME");
+    if (user_env == NULL) {
+        user_env = getenv("USER");
+    }
+    if (user_env != NULL) {
+        strncpy(buffer, user_env, buffer_size);
+        buffer[buffer_size - 1] = '\0';
+        return 0;
+    }
+    return -1; 
+#endif
+}
 
 
 int
@@ -371,8 +408,15 @@ main(int argc, char* argv[])
 	FILE* file_ptr;
 	int opt;
 	toothpaste_data_t cur;
-    
+    char username[UNLEN + 1];
 	char* user_home_dir=get_user_home_dir();
+	
+	if (get_current_username(username, sizeof(username)) == 0) {
+        
+    } else {
+        fprintf(stderr, "Failed to get username.\n");
+    }
+	
 #ifdef _WIN32
 	strcat(user_home_dir,"\\tpm\\");
 #else
@@ -431,7 +475,7 @@ main(int argc, char* argv[])
 	get_counters(&stats);
 	i=(total_seconds)/(SECONDS_PER_DAY/TOTAL_TIMES_OF_DAY)%(TOTAL_TIMES_OF_DAY);
 	if (verbose)
-		printf("Good %s %s", times_of_day[i] ,"Welcome to toothpaste picking manager \n");
+		printf("Good %s %s %s", times_of_day[i],username ,"Welcome to toothpaste picking manager \n");
 	day = total_seconds/SECONDS_PER_DAY;
 	
 	i=day%total_toothpastes;
