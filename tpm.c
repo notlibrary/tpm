@@ -73,9 +73,9 @@ static const char* times_of_day[TOTAL_TIMES_OF_DAY]={
 	
 };	
 
-static const char stats_file_path[MAX_PATH]="pickstats";
-static const char toothpastes_file_path[MAX_PATH]="toothpastes";
-static const char home_dir[MAX_PATH]="";
+static const char stats_file_name[MAX_PATH]="pickstats";
+static const char toothpastes_file_name[MAX_PATH]="toothpastes";
+
 static char stats_file_path_final[MAX_PATH];
 static char toothpastes_file_path_final[MAX_PATH];
 
@@ -367,10 +367,10 @@ main(int argc, char* argv[])
 #endif
 	
 	strcpy(stats_file_path_final,user_home_dir);
-	strcat(stats_file_path_final,stats_file_path);
+	strcat(stats_file_path_final,stats_file_name);
 	
 	strcpy(toothpastes_file_path_final,user_home_dir);
-	strcat(toothpastes_file_path_final,toothpastes_file_path);
+	strcat(toothpastes_file_path_final,toothpastes_file_name);
 	
 	printf("%s \n",toothpastes_file_path_final);
 	printf("%s \n",stats_file_path_final);

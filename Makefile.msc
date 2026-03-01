@@ -1,6 +1,7 @@
 CC = cl
 MKDIR = mkdir
 CFLAGS =
+TARGET_DIR ="C:\Program Files\tpm"
 
 all: tpm.exe install clean
 
@@ -8,7 +9,7 @@ tpm.exe:
 	$(CC) $(CFLAGS) tpm.c 
 
 install:
-	MKDIR "C:\Program Files\tpm\"
+	@if not exist $(TARGET_DIR)\ mkdir $(TARGET_DIR)
 	copy "tpm.exe" "C:\Program Files\tpm\tpm.exe"
 clean:	
 	del tpm.exe 
