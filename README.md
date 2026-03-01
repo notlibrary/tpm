@@ -36,7 +36,7 @@ by picking it from predefined available toothpastes linked list using total epoc
 
 ## Toothpastes List CSV format sample
 ```
-Index, Brand string, Tube mass grams, Rating
+#Index, Brand string, Tube mass grams, Rating
 0,Paste 1,100,85
 1,Paste 2,50,90
 2,Paste 3,150,100
