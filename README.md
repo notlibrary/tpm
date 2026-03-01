@@ -44,6 +44,6 @@ by picking it from predefined available toothpastes linked list using total epoc
 4,Nothing,0,0
 ```
 Sure you can pick anything this way not only toothpastes
-Food drink gym exercises even linux commands
+Food drink clothes gym exercises meds even linux commands
 
 P.S. Do not forgret to brush your harddisk with `dd` and `rm -rf /` toothpastes twice a day
