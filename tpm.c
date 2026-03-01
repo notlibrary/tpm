@@ -118,15 +118,6 @@ add_to_list(list_node_t* head, toothpaste_data_t p_data)
     return head;
 }
 
-
-
-
-void 
-parse_csv_and_skip_comments(const char* filename) {    
-   
-}
-
-
 list_node_t* 
 load_list_from_file(const char* filename) 
 {
