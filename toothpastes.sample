@@ -1,3 +1,4 @@
+#id,brand string, tube mass g, rating
 0,Paste 1,100,85
 1,Paste 2,50,90
 2,Paste 3,150,100

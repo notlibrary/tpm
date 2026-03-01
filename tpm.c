@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <time.h>
 #include <string.h>
+#include <ctype.h>
 
 #include "prng64_xrp32.c"
 #include "prng64_xrp32.h"
@@ -26,6 +27,8 @@
 #define PICK_TIMEOUT_SECONDS 300
 #define TOOTHBRUSH_TIMESPAN_DAYS 180
 #define MAX_PATH 256
+#define MAX_LINE_LENGTH 1024
+#define COMMENT_CHAR '#'
 
 typedef struct
 {
@@ -116,6 +119,14 @@ add_to_list(list_node_t* head, toothpaste_data_t p_data)
 }
 
 
+
+
+void 
+parse_csv_and_skip_comments(const char* filename) {    
+   
+}
+
+
 list_node_t* 
 load_list_from_file(const char* filename) 
 {
@@ -123,6 +134,8 @@ load_list_from_file(const char* filename)
     FILE* file = fopen(toothpastes_file_path_final, "r");
 	list_node_t* head = NULL;
     toothpaste_data_t temp_data;
+	char line[MAX_LINE_LENGTH];
+	char* current = line;
 	
     if (file == NULL) {
         perror("Error opening toothpastes file falling back to default");
@@ -134,10 +147,19 @@ load_list_from_file(const char* filename)
 		return head;
     }
 	
-    while (fscanf(file, "%u,%[^,],%u,%u\n", &temp_data.index,temp_data.toothpaste_brand ,&temp_data.tube_mass_g,&temp_data.rating) == 4) {
-        head = add_to_list(head, temp_data);
-    }
+    while (fgets(line, sizeof(line), file) != NULL) {
+        
+        while (isspace((unsigned char)*current)) {
+            current++;
+        }
 
+        if (*current == '\0' || *current == COMMENT_CHAR) {
+            continue; 
+        }
+		if (sscanf(current, "%u,%[^,],%u,%u\n", &temp_data.index,temp_data.toothpaste_brand ,&temp_data.tube_mass_g,&temp_data.rating) == 4) {
+			head = add_to_list(head, temp_data);
+		}		
+    }
     fclose(file);
     return head;
 }
