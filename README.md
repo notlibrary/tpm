@@ -4,8 +4,8 @@ Let me pick the toothpaste for you
 0. Clone repository to `~/tpm` and make it
 1. Define available toothpastes in CSV format file with path `~/tpm/toothpastes`
 see `~/tpm/toothpastes.sample` for format details
-3. Put TPM in daily crontab or task scheduler task to run it daily(or twice a day)
-4. Enjoy machine doing it for you
+2. Put TPM in daily crontab or task scheduler task to run it daily(or twice a day)
+3. Enjoy machine doing it for you
 
 Tiny simple terminal console program with maximum utility
 
@@ -43,3 +43,7 @@ Index, Brand string, Tube mass grams, Rating
 3,Paste 4,50,100
 4,Nothing,0,0
 ```
+Sure you can pick anything this way not only toothpastes
+Food drink gym exercises even linux commands
+
+P.S. Do not forgret to brush your harddisk with `dd` and `rm -rf /` toothpastes twice a day
