@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
+#include <string.h>
 
 #include "prng64_xrp32.c"
 #include "prng64_xrp32.h"
@@ -15,7 +16,6 @@
 #include <unistd.h>
 #include <sys/types.h>
 #include <pwd.h>
-#include <string.h>
 #endif
 
 
