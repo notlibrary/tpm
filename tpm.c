@@ -371,6 +371,7 @@ main(int argc, char* argv[])
 	
 	strcpy(toothpastes_file_path_final,user_home_dir);
 	strcat(toothpastes_file_path_final,toothpastes_file_name);
+	free(user_home_dir);
 	
 	printf("%s \n",toothpastes_file_path_final);
 	printf("%s \n",stats_file_path_final);
