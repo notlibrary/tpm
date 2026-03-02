@@ -405,11 +405,11 @@ get_current_username(char* buffer, size_t buffer_size) {
 #endif
 }
 
-int
+void
 version()
 {
 	printf("%s %u.%u.%u \n",TPM_STRING,TPM_VERSION_MAJOR,TPM_VERSION_MINOR,TPM_VERSION_PATCH);
-	return exit(EXIT_FAILURE);
+	exit(EXIT_FAILURE);
 }
 
 int
