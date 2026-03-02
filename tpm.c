@@ -405,6 +405,12 @@ get_current_username(char* buffer, size_t buffer_size) {
 #endif
 }
 
+int
+version()
+{
+	printf("%s %u.%u.%u \n",TPM_STRING,TPM_VERSION_MAJOR,TPM_VERSION_MINOR,TPM_VERSION_PATCH);
+	return exit(EXIT_FAILURE);
+}
 
 int
 main(int argc, char* argv[])
@@ -437,15 +443,11 @@ main(int argc, char* argv[])
 	strcpy(toothpastes_file_path_final,user_home_dir);
 	strcat(toothpastes_file_path_final,toothpastes_file_name);
 	free(user_home_dir);
-	
-	printf("%s \n",toothpastes_file_path_final);
-	printf("%s \n",stats_file_path_final);
-	
-	
+		
 	while ((opt = getopt(argc, argv, "vxqlrs:")) != -1) {
         switch (opt) {
 		case 'v':
-        verbose = 1;
+        version();
         break;
         case 'x':
         pick_random = 1;

@@ -22,7 +22,7 @@ by picking it from predefined available toothpastes linked list using total epoc
  
 ## Command line options
 
-`-v` more verbose toothpaste pick(default)
+`-v` show toothpaste picking manager version
 
 `-x` perform random toothpaste pick
 
