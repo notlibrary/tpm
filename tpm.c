@@ -437,14 +437,16 @@ get_toothpaste_pick_JSON(toothpaste_pick_t* pick)
 
 toothpaste_pick_t* pick_toothpaste(list_node_t* head)
 {
-	int i,j;
+	int i,j,k;
 	static toothpaste_pick_t pick;
 	time_t total_seconds = time(NULL);
 	unsigned int day;
 	char username[UNLEN + 1];
 	char line[MAX_LINE_LENGTH];
-	for (i=0;i<MAX_LINE_LENGTH;i++) line[i]=0;
+	memset(line,0,MAX_LINE_LENGTH);
 	
+	pick.message=malloc(OUTPUT_BLOCK_SIZE);
+		memset(pick.message,0,OUTPUT_BLOCK_SIZE);
 	
 	if (get_current_username(username, sizeof(username)) == 0) 
 	{
@@ -465,13 +467,10 @@ toothpaste_pick_t* pick_toothpaste(list_node_t* head)
 	pick.when=total_seconds;
 	i=(total_seconds)/(SECONDS_PER_DAY/TOTAL_TIMES_OF_DAY)%(TOTAL_TIMES_OF_DAY);
 	
-	pick.message=malloc(OUTPUT_BLOCK_SIZE);
-	//for (i=0;i<OUTPUT_BLOCK_SIZE;i++) {pick.message[i]='\0';}
-	pick.JSON=malloc(OUTPUT_BLOCK_SIZE);
-	//for (i=0;i<OUTPUT_BLOCK_SIZE;i++) {pick.JSON[i]='\0';}
 	if (verbose)
 	{
-		sprintf(line,"Good %s %s %s", times_of_day[i],pick.who ,"Welcome to the toothpaste picking manager \n");
+		
+		sprintf(line,"Good %s %s %s \n", times_of_day[i],pick.who ,"Welcome to the toothpaste picking manager");
 		strcat(pick.message,line);
 	}
 	
@@ -498,6 +497,7 @@ toothpaste_pick_t* pick_toothpaste(list_node_t* head)
 		{
 			sprintf(line,"%s", "New next pick stats updated \n");
 			strcat(pick.message,line);
+		
 		}
 		
 		pick.stats.total_picks++;
@@ -516,15 +516,18 @@ toothpaste_pick_t* pick_toothpaste(list_node_t* head)
 	if (verbose) 
 	{
 			sprintf(line,"%s", "Already picked today \n");
-			strcat(pick.message,line);	 
+			strcat(pick.message,line);	
+		
 	}
 	if (verbose)
 	{		
 		sprintf(line,"%s %s %s (%ug) [%u/100] %s %s %s %u %s %u \n", "Toothpaste:", ">>>", pick.what.toothpaste_brand, pick.what.tube_mass_g, pick.what.rating, "<<<", "Day:" ,days_of_week[j],day, "Toothpaste index:",i);
 		strcat(pick.message,line);
+		
 
 		sprintf(line,"%s %u %s %llu  \n", "Total picks:", pick.stats.total_picks, "Last pick time:" ,pick.stats.last_pick_time);
 		strcat(pick.message,line);
+	
 	}
 	else 
 	{
