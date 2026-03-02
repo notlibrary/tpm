@@ -22,6 +22,10 @@ by picking it from predefined available toothpastes linked list using total epoc
  
 ## Command line options
 
+`-o [file_name]` output toothpaste picking string or JSON to text file
+
+`-j` output JSON with last pick info instead toothpaste picking string
+
 `-v` show toothpaste picking manager version
 
 `-x` perform random toothpaste pick
