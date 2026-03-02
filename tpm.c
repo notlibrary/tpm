@@ -466,7 +466,7 @@ main(int argc, char* argv[])
 			set_counters(optarg);
 		break;       
 		case '?': 
-            fprintf(stderr, "Usage: %s [-vqlrs] [-s total_picks value] [other arguments]\\n", argv[0]);
+            fprintf(stderr, "Usage: %s [-vxqlr] [-s total_picks value] [other arguments]\n", argv[0]);
             exit(EXIT_FAILURE);
         default:
 			break;
