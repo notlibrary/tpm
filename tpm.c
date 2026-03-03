@@ -536,10 +536,11 @@ toothpaste_pick_t* pick_toothpaste(list_node_t* head)
 	}
 	else 
 	{
-		sprintf(pick.message,"%s (%ug) [%u/100] \n", pick.what.toothpaste_brand,pick.what.tube_mass_g, pick.what.rating);
+		sprintf(pick.message,"%s (%ug) [%u/100] \n", pick.what.toothpaste_brand,pick.what.tube_mass_g, pick.what.rating);	
 	}
 	
-	sprintf(pick.JSON,"{\"who\":\"%s\"}",pick.who);
+	sprintf(pick.JSON,"{\n\t\"who\":\"%s\"\,\n\t \"toothpaste\":\"%s\" \n}",pick.who,pick.what.toothpaste_brand);
+	
 	return &pick;
 }
 
