@@ -2,6 +2,13 @@
 Let me pick the toothpaste for you
 
 0. Clone repository to `~/tpm` and make it
+
+Unix:
+`make`
+
+Windows:
+`nmake.exe /f .\Makefile.msc`
+
 1. Define available toothpastes in CSV format file with path `~/tpm/toothpastes`
 see `~/tpm/toothpastes.sample` for format details
 2. Put TPM in daily crontab or task scheduler task to run it daily(or twice a day)
