@@ -84,6 +84,8 @@ TPM list_node_t* tpm_load_list_from_file(const char* filename);
 TPM toothpaste_pick_t* tpm_pick_toothpaste(list_node_t* head);
 TPM char* tpm_get_toothpaste_pick_message(toothpaste_pick_t* pick);
 TPM char* tpm_get_toothpaste_pick_JSON(toothpaste_pick_t* pick);
+TPM int tpm_free_toothpaste_pick(toothpaste_pick_t* pick);
+
 
 list_node_t* toothpastes_list;
 static const toothpaste_data_t toothpastes[TOTAL_TOOTHPASTES]={
@@ -339,11 +341,18 @@ stop_system() {
 }
 
 int 
-finish(int flag,toothpaste_pick_t* pick)
+tpm_free_toothpaste_pick(toothpaste_pick_t* pick)
 {
-	free_list(toothpastes_list);
 	free(pick->message);
 	free(pick->JSON);
+	free_list(pick->where);
+	return 0;
+}
+
+int 
+finish(int flag,toothpaste_pick_t* pick)
+{
+	tpm_free_toothpaste_pick(pick);
 	if (flag) {
 #ifdef _WIN32
 	system("pause");
