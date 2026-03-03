@@ -15,6 +15,7 @@ Good Morning Serenity Welcome to the toothpaste picking manager
 Already picked today
 Toothpaste: >>> SENSODYNE (150g) [100/100] <<< Day: Saturday 20512 Toothpaste index: 1
 Total picks: 7 Last pick time: 1772266460
+
 Press any key to continue . . .
 ```
 ## Sample JSON output:
