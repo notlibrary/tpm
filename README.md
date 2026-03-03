@@ -23,12 +23,13 @@ Press any key to continue . . .
 {
          "who":"Anonymous",
          "toothpaste":"Unknown",
-         "tube_mass_g":666
+         "tube_mass_g":666,
+		 "rating":50
 }
 ```
 Basically it automatically answers the question "What toothpaste I should use today?"
 by picking it from predefined available toothpastes linked list using total epoch days mod total available toothpastes as list index
-Because working with JSON without special library is complicated it outputs only 3 fields JSON
+Because working with JSON without special library is complicated it outputs only 4 fields JSON
 
 ## Command line options
 
