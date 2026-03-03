@@ -539,7 +539,7 @@ toothpaste_pick_t* pick_toothpaste(list_node_t* head)
 		sprintf(pick.message,"%s (%ug) [%u/100] \n", pick.what.toothpaste_brand,pick.what.tube_mass_g, pick.what.rating);	
 	}
 	
-	sprintf(pick.JSON,"{\n\t\"who\":\"%s\",\n\t \"toothpaste\":\"%s\",\n\t \"tube_mass_g\":%u \n}",pick.who,pick.what.toothpaste_brand,pick.what.tube_mass_g);
+	sprintf(pick.JSON,"{\n\t \"who\":\"%s\",\n\t \"toothpaste\":\"%s\",\n\t \"tube_mass_g\":%u \n}",pick.who,pick.what.toothpaste_brand,pick.what.tube_mass_g);
 	
 	return &pick;
 }

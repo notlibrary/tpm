@@ -17,9 +17,18 @@ Toothpaste: >>> SENSODYNE (150g) [100/100] <<< Day: Saturday 20512 Toothpaste in
 Total picks: 7 Last pick time: 1772266460
 Press any key to continue . . .
 ```
+## Sample JSON output:
+```
+{
+         "who":"Anonymous",
+         "toothpaste":"Unknown",
+         "tube_mass_g":666
+}
+```
 Basically it automatically answers the question "What toothpaste I should use today?"
 by picking it from predefined available toothpastes linked list using total epoch days mod total available toothpastes as list index
- 
+Because working with JSON without special library is complicated it outputs only 3 fields JSON
+
 ## Command line options
 
 `-o` output toothpaste picking string or JSON to text file `~/tpm/last_pick`
@@ -50,4 +59,4 @@ by picking it from predefined available toothpastes linked list using total epoc
 Sure you can pick anything this way not only toothpastes
 Food drink clothes gym exercises meds even linux commands
 
-P.S. Do not forgret to brush your harddisk with `dd` and `rm -rf /` toothpastes twice a day
+P.S. Do not forget to brush your hard disk with `dd` and `rm -rf /` toothpastes twice a day
