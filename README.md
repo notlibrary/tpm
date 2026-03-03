@@ -11,7 +11,7 @@ Tiny simple terminal console program with maximum utility
 
 ## Sample terminal output from verbose mode:
 ```
-Good Morning Welcome to toothpaste picking manager
+Good Morning Serenity Welcome to the toothpaste picking manager
 Already picked today
 Toothpaste: >>> SENSODYNE (150g) [100/100] <<< Day: Saturday 20512 Toothpaste index: 1
 Total picks: 7 Last pick time: 1772266460
@@ -22,7 +22,7 @@ by picking it from predefined available toothpastes linked list using total epoc
  
 ## Command line options
 
-`-o [file_name]` output toothpaste picking string or JSON to text file
+`-o` output toothpaste picking string or JSON to text file `~/tpm/last_pick`
 
 `-j` output JSON with last pick info instead toothpaste picking string
 
