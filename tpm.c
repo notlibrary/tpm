@@ -531,7 +531,7 @@ toothpaste_pick_t* tpm_pick_toothpaste(list_node_t* head)
 			 }
 		}
 	}
-	if (verbose) 
+	else if (verbose) 
 	{
 			sprintf(line,"%s", "Already picked today \n");
 			strcat(pick.message,line);	
