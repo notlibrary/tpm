@@ -12,4 +12,4 @@ install:
 	@if not exist $(TARGET_DIR)\ mkdir $(TARGET_DIR)
 	copy "tpm.exe" "C:\Program Files\tpm\tpm.exe"
 clean:	
-	del tpm.exe 
+	del tpm.exe tpm.obj
