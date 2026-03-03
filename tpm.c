@@ -339,9 +339,11 @@ stop_system() {
 }
 
 int 
-finish(int flag)
+finish(int flag,toothpaste_pick_t* pick)
 {
 	free_list(toothpastes_list);
+	free(pick->message);
+	free(pick->JSON);
 	if (flag) {
 #ifdef _WIN32
 	system("pause");
@@ -625,12 +627,12 @@ main(int argc, char* argv[])
 		fprintf(output_file,"%s \n",get_toothpaste_pick_message(pick));
 	if (lat_flag) {
 		list_available_toothpastes();
-		return finish(1);
+		return finish(1,pick);
 	}
 if (json_flag)
-	finish(0);
+	finish(0,pick);
 else
-	finish(1);
+	finish(1,pick);
 
 }
 
