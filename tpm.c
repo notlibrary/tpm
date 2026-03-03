@@ -31,7 +31,7 @@
 #include <pwd.h>
 #endif
 
-
+#define TPM
 #define TOTAL_TOOTHPASTES 3
 #define TOTAL_DAYS_OF_WEEK 7
 #define TOTAL_TIMES_OF_DAY 4
@@ -80,10 +80,10 @@ typedef struct {
 	
 }toothpaste_pick_t;
 
-list_node_t* load_list_from_file(const char* filename);
-toothpaste_pick_t* pick_toothpaste(list_node_t* head);
-char* get_toothpaste_pick_message(toothpaste_pick_t* pick);
-char* get_toothpaste_pick_JSON(toothpaste_pick_t* pick);
+TPM list_node_t* tpm_load_list_from_file(const char* filename);
+TPM toothpaste_pick_t* tpm_pick_toothpaste(list_node_t* head);
+TPM char* tpm_get_toothpaste_pick_message(toothpaste_pick_t* pick);
+TPM char* tpm_get_toothpaste_pick_JSON(toothpaste_pick_t* pick);
 
 list_node_t* toothpastes_list;
 static const toothpaste_data_t toothpastes[TOTAL_TOOTHPASTES]={
@@ -155,7 +155,7 @@ add_to_list(list_node_t* head, toothpaste_data_t p_data)
 }
 
 list_node_t* 
-load_list_from_file(const char* filename) 
+tpm_load_list_from_file(const char* filename) 
 {
 	int i;
     FILE* file = fopen(toothpastes_file_path_final, "r");
@@ -430,18 +430,18 @@ version()
 }
 
 char* 
-get_toothpaste_pick_message(toothpaste_pick_t* pick)
+tpm_get_toothpaste_pick_message(toothpaste_pick_t* pick)
 {
 	return pick->message;
 }
 
 char*
-get_toothpaste_pick_JSON(toothpaste_pick_t* pick)
+tpm_get_toothpaste_pick_JSON(toothpaste_pick_t* pick)
 {
 	return pick->JSON;	
 }
 
-toothpaste_pick_t* pick_toothpaste(list_node_t* head)
+toothpaste_pick_t* tpm_pick_toothpaste(list_node_t* head)
 {
 	int i,j,k;
 	static toothpaste_pick_t pick;
@@ -619,12 +619,12 @@ main(int argc, char* argv[])
 	{
 		output_file=stdout;
 	}
-	toothpastes_list=load_list_from_file(toothpastes_file_path_final);
-	pick=pick_toothpaste(toothpastes_list);	
+	toothpastes_list=tpm_load_list_from_file(toothpastes_file_path_final);
+	pick=tpm_pick_toothpaste(toothpastes_list);	
 	if (json_flag)
-		fprintf(output_file,"%s \n",get_toothpaste_pick_JSON(pick));
+		fprintf(output_file,"%s \n",tpm_get_toothpaste_pick_JSON(pick));
 	else
-		fprintf(output_file,"%s \n",get_toothpaste_pick_message(pick));
+		fprintf(output_file,"%s \n",tpm_get_toothpaste_pick_message(pick));
 	if (lat_flag) {
 		list_available_toothpastes();
 		return finish(1,pick);
