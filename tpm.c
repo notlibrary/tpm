@@ -113,15 +113,17 @@ static const char* times_of_day[TOTAL_TIMES_OF_DAY]={
 
 static const char stats_file_name[MAX_PATH]="pickstats";
 static const char toothpastes_file_name[MAX_PATH]="toothpastes";
+static const char output_file_name[MAX_PATH]="last_pick";
 
 static char stats_file_path_final[MAX_PATH];
 static char toothpastes_file_path_final[MAX_PATH];
+static char output_file_path_final[MAX_PATH];
 
 static int verbose = 1;
 static int pick_random =0;
 static int lat_flag=0;
 static int json_flag=0;
-
+static int output_to_file=0;
 
 
 list_node_t* 
@@ -446,7 +448,10 @@ toothpaste_pick_t* pick_toothpaste(list_node_t* head)
 	memset(line,0,MAX_LINE_LENGTH);
 	
 	pick.message=malloc(OUTPUT_BLOCK_SIZE);
-		memset(pick.message,0,OUTPUT_BLOCK_SIZE);
+	pick.JSON=malloc(OUTPUT_BLOCK_SIZE);
+	
+	memset(pick.JSON,0,OUTPUT_BLOCK_SIZE);	
+	memset(pick.message,0,OUTPUT_BLOCK_SIZE);
 	
 	if (get_current_username(username, sizeof(username)) == 0) 
 	{
@@ -534,7 +539,7 @@ toothpaste_pick_t* pick_toothpaste(list_node_t* head)
 		sprintf(pick.message,"%s (%ug) [%u/100] \n", pick.what.toothpaste_brand,pick.what.tube_mass_g, pick.what.rating);
 	}
 	
-	
+	sprintf(pick.JSON,"{\"who\":\"%s\"}",pick.who);
 	return &pick;
 }
 
@@ -543,23 +548,29 @@ main(int argc, char* argv[])
 {
 
 	int opt;
+	FILE* output_file;
 	toothpaste_pick_t* pick;
 	char* user_home_dir=get_user_home_dir();
-	
+
 #ifdef _WIN32
 	strcat(user_home_dir,"\\tpm\\");
 #else
 	strcat(user_home_dir,"/tpm/");
 #endif
-strcpy(stats_file_path_final,user_home_dir);
+	strcpy(stats_file_path_final,user_home_dir);
 	strcat(stats_file_path_final,stats_file_name);
 	
 	strcpy(toothpastes_file_path_final,user_home_dir);
 	strcat(toothpastes_file_path_final,toothpastes_file_name);
+	
+	strcpy(output_file_path_final,user_home_dir);
+	strcat(output_file_path_final,output_file_name);
+	
 	free(user_home_dir);				
-	while ((opt = getopt(argc, argv, "o:jvxqlrs:")) != -1) {
+	while ((opt = getopt(argc, argv, "ojvxqlrs:")) != -1) {
         switch (opt) {
 		case 'o':
+		output_to_file=1;
         break;
 		case 'j':
 		json_flag=1;
@@ -590,12 +601,25 @@ strcpy(stats_file_path_final,user_home_dir);
 			break;
         }
     }
+	if (output_to_file)
+	{
+		printf("%s %s \n","Output pick to file ",output_file_path_final);
+		output_file=fopen(output_file_path_final,"w");
+		if (output_file == NULL) {
+			perror("Error opening last_pick file for writing");
+
+			}		
+	}
+	else
+	{
+		output_file=stdout;
+	}
 	toothpastes_list=load_list_from_file(toothpastes_file_path_final);
 	pick=pick_toothpaste(toothpastes_list);	
 	if (json_flag)
-		printf("%s \n",get_toothpaste_pick_JSON(pick));
+		fprintf(output_file,"%s \n",get_toothpaste_pick_JSON(pick));
 	else
-		printf("%s \n",get_toothpaste_pick_message(pick));
+		fprintf(output_file,"%s \n",get_toothpaste_pick_message(pick));
 	if (lat_flag) {
 		list_available_toothpastes();
 		return finish();
