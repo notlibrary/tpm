@@ -35,8 +35,10 @@ Press any key to continue . . .
 }
 ```
 Because working with JSON without special library is complicated it outputs only 4 fields JSON
+
 Basically it automatically answers the question "What toothpaste I should use today?"
 by picking it from predefined available toothpastes linked list using total epoch days mod total available toothpastes as list index
+
 Here is analog sqlite query that do the same thing:
 
 ```sql
