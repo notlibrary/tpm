@@ -629,15 +629,16 @@ main(int argc, char* argv[])
 		output_file=stdout;
 	}
 	toothpastes_list=tpm_load_list_from_file(toothpastes_file_path_final);
-	pick=tpm_pick_toothpaste(toothpastes_list);	
+	pick=tpm_pick_toothpaste(toothpastes_list);
+	if (lat_flag) {
+		list_available_toothpastes();
+		return finish(1,pick);
+	}	
 	if (json_flag)
 		fprintf(output_file,"%s \n",tpm_get_toothpaste_picking_JSON(pick));
 	else
 		fprintf(output_file,"%s \n",tpm_get_toothpaste_picking_message(pick));
-	if (lat_flag) {
-		list_available_toothpastes();
-		return finish(1,pick);
-	}
+	
 if (json_flag)
 	finish(0,pick);
 else
