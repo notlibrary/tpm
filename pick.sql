@@ -8,6 +8,7 @@ CREATE TABLE IF NOT EXISTS toothpastes (
 INSERT INTO toothpastes (id, brand_string, tube_mass_g,rating) VALUES (0,'Toothpaste 1', 100, 100);
 INSERT INTO toothpastes (id, brand_string, tube_mass_g,rating) VALUES (1,'Toothpaste 2', 100, 100);
 INSERT INTO toothpastes (id, brand_string, tube_mass_g,rating) VALUES (2,'Toothpaste 3', 100, 100);
-INSERT INTO toothpastes (id, brand_string, tube_mass_g,rating) VALUES (3,'Nothing', 0, 0);
+INSERT INTO toothpastes (id, brand_string, tube_mass_g,rating) VALUES (3,'Toothpaste 3', 100, 100);
+INSERT INTO toothpastes (id, brand_string, tube_mass_g,rating) VALUES (4,'Nothing', 0, 0);
 
 SELECT * FROM toothpastes WHERE id=mod((SELECT CAST(unixepoch('now') / 86400 AS INTEGER)), (SELECT COUNT(*) FROM toothpastes));
