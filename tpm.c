@@ -82,8 +82,8 @@ typedef struct {
 
 TPM list_node_t* tpm_load_list_from_file(const char* filename);
 TPM toothpaste_pick_t* tpm_pick_toothpaste(list_node_t* head);
-TPM char* tpm_get_toothpaste_pick_message(toothpaste_pick_t* pick);
-TPM char* tpm_get_toothpaste_pick_JSON(toothpaste_pick_t* pick);
+TPM char* tpm_get_toothpaste_picking_message(toothpaste_pick_t* pick);
+TPM char* tpm_get_toothpaste_picking_JSON(toothpaste_pick_t* pick);
 TPM int tpm_free_toothpaste_pick(toothpaste_pick_t* pick);
 
 
@@ -439,13 +439,13 @@ version()
 }
 
 char* 
-tpm_get_toothpaste_pick_message(toothpaste_pick_t* pick)
+tpm_get_toothpaste_picking_message(toothpaste_pick_t* pick)
 {
 	return pick->message;
 }
 
 char*
-tpm_get_toothpaste_pick_JSON(toothpaste_pick_t* pick)
+tpm_get_toothpaste_picking_JSON(toothpaste_pick_t* pick)
 {
 	return pick->JSON;	
 }
@@ -631,9 +631,9 @@ main(int argc, char* argv[])
 	toothpastes_list=tpm_load_list_from_file(toothpastes_file_path_final);
 	pick=tpm_pick_toothpaste(toothpastes_list);	
 	if (json_flag)
-		fprintf(output_file,"%s \n",tpm_get_toothpaste_pick_JSON(pick));
+		fprintf(output_file,"%s \n",tpm_get_toothpaste_picking_JSON(pick));
 	else
-		fprintf(output_file,"%s \n",tpm_get_toothpaste_pick_message(pick));
+		fprintf(output_file,"%s \n",tpm_get_toothpaste_picking_message(pick));
 	if (lat_flag) {
 		list_available_toothpastes();
 		return finish(1,pick);
