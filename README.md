@@ -65,10 +65,10 @@ SELECT * FROM toothpastes WHERE id=mod((SELECT CAST(unixepoch('now') / 86400 AS 
 ## Toothpastes List CSV format sample
 ```
 #Index, Brand string, Tube mass grams, Rating
-0,Paste 1,100,85
-1,Paste 2,50,90
-2,Paste 3,150,100
-3,Paste 4,50,100
+0,Toothpaste 1,100,85
+1,Toothpaste 2,50,90
+2,Toothpaste 3,150,100
+3,Toothpaste 4,50,100
 4,Nothing,0,0
 ```
 Sure you can pick anything this way not only toothpastes
