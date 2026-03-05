@@ -45,7 +45,18 @@
 #define UNLEN 256
 #endif
 #define OUTPUT_BLOCK_SIZE 4096
+#define TOTAL_PICK_TYPE_STRINGS 6
 
+typedef enum
+{
+	PICK_DEFAULT,
+	PICK_RANDOM,
+	PICK_MAX_RATING,
+	PICK_MAX_MASS,
+	PICK_MIN_RATING,
+	PICK_MIN_MASS
+
+}pick_type_t;
 
 typedef struct
 {
@@ -86,12 +97,20 @@ TPM char* tpm_get_toothpaste_picking_message(toothpaste_pick_t* pick);
 TPM char* tpm_get_toothpaste_picking_JSON(toothpaste_pick_t* pick);
 TPM int tpm_free_toothpaste_pick(toothpaste_pick_t* pick);
 
-
+pick_type_t pick_type = PICK_DEFAULT;
 list_node_t* toothpastes_list;
 static const toothpaste_data_t toothpastes[TOTAL_TOOTHPASTES]={
 	{0,"LACALUT",75,90},
 	{1,"SENSODYNE",150,100},
 	{2,"Nothing",0,0}
+};
+static const char* pick_type_strings[TOTAL_PICK_TYPE_STRINGS]={
+	"Pick type: Default",
+	"Pick type: Random",
+	"Pick type: Max rating",
+	"Pick type: Max tube mass",
+	"Pick type: Min rating",
+	"Pick type: Min tube mass"
 };
 
 static const char* days_of_week[TOTAL_DAYS_OF_WEEK]={
@@ -509,17 +528,12 @@ toothpaste_pick_t* tpm_pick_toothpaste(list_node_t* head)
 	day = total_seconds/SECONDS_PER_DAY;
 	
 	i=day%pick.total_toothpastes;
-	if (pick_random) 
+	if (pick_type==PICK_RANDOM) 
 	{
 		seed_xrp32(total_seconds);
 		i=(prng64_xrp32()%pick.total_toothpastes);
-	
-		if (verbose) 
-		{
-			sprintf(line,"%s", "Picking RANDOM toothpaste \n");
-			strcat(pick.message,line);
-		}
 	}
+	
 	pick.what = get_item_by_index(toothpastes_list,i);
 	pick.where=toothpastes_list;
 	j=(day)%TOTAL_DAYS_OF_WEEK;
@@ -550,6 +564,11 @@ toothpaste_pick_t* tpm_pick_toothpaste(list_node_t* head)
 			sprintf(line,"%s", "Already picked today \n");
 			strcat(pick.message,line);	
 		
+	}
+	if (verbose) 
+	{
+		sprintf(line,"%s\n", pick_type_strings[pick_type] );
+		strcat(pick.message,line);
 	}
 	if (verbose)
 	{		
@@ -607,7 +626,7 @@ main(int argc, char* argv[])
         version();
         break;
         case 'x':
-        pick_random = 1;
+        pick_type = PICK_RANDOM;
         break;		
         case 'q':
         verbose = 0;
