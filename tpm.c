@@ -286,6 +286,25 @@ find_item_with_max_mass(list_node_t* where)
 }
 
 toothpaste_data_t 
+find_item_with_min_mass(list_node_t* where)
+{
+		list_node_t* current = where;
+		unsigned int min_mass=100000;
+		unsigned int min_index=0;		
+			
+		while (current != NULL) 
+		{
+			if (current->data.tube_mass_g<min_mass)
+			{
+				min_index =	current->data.index;
+				min_mass =	current->data.tube_mass_g;
+			}
+		current = current->next;
+		}
+		return get_item_by_index(where,min_index);
+}
+
+toothpaste_data_t 
 find_item_with_max_rating(list_node_t* where)
 {
 		list_node_t* current = where;
@@ -302,6 +321,25 @@ find_item_with_max_rating(list_node_t* where)
 		current = current->next;
 		}
 		return get_item_by_index(where,max_index);	
+}
+
+toothpaste_data_t 
+find_item_with_min_rating(list_node_t* where)
+{
+		list_node_t* current = where;
+		unsigned int min_rating=100;
+		unsigned int min_index=0;		
+			
+		while (current != NULL) 
+		{
+			if (current->data.tube_mass_g<min_rating)
+			{
+				min_index =	current->data.index;
+				min_rating =current->data.rating;
+			}
+		current = current->next;
+		}
+		return get_item_by_index(where,min_index);	
 }
 
 void 
@@ -581,6 +619,15 @@ toothpaste_pick_t* tpm_pick_toothpaste(list_node_t* head)
 	{
 		pick.what=find_item_with_max_mass(pick.where);
 	}
+		if (pick_type==PICK_MIN_RATING)
+	{
+		pick.what=find_item_with_min_rating(pick.where);
+	}
+	if (pick_type==PICK_MIN_MASS)
+	{
+		pick.what=find_item_with_min_mass(pick.where);
+	}
+	
 	j=(day)%TOTAL_DAYS_OF_WEEK;
 	
 	if ((total_seconds - pick.stats.last_pick_time) > (SECONDS_PER_DAY-PICK_TIMEOUT_SECONDS)) {
@@ -659,7 +706,7 @@ main(int argc, char* argv[])
 	strcat(output_file_path_final,output_file_name);
 	
 	free(user_home_dir);				
-	while ((opt = getopt(argc, argv, "awojvxqlrs:")) != -1) {
+	while ((opt = getopt(argc, argv, "awojvxqlrs:p:")) != -1) {
         switch (opt) {
 		case 'a':
 		pick_type = PICK_MAX_RATING;
@@ -691,9 +738,12 @@ main(int argc, char* argv[])
         break;
  		case 's':
 			set_counters(optarg);
-		break;       
+		break;
+		case 'p':
+			pick_type=atoi(optarg);
+		break; 		
 		case '?': 
-            fprintf(stderr, "Usage: %s [-awojvxqlr] [-s total_picks value] [other arguments]\n", argv[0]);
+            fprintf(stderr, "Usage: %s [-awojvxqlr] [-s total_picks value] [-p pick_type_value] [other arguments]\n", argv[0]);
             exit(EXIT_FAILURE);
         default:
 			break;

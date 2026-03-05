@@ -68,6 +68,8 @@ SELECT * FROM toothpastes WHERE id=mod((SELECT CAST(unixepoch('now') / 86400 AS 
 
 `-s [counter value]` set total toothpaste picks counter
 
+`-p [set pick type value]` set pick type value
+
 ## Toothpastes List CSV format sample
 ```
 #Index, Brand string, Tube mass grams, Rating
