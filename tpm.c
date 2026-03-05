@@ -266,6 +266,44 @@ get_item_by_index(list_node_t* head,unsigned int i) {
 	return empty;
 }
 
+toothpaste_data_t 
+find_item_with_max_mass(list_node_t* where)
+{
+		list_node_t* current = where;
+		unsigned int max_mass=0;
+		unsigned int max_index=0;		
+			
+		while (current != NULL) 
+		{
+			if (current->data.tube_mass_g>max_mass)
+			{
+				max_index =	current->data.index;
+				max_mass =	current->data.tube_mass_g;
+			}
+		current = current->next;
+		}
+		return get_item_by_index(where,max_index);
+}
+
+toothpaste_data_t 
+find_item_with_max_rating(list_node_t* where)
+{
+		list_node_t* current = where;
+		unsigned int max_rating=0;
+		unsigned int max_index=0;		
+			
+		while (current != NULL) 
+		{
+			if (current->data.tube_mass_g>max_rating)
+			{
+				max_index =	current->data.index;
+				max_rating =current->data.rating;
+			}
+		current = current->next;
+		}
+		return get_item_by_index(where,max_index);	
+}
+
 void 
 free_list(list_node_t* head) 
 {
@@ -533,9 +571,16 @@ toothpaste_pick_t* tpm_pick_toothpaste(list_node_t* head)
 		seed_xrp32(total_seconds);
 		i=(prng64_xrp32()%pick.total_toothpastes);
 	}
-	
 	pick.what = get_item_by_index(toothpastes_list,i);
 	pick.where=toothpastes_list;
+	if (pick_type==PICK_MAX_RATING)
+	{
+		pick.what=find_item_with_max_rating(pick.where);
+	}
+	if (pick_type==PICK_MAX_MASS)
+	{
+		pick.what=find_item_with_max_mass(pick.where);
+	}
 	j=(day)%TOTAL_DAYS_OF_WEEK;
 	
 	if ((total_seconds - pick.stats.last_pick_time) > (SECONDS_PER_DAY-PICK_TIMEOUT_SECONDS)) {
@@ -572,7 +617,7 @@ toothpaste_pick_t* tpm_pick_toothpaste(list_node_t* head)
 	}
 	if (verbose)
 	{		
-		sprintf(line,"%s %s %s (%ug) [%u/100] %s %s %s %u %s %u \n", "Toothpaste:", ">>>", pick.what.toothpaste_brand, pick.what.tube_mass_g, pick.what.rating, "<<<", "Day:" ,days_of_week[j],day, "Toothpaste index:",i);
+		sprintf(line,"%s %s %s (%ug) [%u/100] %s %s %s %u %s %u/%u \n", "Toothpaste:", ">>>", pick.what.toothpaste_brand, pick.what.tube_mass_g, pick.what.rating, "<<<", "Day:" ,days_of_week[j],day, "Toothpaste index:",i,pick.total_toothpastes);
 		strcat(pick.message,line);
 		
 
@@ -614,8 +659,14 @@ main(int argc, char* argv[])
 	strcat(output_file_path_final,output_file_name);
 	
 	free(user_home_dir);				
-	while ((opt = getopt(argc, argv, "ojvxqlrs:")) != -1) {
+	while ((opt = getopt(argc, argv, "awojvxqlrs:")) != -1) {
         switch (opt) {
+		case 'a':
+		pick_type = PICK_MAX_RATING;
+        break;
+		case 'w':
+		pick_type = PICK_MAX_MASS;
+        break;
 		case 'o':
 		output_to_file=1;
         break;
@@ -642,7 +693,7 @@ main(int argc, char* argv[])
 			set_counters(optarg);
 		break;       
 		case '?': 
-            fprintf(stderr, "Usage: %s [-ojvxqlr] [-s total_picks value] [other arguments]\n", argv[0]);
+            fprintf(stderr, "Usage: %s [-awojvxqlr] [-s total_picks value] [other arguments]\n", argv[0]);
             exit(EXIT_FAILURE);
         default:
 			break;

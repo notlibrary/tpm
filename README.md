@@ -21,7 +21,7 @@ Tiny simple terminal console program with maximum utility
 Good Morning Serenity Welcome to the toothpaste picking manager
 Already picked today
 Pick type: Default
-Toothpaste: >>> SENSODYNE (150g) [100/100] <<< Day: Saturday 20512 Toothpaste index: 1
+Toothpaste: >>> SENSODYNE (150g) [100/100] <<< Day: Saturday 20512 Toothpaste index: 1/3
 Total picks: 7 Last pick time: 1772266460
 
 Press any key to continue . . .
@@ -48,6 +48,9 @@ SELECT * FROM toothpastes WHERE id=mod((SELECT CAST(unixepoch('now') / 86400 AS 
 
 
 ## Command line options
+`-a` pick toothpaste with highest rating
+
+`-w` pick toothpaste with highest tube weight
 
 `-o` output toothpaste picking string or JSON to text file `~/tpm/last_pick`
 
