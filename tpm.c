@@ -156,6 +156,19 @@ add_to_list(list_node_t* head, toothpaste_data_t p_data)
     return head;
 }
 
+void
+rtrim(char *s) 
+{
+    int i = strlen(s) - 1; 
+
+    while (i >= 0 && isspace((unsigned char)s[i])) {
+        i--;
+    }
+
+  
+    s[i + 1] = '\0';
+}
+
 list_node_t* 
 tpm_load_list_from_file(const char* filename) 
 {
@@ -186,7 +199,8 @@ tpm_load_list_from_file(const char* filename)
             continue; 
         }
 		if (sscanf(current, "%u, %[^,],%u,%u\n", &temp_data.index,temp_data.toothpaste_brand ,&temp_data.tube_mass_g,&temp_data.rating) == 4) {
-			head = add_to_list(head, temp_data);
+			rtrim(temp_data.toothpaste_brand);
+			head = add_to_list(head, temp_data);	
 		}		
     }
     fclose(file);
