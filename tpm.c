@@ -185,7 +185,7 @@ tpm_load_list_from_file(const char* filename)
         if (*current == '\0' || *current == COMMENT_CHAR) {
             continue; 
         }
-		if (sscanf(current, "%u,%[^,],%u,%u\n", &temp_data.index,temp_data.toothpaste_brand ,&temp_data.tube_mass_g,&temp_data.rating) == 4) {
+		if (sscanf(current, "%u, %[^,],%u,%u\n", &temp_data.index,temp_data.toothpaste_brand ,&temp_data.tube_mass_g,&temp_data.rating) == 4) {
 			head = add_to_list(head, temp_data);
 		}		
     }
