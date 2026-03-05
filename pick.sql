@@ -12,5 +12,5 @@ INSERT INTO toothpastes (id, brand_string, tube_mass_g,rating) VALUES (3,'Toothp
 INSERT INTO toothpastes (id, brand_string, tube_mass_g,rating) VALUES (4,'Nothing', 0, 0);
 
 SELECT * FROM toothpastes WHERE id=mod((SELECT CAST(unixepoch('now') / 86400 AS INTEGER)), (SELECT COUNT(*) FROM toothpastes));
-SELECT rating FROM toothpastes ORDER BY rating DESC LIMIT 1;
-SELECT tube_mass_g FROM toothpastes ORDER BY tube_mass_g DESC LIMIT 1;
+SELECT * FROM toothpastes ORDER BY rating DESC LIMIT 1;
+SELECT * FROM toothpastes ORDER BY tube_mass_g DESC LIMIT 1;
