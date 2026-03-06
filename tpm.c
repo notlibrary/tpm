@@ -45,12 +45,13 @@
 #define UNLEN 256
 #endif
 #define OUTPUT_BLOCK_SIZE 4096
-#define TOTAL_PICK_TYPE_STRINGS 6
+#define TOTAL_PICK_TYPE_STRINGS 7
 
 typedef enum
 {
 	PICK_DEFAULT,
 	PICK_RANDOM,
+	PICK_BY_INDEX,
 	PICK_MAX_RATING,
 	PICK_MAX_MASS,
 	PICK_MIN_RATING,
@@ -107,6 +108,7 @@ static const toothpaste_data_t toothpastes[TOTAL_TOOTHPASTES]={
 static const char* pick_type_strings[TOTAL_PICK_TYPE_STRINGS]={
 	"Pick type: Default",
 	"Pick type: Random",
+	"Pick type: By index",
 	"Pick type: Max rating",
 	"Pick type: Max tube mass",
 	"Pick type: Min rating",
@@ -145,7 +147,7 @@ static int pick_random =0;
 static int lat_flag=0;
 static int json_flag=0;
 static int output_to_file=0;
-
+static int pick_by_index_index = 0;
 
 list_node_t* 
 create_node(toothpaste_data_t p_data) 
@@ -604,6 +606,10 @@ toothpaste_pick_t* tpm_pick_toothpaste(list_node_t* head)
 	day = total_seconds/SECONDS_PER_DAY;
 	
 	i=day%pick.total_toothpastes;
+	if (pick_type==PICK_BY_INDEX) 
+	{
+		i=pick_by_index_index;
+	}
 	if (pick_type==PICK_RANDOM) 
 	{
 		seed_xrp32(total_seconds);
@@ -706,7 +712,7 @@ main(int argc, char* argv[])
 	strcat(output_file_path_final,output_file_name);
 	
 	free(user_home_dir);				
-	while ((opt = getopt(argc, argv, "awojvxqlrs:p:")) != -1) {
+	while ((opt = getopt(argc, argv, "awojvxqlrs:p:i:")) != -1) {
         switch (opt) {
 		case 'a':
 		pick_type = PICK_MAX_RATING;
@@ -741,9 +747,13 @@ main(int argc, char* argv[])
 		break;
 		case 'p':
 			pick_type=atoi(optarg);
-		break; 		
+		break; 	
+		case 'i':
+			pick_type=PICK_BY_INDEX;
+			pick_by_index_index=atoi(optarg);
+		break; 			
 		case '?': 
-            fprintf(stderr, "Usage: %s [-awojvxqlr] [-s total_picks value] [-p pick_type_value] [other arguments]\n", argv[0]);
+            fprintf(stderr, "Usage: %s [-awojvxqlr] [-s total_picks value] [-p pick_type_value] [-i toothpaste_index]\n", argv[0]);
             exit(EXIT_FAILURE);
         default:
 			break;

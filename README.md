@@ -39,12 +39,16 @@ Because working with JSON without special library is complicated it outputs only
 
 Basically it automatically answers the question "What toothpaste I should use today?"
 by picking it from predefined available toothpastes linked list using total epoch days mod total available toothpastes as list index
+It supports 7 toothpaste picking methods calling picking types: 
+`Default, Random, By index, Max rating, Max tube mass, Min rating, Min tube mas`
 
-Here is analog sqlite query that do the same thing:
+Here is analog sqlite query that do default picking type:
 
 ```sql
 SELECT * FROM toothpastes WHERE id=mod((SELECT CAST(unixepoch('now') / 86400 AS INTEGER)), (SELECT COUNT(*) FROM toothpastes));
 ```
+
+Also `pick.sql` contains other sql queries for different pick methods.
 
 
 ## Command line options
@@ -69,6 +73,8 @@ SELECT * FROM toothpastes WHERE id=mod((SELECT CAST(unixepoch('now') / 86400 AS 
 `-s [counter value]` set total toothpaste picks counter
 
 `-p [set pick type value]` set pick type value
+
+`-i [toothpaste_index]` pick toothpaste by index
 
 ## Toothpastes List CSV format sample
 ```
