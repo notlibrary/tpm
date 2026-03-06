@@ -572,7 +572,7 @@ tpm_get_toothpaste_picking_JSON(toothpaste_pick_t* pick)
 
 toothpaste_pick_t* tpm_pick_toothpaste(list_node_t* head,toothpaste_pick_options_t topts)
 {
-	int i,j,k;
+	int i,j;
 	static toothpaste_pick_t pick;
 	time_t total_seconds = time(NULL);
 	unsigned int day;
@@ -775,8 +775,8 @@ main(int argc, char* argv[])
 	topts.lat_flag=lat_flag;
 	topts.json_flag=json_flag;
 	topts.output_to_file=output_to_file;
-
-	int pick_by_index_index ;	
+	topts.pick_by_index_index=pick_by_index_index;
+		
 	if (output_to_file)
 	{
 		printf("%s %s \n","Output pick to file ",output_file_path_final);
