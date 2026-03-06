@@ -71,9 +71,9 @@ Also `pick.sql` contains other sql queries for different pick methods.
 
 `-r` reset total toothpaste picks counter
 
-`-s [counter value]` set total toothpaste picks counter
+`-s [counter_value]` set total toothpaste picks counter
 
-`-p [set pick type value]` set pick type value
+`-p [pick_type_value]` set pick type value
 
 `-i [toothpaste_index]` pick toothpaste by index
 
