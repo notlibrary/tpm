@@ -239,13 +239,19 @@ tpm_load_list_from_file(const char* filename)
 
 
 void 
-display_list(list_node_t* head) 
+display_list(list_node_t* head, toothpaste_pick_t* pick) 
 {
     list_node_t* current = head;
-    printf("Index | Brand | Tube Mass | Rating\n");
+	char line[128];
+	
+	memset(line,0,128);
+	memset(pick->message,0,OUTPUT_BLOCK_SIZE);
+	
+	sprintf(pick->message,"Index | Brand | Tube Mass | Rating\n");
 	while (current != NULL) {
-        printf("%d %s %d %d\n", current->data.index, current->data.toothpaste_brand, current->data.tube_mass_g, current->data.rating);
-        current = current->next;
+        sprintf(line,"%d %s %d %d\n", current->data.index, current->data.toothpaste_brand, current->data.tube_mass_g, current->data.rating);
+        strcat(pick->message,line);
+		current = current->next;
     }
 }
 
@@ -431,9 +437,9 @@ get_counters(toothpaste_pick_stats_t* stats)
 }
 
 int
-list_available_toothpastes(void)
+list_available_toothpastes(toothpaste_pick_t* pick)
 {
-	display_list(toothpastes_list);
+	display_list(pick->where,pick);
 	return 0;
 }
 
@@ -618,7 +624,7 @@ toothpaste_pick_t* tpm_pick_toothpaste(list_node_t* head,toothpaste_pick_options
 	i=day%pick.total_toothpastes;
 	if (topts.ptype==PICK_BY_INDEX) 
 	{
-		i=pick_by_index_index;
+		i=topts.pick_by_index_index;
 	}
 	if (topts.ptype==PICK_RANDOM) 
 	{
@@ -695,6 +701,9 @@ toothpaste_pick_t* tpm_pick_toothpaste(list_node_t* head,toothpaste_pick_options
 	
 	sprintf(pick.JSON,"{\n\t \"who\":\"%s\",\n\t \"toothpaste\":\"%s\",\n\t \"tube_mass_g\":%u,\n\t \"rating\":%u \n}",pick.who,pick.what.toothpaste_brand,pick.what.tube_mass_g,pick.what.rating);
 	
+	if (topts.lat_flag) {
+		list_available_toothpastes(&pick);
+	}	
 	return &pick;
 }
 
@@ -792,10 +801,6 @@ main(int argc, char* argv[])
 	}
 	toothpastes_list=tpm_load_list_from_file(toothpastes_file_path_final);
 	pick=tpm_pick_toothpaste(toothpastes_list,topts);
-	if (lat_flag) {
-		list_available_toothpastes();
-		return finish(1,pick);
-	}	
 	if (json_flag)
 		fprintf(output_file,"%s \n",tpm_get_toothpaste_picking_JSON(pick));
 	else
