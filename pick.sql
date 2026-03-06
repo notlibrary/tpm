@@ -17,4 +17,4 @@ SELECT * FROM toothpastes ORDER BY tube_mass_g DESC LIMIT 1;
 SELECT * FROM toothpastes ORDER BY rating ASC LIMIT 1;
 SELECT * FROM toothpastes ORDER BY tube_mass_g ASC LIMIT 1;
 SELECT * FROM toothpastes ORDER BY RANDOM() LIMIT 1; 
-SELECT * FROM toothpastes WHERE id = ?;
+SELECT * FROM toothpastes WHERE id = ? LIMIT 1;
