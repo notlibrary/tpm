@@ -46,7 +46,7 @@ It supports 7 toothpaste picking methods calling picking types:
 Here is analog sqlite query that do default picking type:
 
 ```sql
-SELECT * FROM toothpastes WHERE id=mod((SELECT CAST(unixepoch('now') / 86400 AS INTEGER)), (SELECT COUNT(*) FROM toothpastes));
+SELECT * FROM toothpastes WHERE id=mod((SELECT CAST(unixepoch('now') / 86400 AS INTEGER)), (SELECT COUNT(*) FROM toothpastes)) LIMIT 1;
 ```
 
 Also `pick.sql` contains other sql queries for different pick methods.
