@@ -92,8 +92,18 @@ typedef struct {
 	
 }toothpaste_pick_t;
 
+typedef struct {
+	pick_type_t ptype;
+	int verbose;
+	int lat_flag;
+	int json_flag;
+	int output_to_file;
+	int pick_by_index_index ;	
+}toothpaste_pick_options_t;
+
+
 TPM list_node_t* tpm_load_list_from_file(const char* filename);
-TPM toothpaste_pick_t* tpm_pick_toothpaste(list_node_t* head);
+TPM toothpaste_pick_t* tpm_pick_toothpaste(list_node_t* head,toothpaste_pick_options_t topts);
 TPM char* tpm_get_toothpaste_picking_message(toothpaste_pick_t* pick);
 TPM char* tpm_get_toothpaste_picking_JSON(toothpaste_pick_t* pick);
 TPM int tpm_free_toothpaste_pick(toothpaste_pick_t* pick);
@@ -143,7 +153,6 @@ static char toothpastes_file_path_final[MAX_PATH];
 static char output_file_path_final[MAX_PATH];
 
 static int verbose = 1;
-static int pick_random =0;
 static int lat_flag=0;
 static int json_flag=0;
 static int output_to_file=0;
@@ -561,7 +570,7 @@ tpm_get_toothpaste_picking_JSON(toothpaste_pick_t* pick)
 	return pick->JSON;	
 }
 
-toothpaste_pick_t* tpm_pick_toothpaste(list_node_t* head)
+toothpaste_pick_t* tpm_pick_toothpaste(list_node_t* head,toothpaste_pick_options_t topts)
 {
 	int i,j,k;
 	static toothpaste_pick_t pick;
@@ -569,8 +578,9 @@ toothpaste_pick_t* tpm_pick_toothpaste(list_node_t* head)
 	unsigned int day;
 	char username[UNLEN + 1];
 	char line[MAX_LINE_LENGTH];
-	memset(line,0,MAX_LINE_LENGTH);
 	
+	memset(line,0,MAX_LINE_LENGTH);
+	memset(username,0,UNLEN+1);
 	pick.message=malloc(OUTPUT_BLOCK_SIZE);
 	pick.JSON=malloc(OUTPUT_BLOCK_SIZE);
 	
@@ -596,7 +606,7 @@ toothpaste_pick_t* tpm_pick_toothpaste(list_node_t* head)
 	pick.when=total_seconds;
 	i=(total_seconds)/(SECONDS_PER_DAY/TOTAL_TIMES_OF_DAY)%(TOTAL_TIMES_OF_DAY);
 	
-	if (verbose)
+	if (topts.verbose)
 	{
 		
 		sprintf(line,"Good %s %s %s \n", times_of_day[i],pick.who ,"Welcome to the toothpaste picking manager");
@@ -606,30 +616,30 @@ toothpaste_pick_t* tpm_pick_toothpaste(list_node_t* head)
 	day = total_seconds/SECONDS_PER_DAY;
 	
 	i=day%pick.total_toothpastes;
-	if (pick_type==PICK_BY_INDEX) 
+	if (topts.ptype==PICK_BY_INDEX) 
 	{
 		i=pick_by_index_index;
 	}
-	if (pick_type==PICK_RANDOM) 
+	if (topts.ptype==PICK_RANDOM) 
 	{
 		seed_xrp32(total_seconds);
 		i=(prng64_xrp32()%pick.total_toothpastes);
 	}
 	pick.what = get_item_by_index(toothpastes_list,i);
 	pick.where=toothpastes_list;
-	if (pick_type==PICK_MAX_RATING)
+	if (topts.ptype==PICK_MAX_RATING)
 	{
 		pick.what=find_item_with_max_rating(pick.where);
 	}
-	if (pick_type==PICK_MAX_MASS)
+	if (topts.ptype==PICK_MAX_MASS)
 	{
 		pick.what=find_item_with_max_mass(pick.where);
 	}
-		if (pick_type==PICK_MIN_RATING)
+		if (topts.ptype==PICK_MIN_RATING)
 	{
 		pick.what=find_item_with_min_rating(pick.where);
 	}
-	if (pick_type==PICK_MIN_MASS)
+	if (topts.ptype==PICK_MIN_MASS)
 	{
 		pick.what=find_item_with_min_mass(pick.where);
 	}
@@ -637,7 +647,7 @@ toothpaste_pick_t* tpm_pick_toothpaste(list_node_t* head)
 	j=(day)%TOTAL_DAYS_OF_WEEK;
 	
 	if ((total_seconds - pick.stats.last_pick_time) > (SECONDS_PER_DAY-PICK_TIMEOUT_SECONDS)) {
-		if (verbose) 
+		if (topts.verbose) 
 		{
 			sprintf(line,"%s", "New next pick stats updated \n");
 			strcat(pick.message,line);
@@ -650,25 +660,25 @@ toothpaste_pick_t* tpm_pick_toothpaste(list_node_t* head)
 		
 		if (pick.stats.total_picks % TOOTHBRUSH_TIMESPAN_DAYS ==0)
 		{
-			 if (verbose) 
+			 if (topts.verbose) 
 			 { 
 					sprintf(line,"%s", "180 days toothbrush time span over swap the toothbrush(or order new one) \n"); 
 					strcat(pick.message,line);
 			 }
 		}
 	}
-	else if (verbose) 
+	else if (topts.verbose) 
 	{
 			sprintf(line,"%s", "Already picked today \n");
 			strcat(pick.message,line);	
 		
 	}
-	if (verbose) 
+	if (topts.verbose) 
 	{
-		sprintf(line,"%s\n", pick_type_strings[pick_type] );
+		sprintf(line,"%s\n", pick_type_strings[topts.ptype] );
 		strcat(pick.message,line);
 	}
-	if (verbose)
+	if (topts.verbose)
 	{		
 		sprintf(line,"%s %s %s (%ug) [%u/100] %s %s %s %u %s %u/%u \n", "Toothpaste:", ">>>", pick.what.toothpaste_brand, pick.what.tube_mass_g, pick.what.rating, "<<<", "Day:" ,days_of_week[j],day, "Toothpaste index:",i,pick.total_toothpastes);
 		strcat(pick.message,line);
@@ -696,6 +706,7 @@ main(int argc, char* argv[])
 	FILE* output_file;
 	toothpaste_pick_t* pick;
 	char* user_home_dir=get_user_home_dir();
+	toothpaste_pick_options_t topts;
 
 #ifdef _WIN32
 	strcat(user_home_dir,"\\tpm\\");
@@ -759,6 +770,13 @@ main(int argc, char* argv[])
 			break;
         }
     }
+	topts.ptype=pick_type;
+	topts.verbose=verbose;
+	topts.lat_flag=lat_flag;
+	topts.json_flag=json_flag;
+	topts.output_to_file=output_to_file;
+
+	int pick_by_index_index ;	
 	if (output_to_file)
 	{
 		printf("%s %s \n","Output pick to file ",output_file_path_final);
@@ -773,7 +791,7 @@ main(int argc, char* argv[])
 		output_file=stdout;
 	}
 	toothpastes_list=tpm_load_list_from_file(toothpastes_file_path_final);
-	pick=tpm_pick_toothpaste(toothpastes_list);
+	pick=tpm_pick_toothpaste(toothpastes_list,topts);
 	if (lat_flag) {
 		list_available_toothpastes();
 		return finish(1,pick);
