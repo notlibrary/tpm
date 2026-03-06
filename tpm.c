@@ -110,6 +110,7 @@ TPM int tpm_free_toothpaste_pick(toothpaste_pick_t* pick);
 
 pick_type_t pick_type = PICK_DEFAULT;
 list_node_t* toothpastes_list;
+
 static const toothpaste_data_t toothpastes[TOTAL_TOOTHPASTES]={
 	{0,"LACALUT",75,90},
 	{1,"SENSODYNE",150,100},
@@ -124,7 +125,6 @@ static const char* pick_type_strings[TOTAL_PICK_TYPE_STRINGS]={
 	"Pick type: Min rating",
 	"Pick type: Min tube mass"
 };
-
 static const char* days_of_week[TOTAL_DAYS_OF_WEEK]={
 	"Thursday", /*1 jan 1970 epoch start is Thursday*/
 	"Friday",
@@ -135,7 +135,6 @@ static const char* days_of_week[TOTAL_DAYS_OF_WEEK]={
 	"Wednesday"
 	
 };	
-
 static const char* times_of_day[TOTAL_TIMES_OF_DAY]={
 	"Night", /*1 jan 1970 epoch start is Thursday*/
 	"Morning",
@@ -237,7 +236,6 @@ tpm_load_list_from_file(const char* filename)
     return head;
 }
 
-
 void 
 display_list(list_node_t* head, toothpaste_pick_t* pick) 
 {
@@ -267,7 +265,6 @@ count_list(list_node_t* head)
 	}
 	return i;
 }
-
 
 toothpaste_data_t 
 get_item_by_index(list_node_t* head,unsigned int i) {
@@ -414,7 +411,6 @@ set_counters(void* optarg)
 		return 0;
 }
 
-
 int
 get_counters(toothpaste_pick_stats_t* stats)
 {
@@ -459,9 +455,11 @@ write_counters(toothpaste_pick_stats_t stats)
 }
 
 void 
-stop_system() {
-    printf("Press Enter to continue...");
+stop_system() 
+{
     int c;
+	
+    printf("Press Enter to continue...");
     while ((c = getchar()) != EOF && c != '\n');
     getchar(); 
 }
@@ -528,9 +526,9 @@ get_user_home_dir()
 
 int 
 get_current_username(char* buffer, size_t buffer_size) {
-
 #ifdef _WIN32
     DWORD len = (DWORD)buffer_size;
+	
     if (GetUserName(buffer, &len)) {
         return 0; 
     }
@@ -538,13 +536,15 @@ get_current_username(char* buffer, size_t buffer_size) {
 #else
     uid_t uid = geteuid();
     struct passwd *pw = getpwuid(uid);
+	const char* user_env = getenv("LOGNAME");
+	
     if (pw != NULL) {
         strncpy(buffer, pw->pw_name, buffer_size);
         buffer[buffer_size - 1] = '\0';
         return 0; 
     }
     
-	const char* user_env = getenv("LOGNAME");
+
     if (user_env == NULL) {
         user_env = getenv("USER");
     }
