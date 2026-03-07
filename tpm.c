@@ -599,7 +599,9 @@ toothpaste_pick_t* tpm_pick_toothpaste(list_node_t* head,toothpaste_pick_options
 	
 	if (get_current_username(username, sizeof(username)) == 0) 
 	{
-		pick.who=username;
+		if (topts.username == NULL)
+		{topts.username =username;}
+		pick.who=topts.username;
     }
 	else 
 	{
