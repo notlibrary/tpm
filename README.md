@@ -77,6 +77,24 @@ Also `pick.sql` contains other sql queries for different pick methods.
 
 `-i [toothpaste_index]` pick toothpaste by index
 
+## Configuration file options
+Configuration is located in `~/tpm/tpm.conf` file
+It's options:
+
+`USERNAME` override username
+
+`PICK_TYPE` set toothpaste pick type [0,6] number for `Default, Random, By index, Max rating, Max tube mass, Min rating, Min tube mas`
+
+`VERBOSE` 0 for quiet toothpaste pick
+
+`LIST_TOOTHPASTES` 1 to list available toothpastes
+
+`OUTPUT_JSON` 1 to output JSON with toothpaste pick
+
+`OUTPUT_FILE` 1 to output to file `~tpm/last_pick`
+
+`PICK_INDEX` pick toothpaste by this index if `PICK_TYPE=2`
+
 ## Toothpastes List CSV format sample
 ```
 #Index, Brand string, Tube mass grams, Rating

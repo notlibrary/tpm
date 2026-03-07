@@ -718,11 +718,18 @@ read_config(char* src)
 	toothpaste_pick_options_t opts;
 	struct cfg_struct* cfg;
 	
+	opts.ptype=pick_type;
+	opts.verbose=verbose;
+	opts.lat_flag=lat_flag;
+	opts.json_flag=json_flag;
+	opts.output_to_file=output_to_file;
+	opts.pick_by_index_index=pick_by_index_index;
+	
 	cfg = cfg_init();
 	if (cfg_load(cfg, src) < 0)
 	{
 		fprintf(stderr, "Unable to load config ~tpm/tpm.conf\n");
-		return opts
+		return opts;
     }
 	opts.username = cfg_get(cfg, "USERNAME");
 	opts.ptype = atoi(cfg_get(cfg, "PICK_TYPE"));;
@@ -810,12 +817,6 @@ main(int argc, char* argv[])
 			break;
         }
     }
-	topts.ptype=pick_type;
-	topts.verbose=verbose;
-	topts.lat_flag=lat_flag;
-	topts.json_flag=json_flag;
-	topts.output_to_file=output_to_file;
-	topts.pick_by_index_index=pick_by_index_index;
 		
 	if (output_to_file)
 	{
