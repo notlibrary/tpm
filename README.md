@@ -88,5 +88,6 @@ Also `pick.sql` contains other sql queries for different pick methods.
 ```
 Sure you can pick anything this way not only toothpastes
 Food drink clothes gym exercises meds even linux commands
-
+moreover you can recursively pick the toothpaste pick type(method) itself
+but there is no meaning in it
 P.S. Do not forget to brush your hard disk with `dd` and `rm -rf /` toothpastes twice a day

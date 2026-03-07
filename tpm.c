@@ -14,6 +14,8 @@
 
 #include "prng64_xrp32.c"
 #include "prng64_xrp32.h"
+#include "cfg_parse.h"
+#include "cfg_parse.c"
 
 #ifdef _WIN32
 #include <windows.h>
@@ -80,6 +82,16 @@ typedef struct list_node_t {
 } list_node_t;
 
 typedef struct {
+	pick_type_t ptype;
+	int verbose;
+	int lat_flag;
+	int json_flag;
+	int output_to_file;
+	int pick_by_index_index;
+	char* username;
+}toothpaste_pick_options_t;
+
+typedef struct {
 	char* who;
 	toothpaste_data_t what;
 	list_node_t* where;
@@ -89,18 +101,8 @@ typedef struct {
 	unsigned int toothpaste_pick_index;
 	char* message;
 	char* JSON;
-	
+	toothpaste_pick_options_t opts;
 }toothpaste_pick_t;
-
-typedef struct {
-	pick_type_t ptype;
-	int verbose;
-	int lat_flag;
-	int json_flag;
-	int output_to_file;
-	int pick_by_index_index ;	
-}toothpaste_pick_options_t;
-
 
 TPM list_node_t* tpm_load_list_from_file(const char* filename);
 TPM toothpaste_pick_t* tpm_pick_toothpaste(list_node_t* head,toothpaste_pick_options_t topts);
@@ -146,10 +148,12 @@ static const char* times_of_day[TOTAL_TIMES_OF_DAY]={
 static const char stats_file_name[MAX_PATH]="pickstats";
 static const char toothpastes_file_name[MAX_PATH]="toothpastes";
 static const char output_file_name[MAX_PATH]="last_pick";
+static const char config_file_name[MAX_PATH]="tpm.conf";
 
 static char stats_file_path_final[MAX_PATH];
 static char toothpastes_file_path_final[MAX_PATH];
 static char output_file_path_final[MAX_PATH];
+static char config_file_path_final[MAX_PATH];
 
 static int verbose = 1;
 static int lat_flag=0;
@@ -707,6 +711,30 @@ toothpaste_pick_t* tpm_pick_toothpaste(list_node_t* head,toothpaste_pick_options
 	return &pick;
 }
 
+
+toothpaste_pick_options_t
+read_config(char* src)
+{
+	toothpaste_pick_options_t opts;
+	struct cfg_struct* cfg;
+	
+	cfg = cfg_init();
+	if (cfg_load(cfg, src) < 0)
+	{
+		fprintf(stderr, "Unable to load config ~tpm/tpm.conf\n");
+		return opts
+    }
+	opts.username = cfg_get(cfg, "USERNAME");
+	opts.ptype = atoi(cfg_get(cfg, "PICK_TYPE"));;
+	opts.verbose = atoi(cfg_get(cfg, "VERBOSE"));
+	opts.lat_flag = atoi(cfg_get(cfg, "LIST_TOOTHPASTES"));
+	opts.json_flag= atoi(cfg_get(cfg, "OUTPUT_JSON"));
+	opts.output_to_file=atoi(cfg_get(cfg, "OUTPUT_FILE"));
+	opts.pick_by_index_index=atoi(cfg_get(cfg, "PICK_INDEX"));
+	
+	return opts;
+}
+
 int
 main(int argc, char* argv[])
 {
@@ -716,7 +744,7 @@ main(int argc, char* argv[])
 	toothpaste_pick_t* pick;
 	char* user_home_dir=get_user_home_dir();
 	toothpaste_pick_options_t topts;
-
+	
 #ifdef _WIN32
 	strcat(user_home_dir,"\\tpm\\");
 #else
@@ -730,8 +758,12 @@ main(int argc, char* argv[])
 	
 	strcpy(output_file_path_final,user_home_dir);
 	strcat(output_file_path_final,output_file_name);
+
+	strcpy(config_file_path_final,user_home_dir);
+	strcat(config_file_path_final,config_file_name);
 	
-	free(user_home_dir);				
+	free(user_home_dir);
+	topts=read_config(config_file_path_final);
 	while ((opt = getopt(argc, argv, "awojvxqlrs:p:i:")) != -1) {
         switch (opt) {
 		case 'a':
@@ -757,7 +789,6 @@ main(int argc, char* argv[])
         break;
         case 'l':
 		lat_flag=1;
-	
         break;
         case 'r':
 		reset_counters();
