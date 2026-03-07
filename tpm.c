@@ -88,11 +88,11 @@ typedef struct {
 	int json_flag;
 	int output_to_file;
 	int pick_by_index_index;
-	char* username;
+	const char* username;
 }toothpaste_pick_options_t;
 
 typedef struct {
-	char* who;
+	const char* who;
 	toothpaste_data_t what;
 	list_node_t* where;
 	unsigned int total_toothpastes;	
