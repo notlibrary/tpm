@@ -95,6 +95,10 @@ It's options:
 
 `PICK_INDEX` pick toothpaste by this index if `PICK_TYPE=2`
 
+`RESET_COUNTER` 1 to reset toothpaste pick counter
+
+`SET_COUNTER` not 0 to set toothpaste pick counter
+
 ## Toothpastes List CSV format sample
 ```
 #Index, Brand string, Tube mass grams, Rating

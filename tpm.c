@@ -717,6 +717,8 @@ read_config(char* src)
 {
 	toothpaste_pick_options_t opts;
 	struct cfg_struct* cfg;
+	int reset_counters=0;
+	int set_counters=0;
 	
 	opts.ptype=pick_type;
 	opts.verbose=verbose;
@@ -738,7 +740,10 @@ read_config(char* src)
 	opts.json_flag= atoi(cfg_get(cfg, "OUTPUT_JSON"));
 	opts.output_to_file=atoi(cfg_get(cfg, "OUTPUT_FILE"));
 	opts.pick_by_index_index=atoi(cfg_get(cfg, "PICK_INDEX"));
-	
+	reset_counters=atoi(cfg_get(cfg, "RESET_COUNTER"));
+	if (reset_counters) reset_counters();
+	set_counters=atoi(cfg_get(cfg, "SET_COUNTER"));
+	if (set_counters) set_counters(set_counters);
 	return opts;
 }
 
