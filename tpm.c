@@ -719,6 +719,7 @@ read_config(char* src)
 	struct cfg_struct* cfg;
 	int reset_counters_v=0;
 	int set_counters_v=0;
+	const char* value = NULL;
 	
 	opts.ptype=pick_type;
 	opts.verbose=verbose;
@@ -734,15 +735,25 @@ read_config(char* src)
 		return opts;
     }
 	opts.username = cfg_get(cfg, "USERNAME");
-	opts.ptype = atoi(cfg_get(cfg, "PICK_TYPE"));;
-	opts.verbose = atoi(cfg_get(cfg, "VERBOSE"));
-	opts.lat_flag = atoi(cfg_get(cfg, "LIST_TOOTHPASTES"));
-	opts.json_flag= atoi(cfg_get(cfg, "OUTPUT_JSON"));
-	opts.output_to_file=atoi(cfg_get(cfg, "OUTPUT_FILE"));
-	opts.pick_by_index_index=atoi(cfg_get(cfg, "PICK_INDEX"));
-	reset_counters_v=atoi(cfg_get(cfg, "RESET_COUNTER"));
-	if (reset_counters_v) reset_counters();
-	set_counters_v=atoi(cfg_get(cfg, "SET_COUNTER"));
+	
+
+	value = cfg_get(cfg, "PICK_TYPE");
+	if (value!=NULL) opts.ptype =  atoi(value);
+	value = cfg_get(cfg, "VERBOSE");
+	if (value!=NULL) opts.verbose =  atoi(value);
+	value = cfg_get(cfg, "LIST_TOOTHPASTES");
+	if (value!=NULL) opts.lat_flag =  atoi(value);
+	value = cfg_get(cfg, "OUTPUT_JSON");
+	if (value!=NULL) opts.json_flag =  atoi(value);
+	value = cfg_get(cfg, "OUTPUT_FILE");
+	if (value!=NULL) opts.output_to_file =  atoi(value);
+	value = cfg_get(cfg, "PICK_INDEX");
+	if (value!=NULL) opts.pick_by_index_index =  atoi(value);
+	value = cfg_get(cfg, "RESET_COUNTER");
+	if (value!=NULL) {reset_counters_v=atoi(cfg_get(cfg, "RESET_COUNTER"));}
+	if (reset_counters_v){ reset_counters();}
+	value = cfg_get(cfg, "SET_COUNTER");
+	if (value!=NULL) {set_counters_v=atoi(cfg_get(cfg, "SET_COUNTER"));}
 	if (set_counters_v) set_counters(&set_counters_v);
 	return opts;
 }
