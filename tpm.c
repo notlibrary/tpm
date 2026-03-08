@@ -879,7 +879,7 @@ main(int argc, char* argv[])
 			delta_days=atoi(optarg);
 		break; 	
 		case '?': 
-            fprintf(stderr, "Usage: %s [-awojvxqlr] [-s total_picks value] [-p pick_type_value] [-i toothpaste_index] [-b brand_string] \n", argv[0]);
+            fprintf(stderr, "Usage: %s [-awojvxqlr] [-s total_picks value] [-p pick_type_value] [-i toothpaste_index] [-b brand_string -z delta_hours -d delta_days] \n", argv[0]);
             exit(EXIT_FAILURE);
         default:
 			break;
