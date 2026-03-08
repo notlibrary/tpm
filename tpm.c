@@ -38,6 +38,7 @@
 #define TOTAL_DAYS_OF_WEEK 7
 #define TOTAL_TIMES_OF_DAY 4
 #define SECONDS_PER_DAY 86400
+#define SECONDS_PER_HOUR 3600
 #define PICK_TIMEOUT_SECONDS 300
 #define TOOTHBRUSH_TIMESPAN_DAYS 180
 #define MAX_PATH 256
@@ -164,6 +165,9 @@ static int json_flag=0;
 static int output_to_file=0;
 static int pick_by_index_index = 0;
 static char* brand_string = NULL;
+
+static int delta_days= 0;
+static int delta_hours= 0;
 
 static list_node_t* 
 create_node(toothpaste_data_t p_data) 
@@ -418,8 +422,9 @@ set_counters(void* optarg)
 	FILE* file_ptr;
 	unsigned int zero=0;
 	time_t zero_time =0;
-	time_t total_seconds=time(NULL);
+	time_t total_seconds=time(NULL)+delta_hours*SECONDS_PER_HOUR;
 	unsigned char* counter=	(unsigned char*) (optarg);
+	
 	zero = atoi(optarg);
 	file_ptr = fopen(stats_file_path_final, "wb");
 		if (file_ptr == NULL) {
@@ -605,7 +610,7 @@ tpm_pick_toothpaste(list_node_t* head,toothpaste_pick_options_t topts)
 {
 	int i,j;
 	static toothpaste_pick_t pick;
-	time_t total_seconds = time(NULL);
+	time_t total_seconds = time(NULL)+delta_days*SECONDS_PER_DAY+delta_hours*SECONDS_PER_HOUR;
 	unsigned int day;
 	char username[UNLEN + 1];
 	char line[MAX_LINE_LENGTH];
@@ -768,6 +773,10 @@ read_config(const char* src)
 	opts.username = cfg_get(cfg, "USERNAME");
 	
 
+	value = cfg_get(cfg, "TIMEZONE");
+	if (value!=NULL) delta_hours =  atoi(value);
+	value = cfg_get(cfg, "DELTA_DAYS");
+	if (value!=NULL) delta_days = atoi(value);
 	value = cfg_get(cfg, "PICK_TYPE");
 	if (value!=NULL) opts.ptype =  atoi(value);
 	value = cfg_get(cfg, "VERBOSE");
@@ -820,7 +829,7 @@ main(int argc, char* argv[])
 	
 	free(user_home_dir);
 	topts=read_config(config_file_path_final);
-	while ((opt = getopt(argc, argv, "awojvxqlrs:p:i:b:")) != -1) {
+	while ((opt = getopt(argc, argv, "awojvxqlrs:p:i:b:z:d:")) != -1) {
         switch (opt) {
 		case 'a':
 		topts.ptype = PICK_MAX_RATING;
@@ -862,7 +871,13 @@ main(int argc, char* argv[])
 		case 'b':
 			topts.ptype=PICK_BY_BRAND;
 			topts.brand_string=optarg;
-		break; 				
+		break; 	
+		case 'z':
+			delta_hours=atoi(optarg);
+		break; 		
+		case 'd':
+			delta_days=atoi(optarg);
+		break; 	
 		case '?': 
             fprintf(stderr, "Usage: %s [-awojvxqlr] [-s total_picks value] [-p pick_type_value] [-i toothpaste_index] [-b brand_string] \n", argv[0]);
             exit(EXIT_FAILURE);

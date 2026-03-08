@@ -79,6 +79,10 @@ Also `pick.sql` contains other sql queries for different pick methods.
 
 `-b [toothpaste_brand]` pick toothpaste by brand
 
+`-z [delta_hours]` set the timezone hours [-11,11] lag manually
+
+`-d [delta_days]` pick toothpaste with default method in the future or the past
+
 ## Configuration file options
 Configuration is located in `~/tpm/tpm.conf` file
 It's options:
@@ -102,6 +106,10 @@ It's options:
 `RESET_COUNTER` 1 to reset toothpaste pick counter
 
 `SET_COUNTER` not 0 to set toothpaste pick counter
+
+`TIMEZONE` set the timezone hours [-11,11] lag manually
+
+`DELTA_DAYS` pick toothpaste with default method in the future or the past
 
 ## Toothpastes List CSV format sample
 ```
