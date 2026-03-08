@@ -111,7 +111,23 @@ It's options:
 
 `DELTA_DAYS` pick toothpaste with default method in the future or the past
 
-## Toothpastes List CSV format sample
+## TPM Toothpastes Picking Manager Configuration Sample
+```
+USERNAME=Anonymous
+PICK_TYPE=0
+VERBOSE=1
+LIST_TOOTHPASTES=0
+OUTPUT_JSON=0
+OUTPUT_FILE=0
+PICK_INDEX=0
+RESET_COUNTER=0
+SET_COUNTER=0
+BRAND=Unknown
+TIMEZONE=0
+DELTA_DAYS=0
+```
+
+## TPM Toothpastes Picking Manager Toothpastes List CSV format sample
 ```
 #Index, Brand string, Tube mass grams, Rating
 0,Toothpaste 1,100,85
