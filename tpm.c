@@ -165,7 +165,7 @@ static int output_to_file=0;
 static int pick_by_index_index = 0;
 static char* brand_string = NULL;
 
-list_node_t* 
+static list_node_t* 
 create_node(toothpaste_data_t p_data) 
 {
     list_node_t* new_node = (list_node_t*)malloc(sizeof(list_node_t));
@@ -178,7 +178,7 @@ create_node(toothpaste_data_t p_data)
     return new_node;
 }
 
-list_node_t* 
+static list_node_t* 
 add_to_list(list_node_t* head, toothpaste_data_t p_data) 
 {
     list_node_t* new_node = create_node(p_data);
@@ -193,7 +193,7 @@ add_to_list(list_node_t* head, toothpaste_data_t p_data)
     return head;
 }
 
-void
+static void
 rtrim(char *s) 
 {
     int i = strlen(s) - 1; 
@@ -206,7 +206,7 @@ rtrim(char *s)
     s[i + 1] = '\0';
 }
 
-list_node_t* 
+static list_node_t* 
 tpm_load_list_from_file(const char* filename) 
 {
 	int i;
@@ -244,7 +244,7 @@ tpm_load_list_from_file(const char* filename)
     return head;
 }
 
-void 
+static void 
 display_list(list_node_t* head, toothpaste_pick_t* pick) 
 {
     list_node_t* current = head;
@@ -261,7 +261,7 @@ display_list(list_node_t* head, toothpaste_pick_t* pick)
     }
 }
 
-unsigned int 
+static unsigned int 
 count_list(list_node_t* head) 
 {
     unsigned int i=0;
@@ -274,7 +274,7 @@ count_list(list_node_t* head)
 	return i;
 }
 
-toothpaste_data_t 
+static toothpaste_data_t 
 get_item_by_index(list_node_t* head,unsigned int i) 
 {
    toothpaste_data_t empty ={0,"None",0}; 
@@ -289,7 +289,7 @@ get_item_by_index(list_node_t* head,unsigned int i)
 	return empty;
 }
 
-toothpaste_data_t 
+static toothpaste_data_t 
 get_item_by_brand_string(list_node_t* head,char* str) 
 {
     toothpaste_data_t empty ={0,"None",0}; 
@@ -304,7 +304,7 @@ get_item_by_brand_string(list_node_t* head,char* str)
 	return empty;
 }
 
-toothpaste_data_t 
+static toothpaste_data_t 
 find_item_with_max_mass(list_node_t* where)
 {
 		list_node_t* current = where;
@@ -323,7 +323,7 @@ find_item_with_max_mass(list_node_t* where)
 		return get_item_by_index(where,max_index);
 }
 
-toothpaste_data_t 
+static toothpaste_data_t 
 find_item_with_min_mass(list_node_t* where)
 {
 		list_node_t* current = where;
@@ -342,7 +342,7 @@ find_item_with_min_mass(list_node_t* where)
 		return get_item_by_index(where,min_index);
 }
 
-toothpaste_data_t 
+static toothpaste_data_t 
 find_item_with_max_rating(list_node_t* where)
 {
 		list_node_t* current = where;
@@ -361,7 +361,7 @@ find_item_with_max_rating(list_node_t* where)
 		return get_item_by_index(where,max_index);	
 }
 
-toothpaste_data_t 
+static toothpaste_data_t 
 find_item_with_min_rating(list_node_t* where)
 {
 		list_node_t* current = where;
@@ -380,7 +380,7 @@ find_item_with_min_rating(list_node_t* where)
 		return get_item_by_index(where,min_index);	
 }
 
-void 
+static void 
 free_list(list_node_t* head) 
 {
     list_node_t* temp;
@@ -392,7 +392,7 @@ free_list(list_node_t* head)
 }
 
 
-int 
+static int 
 reset_counters(void) 
 {
 	FILE* file_ptr;
@@ -412,7 +412,7 @@ reset_counters(void)
 		return 0;
 }
 
-int 
+static int 
 set_counters(void* optarg) 
 {
 	FILE* file_ptr;
@@ -435,7 +435,7 @@ set_counters(void* optarg)
 		return 0;
 }
 
-int
+static int
 get_counters(toothpaste_pick_stats_t* stats)
 {
 	FILE* file_ptr;
@@ -456,14 +456,14 @@ get_counters(toothpaste_pick_stats_t* stats)
 	return 0;
 }
 
-int
+static int
 list_available_toothpastes(toothpaste_pick_t* pick)
 {
 	display_list(pick->where,pick);
 	return 0;
 }
 
-int
+static int
 write_counters(toothpaste_pick_stats_t stats)
 {
 	FILE* file_ptr;
@@ -478,7 +478,7 @@ write_counters(toothpaste_pick_stats_t stats)
 	return 0;
 }
 
-void 
+static void 
 stop_system() 
 {
     int c;
@@ -488,7 +488,7 @@ stop_system()
     getchar(); 
 }
 
-int 
+static int 
 tpm_free_toothpaste_pick(toothpaste_pick_t* pick)
 {
 	free(pick->message);
@@ -497,7 +497,7 @@ tpm_free_toothpaste_pick(toothpaste_pick_t* pick)
 	return 0;
 }
 
-int 
+static int 
 finish(int flag,toothpaste_pick_t* pick)
 {
 	tpm_free_toothpaste_pick(pick);
@@ -511,7 +511,7 @@ finish(int flag,toothpaste_pick_t* pick)
 	return 0;
 }
 
-char* 
+static char* 
 get_user_home_dir() 
 {
     char* home_dir = NULL;
@@ -548,7 +548,7 @@ get_user_home_dir()
     return home_dir;
 }
 
-int 
+static int 
 get_current_username(char* buffer, size_t buffer_size) {
 #ifdef _WIN32
     DWORD len = (DWORD)buffer_size;
@@ -581,26 +581,26 @@ get_current_username(char* buffer, size_t buffer_size) {
 #endif
 }
 
-void
+static void
 version()
 {
 	printf("%s %u.%u.%u \n",TPM_STRING,TPM_VERSION_MAJOR,TPM_VERSION_MINOR,TPM_VERSION_PATCH);
 	exit(EXIT_FAILURE);
 }
 
-char* 
+static char* 
 tpm_get_toothpaste_picking_message(toothpaste_pick_t* pick)
 {
 	return pick->message;
 }
 
-char*
+static char*
 tpm_get_toothpaste_picking_JSON(toothpaste_pick_t* pick)
 {
 	return pick->JSON;	
 }
 
-toothpaste_pick_t* tpm_pick_toothpaste(list_node_t* head,toothpaste_pick_options_t topts)
+static toothpaste_pick_t* tpm_pick_toothpaste(list_node_t* head,toothpaste_pick_options_t topts)
 {
 	int i,j;
 	static toothpaste_pick_t pick;
@@ -741,7 +741,7 @@ toothpaste_pick_t* tpm_pick_toothpaste(list_node_t* head,toothpaste_pick_options
 }
 
 
-toothpaste_pick_options_t
+static toothpaste_pick_options_t
 read_config(char* src)
 {
 	toothpaste_pick_options_t opts;
