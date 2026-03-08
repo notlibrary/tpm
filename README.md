@@ -73,11 +73,11 @@ Also `pick.sql` contains other sql queries for different pick methods.
 
 `-s [counter_value]` set total toothpaste picks counter
 
-`-p [pick_type_value]` set pick type value
+`-p [toothpaste_pick_type_value]` set toothpaste pick type value
 
 `-i [toothpaste_index]` pick toothpaste by index
 
-`-b [Toothpaste_brand]` pick toothpaste by brand
+`-b [toothpaste_brand]` pick toothpaste by brand
 
 ## Configuration file options
 Configuration is located in `~/tpm/tpm.conf` file
