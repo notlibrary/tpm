@@ -822,28 +822,28 @@ main(int argc, char* argv[])
 	while ((opt = getopt(argc, argv, "awojvxqlrs:p:i:b:")) != -1) {
         switch (opt) {
 		case 'a':
-		pick_type = PICK_MAX_RATING;
+		topts.ptype = PICK_MAX_RATING;
         break;
 		case 'w':
-		pick_type = PICK_MAX_MASS;
+		topts.ptype = PICK_MAX_MASS;
         break;
 		case 'o':
-		output_to_file=1;
+		topts.output_to_file=1;
         break;
 		case 'j':
-		json_flag=1;
+		topts.json_flag=1;
         break;
 		case 'v':
         version();
         break;
         case 'x':
-        pick_type = PICK_RANDOM;
+        topts.ptype = PICK_RANDOM;
         break;		
         case 'q':
-        verbose = 0;
+        topts.verbose = 0;
         break;
         case 'l':
-		lat_flag=1;
+		topts.lat_flag=1;
         break;
         case 'r':
 		reset_counters();
@@ -852,15 +852,15 @@ main(int argc, char* argv[])
 			set_counters(optarg);
 		break;
 		case 'p':
-			pick_type=atoi(optarg);
+			topts.ptype=atoi(optarg);
 		break; 	
 		case 'i':
-			pick_type=PICK_BY_INDEX;
-			pick_by_index_index=atoi(optarg);
+			topts.ptype=PICK_BY_INDEX;
+			topts.pick_by_index_index=atoi(optarg);
 		break;
 		case 'b':
-			pick_type=PICK_BY_BRAND;
-			brand_string=optarg;
+			topts.ptype=PICK_BY_BRAND;
+			topts.brand_string=optarg;
 		break; 				
 		case '?': 
             fprintf(stderr, "Usage: %s [-awojvxqlr] [-s total_picks value] [-p pick_type_value] [-i toothpaste_index] [-b brand_string] \n", argv[0]);
