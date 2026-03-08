@@ -290,7 +290,7 @@ get_item_by_index(list_node_t* head,unsigned int i)
 }
 
 static toothpaste_data_t 
-get_item_by_brand_string(list_node_t* head,char* str) 
+get_item_by_brand_string(list_node_t* head,const char* str) 
 {
     toothpaste_data_t empty ={0,"None",0}; 
 	list_node_t* current = head;
@@ -600,7 +600,8 @@ tpm_get_toothpaste_picking_JSON(toothpaste_pick_t* pick)
 	return pick->JSON;	
 }
 
-static toothpaste_pick_t* tpm_pick_toothpaste(list_node_t* head,toothpaste_pick_options_t topts)
+static toothpaste_pick_t*
+tpm_pick_toothpaste(list_node_t* head,toothpaste_pick_options_t topts)
 {
 	int i,j;
 	static toothpaste_pick_t pick;
@@ -742,7 +743,7 @@ static toothpaste_pick_t* tpm_pick_toothpaste(list_node_t* head,toothpaste_pick_
 
 
 static toothpaste_pick_options_t
-read_config(char* src)
+read_config(const char* src)
 {
 	toothpaste_pick_options_t opts;
 	struct cfg_struct* cfg;
