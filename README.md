@@ -40,8 +40,8 @@ Because working with JSON without special library is complicated it outputs only
 Basically it automatically answers the question "What toothpaste I should use today?"
 by picking it from predefined available toothpastes linked list using total epoch days mod total available toothpastes as list index
 
-It supports 7 toothpaste picking methods calling picking types: 
-`Default, Random, By index, Max rating, Max tube mass, Min rating, Min tube mas`
+It supports 8 toothpaste picking methods calling picking types: 
+`Default, Random, By index, By Brand, Max rating, Max tube mass, Min rating, Min tube mas`
 
 Here is analog sqlite query that do default picking type:
 
@@ -77,13 +77,15 @@ Also `pick.sql` contains other sql queries for different pick methods.
 
 `-i [toothpaste_index]` pick toothpaste by index
 
+`-b [Toothpaste_brand]` pick toothpaste by brand
+
 ## Configuration file options
 Configuration is located in `~/tpm/tpm.conf` file
 It's options:
 
 `USERNAME` override username
 
-`PICK_TYPE` set toothpaste pick type [0,6] number for `Default, Random, By index, Max rating, Max tube mass, Min rating, Min tube mas`
+`PICK_TYPE` set toothpaste pick type [0,7] number for `Default, Random, By index, By brand, Max rating, Max tube mass, Min rating, Min tube mas`
 
 `VERBOSE` 0 for quiet toothpaste pick
 
@@ -94,6 +96,8 @@ It's options:
 `OUTPUT_FILE` 1 to output to file `~tpm/last_pick`
 
 `PICK_INDEX` pick toothpaste by this index if `PICK_TYPE=2`
+
+`BRAND` pick toothpaste by this brand if `PICK_TYPE=3`
 
 `RESET_COUNTER` 1 to reset toothpaste pick counter
 

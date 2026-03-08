@@ -47,13 +47,14 @@
 #define UNLEN 256
 #endif
 #define OUTPUT_BLOCK_SIZE 4096
-#define TOTAL_PICK_TYPE_STRINGS 7
+#define TOTAL_PICK_TYPE_STRINGS 8
 
 typedef enum
 {
 	PICK_DEFAULT,
 	PICK_RANDOM,
 	PICK_BY_INDEX,
+	PICK_BY_BRAND,
 	PICK_MAX_RATING,
 	PICK_MAX_MASS,
 	PICK_MIN_RATING,
@@ -89,6 +90,7 @@ typedef struct {
 	int output_to_file;
 	int pick_by_index_index;
 	const char* username;
+	const char* brand_string;
 }toothpaste_pick_options_t;
 
 typedef struct {
@@ -122,6 +124,7 @@ static const char* pick_type_strings[TOTAL_PICK_TYPE_STRINGS]={
 	"Pick type: Default",
 	"Pick type: Random",
 	"Pick type: By index",
+	"Pick type: By brand",
 	"Pick type: Max rating",
 	"Pick type: Max tube mass",
 	"Pick type: Min rating",
@@ -160,6 +163,7 @@ static int lat_flag=0;
 static int json_flag=0;
 static int output_to_file=0;
 static int pick_by_index_index = 0;
+static char* brand_string = NULL;
 
 list_node_t* 
 create_node(toothpaste_data_t p_data) 
@@ -271,11 +275,27 @@ count_list(list_node_t* head)
 }
 
 toothpaste_data_t 
-get_item_by_index(list_node_t* head,unsigned int i) {
+get_item_by_index(list_node_t* head,unsigned int i) 
+{
    toothpaste_data_t empty ={0,"None",0}; 
 	list_node_t* current = head;
     while (current != NULL) {
         if (current->data.index==i)
+		{
+			return current->data;
+        }
+		current = current->next;
+    }
+	return empty;
+}
+
+toothpaste_data_t 
+get_item_by_brand_string(list_node_t* head,char* str) 
+{
+    toothpaste_data_t empty ={0,"None",0}; 
+	list_node_t* current = head;
+    while (current != NULL) {
+        if (0==strcmp(str,current->data.toothpaste_brand))
 		{
 			return current->data;
         }
@@ -637,7 +657,14 @@ toothpaste_pick_t* tpm_pick_toothpaste(list_node_t* head,toothpaste_pick_options
 		seed_xrp32(total_seconds);
 		i=(prng64_xrp32()%pick.total_toothpastes);
 	}
-	pick.what = get_item_by_index(toothpastes_list,i);
+	if (topts.ptype==PICK_BY_BRAND) 
+	{
+		pick.what = get_item_by_brand_string(toothpastes_list,topts.brand_string);
+	}
+	else
+	{
+		pick.what = get_item_by_index(toothpastes_list,i);
+	}
 	pick.where=toothpastes_list;
 	if (topts.ptype==PICK_MAX_RATING)
 	{
@@ -729,6 +756,7 @@ read_config(char* src)
 	opts.json_flag=json_flag;
 	opts.output_to_file=output_to_file;
 	opts.pick_by_index_index=pick_by_index_index;
+	opts.brand_string=brand_string;
 	
 	cfg = cfg_init();
 	if (cfg_load(cfg, src) < 0)
@@ -751,6 +779,8 @@ read_config(char* src)
 	if (value!=NULL) opts.output_to_file =  atoi(value);
 	value = cfg_get(cfg, "PICK_INDEX");
 	if (value!=NULL) opts.pick_by_index_index =  atoi(value);
+	value = cfg_get(cfg, "BRAND");
+	if (value!=NULL) opts.brand_string = (value);
 	value = cfg_get(cfg, "RESET_COUNTER");
 	if (value!=NULL) {reset_counters_v=atoi(cfg_get(cfg, "RESET_COUNTER"));}
 	if (reset_counters_v){ reset_counters();}
@@ -789,7 +819,7 @@ main(int argc, char* argv[])
 	
 	free(user_home_dir);
 	topts=read_config(config_file_path_final);
-	while ((opt = getopt(argc, argv, "awojvxqlrs:p:i:")) != -1) {
+	while ((opt = getopt(argc, argv, "awojvxqlrs:p:i:b:")) != -1) {
         switch (opt) {
 		case 'a':
 		pick_type = PICK_MAX_RATING;
@@ -827,9 +857,13 @@ main(int argc, char* argv[])
 		case 'i':
 			pick_type=PICK_BY_INDEX;
 			pick_by_index_index=atoi(optarg);
-		break; 			
+		break;
+		case 'b':
+			pick_type=PICK_BY_BRAND;
+			brand_string=optarg;
+		break; 				
 		case '?': 
-            fprintf(stderr, "Usage: %s [-awojvxqlr] [-s total_picks value] [-p pick_type_value] [-i toothpaste_index]\n", argv[0]);
+            fprintf(stderr, "Usage: %s [-awojvxqlr] [-s total_picks value] [-p pick_type_value] [-i toothpaste_index] [-b brand_string] \n", argv[0]);
             exit(EXIT_FAILURE);
         default:
 			break;
