@@ -39,6 +39,7 @@ Because working with JSON without special library is complicated it outputs only
 
 Basically it automatically answers the question "What toothpaste I should use today?"
 by picking it from predefined available toothpastes linked list using total epoch days mod total available toothpastes as list index
+I started coding it when found 3 different toothpaste tubes in the bathroom
 
 It supports 8 toothpaste picking methods calling picking types: 
 `Default, Random, By index, By Brand, Max rating, Max tube mass, Min rating, Min tube mas`
