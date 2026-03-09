@@ -49,6 +49,7 @@
 #endif
 #define OUTPUT_BLOCK_SIZE 4096
 #define TOTAL_PICK_TYPE_STRINGS 8
+#define MAX_TIMEZONE_DELTA 11
 
 typedef enum
 {
@@ -774,11 +775,11 @@ read_config(const char* src)
 	
 
 	value = cfg_get(cfg, "TIMEZONE");
-	if (value!=NULL) delta_hours =  atoi(value);
+	if ((value!=NULL) && atoi(value)>=-MAX_TIMEZONE_DELTA && atoi(value)<=MAX_TIMEZONE_DELTA) delta_hours=atoi(value);
 	value = cfg_get(cfg, "DELTA_DAYS");
 	if (value!=NULL) delta_days = atoi(value);
 	value = cfg_get(cfg, "PICK_TYPE");
-	if (value!=NULL) opts.ptype =  atoi(value);
+	if ((value!=NULL) && atoi(value)>=0 && atoi(value)<TOTAL_PICK_TYPE_STRINGS) opts.ptype =  atoi(value);
 	value = cfg_get(cfg, "VERBOSE");
 	if (value!=NULL) opts.verbose =  atoi(value);
 	value = cfg_get(cfg, "LIST_TOOTHPASTES");
@@ -862,6 +863,7 @@ main(int argc, char* argv[])
 			set_counters(optarg);
 		break;
 		case 'p':
+			if (atoi(optarg)>=0 && atoi(optarg)<TOTAL_PICK_TYPE_STRINGS)
 			topts.ptype=atoi(optarg);
 		break; 	
 		case 'i':
@@ -873,7 +875,7 @@ main(int argc, char* argv[])
 			topts.brand_string=optarg;
 		break; 	
 		case 'z':
-			delta_hours=atoi(optarg);
+		if ( atoi(optarg)>=-MAX_TIMEZONE_DELTA && atoi(optarg)<=MAX_TIMEZONE_DELTA) delta_hours=atoi(optarg);
 		break; 		
 		case 'd':
 			delta_days=atoi(optarg);
