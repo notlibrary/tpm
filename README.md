@@ -129,8 +129,11 @@ DELTA_DAYS=0
 
 ## TPM Toothpastes Picking Manager Files List
 `~/tpm/toothpastes` CSV toothpastes list
+
 `~/tpm/tpm.conf` TPM configuration file
+
 `~/tpm/pickstats` toothpaste pick stats binary file
+
 `~/tpm/last_pick` last toothpaste pick output message string or JSON file
 `
 ## TPM Toothpastes Picking Manager Toothpastes List CSV format sample
