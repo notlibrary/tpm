@@ -14,8 +14,8 @@ see `~/tpm/toothpastes.sample` for format details
 2. Put TPM in daily crontab or task scheduler task to run it daily(or twice a day)
 3. Enjoy machine doing it for you
 
-Tiny simple terminal console program with maximum utility
-
+Tiny simple terminal console C program with maximum utility
+and zero maintenance burden
 ## Sample terminal output from verbose mode:
 ```
 Good Morning Serenity Welcome to the toothpaste picking manager
