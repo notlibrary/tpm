@@ -1,4 +1,5 @@
 #TPM Toothpaste Picking Manager ~/tpm/tpm.conf file sample
+[GENERAL]
 USERNAME=Anonymous
 PICK_TYPE=0
 VERBOSE=1

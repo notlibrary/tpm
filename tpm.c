@@ -174,7 +174,8 @@ static list_node_t*
 create_node(toothpaste_data_t p_data) 
 {
     list_node_t* new_node = (list_node_t*)malloc(sizeof(list_node_t));
-    if (new_node == NULL) {
+    
+	if (new_node == NULL) {
         perror("Memory allocation failed");
         exit(EXIT_FAILURE);
     }
@@ -187,10 +188,11 @@ static list_node_t*
 add_to_list(list_node_t* head, toothpaste_data_t p_data) 
 {
     list_node_t* new_node = create_node(p_data);
-    if (head == NULL) {
+    list_node_t* current = head;
+	
+	if (head == NULL) {
         return new_node;
     }
-    list_node_t* current = head;
     while (current->next != NULL) {
         current = current->next;
     }
@@ -270,8 +272,8 @@ static unsigned int
 count_list(list_node_t* head) 
 {
     unsigned int i=0;
-	
 	list_node_t* current = head;
+	
     while (current != NULL) {
         i++;
         current = current->next;
@@ -282,8 +284,9 @@ count_list(list_node_t* head)
 static toothpaste_data_t 
 get_item_by_index(list_node_t* head,unsigned int i) 
 {
-   toothpaste_data_t empty ={0,"None",0}; 
+    toothpaste_data_t empty ={0,"None",0}; 
 	list_node_t* current = head;
+	
     while (current != NULL) {
         if (current->data.index==i)
 		{
@@ -299,6 +302,7 @@ get_item_by_brand_string(list_node_t* head,const char* str)
 {
     toothpaste_data_t empty ={0,"None",0}; 
 	list_node_t* current = head;
+	
     while (current != NULL) {
         if (0==strcmp(str,current->data.toothpaste_brand))
 		{
@@ -389,6 +393,7 @@ static void
 free_list(list_node_t* head) 
 {
     list_node_t* temp;
+	
     while (head != NULL) {
         temp = head;
         head = head->next;
@@ -473,6 +478,7 @@ static int
 write_counters(toothpaste_pick_stats_t stats)
 {
 	FILE* file_ptr;
+	
 	file_ptr = fopen(stats_file_path_final, "wb");
 		if (file_ptr == NULL) {
 			perror("Error opening pickstats file for writing");
