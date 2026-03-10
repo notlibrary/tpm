@@ -495,7 +495,7 @@ write_counters(toothpaste_pick_stats_t stats)
 }
 
 static void 
-stop_system() 
+stop_system(void) 
 {
     int c;
 	
@@ -528,7 +528,7 @@ finish(int flag,toothpaste_pick_t* pick)
 }
 
 static char* 
-get_user_home_dir() 
+get_user_home_dir(void) 
 {
     char* home_dir = NULL;
 
@@ -598,7 +598,7 @@ get_current_username(char* buffer, size_t buffer_size) {
 }
 
 static void
-version()
+version(void)
 {
 	printf("%s %u.%u.%u \n",TPM_STRING,TPM_VERSION_MAJOR,TPM_VERSION_MINOR,TPM_VERSION_PATCH);
 	exit(EXIT_FAILURE);
