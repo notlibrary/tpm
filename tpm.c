@@ -758,7 +758,7 @@ const
 char* cfg_get_rec(const struct cfg_struct* cfg, const char* key)
 {
 	const char* val;
-	unsigned int i=0
+	unsigned int i=0;
 	do
 	{
 		val = cfg_get(cfg,key);
