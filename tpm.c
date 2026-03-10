@@ -51,6 +51,9 @@
 #define TOTAL_PICK_TYPE_STRINGS 8
 #define MAX_TIMEZONE_DELTA 11
 #define MAX_RECURSION 128
+#define SYSTEM_PAUSE 1
+#define NO_SYSTEM_PAUSE 0
+#define MAX_TOOTHPASTE_LINE 128
 
 typedef enum
 {
@@ -256,9 +259,9 @@ static void
 display_list(list_node_t* head, toothpaste_pick_t* pick) 
 {
     list_node_t* current = head;
-	char line[128];
+	char line[MAX_TOOTHPASTE_LINE];
 	
-	memset(line,0,128);
+	memset(line,0,MAX_TOOTHPASTE_LINE);
 	memset(pick->message,0,OUTPUT_BLOCK_SIZE);
 	
 	sprintf(pick->message,"Index | Brand | Tube Mass | Rating\n");
@@ -933,9 +936,9 @@ main(int argc, char* argv[])
 		fprintf(output_file,"%s \n",tpm_get_toothpaste_picking_message(pick));
 	
 if (json_flag)
-	finish(0,pick);
+	finish(NO_SYSTEM_PAUSE,pick);
 else
-	finish(1,pick);
+	finish(SYSTEM_PAUSE,pick);
 
 }
 
