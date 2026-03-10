@@ -50,6 +50,7 @@
 #define OUTPUT_BLOCK_SIZE 4096
 #define TOTAL_PICK_TYPE_STRINGS 8
 #define MAX_TIMEZONE_DELTA 11
+#define MAX_RECURSION 128
 
 typedef enum
 {
@@ -757,14 +758,14 @@ const
 char* cfg_get_rec(const struct cfg_struct* cfg, const char* key)
 {
 	const char* val;
-	
+	unsigned int i=0
 	do
 	{
 		val = cfg_get(cfg,key);
-		if (val==NULL) break;
+		if ((val==NULL) || (i>MAX_RECURSION)) break;
 
 		key=val;
-	
+		i++;
 	}
 	while (val!=NULL);
 	return key;
