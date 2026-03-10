@@ -753,6 +753,23 @@ tpm_pick_toothpaste(list_node_t* head,toothpaste_pick_options_t topts)
 	return &pick;
 }
 
+const
+char* cfg_get_rec(const struct cfg_struct* cfg, const char* key)
+{
+	const char* val;
+	
+	do
+	{
+		val = cfg_get(cfg,key);
+		if (val==NULL) break;
+
+		key=val;
+	
+	}
+	while (val!=NULL);
+	return key;
+	
+}
 
 static toothpaste_pick_options_t
 read_config(const char* src)
@@ -777,32 +794,32 @@ read_config(const char* src)
 		fprintf(stderr, "Unable to load config ~tpm/tpm.conf\n");
 		return opts;
     }
-	opts.username = cfg_get(cfg, "USERNAME");
+	opts.username = cfg_get_rec(cfg, "USERNAME");
 	
 
-	value = cfg_get(cfg, "TIMEZONE");
+	value = cfg_get_rec(cfg, "TIMEZONE");
 	if ((value!=NULL) && atoi(value)>=-MAX_TIMEZONE_DELTA && atoi(value)<=MAX_TIMEZONE_DELTA) delta_hours=atoi(value);
-	value = cfg_get(cfg, "DELTA_DAYS");
+	value = cfg_get_rec(cfg, "DELTA_DAYS");
 	if (value!=NULL) delta_days = atoi(value);
-	value = cfg_get(cfg, "PICK_TYPE");
+	value = cfg_get_rec(cfg, "PICK_TYPE");
 	if ((value!=NULL) && atoi(value)>=0 && atoi(value)<TOTAL_PICK_TYPE_STRINGS) opts.ptype =  atoi(value);
-	value = cfg_get(cfg, "VERBOSE");
+	value = cfg_get_rec(cfg, "VERBOSE");
 	if (value!=NULL) opts.verbose =  atoi(value);
-	value = cfg_get(cfg, "LIST_TOOTHPASTES");
+	value = cfg_get_rec(cfg, "LIST_TOOTHPASTES");
 	if (value!=NULL) opts.lat_flag =  atoi(value);
-	value = cfg_get(cfg, "OUTPUT_JSON");
+	value = cfg_get_rec(cfg, "OUTPUT_JSON");
 	if (value!=NULL) opts.json_flag =  atoi(value);
-	value = cfg_get(cfg, "OUTPUT_FILE");
+	value = cfg_get_rec(cfg, "OUTPUT_FILE");
 	if (value!=NULL) opts.output_to_file =  atoi(value);
-	value = cfg_get(cfg, "PICK_INDEX");
+	value = cfg_get_rec(cfg, "PICK_INDEX");
 	if (value!=NULL) opts.pick_by_index_index =  atoi(value);
-	value = cfg_get(cfg, "BRAND");
+	value = cfg_get_rec(cfg, "BRAND");
 	if (value!=NULL) opts.brand_string = (value);
-	value = cfg_get(cfg, "RESET_COUNTER");
-	if (value!=NULL) {reset_counters_v=atoi(cfg_get(cfg, "RESET_COUNTER"));}
+	value = cfg_get_rec(cfg, "RESET_COUNTER");
+	if (value!=NULL) {reset_counters_v=atoi(cfg_get_rec(cfg, "RESET_COUNTER"));}
 	if (reset_counters_v){ reset_counters();}
-	value = cfg_get(cfg, "SET_COUNTER");
-	if (value!=NULL) {set_counters_v=atoi(cfg_get(cfg, "SET_COUNTER"));}
+	value = cfg_get_rec(cfg, "SET_COUNTER");
+	if (value!=NULL) {set_counters_v=atoi(cfg_get_rec(cfg, "SET_COUNTER"));}
 	if (set_counters_v) set_counters(&set_counters_v);
 	return opts;
 }
