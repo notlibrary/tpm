@@ -90,7 +90,7 @@ typedef struct {
 	int lat_flag;
 	int json_flag;
 	int output_to_file;
-	int pick_by_index_index;
+	unsigned int pick_by_index_index;
 	const char* username;
 	const char* brand_string;
 }toothpaste_pick_options_t;
