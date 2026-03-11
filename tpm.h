@@ -123,6 +123,7 @@ TPM toothpaste_pick_t* tpm_pick_toothpaste(list_node_t* head,toothpaste_pick_opt
 TPM char* tpm_get_toothpaste_picking_message(toothpaste_pick_t* pick);
 TPM char* tpm_get_toothpaste_picking_JSON(toothpaste_pick_t* pick);
 TPM int tpm_free_toothpaste_pick(toothpaste_pick_t* pick);
+
 #ifdef __cplusplus
 }
 #endif /*__cpluplus*/
