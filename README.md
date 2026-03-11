@@ -144,7 +144,7 @@ DELTA_DAYS=0
 `
 ## TPM Toothpastes Picking Manager Toothpastes List CSV format sample
 ```
-#Index, Brand string, Tube mass grams, Rating
+#Index,Brand string,Tube mass grams,Rating
 0,Toothpaste 1,100,85
 1,Toothpaste 2,50,90
 2,Toothpaste 3,150,100
