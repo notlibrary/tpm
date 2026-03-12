@@ -29,7 +29,6 @@ extern "C" {
 #include <Lmcons.h>
 #define STATIC_GETOPT
 #include "getopt.h"
-#include "getopt.c"
 #pragma comment(lib, "advapi32.lib")
 #else
 #include <unistd.h>
