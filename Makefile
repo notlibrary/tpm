@@ -20,4 +20,4 @@ $(OBJECTS): $(SOURCES)
 install: 
 	cp $(CURRENT_DIR)/tpm /usr/local/bin/
 clean:	
-	rm $(CURRENT_DIR)/tpm 
+	rm $(CURRENT_DIR)/tpm $(OBJECTS) 

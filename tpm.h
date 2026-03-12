@@ -45,7 +45,9 @@ extern "C" {
 #define SECONDS_PER_HOUR 3600
 #define PICK_TIMEOUT_SECONDS 300
 #define TOOTHBRUSH_TIMESPAN_DAYS 180
+#ifndef MAX_PATH
 #define MAX_PATH 256
+#endif
 #define MAX_LINE_LENGTH 1024
 #define COMMENT_CHAR '#'
 #ifndef UNLEN
