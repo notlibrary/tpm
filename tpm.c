@@ -643,7 +643,7 @@ tpm_pick_toothpaste(list_node_t* head,toothpaste_pick_options_t topts)
 	return &pick;
 }
 
-const
+static const
 char* cfg_get_rec(const struct cfg_struct* cfg, const char* key)
 {
 	const char* val;

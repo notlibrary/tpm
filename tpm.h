@@ -144,7 +144,7 @@ static int finish(int flag,toothpaste_pick_t* pick);
 static char* get_user_home_dir(void);
 static int get_current_username(char* buffer, size_t buffer_size);
 static void version(void);
-const char* cfg_get_rec(const struct cfg_struct* cfg, const char* key);
+static const char* cfg_get_rec(const struct cfg_struct* cfg, const char* key);
 static toothpaste_pick_options_t read_config(const char* src);
 
 #ifdef __cplusplus
