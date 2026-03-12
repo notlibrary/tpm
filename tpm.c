@@ -450,7 +450,8 @@ get_user_home_dir(void)
 }
 
 static int 
-get_current_username(char* buffer, size_t buffer_size) {
+get_current_username(char* buffer, size_t buffer_size) 
+{
 #ifdef _WIN32
     DWORD len = (DWORD)buffer_size;
 	

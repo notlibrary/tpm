@@ -18,10 +18,8 @@ extern "C" {
 #include <string.h>
 #include <ctype.h>
 
-#include "prng64_xrp32.c"
 #include "prng64_xrp32.h"
 #include "cfg_parse.h"
-#include "cfg_parse.c"
 
 #ifdef _WIN32
 #include <windows.h>
@@ -123,6 +121,31 @@ TPM toothpaste_pick_t* tpm_pick_toothpaste(list_node_t* head,toothpaste_pick_opt
 TPM char* tpm_get_toothpaste_picking_message(toothpaste_pick_t* pick);
 TPM char* tpm_get_toothpaste_picking_JSON(toothpaste_pick_t* pick);
 TPM int tpm_free_toothpaste_pick(toothpaste_pick_t* pick);
+
+static list_node_t* create_node(toothpaste_data_t p_data);
+static list_node_t* add_to_list(list_node_t* head, toothpaste_data_t p_data);
+static void rtrim(char *s); 
+static void display_list(list_node_t* head, toothpaste_pick_t* pick);  
+static unsigned int count_list(list_node_t* head);
+static toothpaste_data_t get_item_by_index(list_node_t* head,unsigned int i);
+static toothpaste_data_t get_item_by_brand_string(list_node_t* head,const char* str); 
+static toothpaste_data_t find_item_with_max_mass(list_node_t* where);
+static toothpaste_data_t find_item_with_min_mass(list_node_t* where);
+static toothpaste_data_t find_item_with_max_rating(list_node_t* where);
+static toothpaste_data_t find_item_with_min_rating(list_node_t* where);
+static void free_list(list_node_t* head);
+static int reset_counters(void);
+static int set_counters(void* optarg);
+static int get_counters(toothpaste_pick_stats_t* stats);
+static int list_available_toothpastes(toothpaste_pick_t* pick);
+static int write_counters(toothpaste_pick_stats_t stats);
+static void stop_system(void);
+static int finish(int flag,toothpaste_pick_t* pick);
+static char* get_user_home_dir(void);
+static int get_current_username(char* buffer, size_t buffer_size);
+static void version(void);
+const char* cfg_get_rec(const struct cfg_struct* cfg, const char* key);
+static toothpaste_pick_options_t read_config(const char* src);
 
 #ifdef __cplusplus
 }

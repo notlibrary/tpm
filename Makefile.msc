@@ -1,15 +1,22 @@
-CC = cl
-MKDIR = mkdir
-CFLAGS =
+CC=cl.exe
+LINKER=link.exe
+MKDIR= mkdir
+CFLAGS=/c /EHsc /Fo
+LFLAGS  = /OUT:
 TARGET_DIR ="C:\Program Files\tpm"
-
+SOURCES=tpm.c\
+		prng64_xrp32.c\
+		cfg_parse.c
+OBJECTS=tpm.obj\
+		prng64_xrp32.obj\
+		cfg_parse.obj
 all: tpm.exe install clean
-
-tpm.exe:
-	$(CC) $(CFLAGS) tpm.c 
-
+tpm.exe: $(OBJECTS)
+	$(LINKER) $(LFLAGS)$@ $(OBJECTS)
+$(OBJECTS):$(SOURCES)
+	$(CC) $(CFLAGS) $(SOURCES)
 install:
 	@if not exist $(TARGET_DIR)\ mkdir $(TARGET_DIR)
 	copy "tpm.exe" "C:\Program Files\tpm\tpm.exe"
 clean:	
-	del tpm.exe tpm.obj
+	del tpm.exe $(OBJECTS)
