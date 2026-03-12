@@ -2,6 +2,7 @@
 	TPM Toothpaste Picking Manager source code 0BSD license
 */
 #include "tpm.h"
+
 pick_type_t pick_type = PICK_DEFAULT;
 list_node_t* toothpastes_list;
 
@@ -101,7 +102,7 @@ rtrim(char *s)
     s[i + 1] = '\0';
 }
 
-static list_node_t* 
+TPM list_node_t* 
 tpm_load_list_from_file(const char* filename) 
 {
 	int i;
@@ -388,7 +389,7 @@ stop_system(void)
     getchar(); 
 }
 
-static int 
+TPM int 
 tpm_free_toothpaste_pick(toothpaste_pick_t* pick)
 {
 	free(pick->message);
@@ -488,19 +489,19 @@ version(void)
 	exit(EXIT_FAILURE);
 }
 
-static char* 
+TPM char* 
 tpm_get_toothpaste_picking_message(toothpaste_pick_t* pick)
 {
 	return pick->message;
 }
 
-static char*
+TPM char*
 tpm_get_toothpaste_picking_JSON(toothpaste_pick_t* pick)
 {
 	return pick->JSON;	
 }
 
-static toothpaste_pick_t*
+TPM toothpaste_pick_t*
 tpm_pick_toothpaste(list_node_t* head,toothpaste_pick_options_t topts)
 {
 	int i,j;
