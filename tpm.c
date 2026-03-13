@@ -559,7 +559,8 @@ tpm_pick_toothpaste(list_node_t* head,toothpaste_pick_options_t topts)
 	i=day%pick.total_toothpastes;
 	if (topts.ptype==PICK_BY_INDEX) 
 	{
-		i=topts.pick_by_index_index;
+	    if (topts.pick_by_index_index>=pick.total_toothpastes)
+		{i=pick.total_toothpastes-1;}else{i=topts.pick_by_index_index;}
 	}
 	if (topts.ptype==PICK_RANDOM) 
 	{
