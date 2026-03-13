@@ -14,12 +14,18 @@ OBJECTS=tpm.obj\
 		getopt.obj
 		
 all: tpm.exe install clean
+
 tpm.exe: $(OBJECTS)
-	$(LINKER) $(LFLAGS)$@ $(OBJECTS)
+	$(LINKER) $(LFLAGS)$@ $(OBJECTS) tpm.res
+
 $(OBJECTS):$(SOURCES)
 	$(CC) $(CFLAGS) $(SOURCES)
+	rc /nologo tpm.rc
+	
 install:
 	@if not exist $(TARGET_DIR)\ mkdir $(TARGET_DIR)
 	copy "tpm.exe" "C:\Program Files\tpm\tpm.exe"
+
 clean:	
-	del tpm.exe $(OBJECTS) tpm.exp tpm.lib
+	del tpm.exe $(OBJECTS) tpm.exp tpm.lib tpm.res
+
