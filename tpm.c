@@ -146,6 +146,7 @@ tpm_load_list_from_file(const char* filename)
 static void 
 display_list(list_node_t* head, toothpaste_pick_t* pick) 
 {
+	unsigned int cnt=0;
     list_node_t* current = head;
 	char line[MAX_TOOTHPASTE_LINE];
 	
@@ -157,7 +158,9 @@ display_list(list_node_t* head, toothpaste_pick_t* pick)
         sprintf(line,"%d %s %d %d\n", current->data.index, current->data.toothpaste_brand, current->data.tube_mass_g, current->data.rating);
         strcat(pick->message,line);
 		current = current->next;
-    }
+		cnt++;
+		if (cnt>MAX_TOOTHPASTE_LINES){break;}
+	}
 }
 
 static unsigned int 
