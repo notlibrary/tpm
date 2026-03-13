@@ -701,7 +701,7 @@ read_config(const char* src)
 	value = cfg_get_rec(cfg, "PICK_TYPE");
 	if ((value!=NULL) && atoi(value)>=0 && atoi(value)<TOTAL_PICK_TYPE_STRINGS) opts.ptype =  atoi(value);
 	value = cfg_get_rec(cfg, "VERBOSE");
-	if (value!=NULL) opts.verbose =  atoi(value);
+	if ((value!=NULL) && (strcmp(value,"VERBOSE")!=0)) opts.verbose = atoi(value);
 	value = cfg_get_rec(cfg, "LIST_TOOTHPASTES");
 	if (value!=NULL) opts.lat_flag =  atoi(value);
 	value = cfg_get_rec(cfg, "OUTPUT_JSON");
@@ -718,6 +718,7 @@ read_config(const char* src)
 	value = cfg_get_rec(cfg, "SET_COUNTER");
 	if (value!=NULL) {set_counters_v=atoi(cfg_get_rec(cfg, "SET_COUNTER"));}
 	if (set_counters_v) set_counters(&set_counters_v);
+	
 	return opts;
 }
 
