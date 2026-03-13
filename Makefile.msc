@@ -12,6 +12,7 @@ OBJECTS=tpm.obj\
 		prng64_xrp32.obj\
 		cfg_parse.obj\
 		getopt.obj
+		
 all: tpm.exe install clean
 tpm.exe: $(OBJECTS)
 	$(LINKER) $(LFLAGS)$@ $(OBJECTS)
@@ -21,4 +22,4 @@ install:
 	@if not exist $(TARGET_DIR)\ mkdir $(TARGET_DIR)
 	copy "tpm.exe" "C:\Program Files\tpm\tpm.exe"
 clean:	
-	del tpm.exe $(OBJECTS)
+	del tpm.exe $(OBJECTS) tpm.exp tpm.lib
