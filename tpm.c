@@ -106,6 +106,7 @@ TPM list_node_t*
 tpm_load_list_from_file(const char* filename) 
 {
 	int i;
+	unsigned int cnt=0;
     FILE* file = fopen(toothpastes_file_path_final, "r");
 	list_node_t* head = NULL;
     toothpaste_data_t temp_data;
@@ -134,6 +135,8 @@ tpm_load_list_from_file(const char* filename)
 		if (sscanf(current, "%u, %[^,],%u,%u\n", &temp_data.index,temp_data.toothpaste_brand ,&temp_data.tube_mass_g,&temp_data.rating) == 4) {
 			rtrim(temp_data.toothpaste_brand);
 			head = add_to_list(head, temp_data);	
+			cnt++;
+			if (cnt>MAX_TOOTHPASTE_LINES){break;}
 		}		
     }
     fclose(file);

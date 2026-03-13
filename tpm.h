@@ -59,6 +59,7 @@ extern "C" {
 #define SYSTEM_PAUSE 1
 #define NO_SYSTEM_PAUSE 0
 #define MAX_TOOTHPASTE_LINE 128
+#define MAX_TOOTHPASTE_LINES 1024
 
 typedef enum
 {
