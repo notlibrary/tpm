@@ -658,10 +658,11 @@ char* cfg_get_rec(const struct cfg_struct* cfg, const char* key)
 	do
 	{
 		val = cfg_get(cfg,key);
-		if ((val==NULL) || (i>MAX_RECURSION)) break;
+		if ((val==NULL) || (i>MAX_RECURSION)) {if (i==0)key=NULL;break;}
 
 		key=val;
 		i++;
+		if ((val==NULL)&&(i==1)) return NULL;
 	}
 	while (val!=NULL);
 	return key;
@@ -701,7 +702,7 @@ read_config(const char* src)
 	value = cfg_get_rec(cfg, "PICK_TYPE");
 	if ((value!=NULL) && atoi(value)>=0 && atoi(value)<TOTAL_PICK_TYPE_STRINGS) opts.ptype =  atoi(value);
 	value = cfg_get_rec(cfg, "VERBOSE");
-	if ((value!=NULL) && (strcmp(value,"VERBOSE")!=0)) opts.verbose = atoi(value);
+	if (value!=NULL) opts.verbose = atoi(value); else opts.verbose=verbose;
 	value = cfg_get_rec(cfg, "LIST_TOOTHPASTES");
 	if (value!=NULL) opts.lat_flag =  atoi(value);
 	value = cfg_get_rec(cfg, "OUTPUT_JSON");
