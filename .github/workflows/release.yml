@@ -28,7 +28,6 @@ jobs:
           cp tpm.exe ${{ env.APP_NAME }}
           cp toothpastes.sample ${{ env.APP_NAME }}
           cp tpm.conf.sample ${{ env.APP_NAME }}
-          ${{ env.APP_NAME }}
           zip -r tpm-win.zip ${{ env.APP_NAME }}
       - name: Create Release
         id: create_release
