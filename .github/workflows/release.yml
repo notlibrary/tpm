@@ -31,6 +31,8 @@ jobs:
           Compress-Archive -Path toothpaste-picking-manager -DestinationPath tpm-win.zip
 
       - name: Create Release
+        permissions:
+            contents: write 
         id: create_release
         uses: softprops/action-gh-release@v1
         with:
