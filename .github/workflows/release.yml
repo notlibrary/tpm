@@ -1,0 +1,41 @@
+name: Release Toothpaste Picking Manager
+
+on:
+  push:
+    tags:
+      - "*"
+
+env:
+  APP_NAME: toothpaste-picking-manager
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Setup VS PS
+        uses: ilammy/msvc-dev-cmd@v1 
+        with:
+            arch: x64
+      - name: Build
+        id: build        
+        shell: powershell
+        run: |
+          nmake.exe /f .\Makefile.msc tpm.exe
+          mkdir ${{ env.APP_NAME }}
+          cp tpm.exe toothpastes.sample tpm.conf.sample ${{ env.APP_NAME }}
+          zip -r tpm-win.zip ${{ env.APP_NAME }}
+      - name: Create Release
+        id: create_release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ github.ref }}
+          name: TPM 
+          draft: false
+          prerelease: false
+          body: Toothpaste picking manager
+          token: ${{ secrets.GITHUB_TOKEN }}
+          files: |
+            tpm-win.zip
