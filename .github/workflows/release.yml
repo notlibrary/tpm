@@ -31,8 +31,6 @@ jobs:
           Compress-Archive -Path toothpaste-picking-manager -DestinationPath tpm-win.zip
 
       - name: Create Release
-        permissions:
-            contents: write 
         id: create_release
         uses: softprops/action-gh-release@v1
         with:
@@ -41,6 +39,6 @@ jobs:
           draft: false
           prerelease: false
           body: Toothpaste picking manager
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.PAT3 }}
           files: |
             tpm-win.zip
