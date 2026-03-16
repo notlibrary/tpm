@@ -59,6 +59,8 @@ static char* brand_string = NULL;
 static int delta_days= 0;
 static int delta_hours= 0;
 
+static int config_load_failure= 0;
+
 static list_node_t* 
 create_node(toothpaste_data_t p_data) 
 {
@@ -654,7 +656,6 @@ static void
 save_default_config(struct cfg_struct* cfg)
 {
 	cfg_set(cfg, "TIMEZONE","0");
-	
 	cfg_set(cfg,"USERNAME","Anonymous");
 	cfg_set(cfg,"DELTA_DAYS","0");
 	cfg_set(cfg,"PICK_TYPE","0");
@@ -711,7 +712,7 @@ read_config(const char* src)
 	if (cfg_load(cfg, src) < 0)
 	{
 		fprintf(stderr, "Unable to load config ~tpm/tpm.conf\n");
-		save_default_config(cfg);
+		config_load_failure=1;
 		return opts;
     }
 	opts.username = cfg_get_rec(cfg, "USERNAME");
@@ -851,6 +852,10 @@ main(int argc, char* argv[])
 		fprintf(output_file,"%s \n",tpm_get_toothpaste_picking_JSON(pick));
 	else
 		fprintf(output_file,"%s \n",tpm_get_toothpaste_picking_message(pick));
+	if (config_load_failure) {
+		struct cfg_struct* cfg; cfg=cfg_init(); save_default_config(cfg);
+	}
+	
 	
 if (json_flag)
 	finish(NO_SYSTEM_PAUSE,pick);
