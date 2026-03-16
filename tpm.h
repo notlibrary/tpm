@@ -148,6 +148,7 @@ static int get_current_username(char* buffer, size_t buffer_size);
 static void version(void);
 static const char* cfg_get_rec(const struct cfg_struct* cfg, const char* key);
 static toothpaste_pick_options_t read_config(const char* src);
+static void save_default_config(struct cfg_struct* cfg);
 
 #ifdef __cplusplus
 }

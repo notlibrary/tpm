@@ -650,6 +650,27 @@ tpm_pick_toothpaste(list_node_t* head,toothpaste_pick_options_t topts)
 	return &pick;
 }
 
+static void 
+save_default_config(struct cfg_struct* cfg)
+{
+	cfg_set(cfg, "TIMEZONE","0");
+	
+	cfg_set(cfg,"USERNAME","Anonymous");
+	cfg_set(cfg,"DELTA_DAYS","0");
+	cfg_set(cfg,"PICK_TYPE","0");
+	cfg_set(cfg,"VERBOSE","1");
+	cfg_set(cfg,"LIST_TOOTHPASTES","0");
+	cfg_set(cfg,"OUTPUT_JSON","0");
+	cfg_set(cfg,"OUTPUT_FILE","0");
+	cfg_set(cfg,"PICK_INDEX","0");
+	cfg_set(cfg,"BRAND","Unknown");
+	cfg_set(cfg,"SET_COUNTER","0");
+	cfg_set(cfg,"RESET_COUNTER","0");
+	
+	cfg_save(cfg,config_file_path_final);		
+}
+
+
 static const
 char* cfg_get_rec(const struct cfg_struct* cfg, const char* key)
 {
@@ -690,6 +711,7 @@ read_config(const char* src)
 	if (cfg_load(cfg, src) < 0)
 	{
 		fprintf(stderr, "Unable to load config ~tpm/tpm.conf\n");
+		save_default_config(cfg);
 		return opts;
     }
 	opts.username = cfg_get_rec(cfg, "USERNAME");
