@@ -20,4 +20,8 @@ $(OBJECTS): $(SOURCES)
 install: 
 	cp $(CURRENT_DIR)/tpm /usr/local/bin/
 clean:	
-	rm $(CURRENT_DIR)/tpm $(OBJECTS) 
+	rm $(CURRENT_DIR)/tpm $(OBJECTS)
+distr:
+	mkdir -p distr
+	cp tpm.conf.sample toothpastes.sample tpm distr
+	tar -czf tpm-linux.tar.gz distr
