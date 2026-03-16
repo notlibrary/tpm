@@ -12,6 +12,15 @@ Windows:
 1. Define available toothpastes in CSV format file with path `~/tpm/toothpastes`
 see `~/tpm/toothpastes.sample` for format details
 2. Put TPM in daily crontab or task scheduler task to run it daily(or twice a day)
+
+Windows:
+`schtasks /create /tn "TPM" /tr "C:\Program Files\tpm\tpm.exe" /sc daily /st 09:00`
+
+Unix(Ubuntu):
+`crontab -e` 
+then add this line:
+`00 9 * * * /usr/local/bin/tpm`
+
 3. Enjoy machine doing it for you
 
 Tiny simple terminal console C program with maximum utility
