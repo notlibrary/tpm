@@ -691,6 +691,19 @@ char* cfg_get_rec(const struct cfg_struct* cfg, const char* key)
 	
 }
 
+static int 
+file_exists_fopen(const char *filename) 
+{
+    FILE *file;
+	
+    if ((file = fopen(filename, "r"))) {
+        fclose(file);
+        return 1;
+    } else {
+        return 0;
+    }
+}
+
 static toothpaste_pick_options_t
 read_config(const char* src)
 {
@@ -775,6 +788,7 @@ main(int argc, char* argv[])
 	
 	free(user_home_dir);
 	topts=read_config(config_file_path_final);
+	config_load_failure=!file_exists_fopen(config_file_path_final);
 	while ((opt = getopt(argc, argv, "awojvxqlrs:p:i:b:z:d:")) != -1) {
         switch (opt) {
 		case 'a':
