@@ -22,6 +22,6 @@ install:
 clean:	
 	rm $(CURRENT_DIR)/tpm $(OBJECTS)
 distr:
-	mkdir -p distr
-	cp tpm.conf.sample toothpastes.sample tpm README.md distr
-	tar -czf tpm-linux-bin.tar.gz distr
+	mkdir -p tpm-linux-bin
+	cp tpm.conf.sample toothpastes.sample tpm README.md tpm-linux-bin
+	tar -czf tpm-linux-bin.tar.gz tpm-linux-bin
