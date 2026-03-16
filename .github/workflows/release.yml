@@ -28,6 +28,7 @@ jobs:
           cp tpm.exe ${{ env.APP_NAME }}
           cp toothpastes.sample ${{ env.APP_NAME }}
           cp tpm.conf.sample ${{ env.APP_NAME }}
+          cp README.md ${{ env.APP_NAME }}
           Compress-Archive -Path toothpaste-picking-manager -DestinationPath tpm-win.zip
 
       - name: Create Release
@@ -41,4 +42,4 @@ jobs:
           body: Toothpaste picking manager
           token: ${{ secrets.PAT3 }}
           files: |
-            tpm-win.zip
+            tpm-win-bin.zip
