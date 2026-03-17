@@ -3,7 +3,7 @@ Let me pick the toothpaste for you
 
 0. Clone repository to `~/tpm` and make it
 
-Unix:
+Unix(Ubuntu):
 `make`
 
 Windows:
@@ -61,8 +61,8 @@ SELECT * FROM toothpastes WHERE id=mod((SELECT CAST(unixepoch('now') / 86400 AS 
 
 Also `pick.sql` contains other sql queries for different pick methods.
 
-The point is in fact you do not need sqlite postgres or lmdb to perform single pick
-and sometimes even single pick is more than enough
+The point is in fact you do not need sqlite postgres or lmdb to perform a single pick
+and sometimes even the single pick is more than enough
 
 
 ## Command line options
