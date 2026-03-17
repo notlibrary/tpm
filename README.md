@@ -61,6 +61,9 @@ SELECT * FROM toothpastes WHERE id=mod((SELECT CAST(unixepoch('now') / 86400 AS 
 
 Also `pick.sql` contains other sql queries for different pick methods.
 
+The point is in fact you do not need sqlite postgres or lmdb to perform single pick
+and sometimes even single pick is more than enough
+
 
 ## Command line options
 `-a` pick toothpaste with highest rating
