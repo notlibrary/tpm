@@ -83,7 +83,7 @@ typedef struct
 
 typedef struct {
     unsigned int index;
-	char toothpaste_brand[50];
+	char toothpaste_brand[MAX_TOOTHPASTE_LINE];
 	unsigned int tube_mass_g;
 	unsigned int rating;
 } toothpaste_data_t;
