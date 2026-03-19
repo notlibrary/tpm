@@ -597,12 +597,12 @@ tpm_pick_toothpaste(list_node_t* head,toothpaste_pick_options_t topts)
 	
 	j=(day)%TOTAL_DAYS_OF_WEEK;
 	
-	if ((total_seconds - pick.stats.last_pick_time) > (SECONDS_PER_DAY-PICK_TIMEOUT_SECONDS)) {
+	if ((total_seconds - pick.stats.last_pick_time) > (SECONDS_PER_DAY-PICK_TIMEOUT_SECONDS)) 
+	{
 		if (topts.verbose) 
 		{
 			sprintf(line,"%s", "New next pick stats updated \n");
 			strcat(pick.message,line);
-		
 		}
 		
 		pick.stats.total_picks++;
@@ -620,17 +620,12 @@ tpm_pick_toothpaste(list_node_t* head,toothpaste_pick_options_t topts)
 	}
 	else if (topts.verbose) 
 	{
-			sprintf(line,"%s", "Already picked today \n");
-			strcat(pick.message,line);	
+		sprintf(line,"%s", "Already picked today \n");
+		strcat(pick.message,line);	
 		
-	}
-	if (topts.verbose) 
-	{
 		sprintf(line,"%s\n", pick_type_strings[topts.ptype] );
 		strcat(pick.message,line);
-	}
-	if (topts.verbose)
-	{		
+		
 		sprintf(line,"%s %s %s (%ug) [%u/100] %s %s %s %u %s %u/%u \n", "Toothpaste:", ">>>", pick.what.toothpaste_brand, pick.what.tube_mass_g, pick.what.rating, "<<<", "Day:" ,days_of_week[j],day, "Toothpaste index:",i,pick.total_toothpastes);
 		strcat(pick.message,line);
 		
