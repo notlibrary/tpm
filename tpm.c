@@ -670,8 +670,11 @@ save_default_config(struct cfg_struct* cfg)
 	cfg_set(cfg,"PICK_STATS",stats_file_path_final);
 	cfg_set(cfg,"LAST_PICK",output_file_path_final);
 	cfg_set(cfg,"TOOTHPASTES",toothpastes_file_path_final);
+	cfg_set(cfg,"CONFIG_DEFAULT",config_file_path_final);
 	
-	cfg_save(cfg,config_file_path_final);		
+	cfg_save(cfg,config_file_path_final);
+	
+	return;
 }
 
 
@@ -699,10 +702,13 @@ file_exists_fopen(const char *filename)
 {
     FILE *file;
 	
-    if ((file = fopen(filename, "r"))) {
+    if ((file = fopen(filename, "r"))) 
+	{
         fclose(file);
         return 1;
-    } else {
+    } 
+	else 
+	{
         return 0;
     }
 }
@@ -777,6 +783,7 @@ main(int argc, char* argv[])
 	toothpaste_pick_t* pick;
 	char* user_home_dir=get_user_home_dir();
 	toothpaste_pick_options_t topts;
+	struct cfg_struct* cfg; 
 	
 #ifdef _WIN32
 	strcat(user_home_dir,"\\tpm\\");
@@ -855,7 +862,8 @@ main(int argc, char* argv[])
 			break;
         }
 	}
-	if (argv[optind]!=NULL){
+	if (argv[optind]!=NULL)
+	{
 		strcpy(toothpastes_file_path_final,argv[optind]);
 	}	
 	if (output_to_file)
@@ -874,19 +882,32 @@ main(int argc, char* argv[])
 	toothpastes_list=tpm_load_list_from_file(toothpastes_file_path_final);
 	pick=tpm_pick_toothpaste(toothpastes_list,topts);
 	if (json_flag)
+	{
 		fprintf(output_file,"%s \n",tpm_get_toothpaste_picking_JSON(pick));
+	}
 	else
+	{
 		fprintf(output_file,"%s \n",tpm_get_toothpaste_picking_message(pick));
-	if (config_load_failure) {
-		struct cfg_struct* cfg; cfg=cfg_init(); save_default_config(cfg);
+	}
+	if (config_load_failure) 
+	{
+		cfg=cfg_init(); 
+		save_default_config(cfg);
+	}
+	if ((output_file)!=stdout)
+	{
+		fclose(output_file);
 	}
 	
 	
-if (json_flag)
-	finish(NO_SYSTEM_PAUSE,pick);
-else
-	finish(SYSTEM_PAUSE,pick);
-
+	if (json_flag) 
+	{
+		finish(NO_SYSTEM_PAUSE,pick);
+	}
+	else
+	{
+		finish(SYSTEM_PAUSE,pick);
+	}
 }
 
 	
