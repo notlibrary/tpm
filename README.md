@@ -110,6 +110,10 @@ It's options:
 
 `TOOTHPASTES` toothpastes list CSV full file name
 
+`LAST_PICK` last pick file location
+
+`PICK_STATS` pick stats file location
+
 `LIST_TOOTHPASTES` 1 to list available toothpastes
 
 `OUTPUT_JSON` 1 to output JSON with toothpaste pick
@@ -138,7 +142,9 @@ FALSE=0
 USERNAME=Anonymous
 PICK_TYPE=DEFAULT
 VERBOSE=TRUE
-TOOTHPASTES=~\tpm\toothpastes
+TOOTHPASTES=C:\Users\Anonymous\tpm\toothpastes
+LAST_PICK=C:\Users\Anonymous\tpm\last_pick
+PICK_STATS=C:\Users\Anonymous\tpm\pickstats
 LIST_TOOTHPASTES=FALSE
 OUTPUT_JSON=FALSE
 OUTPUT_FILE=FALSE
