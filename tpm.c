@@ -667,6 +667,9 @@ save_default_config(struct cfg_struct* cfg)
 	cfg_set(cfg,"BRAND","Unknown");
 	cfg_set(cfg,"SET_COUNTER","0");
 	cfg_set(cfg,"RESET_COUNTER","0");
+	cfg_set(cfg,"PICK_STATS",stats_file_path_final);
+	cfg_set(cfg,"LAST_PICK",output_file_path_final);
+	cfg_set(cfg,"TOOTHPASTES",toothpastes_file_path_final);
 	
 	cfg_save(cfg,config_file_path_final);		
 }
