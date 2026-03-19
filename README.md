@@ -96,6 +96,8 @@ and sometimes even the single pick is more than enough
 
 `-d [delta_days]` pick toothpaste with default method in the future or the past
 
+`toothpastes_path` path to toothpastes CSV file
+
 ## Configuration file options
 Configuration is located in `~/tpm/tpm.conf` file
 It's options:

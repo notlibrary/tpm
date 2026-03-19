@@ -840,13 +840,15 @@ main(int argc, char* argv[])
 			delta_days=atoi(optarg);
 		break; 	
 		case '?': 
-            fprintf(stderr, "Usage: %s [-awojvxqlr] [-s total_picks value] [-p pick_type_value] [-i toothpaste_index] [-b brand_string -z delta_hours -d delta_days] \n", argv[0]);
+            fprintf(stderr, "Usage: %s [-awojvxqlr] [-s total_picks value] [-p pick_type_value] [-i toothpaste_index] [-b brand_string -z delta_hours -d delta_days] [toothpastes_file] \n", argv[0]);
             exit(EXIT_FAILURE);
         default:
 			break;
         }
-    }
-		
+	}
+	if (argv[optind]!=NULL){
+		strcpy(toothpastes_file_path_final,argv[optind]);
+	}	
 	if (output_to_file)
 	{
 		printf("%s %s \n","Output pick to file ",output_file_path_final);
