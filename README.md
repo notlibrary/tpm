@@ -108,6 +108,8 @@ It's options:
 
 `VERBOSE` 0 for quiet toothpaste pick
 
+`TOOTHPASTES` toothpastes list CSV full file name
+
 `LIST_TOOTHPASTES` 1 to list available toothpastes
 
 `OUTPUT_JSON` 1 to output JSON with toothpaste pick
@@ -136,6 +138,7 @@ FALSE=0
 USERNAME=Anonymous
 PICK_TYPE=DEFAULT
 VERBOSE=TRUE
+TOOTHPASTES=~\tpm\toothpastes
 LIST_TOOTHPASTES=FALSE
 OUTPUT_JSON=FALSE
 OUTPUT_FILE=FALSE

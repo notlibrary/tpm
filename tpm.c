@@ -739,6 +739,9 @@ read_config(const char* src)
 	if ((value!=NULL) && atoi(value)>=0 && atoi(value)<TOTAL_PICK_TYPE_STRINGS) opts.ptype =  atoi(value);
 	value = cfg_get_rec(cfg, "VERBOSE");
 	if (value!=NULL) opts.verbose = atoi(value); else opts.verbose=verbose;
+	value = cfg_get_rec(cfg, "TOOTHPASTES");
+	if (value!=NULL) strcpy(toothpastes_file_path_final,value); 
+	
 	value = cfg_get_rec(cfg, "LIST_TOOTHPASTES");
 	if (value!=NULL) opts.lat_flag =  atoi(value);
 	value = cfg_get_rec(cfg, "OUTPUT_JSON");
