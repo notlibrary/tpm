@@ -35,5 +35,5 @@ install:
 
 clean:	
 	del tpm.exe $(OBJECTS) tpm.exp tpm.lib tpm.res
-	del tpm-win-bin
+	rm -r -fo tpm-win-bin
 
