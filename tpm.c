@@ -519,6 +519,7 @@ tpm_pick_toothpaste(list_node_t* head,toothpaste_pick_options_t topts)
 	unsigned int day;
 	char username[UNLEN + 1];
 	char line[MAX_LINE_LENGTH];
+	int new_pick_flag =0;
 	
 	memset(line,0,MAX_LINE_LENGTH);
 	memset(username,0,UNLEN+1);
@@ -604,7 +605,7 @@ tpm_pick_toothpaste(list_node_t* head,toothpaste_pick_options_t topts)
 			sprintf(line,"%s", "New next pick stats updated \n");
 			strcat(pick.message,line);
 		}
-		
+		new_pick_flag=1;
 		pick.stats.total_picks++;
 		pick.stats.last_pick_time=total_seconds;
 		write_counters(pick.stats);
@@ -618,18 +619,19 @@ tpm_pick_toothpaste(list_node_t* head,toothpaste_pick_options_t topts)
 			 }
 		}
 	}
-	else if (topts.verbose) 
+	if (topts.verbose) 
 	{
-		sprintf(line,"%s", "Already picked today \n");
-		strcat(pick.message,line);	
-		
+		if (new_pick_flag==0)
+		{	
+			sprintf(line,"%s", "Already picked today \n");
+			strcat(pick.message,line);	
+		}
 		sprintf(line,"%s\n", pick_type_strings[topts.ptype] );
 		strcat(pick.message,line);
 		
 		sprintf(line,"%s %s %s (%ug) [%u/100] %s %s %s %u %s %u/%u \n", "Toothpaste:", ">>>", pick.what.toothpaste_brand, pick.what.tube_mass_g, pick.what.rating, "<<<", "Day:" ,days_of_week[j],day, "Toothpaste index:",i,pick.total_toothpastes);
 		strcat(pick.message,line);
 		
-
 		sprintf(line,"%s %u %s %llu  \n", "Total picks:", pick.stats.total_picks, "Last pick time:" ,pick.stats.last_pick_time);
 		strcat(pick.message,line);
 	
@@ -678,6 +680,7 @@ char* cfg_get_rec(const struct cfg_struct* cfg, const char* key)
 {
 	const char* val;
 	unsigned int i=0;
+	
 	do
 	{
 		val = cfg_get(cfg,key);
