@@ -397,8 +397,8 @@ stop_system(void)
     int c;
 	
     printf("Press Enter to continue...");
-    while ((c = getchar()) != EOF && c != '\n');
-    getchar(); 
+    while ((c = getchar(void)) != EOF && c != '\n');
+    getchar(void); 
 	
 	return;
 }
@@ -420,7 +420,7 @@ finish(int flag,toothpaste_pick_t* pick)
 #ifdef _WIN32
 	system("pause");
 #else
-	stop_system();
+	stop_system(void);
 #endif
 	}
 	return 0;
@@ -452,7 +452,7 @@ get_user_home_dir(void)
         home_dir = strdup(home_env);
     } else {
         struct passwd *pwd;
-        uid_t uid = getuid();
+        uid_t uid = getuid(void);
         pwd = getpwuid(uid);
         if (pwd != NULL) {
             home_dir = strdup(pwd->pw_dir);
@@ -474,7 +474,7 @@ get_current_username(char* buffer, size_t buffer_size)
     }
     return -1; 
 #else
-    uid_t uid = geteuid();
+    uid_t uid = geteuid(void);
     struct passwd *pw = getpwuid(uid);
 	const char* user_env = getenv("LOGNAME");
 	
@@ -575,7 +575,7 @@ tpm_pick_toothpaste(list_node_t* head,toothpaste_pick_options_t topts)
 	if (topts.ptype==PICK_RANDOM) 
 	{
 		seed_xrp32(total_seconds);
-		i=(prng64_xrp32()%pick.total_toothpastes);
+		i=(prng64_xrp32(void)%pick.total_toothpastes);
 	}
 	if (topts.ptype==PICK_BY_BRAND) 
 	{
@@ -735,7 +735,7 @@ read_config(const char* src)
 	opts.pick_by_index_index=pick_by_index_index;
 	opts.brand_string=brand_string;
 	
-	cfg = cfg_init();
+	cfg = cfg_init(void);
 	if (cfg_load(cfg, src) < 0)
 	{
 		fprintf(stderr, "Unable to load config ~tpm/tpm.conf\n");
@@ -771,7 +771,7 @@ read_config(const char* src)
 	if (value!=NULL) opts.brand_string = (value);
 	value = cfg_get_rec(cfg, "RESET_COUNTER");
 	if (value!=NULL) {reset_counters_v=atoi(cfg_get_rec(cfg, "RESET_COUNTER"));}
-	if (reset_counters_v){ reset_counters();}
+	if (reset_counters_v){ reset_counters(void);}
 	value = cfg_get_rec(cfg, "SET_COUNTER");
 	if (value!=NULL) {set_counters_v=atoi(cfg_get_rec(cfg, "SET_COUNTER"));}
 	if (set_counters_v) set_counters(&set_counters_v);
@@ -786,7 +786,7 @@ main(int argc, char* argv[])
 	int opt;
 	FILE* output_file;
 	toothpaste_pick_t* pick;
-	char* user_home_dir=get_user_home_dir();
+	char* user_home_dir=get_user_home_dir(void);
 	toothpaste_pick_options_t topts;
 	struct cfg_struct* cfg; 
 	
@@ -825,7 +825,7 @@ main(int argc, char* argv[])
 		topts.json_flag=1;
         break;
 		case 'v':
-        version();
+        version(void);
         break;
         case 'x':
         topts.ptype = PICK_RANDOM;
@@ -837,7 +837,7 @@ main(int argc, char* argv[])
 		topts.lat_flag=1;
         break;
         case 'r':
-		reset_counters();
+		reset_counters(void);
         break;
  		case 's':
 			set_counters(optarg);
@@ -896,7 +896,7 @@ main(int argc, char* argv[])
 	}
 	if (config_load_failure) 
 	{
-		cfg=cfg_init(); 
+		cfg=cfg_init(void); 
 		save_default_config(cfg);
 	}
 	if ((output_file)!=stdout)
