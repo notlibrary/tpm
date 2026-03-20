@@ -1,17 +1,19 @@
-CC=cl.exe
-LINKER=link.exe
-MKDIR= mkdir
-CFLAGS=/c /EHsc /Fo
-LFLAGS  = /OUT:
+CC = cl.exe
+LINKER = link.exe
+MKDIR = mkdir
+CFLAGS = /c /EHsc /Fo
+LFLAGS = /OUT:
 TARGET_DIR ="C:\Program Files\tpm"
-SOURCES=tpm.c\
-		prng64_xrp32.c\
-		cfg_parse.c\
-		getopt.c
-OBJECTS=tpm.obj\
-		prng64_xrp32.obj\
-		cfg_parse.obj\
-		getopt.obj
+SOURCES = \
+	tpm.c\
+	prng64_xrp32.c\
+	cfg_parse.c\
+	getopt.c
+OBJECTS = \
+	tpm.obj\
+	prng64_xrp32.obj\
+	cfg_parse.obj\
+	getopt.obj
 		
 all: tpm.exe install clean
 
@@ -35,5 +37,6 @@ install:
 
 clean:	
 	del tpm.exe $(OBJECTS) tpm.exp tpm.lib tpm.res
-	rm -r -fo tpm-win-bin
+	@if exist tpm-win-bin\
+	rmdir /S tpm-win-bin
 
