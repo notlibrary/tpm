@@ -22,12 +22,12 @@ $(OBJECTS):$(SOURCES)
 	$(CC) $(CFLAGS) $(SOURCES)
 	rc /nologo tpm.rc
 distr:
-	@if not exist toothpaste\ mkdir toothpaste-picking-manager
-    copy tpm.exe toothpaste-picking-manager
-    copy toothpastes.sample toothpaste-picking-manager
-    copy tpm.conf.sample toothpaste-picking-manager
-    copy README.md toothpaste-picking-manager
-    zip -r tpm-win-bin.zip toothpaste-picking-manager
+	@if not exist tpm-win-bin\ mkdir tpm-win-bin
+    copy tpm.exe tpm-win-bin
+    copy toothpastes.sample tpm-win-bin
+    copy tpm.conf.sample tpm-win-bin
+    copy README.md tpm-win-bin
+    zip -r tpm-win-bin.zip tpm-win-bin
 	
 install:
 	@if not exist $(TARGET_DIR)\ mkdir $(TARGET_DIR)
@@ -35,4 +35,5 @@ install:
 
 clean:	
 	del tpm.exe $(OBJECTS) tpm.exp tpm.lib tpm.res
+	del tpm-win-bin
 

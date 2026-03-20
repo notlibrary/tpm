@@ -21,6 +21,7 @@ install:
 	cp $(CURRENT_DIR)/tpm /usr/local/bin/
 clean:	
 	rm $(CURRENT_DIR)/tpm $(OBJECTS)
+	rm -r tpm-linux-bin
 distr:
 	mkdir -p tpm-linux-bin
 	cp tpm.conf.sample toothpastes.sample tpm README.md tpm-linux-bin
