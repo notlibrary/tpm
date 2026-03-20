@@ -7,9 +7,9 @@ static pick_type_t pick_type = PICK_DEFAULT;
 static list_node_t* toothpastes_list;
 
 static const toothpaste_data_t toothpastes[TOTAL_TOOTHPASTES]={
-	{0,"Toothpaste 1",75,90},
-	{1,"Toothpaste 2",150,100},
-	{2,"Toothpaste 3",50,80}
+	{0,"Builtin Toothpaste 1",75,90},
+	{1,"Builtin Toothpaste 2",150,100},
+	{2,"Builtin Toothpaste 3",50,80}
 };
 static const char* pick_type_strings[TOTAL_PICK_TYPE_STRINGS]={
 	"Pick type: Default",
