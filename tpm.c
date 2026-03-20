@@ -3,8 +3,8 @@
 */
 #include "tpm.h"
 
-pick_type_t pick_type = PICK_DEFAULT;
-list_node_t* toothpastes_list;
+static pick_type_t pick_type = PICK_DEFAULT;
+static list_node_t* toothpastes_list;
 
 static const toothpaste_data_t toothpastes[TOTAL_TOOTHPASTES]={
 	{0,"Toothpaste 1",75,90},
@@ -49,17 +49,17 @@ static char toothpastes_file_path_final[MAX_PATH];
 static char output_file_path_final[MAX_PATH];
 static char config_file_path_final[MAX_PATH];
 
-static int verbose = 1;
-static int lat_flag=0;
-static int json_flag=0;
-static int output_to_file=0;
-static int pick_by_index_index = 0;
-static char* brand_string = NULL;
+static int verbose =1;
+static int lat_flag =0;
+static int json_flag =0;
+static int output_to_file =0;
+static int pick_by_index_index =0;
+static char* brand_string =NULL;
 
-static int delta_days= 0;
-static int delta_hours= 0;
+static int delta_days =0;
+static int delta_hours =0;
 
-static int config_load_failure= 0;
+static int config_load_failure =0;
 
 static list_node_t* 
 create_node(toothpaste_data_t p_data) 
@@ -102,6 +102,8 @@ rtrim(char *s)
 
   
     s[i + 1] = '\0';
+	
+	return;
 }
 
 TPM list_node_t* 
@@ -163,6 +165,7 @@ display_list(list_node_t* head, toothpaste_pick_t* pick)
 		cnt++;
 		if (cnt>MAX_TOOTHPASTE_LINES){break;}
 	}
+	return;
 }
 
 static unsigned int 
@@ -296,6 +299,7 @@ free_list(list_node_t* head)
         head = head->next;
         free(temp);
     }
+	return;
 }
 
 
@@ -395,6 +399,8 @@ stop_system(void)
     printf("Press Enter to continue...");
     while ((c = getchar()) != EOF && c != '\n');
     getchar(); 
+	
+	return;
 }
 
 TPM int 
@@ -496,6 +502,7 @@ version(void)
 {
 	printf("%s %u.%u.%u \n",TPM_STRING,TPM_VERSION_MAJOR,TPM_VERSION_MINOR,TPM_VERSION_PATCH);
 	exit(EXIT_FAILURE);
+	return;
 }
 
 TPM char* 
@@ -746,11 +753,11 @@ read_config(const char* src)
 	if ((value!=NULL) && atoi(value)>=0 && atoi(value)<TOTAL_PICK_TYPE_STRINGS) opts.ptype =  atoi(value);
 	value = cfg_get_rec(cfg, "VERBOSE");
 	if (value!=NULL) opts.verbose = atoi(value); else opts.verbose=verbose;
-	value = cfg_get(cfg, "TOOTHPASTES");
+	value = cfg_get_rec(cfg, "TOOTHPASTES");
 	if (value!=NULL) strcpy(toothpastes_file_path_final,value); 
-	value = cfg_get(cfg, "LAST_PICK");
+	value = cfg_get_rec(cfg, "LAST_PICK");
 	if (value!=NULL) strcpy(output_file_path_final,value); 
-	value = cfg_get(cfg, "PICK_STATS"); 
+	value = cfg_get_rec(cfg, "PICK_STATS"); 
 	if (value!=NULL) strcpy(stats_file_path_final,value); 
 	value = cfg_get_rec(cfg, "LIST_TOOTHPASTES");
 	if (value!=NULL) opts.lat_flag =  atoi(value);
