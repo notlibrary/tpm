@@ -21,8 +21,8 @@ install:
 	cp $(CURRENT_DIR)/tpm /usr/local/bin/
 clean:	
 	rm $(CURRENT_DIR)/tpm $(OBJECTS)
-	rm -rf tpm-linux-bin
+	rm -rf tpm-linux-bin-amd64
 distr:
-	mkdir -p tpm-linux-bin
-	cp tpm.conf.sample toothpastes.sample tpm README.md tpm-linux-bin
-	tar -czf tpm-linux-bin.tar.gz tpm-linux-bin
+	mkdir -p tpm-linux-bin-amd64
+	cp tpm.conf.sample toothpastes.sample tpm README.md tpm-linux-bin-amd64
+	tar -czf tpm-linux-bin-amd64.tar.gz tpm-linux-bin-amd64

@@ -6,7 +6,7 @@ on:
       - "*"
 
 env:
-  APP_NAME: toothpaste-picking-manager
+  APP_NAME: tpm-win-bin-amd64
 
 jobs:
   build:
@@ -14,7 +14,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Setup VS PS
         uses: ilammy/msvc-dev-cmd@v1 
         with:
@@ -29,7 +29,7 @@ jobs:
           cp toothpastes.sample ${{ env.APP_NAME }}
           cp tpm.conf.sample ${{ env.APP_NAME }}
           cp README.md ${{ env.APP_NAME }}
-          Compress-Archive -Path toothpaste-picking-manager -DestinationPath tpm-win.zip
+          Compress-Archive -Path tpm-win-bin-amd64 -DestinationPath tpm-win-bin-amd64.zip
 
       - name: Create Release
         id: create_release
@@ -42,4 +42,4 @@ jobs:
           body: Toothpaste picking manager
           token: ${{ secrets.PAT3 }}
           files: |
-            tpm-win-bin.zip
+            tpm-win-bin-amd64.zip

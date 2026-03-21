@@ -14,7 +14,7 @@ OBJECTS = \
 	prng64_xrp32.obj\
 	cfg_parse.obj\
 	getopt.obj
-		
+	
 all: tpm.exe install clean
 
 tpm.exe: $(OBJECTS)
@@ -23,20 +23,21 @@ tpm.exe: $(OBJECTS)
 $(OBJECTS):$(SOURCES)
 	$(CC) $(CFLAGS) $(SOURCES)
 	rc /nologo tpm.rc
+
 distr:
-	@if not exist tpm-win-bin\ mkdir tpm-win-bin
-    copy tpm.exe tpm-win-bin
-    copy toothpastes.sample tpm-win-bin
-    copy tpm.conf.sample tpm-win-bin
-    copy README.md tpm-win-bin
-    zip -r tpm-win-bin.zip tpm-win-bin
+	@if not exist tpm-win-bin-amd64\ mkdir tpm-win-bin-amd64
+    copy tpm.exe tpm-win-bin-amd64
+    copy toothpastes.sample tpm-win-bin-amd64
+    copy tpm.conf.sample tpm-win-bin-amd64
+    copy README.md tpm-win-bin-amd64
+    zip -r tpm-win-bin-amd64.zip tpm-win-bin-amd64
 	
 install:
 	@if not exist $(TARGET_DIR)\ mkdir $(TARGET_DIR)
 	copy "tpm.exe" "C:\Program Files\tpm\tpm.exe"
 
-clean:	
+clean:
 	del tpm.exe $(OBJECTS) tpm.exp tpm.lib tpm.res
-	@if exist tpm-win-bin\
-	rmdir /S /Q tpm-win-bin
+	@if exist tpm-win-bin-amd64\
+	rmdir /S /Q tpm-win-bin-amd64
 
