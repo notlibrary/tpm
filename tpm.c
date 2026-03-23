@@ -434,33 +434,45 @@ get_user_home_dir(void)
 
 #ifdef _WIN32
     const char* user_profile_env = getenv("USERPROFILE");
-    if (user_profile_env != NULL) {
+	const char* home_drive;
+    const char* home_path;
+	size_t len; 
+	
+    if (user_profile_env != NULL) 
+	{
         home_dir = _strdup(user_profile_env); 
-    } else {
-        const char* home_drive = getenv("HOMEDRIVE");
-        const char* home_path = getenv("HOMEPATH");
-        if (home_drive != NULL && home_path != NULL) {
-            size_t len = strlen(home_drive) + strlen(home_path) + 1;
-            home_dir = malloc(len);
-            if (home_dir != NULL) {
-                snprintf(home_dir, len, "%s%s", home_drive, home_path);
-            }
-        }
+    } 
+	else {
+		home_drive = getenv("HOMEDRIVE");
+		home_path = getenv("HOMEPATH");
+		if (home_drive != NULL && home_path != NULL) 
+		{
+			len = strlen(home_drive) + strlen(home_path) + 1;
+			home_dir = malloc(len);
+			if (home_dir != NULL) 
+			{
+				snprintf(home_dir, len, "%s%s", home_drive, home_path);
+			}
+		}
     }
 #else
     const char* home_env = getenv("HOME");
-    if (home_env != NULL) {
+    struct passwd *pwd;
+    uid_t uid;
+	
+    if (home_env != NULL) 
+	{
         home_dir = strdup(home_env);
-    } else {
-        struct passwd *pwd;
-        uid_t uid = getuid();
-        pwd = getpwuid(uid);
+    } 
+	else 
+	{
+        uid = getuid();
+		pwd = getpwuid(uid);
         if (pwd != NULL) {
             home_dir = strdup(pwd->pw_dir);
         }
     }
 #endif
-
     return home_dir;
 }
 
