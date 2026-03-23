@@ -157,10 +157,10 @@ display_list(list_node_t* head, toothpaste_pick_t* pick)
 	memset(line,0,MAX_TOOTHPASTE_LINE);
 	memset(pick->message,0,OUTPUT_BLOCK_SIZE);
 	
-	sprintf(pick->message,"Index | Brand | Tube Mass | Rating\n");
+	snprintf(pick->message,MAX_TOOTHPASTE_LINE,"Index | Brand | Tube Mass | Rating\n");
 	while (current != NULL) {
-        sprintf(line,"%d %s %d %d\n", current->data.index, current->data.toothpaste_brand, current->data.tube_mass_g, current->data.rating);
-        strcat(pick->message,line);
+        snprintf(line,MAX_TOOTHPASTE_LINE,"%d %s %d %d\n", current->data.index, current->data.toothpaste_brand, current->data.tube_mass_g, current->data.rating);
+        strncat(pick->message,line,MAX_LINE_LENGTH);
 		current = current->next;
 		cnt++;
 		if (cnt>MAX_TOOTHPASTE_LINES){break;}
@@ -311,16 +311,17 @@ reset_counters(void)
 	time_t zero_time =0;
 	
 	file_ptr = fopen(stats_file_path_final, "wb");
-		if (file_ptr == NULL) {
-			perror("Error opening pickstats file for writing");
-			return 1;
-		}	
+	if (file_ptr == NULL) 
+	{
+		perror("Error opening pickstats file for writing");
+		return 1;
+	}	
 
-		fwrite(&zero, sizeof(int), 1, file_ptr);
-		fwrite(&zero_time, sizeof(time_t), 1, file_ptr);
-		fclose(file_ptr);
-		printf("%s", "Pick counter clear\n"); 
-		return 0;
+	fwrite(&zero, sizeof(int), 1, file_ptr);
+	fwrite(&zero_time, sizeof(time_t), 1, file_ptr);
+	fclose(file_ptr);
+	printf("%s", "Pick counter clear\n"); 
+	return 0;
 }
 
 static int 
@@ -560,8 +561,8 @@ tpm_pick_toothpaste(list_node_t* head,toothpaste_pick_options_t topts)
 	if (topts.verbose)
 	{
 		
-		sprintf(line,"Good %s %s %s \n", times_of_day[i],pick.who ,"Welcome to the toothpaste picking manager");
-		strcat(pick.message,line);
+		snprintf(line,MAX_TOOTHPASTE_LINE,"Good %s %s %s \n", times_of_day[i],pick.who ,"Welcome to the toothpaste picking manager");
+		strncat(pick.message,line,MAX_LINE_LENGTH);
 	}
 	
 	day = total_seconds/SECONDS_PER_DAY;
@@ -609,8 +610,8 @@ tpm_pick_toothpaste(list_node_t* head,toothpaste_pick_options_t topts)
 	{
 		if (topts.verbose) 
 		{
-			sprintf(line,"%s", "New next pick stats updated \n");
-			strcat(pick.message,line);
+			snprintf(line,MAX_TOOTHPASTE_LINE,"%s", "New next pick stats updated \n");
+			strncat(pick.message,line,MAX_LINE_LENGTH);
 		}
 		new_pick_flag=1;
 		pick.stats.total_picks++;
@@ -621,8 +622,8 @@ tpm_pick_toothpaste(list_node_t* head,toothpaste_pick_options_t topts)
 		{
 			 if (topts.verbose) 
 			 { 
-					sprintf(line,"%s", "180 days toothbrush time span over swap the toothbrush(or order new one) \n"); 
-					strcat(pick.message,line);
+					snprintf(line,MAX_TOOTHPASTE_LINE,"%s", "180 days toothbrush time span over swap the toothbrush(or order new one) \n"); 
+					strncat(pick.message,line,MAX_LINE_LENGTH);
 			 }
 		}
 	}
@@ -630,25 +631,25 @@ tpm_pick_toothpaste(list_node_t* head,toothpaste_pick_options_t topts)
 	{
 		if (new_pick_flag==0)
 		{	
-			sprintf(line,"%s", "Already picked today \n");
-			strcat(pick.message,line);	
+			snprintf(line,MAX_TOOTHPASTE_LINE,"%s", "Already picked today \n");
+			strncat(pick.message,line,MAX_LINE_LENGTH);	
 		}
-		sprintf(line,"%s\n", pick_type_strings[topts.ptype] );
-		strcat(pick.message,line);
+		snprintf(line,MAX_TOOTHPASTE_LINE,"%s\n", pick_type_strings[topts.ptype] );
+		strncat(pick.message,line,MAX_LINE_LENGTH);
 		
-		sprintf(line,"%s %s %s (%ug) [%u/100] %s %s %s %u %s %u/%u \n", "Toothpaste:", ">>>", pick.what.toothpaste_brand, pick.what.tube_mass_g, pick.what.rating, "<<<", "Day:" ,days_of_week[j],day, "Toothpaste index:",i,pick.total_toothpastes);
-		strcat(pick.message,line);
+		snprintf(line,MAX_LINE_LENGTH,"%s %s %s (%ug) [%u/100] %s %s %s %u %s %u/%u \n", "Toothpaste:", ">>>", pick.what.toothpaste_brand, pick.what.tube_mass_g, pick.what.rating, "<<<", "Day:" ,days_of_week[j],day, "Toothpaste index:",i,pick.total_toothpastes);
+		strncat(pick.message,line,MAX_LINE_LENGTH);
 		
-		sprintf(line,"%s %u %s %llu  \n", "Total picks:", pick.stats.total_picks, "Last pick time:" ,pick.stats.last_pick_time);
-		strcat(pick.message,line);
+		snprintf(line,MAX_LINE_LENGTH,"%s %u %s %llu  \n", "Total picks:", pick.stats.total_picks, "Last pick time:" ,pick.stats.last_pick_time);
+		strncat(pick.message,line,MAX_LINE_LENGTH);
 	
 	}
 	else 
 	{
-		sprintf(pick.message,"%s (%ug) [%u/100] \n", pick.what.toothpaste_brand,pick.what.tube_mass_g, pick.what.rating);	
+		snprintf(pick.message,MAX_TOOTHPASTE_LINE,"%s (%ug) [%u/100] \n", pick.what.toothpaste_brand,pick.what.tube_mass_g, pick.what.rating);	
 	}
 	
-	sprintf(pick.JSON,"{\n\t \"who\":\"%s\",\n\t \"toothpaste\":\"%s\",\n\t \"tube_mass_g\":%u,\n\t \"rating\":%u \n}",pick.who,pick.what.toothpaste_brand,pick.what.tube_mass_g,pick.what.rating);
+	snprintf(pick.JSON,MAX_LINE_LENGTH,"{\n\t \"who\":\"%s\",\n\t \"toothpaste\":\"%s\",\n\t \"tube_mass_g\":%u,\n\t \"rating\":%u \n}",pick.who,pick.what.toothpaste_brand,pick.what.tube_mass_g,pick.what.rating);
 	
 	if (topts.lat_flag) {
 		list_available_toothpastes(&pick);
@@ -754,11 +755,11 @@ read_config(const char* src)
 	value = cfg_get_rec(cfg, "VERBOSE");
 	if (value!=NULL) opts.verbose = atoi(value); else opts.verbose=verbose;
 	value = cfg_get_rec(cfg, "TOOTHPASTES");
-	if (value!=NULL) strcpy(toothpastes_file_path_final,value); 
+	if (value!=NULL) strncpy(toothpastes_file_path_final,value,MAX_PATH); 
 	value = cfg_get_rec(cfg, "LAST_PICK");
-	if (value!=NULL) strcpy(output_file_path_final,value); 
+	if (value!=NULL) strncpy(output_file_path_final,value,MAX_PATH); 
 	value = cfg_get_rec(cfg, "PICK_STATS"); 
-	if (value!=NULL) strcpy(stats_file_path_final,value); 
+	if (value!=NULL) strncpy(stats_file_path_final,value,MAX_PATH); 
 	value = cfg_get_rec(cfg, "LIST_TOOTHPASTES");
 	if (value!=NULL) opts.lat_flag =  atoi(value);
 	value = cfg_get_rec(cfg, "OUTPUT_JSON");
@@ -791,21 +792,21 @@ main(int argc, char* argv[])
 	struct cfg_struct* cfg; 
 	
 #ifdef _WIN32
-	strcat(user_home_dir,"\\tpm\\");
+	strncat(user_home_dir,"\\tpm\\",MAX_PATH);
 #else
-	strcat(user_home_dir,"/tpm/");
+	strncat(user_home_dir,"/tpm/",MAX_PATH);
 #endif
-	strcpy(stats_file_path_final,user_home_dir);
-	strcat(stats_file_path_final,stats_file_name);
+	strncpy(stats_file_path_final,user_home_dir,MAX_PATH);
+	strncat(stats_file_path_final,stats_file_name,MAX_PATH);
 	
-	strcpy(toothpastes_file_path_final,user_home_dir);
-	strcat(toothpastes_file_path_final,toothpastes_file_name);
+	strncpy(toothpastes_file_path_final,user_home_dir,MAX_PATH);
+	strncat(toothpastes_file_path_final,toothpastes_file_name,MAX_PATH);
 	
-	strcpy(output_file_path_final,user_home_dir);
-	strcat(output_file_path_final,output_file_name);
+	strncpy(output_file_path_final,user_home_dir,MAX_PATH);
+	strncat(output_file_path_final,output_file_name,MAX_PATH);
 
-	strcpy(config_file_path_final,user_home_dir);
-	strcat(config_file_path_final,config_file_name);
+	strncpy(config_file_path_final,user_home_dir,MAX_PATH);
+	strncat(config_file_path_final,config_file_name,MAX_PATH);
 	
 	free(user_home_dir);
 	topts=read_config(config_file_path_final);
@@ -869,7 +870,7 @@ main(int argc, char* argv[])
 	}
 	if (argv[optind]!=NULL)
 	{
-		strcpy(toothpastes_file_path_final,argv[optind]);
+		strncpy(toothpastes_file_path_final,argv[optind],MAX_PATH);
 	}	
 	if (output_to_file)
 	{
