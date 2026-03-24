@@ -168,10 +168,10 @@ DELTA_DAYS=0
 ## TPM Toothpastes Picking Manager Toothpastes List CSV format sample
 ```
 #Index,Brand string,Tube mass grams,Rating
-0,Toothpaste 1,100,85
-1,Toothpaste 2,50,90
-2,Toothpaste 3,150,100
-3,Toothpaste 4,50,100
+0,Random Toothpaste 1,100,85
+1,Random Toothpaste 2,50,90
+2,Random Toothpaste 3,150,100
+3,Random Toothpaste 4,50,100
 4,Nothing,0,0
 ```
 Sure you can pick anything this way not only toothpastes
