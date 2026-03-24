@@ -3,7 +3,7 @@
 */
 #include "tpm.h"
 
-static pick_type_t pick_type = PICK_DEFAULT;
+static pick_type_t pick_type =PICK_DEFAULT;
 static list_node_t* toothpastes_list;
 
 static const toothpaste_data_t toothpastes[TOTAL_TOOTHPASTES]={
@@ -39,10 +39,10 @@ static const char* times_of_day[TOTAL_TIMES_OF_DAY]={
 	
 };	
 
-static const char stats_file_name[MAX_PATH]="pickstats";
-static const char toothpastes_file_name[MAX_PATH]="toothpastes";
-static const char output_file_name[MAX_PATH]="last_pick";
-static const char config_file_name[MAX_PATH]="tpm.conf";
+static const char stats_file_name[MAX_PATH] ="pickstats";
+static const char toothpastes_file_name[MAX_PATH] ="toothpastes";
+static const char output_file_name[MAX_PATH] ="last_pick";
+static const char config_file_name[MAX_PATH] ="tpm.conf";
 
 static char stats_file_path_final[MAX_PATH];
 static char toothpastes_file_path_final[MAX_PATH];
@@ -66,7 +66,8 @@ create_node(toothpaste_data_t p_data)
 {
     list_node_t* new_node = (list_node_t*)malloc(sizeof(list_node_t));
     
-	if (new_node == NULL) {
+	if (new_node == NULL) 
+	{
         perror("Memory allocation failed");
         exit(EXIT_FAILURE);
     }
@@ -81,10 +82,12 @@ add_to_list(list_node_t* head, toothpaste_data_t p_data)
     list_node_t* new_node = create_node(p_data);
     list_node_t* current = head;
 	
-	if (head == NULL) {
+	if (head == NULL) 
+	{
         return new_node;
     }
-    while (current->next != NULL) {
+    while (current->next != NULL) 
+	{
         current = current->next;
     }
     current->next = new_node;
@@ -96,7 +99,8 @@ rtrim(char *s)
 {
     int i = strlen(s) - 1; 
 
-    while (i >= 0 && isspace((unsigned char)s[i])) {
+    while (i >= 0 && isspace((unsigned char)s[i])) 
+	{
         i--;
     }
 
@@ -117,7 +121,8 @@ tpm_load_list_from_file(const char* filename)
 	char line[MAX_LINE_LENGTH];
 	char* current = line;
 	
-    if (file == NULL) {
+    if (file == NULL) 
+	{
         perror("Error opening toothpastes file falling back to default");
 		for (i=0;i<TOTAL_TOOTHPASTES;i++)
 		{
@@ -127,16 +132,20 @@ tpm_load_list_from_file(const char* filename)
 		return head;
     }
 	
-    while (fgets(line, sizeof(line), file) != NULL) {
+    while (fgets(line, sizeof(line), file) != NULL) 
+	{
         
-        while (isspace((unsigned char)*current)) {
+        while (isspace((unsigned char)*current)) 
+		{
             current++;
         }
 
-        if (*current == '\0' || *current == COMMENT_CHAR) {
+        if (*current == '\0' || *current == COMMENT_CHAR) 
+		{
             continue; 
         }
-		if (sscanf(current, "%u, %[^,],%u,%u\n", &temp_data.index,temp_data.toothpaste_brand ,&temp_data.tube_mass_g,&temp_data.rating) == 4) {
+		if (sscanf(current, "%u, %[^,],%u,%u\n", &temp_data.index,temp_data.toothpaste_brand ,&temp_data.tube_mass_g,&temp_data.rating) == 4) 
+		{
 			rtrim(temp_data.toothpaste_brand);
 			head = add_to_list(head, temp_data);	
 			cnt++;
@@ -158,7 +167,8 @@ display_list(list_node_t* head, toothpaste_pick_t* pick)
 	memset(pick->message,0,OUTPUT_BLOCK_SIZE);
 	
 	snprintf(pick->message,MAX_TOOTHPASTE_LINE,"Index | Brand | Tube Mass | Rating\n");
-	while (current != NULL) {
+	while (current != NULL) 
+	{
         snprintf(line,MAX_TOOTHPASTE_LINE,"%d %s %d %d\n", current->data.index, current->data.toothpaste_brand, current->data.tube_mass_g, current->data.rating);
         strncat(pick->message,line,MAX_LINE_LENGTH);
 		current = current->next;
@@ -174,7 +184,8 @@ count_list(list_node_t* head)
     unsigned int i=0;
 	list_node_t* current = head;
 	
-    while (current != NULL) {
+    while (current != NULL) 
+	{
         i++;
         current = current->next;
 	}
@@ -425,7 +436,8 @@ static int
 finish(int flag,toothpaste_pick_t* pick)
 {
 	tpm_free_toothpaste_pick(pick);
-	if (flag) {
+	if (flag) 
+	{
 #ifdef _WIN32
 	system("pause");
 #else
@@ -490,7 +502,8 @@ get_current_username(char* buffer, size_t buffer_size)
 #ifdef _WIN32
     DWORD len = (DWORD)buffer_size;
 	
-    if (GetUserName(buffer, &len)) {
+    if (GetUserName(buffer, &len)) 
+	{
         return 0; 
     }
     return -1; 
@@ -499,17 +512,20 @@ get_current_username(char* buffer, size_t buffer_size)
     struct passwd *pw = getpwuid(uid);
 	const char* user_env = getenv("LOGNAME");
 	
-    if (pw != NULL) {
+    if (pw != NULL) 
+	{
         strncpy(buffer, pw->pw_name, buffer_size);
         buffer[buffer_size - 1] = '\0';
         return 0; 
     }
     
 
-    if (user_env == NULL) {
+    if (user_env == NULL) 
+	{
         user_env = getenv("USER");
     }
-    if (user_env != NULL) {
+    if (user_env != NULL) 
+	{
         strncpy(buffer, user_env, buffer_size);
         buffer[buffer_size - 1] = '\0';
         return 0;
@@ -831,61 +847,63 @@ main(int argc, char* argv[])
 	free(user_home_dir);
 	topts=read_config(config_file_path_final);
 	config_load_failure=!file_exists_fopen(config_file_path_final);
-	while ((opt = getopt(argc, argv, "awojvxqlrs:p:i:b:z:d:")) != -1) {
-        switch (opt) {
-		case 'a':
-		topts.ptype = PICK_MAX_RATING;
-        break;
-		case 'w':
-		topts.ptype = PICK_MAX_MASS;
-        break;
-		case 'o':
-		topts.output_to_file=1;
-        break;
-		case 'j':
-		topts.json_flag=1;
-        break;
-		case 'v':
-        version();
-        break;
-        case 'x':
-        topts.ptype = PICK_RANDOM;
-        break;		
-        case 'q':
-        topts.verbose = 0;
-        break;
-        case 'l':
-		topts.lat_flag=1;
-        break;
-        case 'r':
-		reset_counters();
-        break;
- 		case 's':
-			set_counters(optarg);
-		break;
-		case 'p':
-			if (atoi(optarg)>=0 && atoi(optarg)<TOTAL_PICK_TYPE_STRINGS)
-			topts.ptype=atoi(optarg);
-		break; 	
-		case 'i':
-			topts.ptype=PICK_BY_INDEX;
-			topts.pick_by_index_index=atoi(optarg);
-		break;
-		case 'b':
-			topts.ptype=PICK_BY_BRAND;
-			topts.brand_string=optarg;
-		break; 	
-		case 'z':
-		if ( atoi(optarg)>=-MAX_TIMEZONE_DELTA && atoi(optarg)<=MAX_TIMEZONE_DELTA) delta_hours=atoi(optarg);
-		break; 		
-		case 'd':
-			delta_days=atoi(optarg);
-		break; 	
-		case '?': 
-            fprintf(stderr, "Usage: %s [-awojvxqlr] [-s total_picks value] [-p pick_type_value] [-i toothpaste_index] [-b brand_string -z delta_hours -d delta_days] [toothpastes_file] \n", argv[0]);
-            exit(EXIT_FAILURE);
-        default:
+	while ((opt = getopt(argc, argv, "awojvxqlrs:p:i:b:z:d:")) != -1) 
+	{
+        switch (opt) 
+		{
+			case 'a':
+			topts.ptype = PICK_MAX_RATING;
 			break;
+			case 'w':
+			topts.ptype = PICK_MAX_MASS;
+			break;
+			case 'o':
+			topts.output_to_file=1;
+			break;
+			case 'j':
+			topts.json_flag=1;
+			break;
+			case 'v':
+			version();
+			break;
+			case 'x':
+			topts.ptype = PICK_RANDOM;
+			break;		
+			case 'q':
+			topts.verbose = 0;
+			break;
+			case 'l':
+			topts.lat_flag=1;
+			break;
+			case 'r':
+			reset_counters();
+			break;
+			case 's':
+				set_counters(optarg);
+			break;
+			case 'p':
+				if (atoi(optarg)>=0 && atoi(optarg)<TOTAL_PICK_TYPE_STRINGS)
+				topts.ptype=atoi(optarg);
+			break; 	
+			case 'i':
+				topts.ptype=PICK_BY_INDEX;
+				topts.pick_by_index_index=atoi(optarg);
+			break;
+			case 'b':
+				topts.ptype=PICK_BY_BRAND;
+				topts.brand_string=optarg;
+			break; 	
+			case 'z':
+			if ( atoi(optarg)>=-MAX_TIMEZONE_DELTA && atoi(optarg)<=MAX_TIMEZONE_DELTA) delta_hours=atoi(optarg);
+			break; 		
+			case 'd':
+				delta_days=atoi(optarg);
+			break; 	
+			case '?': 
+				fprintf(stderr, "Usage: %s [-awojvxqlr] [-s total_picks value] [-p pick_type_value] [-i toothpaste_index] [-b brand_string -z delta_hours -d delta_days] [toothpastes_file] \n", argv[0]);
+				exit(EXIT_FAILURE);
+			default:
+				break;
         }
 	}
 	if (argv[optind]!=NULL)
@@ -896,10 +914,11 @@ main(int argc, char* argv[])
 	{
 		printf("%s %s \n","Output pick to file ",output_file_path_final);
 		output_file=fopen(output_file_path_final,"w");
-		if (output_file == NULL) {
+		if (output_file == NULL) 
+		{
 			perror("Error opening last_pick file for writing");
 
-			}		
+		}		
 	}
 	else
 	{
