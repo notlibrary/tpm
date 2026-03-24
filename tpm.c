@@ -94,7 +94,7 @@ add_to_list(list_node_t* head, toothpaste_data_t p_data)
     return head;
 }
 
-static void
+static char*
 rtrim(char *s) 
 {
     int i = strlen(s) - 1; 
@@ -107,6 +107,22 @@ rtrim(char *s)
   
     s[i + 1] = '\0';
 	
+	return s;
+}
+
+static void
+ltrim(char *s) 
+{
+    int i = 0; 
+
+    while (isspace((unsigned char)s[i])) 
+	{
+       i++;
+	   s++;
+	}
+
+  
+    	
 	return;
 }
 
@@ -146,7 +162,7 @@ tpm_load_list_from_file(const char* filename)
         }
 		if (sscanf(current, "%u, %[^,],%u,%u\n", &temp_data.index,temp_data.toothpaste_brand ,&temp_data.tube_mass_g,&temp_data.rating) == 4) 
 		{
-			rtrim(temp_data.toothpaste_brand);
+			ltrim(rtrim(temp_data.toothpaste_brand));
 			head = add_to_list(head, temp_data);	
 			cnt++;
 			if (cnt>MAX_TOOTHPASTE_LINES){break;}

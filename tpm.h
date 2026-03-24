@@ -126,7 +126,8 @@ TPM int tpm_free_toothpaste_pick(toothpaste_pick_t* pick);
 
 static list_node_t* create_node(toothpaste_data_t p_data);
 static list_node_t* add_to_list(list_node_t* head, toothpaste_data_t p_data);
-static void rtrim(char *s); 
+static char* rtrim(char *s); 
+static void ltrim(char *s); 
 static void display_list(list_node_t* head, toothpaste_pick_t* pick);  
 static unsigned int count_list(list_node_t* head);
 static toothpaste_data_t get_item_by_index(list_node_t* head,unsigned int i);
