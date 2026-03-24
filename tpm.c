@@ -849,16 +849,16 @@ main(int argc, char* argv[])
 	strncat(user_home_dir,"/tpm/",MAX_PATH);
 #endif
 	strncpy(stats_file_path_final,user_home_dir,MAX_PATH);
-	strncat(stats_file_path_final,stats_file_name,MAX_PATH);
+	strncat(stats_file_path_final,stats_file_name,MAX_PATH/2);
 	
 	strncpy(toothpastes_file_path_final,user_home_dir,MAX_PATH);
-	strncat(toothpastes_file_path_final,toothpastes_file_name,MAX_PATH);
+	strncat(toothpastes_file_path_final,toothpastes_file_name,MAX_PATH/2);
 	
 	strncpy(output_file_path_final,user_home_dir,MAX_PATH);
-	strncat(output_file_path_final,output_file_name,MAX_PATH);
+	strncat(output_file_path_final,output_file_name,MAX_PATH/2);
 
 	strncpy(config_file_path_final,user_home_dir,MAX_PATH);
-	strncat(config_file_path_final,config_file_name,MAX_PATH);
+	strncat(config_file_path_final,config_file_name,MAX_PATH/2);
 	
 	free(user_home_dir);
 	topts=read_config(config_file_path_final);
