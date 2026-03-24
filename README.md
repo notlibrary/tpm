@@ -64,6 +64,8 @@ Also `pick.sql` contains other sql queries for different pick methods.
 The point is in fact you do not need sqlite postgres or lmdb to perform a single pick
 and sometimes even the single pick is more than enough
 
+How many sqliters does it take to pick the toothpaste? `NULL`
+
 
 ## Command line options
 `-a` pick toothpaste with highest rating
