@@ -799,35 +799,87 @@ read_config(const char* src)
 	
 
 	value = cfg_get_rec(cfg, "TIMEZONE");
-	if ((value!=NULL) && atoi(value)>=-MAX_TIMEZONE_DELTA && atoi(value)<=MAX_TIMEZONE_DELTA) delta_hours=atoi(value);
+	if ((value!=NULL) && atoi(value)>=-MAX_TIMEZONE_DELTA && atoi(value)<=MAX_TIMEZONE_DELTA) 
+	{
+		delta_hours=atoi(value);
+	}
 	value = cfg_get_rec(cfg, "DELTA_DAYS");
-	if (value!=NULL) delta_days = atoi(value);
+	if (value!=NULL)
+	{	
+		delta_days = atoi(value);
+	}
 	value = cfg_get_rec(cfg, "PICK_TYPE");
-	if ((value!=NULL) && atoi(value)>=0 && atoi(value)<TOTAL_PICK_TYPE_STRINGS) opts.ptype =  atoi(value);
+	if ((value!=NULL) && atoi(value)>=0 && atoi(value)<TOTAL_PICK_TYPE_STRINGS)
+	{
+		opts.ptype =  atoi(value);
+	}
 	value = cfg_get_rec(cfg, "VERBOSE");
-	if (value!=NULL) opts.verbose = atoi(value); else opts.verbose=verbose;
+	if (value!=NULL)
+	{
+		opts.verbose = atoi(value);
+	}		
+	else 
+	{
+		opts.verbose=verbose;
+	}
 	value = cfg_get_rec(cfg, "TOOTHPASTES");
-	if (value!=NULL) strncpy(toothpastes_file_path_final,value,MAX_PATH); 
+	if (value!=NULL)
+	{
+		strncpy(toothpastes_file_path_final,value,MAX_PATH); 
+	}
 	value = cfg_get_rec(cfg, "LAST_PICK");
-	if (value!=NULL) strncpy(output_file_path_final,value,MAX_PATH); 
+	if (value!=NULL) 
+	{
+		strncpy(output_file_path_final,value,MAX_PATH);
+	}	
 	value = cfg_get_rec(cfg, "PICK_STATS"); 
-	if (value!=NULL) strncpy(stats_file_path_final,value,MAX_PATH); 
+	if (value!=NULL) 
+	{
+		strncpy(stats_file_path_final,value,MAX_PATH); 
+	}
 	value = cfg_get_rec(cfg, "LIST_TOOTHPASTES");
-	if (value!=NULL) opts.lat_flag =  atoi(value);
+	if (value!=NULL) 
+	{
+		opts.lat_flag =  atoi(value);
+	}
 	value = cfg_get_rec(cfg, "OUTPUT_JSON");
-	if (value!=NULL) opts.json_flag =  atoi(value);
+	if (value!=NULL) 
+	{
+		opts.json_flag =  atoi(value);
+	}
 	value = cfg_get_rec(cfg, "OUTPUT_FILE");
-	if (value!=NULL) opts.output_to_file =  atoi(value);
+	if (value!=NULL) 
+	{
+		opts.output_to_file =  atoi(value);
+	}
 	value = cfg_get_rec(cfg, "PICK_INDEX");
-	if (value!=NULL) opts.pick_by_index_index =  atoi(value);
+	if (value!=NULL) 
+	{
+		opts.pick_by_index_index =  atoi(value);
+	}
 	value = cfg_get_rec(cfg, "BRAND");
-	if (value!=NULL) opts.brand_string = (value);
+	if (value!=NULL) 
+	{
+		opts.brand_string = (value);
+	}
 	value = cfg_get_rec(cfg, "RESET_COUNTER");
-	if (value!=NULL) {reset_counters_v=atoi(cfg_get_rec(cfg, "RESET_COUNTER"));}
-	if (reset_counters_v){ reset_counters();}
+	if (value!=NULL) 
+	{
+		reset_counters_v=atoi(cfg_get_rec(cfg, "RESET_COUNTER"));
+	}
+	if (reset_counters_v)
+	{
+		reset_counters();
+	}
 	value = cfg_get_rec(cfg, "SET_COUNTER");
-	if (value!=NULL) {set_counters_v=atoi(cfg_get_rec(cfg, "SET_COUNTER"));}
-	if (set_counters_v) set_counters(&set_counters_v);
+	if (value!=NULL) 
+	{
+		set_counters_v=atoi(cfg_get_rec(cfg, "SET_COUNTER"));
+	}
+	if (set_counters_v)
+	{ 
+		set_counters(&set_counters_v);
+	}
 	
 	return opts;
 }
