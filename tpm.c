@@ -109,7 +109,7 @@ rtrim(char *s)
 TPM list_node_t* 
 tpm_load_list_from_file(const char* filename) 
 {
-	int i;
+	unsigned int i;
 	unsigned int cnt=0;
     FILE* file = fopen(toothpastes_file_path_final, "r");
 	list_node_t* head = NULL;
@@ -187,7 +187,8 @@ get_item_by_index(list_node_t* head,unsigned int i)
     toothpaste_data_t empty ={0,"None",0}; 
 	list_node_t* current = head;
 	
-    while (current != NULL) {
+    while (current != NULL) 
+	{
         if (current->data.index==i)
 		{
 			return current->data;
@@ -203,7 +204,8 @@ get_item_by_brand_string(list_node_t* head,const char* str)
     toothpaste_data_t empty ={0,"None",0}; 
 	list_node_t* current = head;
 	
-    while (current != NULL) {
+    while (current != NULL) 
+	{
         if (0==strcmp(str,current->data.toothpaste_brand))
 		{
 			return current->data;
@@ -216,77 +218,77 @@ get_item_by_brand_string(list_node_t* head,const char* str)
 static toothpaste_data_t 
 find_item_with_max_mass(list_node_t* where)
 {
-		list_node_t* current = where;
-		unsigned int max_mass=0;
-		unsigned int max_index=0;		
-			
-		while (current != NULL) 
+	list_node_t* current = where;
+	unsigned int max_mass=0;
+	unsigned int max_index=0;		
+		
+	while (current != NULL) 
+	{
+		if (current->data.tube_mass_g>max_mass)
 		{
-			if (current->data.tube_mass_g>max_mass)
-			{
-				max_index =	current->data.index;
-				max_mass =	current->data.tube_mass_g;
-			}
-		current = current->next;
+			max_index =	current->data.index;
+			max_mass =	current->data.tube_mass_g;
 		}
-		return get_item_by_index(where,max_index);
+		current = current->next;
+	}
+	return get_item_by_index(where,max_index);
 }
 
 static toothpaste_data_t 
 find_item_with_min_mass(list_node_t* where)
 {
-		list_node_t* current = where;
-		unsigned int min_mass=100000;
-		unsigned int min_index=0;		
-			
-		while (current != NULL) 
+	list_node_t* current = where;
+	unsigned int min_mass=100000;
+	unsigned int min_index=0;		
+		
+	while (current != NULL) 
+	{
+		if (current->data.tube_mass_g<min_mass)
 		{
-			if (current->data.tube_mass_g<min_mass)
-			{
-				min_index =	current->data.index;
-				min_mass =	current->data.tube_mass_g;
-			}
-		current = current->next;
+			min_index =	current->data.index;
+			min_mass =	current->data.tube_mass_g;
 		}
-		return get_item_by_index(where,min_index);
+		current = current->next;
+	}
+	return get_item_by_index(where,min_index);
 }
 
 static toothpaste_data_t 
 find_item_with_max_rating(list_node_t* where)
 {
-		list_node_t* current = where;
-		unsigned int max_rating=0;
-		unsigned int max_index=0;		
-			
-		while (current != NULL) 
+	list_node_t* current = where;
+	unsigned int max_rating=0;
+	unsigned int max_index=0;		
+		
+	while (current != NULL) 
+	{
+		if (current->data.tube_mass_g>max_rating)
 		{
-			if (current->data.tube_mass_g>max_rating)
-			{
-				max_index =	current->data.index;
-				max_rating =current->data.rating;
-			}
-		current = current->next;
+			max_index =	current->data.index;
+			max_rating =current->data.rating;
 		}
-		return get_item_by_index(where,max_index);	
+		current = current->next;
+	}
+	return get_item_by_index(where,max_index);	
 }
 
 static toothpaste_data_t 
 find_item_with_min_rating(list_node_t* where)
 {
-		list_node_t* current = where;
-		unsigned int min_rating=100;
-		unsigned int min_index=0;		
-			
-		while (current != NULL) 
+	list_node_t* current = where;
+	unsigned int min_rating=100;
+	unsigned int min_index=0;		
+		
+	while (current != NULL) 
+	{
+		if (current->data.tube_mass_g<min_rating)
 		{
-			if (current->data.tube_mass_g<min_rating)
-			{
-				min_index =	current->data.index;
-				min_rating =current->data.rating;
-			}
-		current = current->next;
+			min_index =	current->data.index;
+			min_rating =current->data.rating;
 		}
-		return get_item_by_index(where,min_index);	
+		current = current->next;
+	}
+	return get_item_by_index(where,min_index);	
 }
 
 static void 
@@ -294,7 +296,8 @@ free_list(list_node_t* head)
 {
     list_node_t* temp;
 	
-    while (head != NULL) {
+    while (head != NULL) 
+	{
         temp = head;
         head = head->next;
         free(temp);
@@ -335,17 +338,19 @@ set_counters(void* optarg)
 	
 	zero = atoi(optarg);
 	file_ptr = fopen(stats_file_path_final, "wb");
-		if (file_ptr == NULL) {
-			perror("Error opening pickstats file for writing");
-			return 1;
-		}	
-	
+	if (file_ptr == NULL) 
+	{
+		perror("Error opening pickstats file for writing");
+		return 1;
+	}	
 
-		fwrite(&zero, sizeof(int), 1, file_ptr);
-		fwrite(&total_seconds, sizeof(time_t), 1, file_ptr);
-		fclose(file_ptr);
-		printf("%s", "Pick counter set\n"); 
-		return 0;
+
+	fwrite(&zero, sizeof(int), 1, file_ptr);
+	fwrite(&total_seconds, sizeof(time_t), 1, file_ptr);
+	fclose(file_ptr);
+	printf("%s", "Pick counter set\n"); 
+
+	return 0;
 }
 
 static int
@@ -357,7 +362,8 @@ get_counters(toothpaste_pick_stats_t* stats)
 	stats->last_pick_time=0;
 	
 	file_ptr = fopen(stats_file_path_final, "rb");
-    if (file_ptr == NULL) {
+    if (file_ptr == NULL) 
+	{
         perror("Error opening pickstats file for reading");
         return 1;
     }
@@ -382,13 +388,15 @@ write_counters(toothpaste_pick_stats_t stats)
 	FILE* file_ptr;
 	
 	file_ptr = fopen(stats_file_path_final, "wb");
-		if (file_ptr == NULL) {
-			perror("Error opening pickstats file for writing");
-			return 1;
-    }
+	if (file_ptr == NULL) 
+	{
+		perror("Error opening pickstats file for writing");
+		return 1;
+	}
 	fwrite(&stats.total_picks, sizeof(int), 1, file_ptr);
 	fwrite(&stats.last_pick_time, sizeof(time_t), 1, file_ptr);
 	fclose(file_ptr);
+	
 	return 0;
 }
 
