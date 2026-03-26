@@ -578,11 +578,19 @@ rand_range(uint64_t min, uint64_t max)
     uint64_t buckets = XRP_MAX / range;
     uint64_t limit = buckets * range;
 	
-	if (min == max) { return min; }
-    if (min>max) { SWAP(min,max); }
-    do {
+	if (min == max) 
+	{
+		return min; 
+	}
+    if (min>max) 
+	{
+		SWAP(min,max); 
+	}
+    do 
+	{
         r = prng64_xrp32();
-    } while (r >= limit);
+    } 
+	while (r >= limit);
 
     return (r % (max - min)) + min; 
 }
