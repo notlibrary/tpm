@@ -61,6 +61,13 @@ extern "C" {
 #define MAX_TOOTHPASTE_LINE 128
 #define MAX_TOOTHPASTE_LINES 1024
 
+#define SWAP(x,y) do \
+{unsigned char swap_temp[sizeof(x) == sizeof(y) ? (signed)sizeof(x) : -1]; \
+memcpy(swap_temp,&y,sizeof(x)); \
+memcpy(&y,&x,       sizeof(x)); \
+memcpy(&x,swap_temp,sizeof(x)); \
+} while(0)
+
 typedef enum
 {
 	PICK_DEFAULT,
@@ -151,6 +158,7 @@ static const char* cfg_get_rec(const struct cfg_struct* cfg, const char* key);
 static toothpaste_pick_options_t read_config(const char* src);
 static void save_default_config(struct cfg_struct* cfg);
 static int file_exists_fopen(const char *filename);
+static uint64_t rand_range(uint64_t min, uint64_t max);
 
 #ifdef __cplusplus
 }

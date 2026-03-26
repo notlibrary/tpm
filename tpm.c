@@ -569,6 +569,23 @@ tpm_get_toothpaste_picking_JSON(toothpaste_pick_t* pick)
 {
 	return pick->JSON;	
 }
+/*[min,max)*/
+static uint64_t
+rand_range(uint64_t min, uint64_t max)
+{
+    if (min == max) { return min; }
+    if (min>max) { SWAP(min,max); }
+    int r;
+    uint64_t range = max - min;
+    uint64_t buckets = XRP_MAX / range;
+    uint64_t limit = buckets * range;
+
+    do {
+        r = prng64_xrp32();
+    } while (r >= limit);
+
+    return min + (r / buckets);
+}
 
 TPM toothpaste_pick_t*
 tpm_pick_toothpaste(list_node_t* head,toothpaste_pick_options_t topts)
@@ -628,7 +645,7 @@ tpm_pick_toothpaste(list_node_t* head,toothpaste_pick_options_t topts)
 	if (topts.ptype==PICK_RANDOM) 
 	{
 		seed_xrp32(total_seconds);
-		i=(prng64_xrp32()%pick.total_toothpastes);
+		i=rand_range(0,pick.total_toothpastes);
 	}
 	if (topts.ptype==PICK_BY_BRAND) 
 	{
