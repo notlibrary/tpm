@@ -113,16 +113,15 @@ rtrim(char *s)
 static void
 ltrim(char *s) 
 {
-    int i = 0; 
+    char* tmp = s;
 
-    while (isspace((unsigned char)s[i])) 
+	while (isspace(*tmp)) 
 	{
-       i++;
-	   s++;
+		++tmp;
 	}
 
-  
-    	
+  memmove(s, tmp, tmp - s); 
+                               
 	return;
 }
 
