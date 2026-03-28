@@ -737,7 +737,7 @@ static void
 save_default_config(struct cfg_struct* cfg)
 {
 	cfg_set(cfg, "TIMEZONE","0");
-	cfg_set(cfg,"USERNAME","Anonymous");
+	cfg_set(cfg,"USERNAME","\"Anonymous\"");
 	cfg_set(cfg,"DELTA_DAYS","0");
 	cfg_set(cfg,"PICK_TYPE","0");
 	cfg_set(cfg,"VERBOSE","1");
@@ -751,7 +751,7 @@ save_default_config(struct cfg_struct* cfg)
 	cfg_set(cfg,"PICK_STATS",stats_file_path_final);
 	cfg_set(cfg,"LAST_PICK",output_file_path_final);
 	cfg_set(cfg,"TOOTHPASTES",toothpastes_file_path_final);
-	cfg_set(cfg,"CONFIG_DEFAULT",config_file_path_final);
+	cfg_set(cfg,"LOAD_CONFIG",config_file_path_final);
 	
 	cfg_save(cfg,config_file_path_final);
 	
