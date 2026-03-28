@@ -137,16 +137,17 @@ It's options:
 ## TPM Toothpastes Picking Manager Configuration Sample
 ```
 [CONSTANTS]
+LOAD_CONFIG="C:\Users\Anonymous\tpm\tpm.conf"
 DEFAULT=0
 TRUE=1
 FALSE=0
 [GENERAL]
-USERNAME=Anonymous
+USERNAME="Anonymous"
 PICK_TYPE=DEFAULT
 VERBOSE=TRUE
-TOOTHPASTES=C:\Users\Anonymous\tpm\toothpastes
-LAST_PICK=C:\Users\Anonymous\tpm\last_pick
-PICK_STATS=C:\Users\Anonymous\tpm\pickstats
+TOOTHPASTES="C:\Users\Anonymous\tpm\toothpastes"
+LAST_PICK="C:\Users\Anonymous\tpm\last_pick"
+PICK_STATS="C:\Users\Anonymous\tpm\pickstats"
 LIST_TOOTHPASTES=FALSE
 OUTPUT_JSON=FALSE
 OUTPUT_FILE=FALSE
