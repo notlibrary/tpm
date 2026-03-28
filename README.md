@@ -72,8 +72,6 @@ How many sqliters does it take to pick the toothpaste? `NULL`
 
 `-w` pick toothpaste with highest tube weight
 
-`-o` output toothpaste picking string or JSON to text file `~/tpm/last_pick`
-
 `-j` output JSON with last pick info instead toothpaste picking string
 
 `-v` show toothpaste picking manager version
@@ -86,7 +84,11 @@ How many sqliters does it take to pick the toothpaste? `NULL`
 
 `-r` reset total toothpaste picks counter
 
+`-o pick_output_file` output toothpaste picking string or JSON to text file `pick_output_file`
+
 `-c config_file` load custom configuration file
+
+`-t pick_stats` output pick stats to `pick_stats` file
 
 `-s [counter_value]` set total toothpaste picks counter
 

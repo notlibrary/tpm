@@ -945,7 +945,7 @@ main(int argc, char* argv[])
 	free(user_home_dir);
 	topts=read_config(config_file_path_final);
 	config_load_failure=!file_exists_fopen(config_file_path_final);
-	while ((opt = getopt(argc, argv, "awojvxqlrc:s:p:i:b:z:d:")) != -1) 
+	while ((opt = getopt(argc, argv, "awjvxqlrt:o:c:s:p:i:b:z:d:")) != -1) 
 	{
         switch (opt) 
 		{
@@ -954,9 +954,6 @@ main(int argc, char* argv[])
 			break;
 			case 'w':
 			topts.ptype = PICK_MAX_MASS;
-			break;
-			case 'o':
-			topts.output_to_file=1;
 			break;
 			case 'j':
 			topts.json_flag=1;
@@ -978,6 +975,12 @@ main(int argc, char* argv[])
 			break;
 			case 'c':
 				topts=read_config(optarg);
+			break;
+			case 'o':
+				topts.output_to_file=1;
+				strncpy(output_file_path_final,optarg, MAX_PATH);
+			case 't':
+				strncpy(stats_file_path_final,optarg, MAX_PATH);
 			break;
 			case 's':
 				set_counters(optarg);
@@ -1001,7 +1004,7 @@ main(int argc, char* argv[])
 				delta_days=atoi(optarg);
 			break; 	
 			case '?': 
-				fprintf(stderr, "Usage: %s [-awojvxqlr] -[c config_file] [-s total_picks value] [-p pick_type_value] [-i toothpaste_index] [-b brand_string -z delta_hours -d delta_days] [toothpastes_file] \n", argv[0]);
+				fprintf(stderr, "Usage: %s [-awjvxqlr] [-c config_file] [-o pick output file] [-t stats file] [-s total_picks value] [-p pick_type_value] [-i toothpaste_index] [-b brand_string -z delta_hours -d delta_days] [toothpastes_file] \n", argv[0]);
 				exit(EXIT_FAILURE);
 			default:
 				break;
