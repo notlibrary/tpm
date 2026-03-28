@@ -824,7 +824,7 @@ read_config(const char* src)
 	if ((value!=NULL) && (strcmp(src,value)==0) && (recursion < MAX_CONFIG_RECURSION)) 		
 	{
 		recursion++;
-		read_config(value);
+		opts=read_config(value);
 	}
 	
 	opts.username = (cfg_get_rec(cfg, "USERNAME"));
@@ -945,7 +945,7 @@ main(int argc, char* argv[])
 	free(user_home_dir);
 	topts=read_config(config_file_path_final);
 	config_load_failure=!file_exists_fopen(config_file_path_final);
-	while ((opt = getopt(argc, argv, "awojvxqlrs:p:i:b:z:d:")) != -1) 
+	while ((opt = getopt(argc, argv, "awojvxqlrc:s:p:i:b:z:d:")) != -1) 
 	{
         switch (opt) 
 		{
@@ -976,6 +976,9 @@ main(int argc, char* argv[])
 			case 'r':
 			reset_counters();
 			break;
+			case 'c':
+				topts=read_config(optarg);
+			break;
 			case 's':
 				set_counters(optarg);
 			break;
@@ -998,7 +1001,7 @@ main(int argc, char* argv[])
 				delta_days=atoi(optarg);
 			break; 	
 			case '?': 
-				fprintf(stderr, "Usage: %s [-awojvxqlr] [-s total_picks value] [-p pick_type_value] [-i toothpaste_index] [-b brand_string -z delta_hours -d delta_days] [toothpastes_file] \n", argv[0]);
+				fprintf(stderr, "Usage: %s [-awojvxqlr] -[c config_file] [-s total_picks value] [-p pick_type_value] [-i toothpaste_index] [-b brand_string -z delta_hours -d delta_days] [toothpastes_file] \n", argv[0]);
 				exit(EXIT_FAILURE);
 			default:
 				break;

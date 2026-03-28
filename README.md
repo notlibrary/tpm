@@ -86,6 +86,8 @@ How many sqliters does it take to pick the toothpaste? `NULL`
 
 `-r` reset total toothpaste picks counter
 
+`-c config_file` load custom configuration file
+
 `-s [counter_value]` set total toothpaste picks counter
 
 `-p [toothpaste_pick_type_value]` set toothpaste pick type value
