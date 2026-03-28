@@ -86,7 +86,7 @@ How many sqliters does it take to pick the toothpaste? `NULL`
 
 `-o pick_output_file` output toothpaste picking string or JSON to text file `pick_output_file`
 
-`-c config_file` load custom configuration file
+`-c config_file` load custom configuration file `config file`
 
 `-t pick_stats` output pick stats to `pick_stats` file
 
