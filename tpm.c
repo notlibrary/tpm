@@ -803,7 +803,7 @@ read_config(const char* src)
 	int reset_counters_v=0;
 	int set_counters_v=0;
 	const char* value = NULL;
-	int recursion =0;
+	static int recursion =0;
 	opts.ptype=pick_type;
 	opts.verbose=verbose;
 	opts.lat_flag=lat_flag;
@@ -821,10 +821,10 @@ read_config(const char* src)
     }
 	value = cfg_get_rec(cfg, "LOAD_CONFIG");
 	
-	if ((value!=NULL) && (strcmp(src,value)!=0) && (recursion < MAX_CONFIG_RECURSION)) 		
+	if ((value!=NULL) && (strcmp(src,value)==0) && (recursion < MAX_CONFIG_RECURSION)) 		
 	{
 		recursion++;
-		cfg_load(cfg,value);
+		read_config(value);
 	}
 	
 	opts.username = (cfg_get_rec(cfg, "USERNAME"));
