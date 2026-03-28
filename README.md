@@ -104,6 +104,8 @@ How many sqliters does it take to pick the toothpaste? `NULL`
 Configuration is located in `~/tpm/tpm.conf` file
 It's options:
 
+`LOAD_CONFIG` loads configuration file `tpm.conf` from specific path
+
 `USERNAME` override username
 
 `PICK_TYPE` set toothpaste pick type [0,7] number for `Default, Random, By index, By brand, Max rating, Max tube mass, Min rating, Min tube mas`
