@@ -120,7 +120,7 @@ ltrim(char *s)
 		++tmp;
 	}
 
-  memmove(s, tmp, tmp - s); 
+    memmove(s, tmp, tmp - s); 
                                
 	return;
 }
@@ -803,7 +803,7 @@ read_config(const char* src)
 	int reset_counters_v=0;
 	int set_counters_v=0;
 	const char* value = NULL;
-	
+	int recursion =0;
 	opts.ptype=pick_type;
 	opts.verbose=verbose;
 	opts.lat_flag=lat_flag;
@@ -819,9 +819,15 @@ read_config(const char* src)
 		config_load_failure=1;
 		return opts;
     }
-	opts.username = cfg_get_rec(cfg, "USERNAME");
+	value = cfg_get_rec(cfg, "LOAD_CONFIG");
 	
-
+	if ((value!=NULL) && (strcmp(src,value)!=0) && (recursion < MAX_CONFIG_RECURSION)) 		
+	{
+		recursion++;
+		cfg_load(cfg,value);
+	}
+	
+	opts.username = (cfg_get_rec(cfg, "USERNAME"));
 	value = cfg_get_rec(cfg, "TIMEZONE");
 	if ((value!=NULL) && atoi(value)>=-MAX_TIMEZONE_DELTA && atoi(value)<=MAX_TIMEZONE_DELTA) 
 	{

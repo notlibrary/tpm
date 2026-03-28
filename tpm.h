@@ -60,6 +60,7 @@ extern "C" {
 #define NO_SYSTEM_PAUSE 0
 #define MAX_TOOTHPASTE_LINE 128
 #define MAX_TOOTHPASTE_LINES 1024
+#define MAX_CONFIG_RECURSION 16
 
 #define SWAP(x,y) do \
 {unsigned char swap_temp[sizeof(x) == sizeof(y) ? (signed)sizeof(x) : -1]; \

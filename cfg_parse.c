@@ -260,6 +260,21 @@ int cfg_save(const struct cfg_struct* cfg, const char* filename)
  * @param key String containing key to search for.
  * @return String containing associated value, or NULL if key was not found.
  */
+ void remove_outer_quotes(char* str) 
+ {
+    size_t len = strlen(str);
+    if (len >= 2) {
+        char first = str[0];
+        char last = str[len - 1];
+
+        
+        if ((first == '"' && last == '"') || (first == '\'' && last == '\'')) {
+            str[len - 1] = '\0';
+            memmove(str, str + 1, len - 1); 
+        }
+    }
+}
+
 const char* cfg_get(const struct cfg_struct* cfg, const char* key)
 {
   char* tkey;
@@ -282,7 +297,8 @@ const char* cfg_get(const struct cfg_struct* cfg, const char* key)
     if (strcmp(tkey, cur->key) == 0)
     {
       free(tkey);
-      return cur->value;
+      remove_outer_quotes(cur->value);
+	  return cur->value;
     }
   } while ((cur = cur->next) != NULL);
 
