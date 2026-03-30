@@ -68,7 +68,7 @@ How many sqliters does it take to pick the toothpaste? `NULL`
 
 It ubiquitous portability is rather the feature than a bug
 
-It will try to use local computer terminals to pick up the toothpaste long after you die
+It will be trying to use local computer terminals to pick up the toothpaste long after you die
 till the heat death of Universe probably
 
 
