@@ -32,6 +32,7 @@ jobs:
           Compress-Archive -Path tpm-win-bin-amd64 -DestinationPath tpm-win-bin-amd64.zip
           Remove-Item -LiteralPath "tpm-win-bin-amd64" -Force -Recurse -Confirm:$false
           Remove-Item -LiteralPath "tpm.exe" -Force -Recurse -Confirm:$false
+          nmake.exe /f .\Makefile.msc clean
           
 
       - name: Create Release
