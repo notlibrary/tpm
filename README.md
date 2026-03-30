@@ -11,7 +11,7 @@ Windows:
 
 1. Define available toothpastes in CSV format file with path `~/tpm/toothpastes`
 see `~/tpm/toothpastes.sample` for format details
-2. Put TPM in daily crontab or task scheduler task to run it daily(or twice a day)
+2. Put TPM in the daily crontab or task scheduler task to run it daily(or twice a day)
 
 Windows:
 `schtasks /create /tn "TPM" /tr "C:\Program Files\tpm\tpm.exe" /sc daily /st 09:00`
@@ -46,7 +46,7 @@ Press any key to continue . . .
 ```
 Because working with JSON without special library is complicated it outputs only 4 fields JSON
 
-Basically it automatically answers the question "What toothpaste I should use today?"
+Basically it automatically answers the question "Which toothpaste I should use today?"
 by picking it from predefined available toothpastes linked list using total epoch days mod total available toothpastes as list index
 I started coding it when found 3 different toothpaste tubes in the bathroom
 
