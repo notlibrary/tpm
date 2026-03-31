@@ -193,4 +193,9 @@ Food drink clothes gym exercises meds even linux commands
 moreover you can recursively pick the toothpaste pick type(method) itself
 but there is no meaning in it
 
+## Per component reverse engineering and pick by AI
+This is the advanced topic the key point is that make a new toothpaste is cheaper
+than reverse engineer the old one so AI simply has not enough data to base on
+ and thus it's picking in the best case is no better than random
+
 P.S. Do not forget to brush your hard disk with `dd` and `rm -rf /` toothpastes twice a day
