@@ -202,4 +202,6 @@ even with carefully designed system prompts
 Another approach is to treat anything as toothpaste component then store empirically successful compounds
 in the special database again agent without access to this db means it can't produce useful pick
 
+So open source toothpaste is just a daydream
+
 P.S. Do not forget to brush your hard disk with `dd` and `rm -rf /` toothpastes twice a day
