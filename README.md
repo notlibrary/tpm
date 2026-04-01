@@ -71,6 +71,9 @@ It ubiquitous portability is rather the feature than a bug
 It will be trying to use local computer terminals to pick up the toothpaste long after you die
 till the heat death of Universe probably
 
+Moreover it does not even care about download counter if you do not brush your teeth
+you end with dental rot plague sad but true software nerds has little to offer here
+
 
 ## Command line options
 `-a` pick toothpaste with highest rating
