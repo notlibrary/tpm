@@ -205,6 +205,9 @@ even with carefully designed system prompts
 Another approach is to treat anything as toothpaste component then store empirically successful compounds
 in the special database again agent without access to this db means it can't produce useful pick
 
+Or you can hold the master chemistry technology degree and have 20 years of practical experience
+so you just know what toothpaste components are in reality then my question is what the hell are you doing with my repo sir?
+
 So open source toothpaste is just a daydream
 
 P.S. Do not forget to brush your hard disk with `dd` and `rm -rf /` toothpastes twice a day

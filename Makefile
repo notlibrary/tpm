@@ -2,7 +2,7 @@ CC=gcc
 CP=cp -f
 MKDIR=mkdir -p
 RM=rm
-CFLAGS=
+CFLAGS=-Wall
 CURRENT_DIR=$(CURDIR)
 SOURCES=    tpm.c \
 			prng64_xrp32.c \
