@@ -184,7 +184,7 @@ display_list(list_node_t* head, toothpaste_pick_t* pick)
 	snprintf(pick->message,MAX_TOOTHPASTE_LINE,"Index | Brand | Tube Mass | Rating\n");
 	while (current != NULL) 
 	{
-        snprintf(line,MAX_TOOTHPASTE_LINE,"%d %s %d %d\n", current->data.index, current->data.toothpaste_brand, current->data.tube_mass_g, current->data.rating);
+        snprintf(line,2*MAX_TOOTHPASTE_LINE,"%d %s %d %d\n", current->data.index, current->data.toothpaste_brand, current->data.tube_mass_g, current->data.rating);
         strncat(pick->message,line,MAX_LINE_LENGTH);
 		current = current->next;
 		cnt++;
@@ -358,9 +358,7 @@ set_counters(void* optarg)
 {
 	FILE* file_ptr;
 	unsigned int zero=0;
-	time_t zero_time =0;
 	time_t total_seconds=time(NULL)+delta_hours*SECONDS_PER_HOUR;
-	unsigned char* counter=	(unsigned char*) (optarg);
 	
 	zero = atoi(optarg);
 	file_ptr = fopen(stats_file_path_final, "wb");
@@ -716,13 +714,13 @@ tpm_pick_toothpaste(list_node_t* head,toothpaste_pick_options_t topts)
 		snprintf(line,MAX_LINE_LENGTH,"%s %s %s (%ug) [%u/100] %s %s %s %u %s %u/%u \n", "Toothpaste:", ">>>", pick.what.toothpaste_brand, pick.what.tube_mass_g, pick.what.rating, "<<<", "Day:" ,days_of_week[j],day, "Toothpaste index:",i,pick.total_toothpastes);
 		strncat(pick.message,line,MAX_LINE_LENGTH);
 		
-		snprintf(line,MAX_LINE_LENGTH,"%s %u %s %llu  \n", "Total picks:", pick.stats.total_picks, "Last pick time:" ,pick.stats.last_pick_time);
+		snprintf(line,MAX_LINE_LENGTH,"%s %u %s %lu  \n", "Total picks:", pick.stats.total_picks, "Last pick time:" ,pick.stats.last_pick_time);
 		strncat(pick.message,line,MAX_LINE_LENGTH);
 	
 	}
 	else 
 	{
-		snprintf(pick.message,MAX_TOOTHPASTE_LINE,"%s (%ug) [%u/100] \n", pick.what.toothpaste_brand,pick.what.tube_mass_g, pick.what.rating);	
+		snprintf(pick.message,2*MAX_TOOTHPASTE_LINE,"%s (%ug) [%u/100] \n", pick.what.toothpaste_brand,pick.what.tube_mass_g, pick.what.rating);	
 	}
 	
 	snprintf(pick.JSON,MAX_LINE_LENGTH,"{\n\t \"who\":\"%s\",\n\t \"toothpaste\":\"%s\",\n\t \"tube_mass_g\":%u,\n\t \"rating\":%u \n}",pick.who,pick.what.toothpaste_brand,pick.what.tube_mass_g,pick.what.rating);
