@@ -743,7 +743,7 @@ save_default_config(struct cfg_struct* cfg)
 	cfg_set(cfg,"OUTPUT_JSON","0");
 	cfg_set(cfg,"OUTPUT_FILE","0");
 	cfg_set(cfg,"PICK_INDEX","0");
-	cfg_set(cfg,"BRAND","Unknown");
+	cfg_set(cfg,"BRAND","\"Unknown\"");
 	cfg_set(cfg,"SET_COUNTER","0");
 	cfg_set(cfg,"RESET_COUNTER","0");
 	cfg_set(cfg,"PICK_STATS",stats_file_path_final);
