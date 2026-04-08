@@ -1,5 +1,5 @@
 ## TPM Toothpaste Picking Manager
-Let me pick the toothpaste for you
+Let me pick the toothpaste for you(or how to brush your teeth admins way)
 
 0. Clone repository to `~/tpm` and make it
 
