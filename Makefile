@@ -12,12 +12,14 @@ OBJECTS=    tpm.o \
 			prng64_xrp32.o \
 			cfg_parse.o
 
+.PHONY: all install clean
+
 all: tpm install clean
 tpm: $(OBJECTS)
 	$(CC) $(CFLAGS) $(OBJECTS) -o tpm
 $(OBJECTS): $(SOURCES)
 	$(CC) $(CFLAGS) -c $(SOURCES)
-install: 
+install:
 	cp $(CURRENT_DIR)/tpm /usr/local/bin/
 clean:	
 	rm $(CURRENT_DIR)/tpm $(OBJECTS)
