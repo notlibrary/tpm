@@ -1,7 +1,9 @@
 ## TPM Toothpaste Picking Manager
 Let me pick the toothpaste for you(or how to brush your teeth admins way)
 
-0. Clone repository to `~/tpm` and make it
+0. Clone repository to `~/tpm` and make it:
+
+`git clone https://github.com/notlibrary/tpm.git`
 
 Unix(Ubuntu):
 `make`
