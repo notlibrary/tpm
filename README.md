@@ -11,7 +11,7 @@ Unix(Ubuntu):
 Windows:
 `nmake.exe /f .\Makefile.msc`
 
-1. Define available(what is in bathroom) toothpastes in CSV format file with path `~/tpm/toothpastes`
+1. Define available(what is in the bathroom) toothpastes in CSV format file with path `~/tpm/toothpastes`
 see `~/tpm/toothpastes.sample` below for format details
 2. Put TPM in the daily crontab or task scheduler task to run it daily(or twice a day)
 
@@ -22,6 +22,11 @@ Unix(Ubuntu):
 `crontab -e` 
 then add this line:
 `00 9 * * * /usr/local/bin/tpm`
+
+I don't do this step automatically from code because cron is not portable solution
+and each user has different brush time different timezone and different terminal
+it's users who should spent 5 minutes to figure things out and schedule the underlying 
+task as they wish it's simple enough operation for most systems
 
 3. Enjoy machine doing it for you
 
@@ -63,7 +68,7 @@ SELECT * FROM toothpastes WHERE id=mod((SELECT CAST(unixepoch('now') / 86400 AS 
 
 Also `pick.sql` contains other sql queries for different pick methods.
 
-The point is in fact you do not need sqlite postgres or lmdb to perform a single pick
+The point is in fact you do not need sqlite postgres or lmdb to perform a single pick operation
 and sometimes even the single pick is more than enough
 
 How many sqliters does it take to pick the toothpaste? `NULL`
