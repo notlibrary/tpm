@@ -230,4 +230,7 @@ It works on low level in harsh environments when internet is down unavailable or
 
 Of course it runs on toaster with zero system requirements
 
+And finally it's tiny size less than 32KB almost two times smaller than LMDB
+(Windows .exe however has 200KB builtin .ico)
+
 P.S. Do not forget to brush your hard disk with `dd` and `rm -rf /` toothpastes twice a day
