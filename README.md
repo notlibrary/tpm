@@ -188,7 +188,7 @@ DELTA_DAYS=0
 `~/tpm/pickstats` toothpaste pick stats binary file
 
 `~/tpm/last_pick` last toothpaste pick output message string or JSON file
-`
+
 ## TPM Toothpastes Picking Manager Toothpastes List CSV format sample
 ```
 #Index,Brand string,Tube mass grams,Rating
@@ -216,5 +216,17 @@ Or you can hold the master chemistry technology degree and have 20 years of prac
 so you just know what toothpaste components are in reality then my question is what the hell are you doing with my repo sir?
 
 So open source toothpaste is just a daydream
+
+## Why use this program at all?
+Nice point 
+
+It takes single cron slot and list of toothpastes one single time
+
+It gives long string about happening toothpaste picking process for a lifetime for free
+
+Judge for yourself if this is a good deal or not and why
+
+It works on low level in harsh environments when internet is down unavailable or blocked by government
+Of course it runs on toaster with zero system requirements
 
 P.S. Do not forget to brush your hard disk with `dd` and `rm -rf /` toothpastes twice a day
