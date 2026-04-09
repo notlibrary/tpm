@@ -226,7 +226,8 @@ It gives long string about happening toothpaste picking process for a lifetime f
 
 Judge for yourself if this is a good deal or not and why
 
-It works on low level in harsh environments when internet is down unavailable or blocked by government
+It works on low level in harsh environments when internet is down unavailable or blocked by government firewall
+
 Of course it runs on toaster with zero system requirements
 
 P.S. Do not forget to brush your hard disk with `dd` and `rm -rf /` toothpastes twice a day
