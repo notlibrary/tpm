@@ -234,6 +234,8 @@ Of course it runs on toaster with zero system requirements
 
 It serves basic crucial user need independently OS type SQL support just does not matter
 
+It helps utilize 5$ VPSes and old computers including SBC by running on them useful payload
+
 And finally it's tiny size less than 32KB almost two times smaller than LMDB
 (Windows .exe however has 200KB builtin .ico)
 
