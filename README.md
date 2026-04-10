@@ -201,7 +201,8 @@ DELTA_DAYS=0
 Sure you can pick anything this way not only toothpastes
 Food drink clothes gym exercises meds even linux commands
 moreover you can recursively pick the toothpaste pick type(method) itself
-but there is no meaning in it
+but there is no meaning in it `pick toothpaste in the bathroom` is obvious useful
+default solution for most people
 
 ## Per component reverse engineering and pick by AI
 This is the advanced topic the key point is that make a new toothpaste is cheaper
