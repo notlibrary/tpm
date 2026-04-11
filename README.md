@@ -1,7 +1,7 @@
 ## TPM Toothpaste Picking Manager
 Let me pick the toothpaste for you(or how to brush your teeth admins way)
 
-0. Clone repository to `~/tpm` and make it:
+0. Clone the repository to `~/tpm` and make it:
 
 `git clone https://github.com/notlibrary/tpm.git`
 
@@ -11,7 +11,7 @@ Unix(Ubuntu):
 Windows:
 `nmake.exe /f .\Makefile.msc`
 
-1. Define available(what is in the bathroom) toothpastes in the CSV format file with path `~/tpm/toothpastes`
+1. Define the available(what is in the bathroom) toothpastes in the CSV format file with path `~/tpm/toothpastes`
 see `~/tpm/toothpastes.sample` below for format details
 2. Put TPM in the daily crontab or task scheduler task to run it daily(or twice a day)
 
@@ -20,7 +20,7 @@ Windows:
 
 Unix(Ubuntu):
 `crontab -e` 
-then add this line:
+then append this line:
 `00 9 * * * /usr/local/bin/tpm`
 
 I don't do this step automatically from code because cron is not portable solution
@@ -28,7 +28,7 @@ and each user has different brush time different timezone and different terminal
 it's users who should spent 5 minutes to figure things out and schedule the underlying 
 task as they wish it's simple enough operation for most systems
 
-3. Enjoy machine doing it for you
+3. Enjoy the machine doing it for you
 
 Tiny simple terminal console C program with maximum utility
 and zero maintenance burden
@@ -51,22 +51,22 @@ Press any key to continue . . .
 		 "rating":50
 }
 ```
-Because working with JSON without special library is complicated it outputs only 4 fields JSON
+Because working with JSON without the special library is complicated it outputs only 4 fields JSON
 
 Basically it automatically answers the question "Which toothpaste I should use today?"
-by picking it from predefined available toothpastes linked list using total epoch days mod total available toothpastes as list index
+by picking it from the predefined available toothpastes linked list using total epoch days mod total available toothpastes as the list index
 I started coding it when found 3 different toothpaste tubes in the bathroom
 
 It supports 8 toothpaste picking methods calling picking types: 
 `Default, Random, By index, By Brand, Max rating, Max tube mass, Min rating, Min tube mas`
 
-Here is analog sqlite query that do default picking type:
+Here is the analog sqlite query that do default picking type:
 
 ```sql
 SELECT * FROM toothpastes WHERE id=mod((SELECT CAST(unixepoch('now') / 86400 AS INTEGER)), (SELECT COUNT(*) FROM toothpastes)) LIMIT 1;
 ```
 
-Also `pick.sql` contains other sql queries for different pick methods.
+Also the `pick.sql` contains other sql queries for different picking types.
 
 The point is in fact you do not need sqlite postgres or lmdb to perform a single pick operation
 and sometimes even the single pick is more than enough
@@ -78,7 +78,7 @@ It ubiquitous portability is rather the feature than a bug
 It will be trying to use local computer terminals to pick up the toothpaste long after you die
 till the heat death of Universe probably
 
-Moreover it does not even care about download counter if you do not brush your teeth
+Moreover it does not even care about the download counter if you do not brush your teeth
 you end with dental rot plague sad but true software nerds has little to offer here
 
 
