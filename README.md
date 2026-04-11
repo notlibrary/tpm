@@ -5,7 +5,7 @@ Let me pick the toothpaste for you(or how to brush your teeth admins way)
 
 `git clone https://github.com/notlibrary/tpm.git`
 
-Unix(Ubuntu):
+Linux(Ubuntu):
 `make`
 
 Windows:
@@ -18,7 +18,7 @@ see `~/tpm/toothpastes.sample` below for format details
 Windows:
 `schtasks /create /tn "TPM" /tr "C:\Program Files\tpm\tpm.exe" /sc daily /st 09:00`
 
-Unix(Ubuntu):
+Linux(Ubuntu):
 `crontab -e` 
 then append this line:
 `00 9 * * * /usr/local/bin/tpm`
@@ -199,9 +199,9 @@ DELTA_DAYS=0
 4,Nothing,0,0
 ```
 Sure you can pick anything this way not only toothpastes
-Food drink clothes gym exercises meds even linux commands
+Food beverages clothes gym exercises meds even linux commands
 moreover you can recursively pick the toothpaste pick type(method) itself
-but there is no meaning in it `pick toothpaste in the bathroom` is obvious useful
+but there is no meaning in it `pick the toothpaste in the bathroom` is obvious useful
 default solution for most people
 
 ## Per component reverse engineering and pick by AI
@@ -210,7 +210,7 @@ than reverse engineer the old one so AI simply has not enough data to base on
 and thus it's picking in the best case is no better than random 
 even with carefully designed system prompts
 
-Another approach is to treat anything as toothpaste component then store empirically successful compounds
+Another approach is to treat anything as toothpaste component then store the empirically successful compounds
 in the special database again agent without access to this db means it can't produce useful pick
 
 Or you can hold the master chemistry technology degree and have 20 years of practical experience
@@ -220,19 +220,19 @@ Am I good?
 So open source toothpaste is just a daydream
 
 ## Why use this program at all?
-Nice point 
+Nice try 
 
-It takes single cron slot and list of toothpastes one single time
+It takes the single cron slot and list of toothpastes one single time
 
-It gives long string about happening toothpaste picking process for a lifetime for free
+It gives the long string about happening toothpaste picking process for a lifetime for free
 
 Judge for yourself if this is a good deal or not and why
 
-- It works on low level in harsh environments when internet is down unavailable or blocked by government firewall
-- Of course it runs on toaster with zero system requirements
-- It serves basic crucial user need independently OS type SQL support just does not matter
-- It helps utilize 5$ VPSes and old computers including SBC by running on them useful payload
-- It has perfectly fine sane regular ordinary usual behavior(almost pedantic) that makes perfect sense 
-- And finally it's tiny size less than 32KB almost two times smaller than LMDB (Windows .exe however has 200KB builtin .ico)
+- It works on low level in harsh environments when the internet is down unavailable or blocked by the government firewall
+- Of course it runs on the toaster with zero system requirements
+- It serves the basic crucial user need independently OS type SQL support just does not matter
+- It helps utilize the 5$ VPSes and old computers including SBCs by running on them useful payload
+- It has perfectly fine sane regular ordinary usual predictable behavior(almost pedantic) that makes perfect sense 
+- And finally it's the tiny size less than 32KB almost two times smaller than LMDB (Windows .exe however has 200KB builtin .ico)
 
 P.S. Do not forget to brush your hard disk with `dd` and `rm -rf /` toothpastes twice a day
