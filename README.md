@@ -232,6 +232,7 @@ Judge for yourself if this is a good deal or not and why
 - Of course it runs on toaster with zero system requirements
 - It serves basic crucial user need independently OS type SQL support just does not matter
 - It helps utilize 5$ VPSes and old computers including SBC by running on them useful payload
+- It has perfectly fine sane regular ordinary usual behavior(almost pedantic) that makes perfect sense 
 - And finally it's tiny size less than 32KB almost two times smaller than LMDB (Windows .exe however has 200KB builtin .ico)
 
 P.S. Do not forget to brush your hard disk with `dd` and `rm -rf /` toothpastes twice a day
