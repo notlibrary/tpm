@@ -11,7 +11,7 @@ Unix(Ubuntu):
 Windows:
 `nmake.exe /f .\Makefile.msc`
 
-1. Define available(what is in the bathroom) toothpastes in CSV format file with path `~/tpm/toothpastes`
+1. Define available(what is in the bathroom) toothpastes in the CSV format file with path `~/tpm/toothpastes`
 see `~/tpm/toothpastes.sample` below for format details
 2. Put TPM in the daily crontab or task scheduler task to run it daily(or twice a day)
 
@@ -83,77 +83,77 @@ you end with dental rot plague sad but true software nerds has little to offer h
 
 
 ## Command line options
-`-a` pick toothpaste with highest rating
+`-a` pick the toothpaste with highest rating
 
-`-w` pick toothpaste with highest tube weight
+`-w` pick the toothpaste with highest tube weight
 
-`-j` output JSON with last pick info instead toothpaste picking string
+`-j` output the JSON with last pick info instead toothpaste picking string
 
-`-v` show toothpaste picking manager version
+`-v` show the toothpaste picking manager version
 
-`-x` perform random toothpaste pick
+`-x` perform a random toothpaste pick
 
-`-q` more quiet toothpaste pick
+`-q` the quiet toothpaste pick
 
-`-l` list available toothpastes
+`-l` list the available toothpastes
 
-`-r` reset total toothpaste picks counter
+`-r` reset the total toothpaste picks counter
 
-`-o pick_output_file` output toothpaste picking string or JSON to text file `pick_output_file`
+`-o pick_output_file` output toothpaste picking string or JSON to the text file `pick_output_file`
 
-`-c config_file` load custom configuration file `config file`
+`-c config_file` load the custom configuration file `config file`
 
-`-t pick_stats` output pick stats to `pick_stats` file
+`-t pick_stats` output the pick stats to `pick_stats` file
 
-`-s [counter_value]` set total toothpaste picks counter
+`-s [counter_value]` set the total toothpaste picks counter
 
-`-p [toothpaste_pick_type_value]` set toothpaste pick type value
+`-p [toothpaste_pick_type_value]` set the toothpaste pick type value
 
-`-i [toothpaste_index]` pick toothpaste by index
+`-i [toothpaste_index]` pick the toothpaste by index
 
-`-b [toothpaste_brand]` pick toothpaste by brand
+`-b [toothpaste_brand]` pick the toothpaste by brand
 
 `-z [delta_hours]` set the timezone hours [-11,11] lag manually
 
-`-d [delta_days]` pick toothpaste with default method in the future or the past
+`-d [delta_days]` pick the toothpaste with default method in the future or the past
 
-`toothpastes_path` path to toothpastes CSV file
+`toothpastes_path` path to the toothpastes CSV file
 
 ## Configuration file options
-Configuration is located in `~/tpm/tpm.conf` file
+The configuration is located in `~/tpm/tpm.conf` file
 It's options:
 
-`LOAD_CONFIG` loads configuration file `tpm.conf` from specific path
+`LOAD_CONFIG` loads the configuration file `tpm.conf` from specific path
 
-`USERNAME` override username
+`USERNAME` override the username
 
-`PICK_TYPE` set toothpaste pick type [0,7] number for `Default, Random, By index, By brand, Max rating, Max tube mass, Min rating, Min tube mas`
+`PICK_TYPE` set the toothpaste pick type [0,7] number for `Default, Random, By index, By brand, Max rating, Max tube mass, Min rating, Min tube mas`
 
-`VERBOSE` 0 for quiet toothpaste pick
+`VERBOSE` 0 for the quiet toothpaste pick
 
-`TOOTHPASTES` toothpastes list CSV full file name
+`TOOTHPASTES` the toothpastes list CSV full file name
 
-`LAST_PICK` last pick file location
+`LAST_PICK` the last pick file location
 
-`PICK_STATS` pick stats file location
+`PICK_STATS` the pick stats file location
 
-`LIST_TOOTHPASTES` 1 to list available toothpastes
+`LIST_TOOTHPASTES` 1 to list the available toothpastes
 
-`OUTPUT_JSON` 1 to output JSON with toothpaste pick
+`OUTPUT_JSON` 1 to output the JSON with toothpaste pick
 
-`OUTPUT_FILE` 1 to output to file `~tpm/last_pick`
+`OUTPUT_FILE` 1 to output to the file `~tpm/last_pick`
 
-`PICK_INDEX` pick toothpaste by this index if `PICK_TYPE=2`
+`PICK_INDEX` pick the toothpaste by this index if `PICK_TYPE=2`
 
-`BRAND` pick toothpaste by this brand if `PICK_TYPE=3`
+`BRAND` pick the toothpaste by this brand if `PICK_TYPE=3`
 
-`RESET_COUNTER` 1 to reset toothpaste pick counter
+`RESET_COUNTER` 1 to reset the toothpaste pick counter
 
-`SET_COUNTER` not 0 to set toothpaste pick counter
+`SET_COUNTER` not 0 to set the toothpaste pick counter
 
 `TIMEZONE` set the timezone hours [-11,11] lag manually
 
-`DELTA_DAYS` pick toothpaste with default method in the future or the past
+`DELTA_DAYS` pick the toothpaste with default method in the future or the past
 
 ## TPM Toothpastes Picking Manager Configuration Sample
 ```
@@ -180,16 +180,16 @@ TIMEZONE=0
 DELTA_DAYS=0
 ```
 
-## TPM Toothpastes Picking Manager Files List
-`~/tpm/toothpastes` CSV toothpastes list
+## TPM The Toothpastes Picking Manager Files List
+`~/tpm/toothpastes` the CSV toothpastes list
 
-`~/tpm/tpm.conf` TPM configuration file
+`~/tpm/tpm.conf` the TPM configuration file
 
-`~/tpm/pickstats` toothpaste pick stats binary file
+`~/tpm/pickstats` the toothpaste pick stats binary file
 
-`~/tpm/last_pick` last toothpaste pick output message string or JSON file
+`~/tpm/last_pick` the last toothpaste pick output message string or JSON file
 
-## TPM Toothpastes Picking Manager Toothpastes List CSV format sample
+## TPM The Toothpastes Picking Manager Toothpastes List CSV format sample
 ```
 #Index,Brand string,Tube mass grams,Rating
 0,Random Toothpaste 1,100,85
