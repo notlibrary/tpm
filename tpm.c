@@ -48,7 +48,6 @@ static struct option long_options[] = {
     {"random", no_argument,       0, 'x'},
     {"quiet", no_argument,       0, 'q'},
     {"list", no_argument,       0, 'l'},
-    {"random", no_argument,       0, 'x'},	
 	{"reset", no_argument,       0, 'r'},	
 	{"output", required_argument,0, 'o'},
 	{"config", required_argument,0, 'c'},		

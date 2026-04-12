@@ -32,6 +32,7 @@ extern "C" {
 #pragma comment(lib, "advapi32.lib")
 #else
 #include <unistd.h>
+#include <getopt.h>
 #include <sys/types.h>
 #include <pwd.h>
 #endif

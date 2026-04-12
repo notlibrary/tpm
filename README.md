@@ -83,39 +83,39 @@ you end with dental rot plague sad but true software nerds has little to offer h
 
 
 ## Command line options
-`-a` pick the toothpaste with highest rating
+`-a --rating` pick the toothpaste with highest rating
 
-`-w` pick the toothpaste with highest tube weight
+`-w --weight` pick the toothpaste with highest tube weight
 
-`-j` output the JSON with last pick info instead toothpaste picking string
+`-j --json` output the JSON with last pick info instead toothpaste picking string
 
-`-v` show the toothpaste picking manager version
+`-v --version` show the toothpaste picking manager version
 
-`-x` perform a random toothpaste pick
+`-x --random` perform a random toothpaste pick
 
-`-q` the quiet toothpaste pick
+`-q --quiet` the quiet toothpaste pick
 
-`-l` list the available toothpastes
+`-l --list` list the available toothpastes
 
-`-r` reset the total toothpaste picks counter
+`-r --reset` reset the total toothpaste picks counter
 
-`-o pick_output_file` output toothpaste picking string or JSON to the text file `pick_output_file`
+`-o --output pick_output_file` output toothpaste picking string or JSON to the text file `pick_output_file`
 
-`-c config_file` load the custom configuration file `config file`
+`-c --config config_file` load the custom configuration file `config file`
 
-`-t pick_stats` output the pick stats to `pick_stats` file
+`-t --stats pick_stats` output the pick stats to `pick_stats` file
 
-`-s [counter_value]` set the total toothpaste picks counter
+`-s --counter [counter_value]` set the total toothpaste picks counter
 
-`-p [toothpaste_pick_type_value]` set the toothpaste pick type value
+`-p --type [toothpaste_pick_type_value]` set the toothpaste pick type value
 
-`-i [toothpaste_index]` pick the toothpaste by index
+`-i --index [toothpaste_index]` pick the toothpaste by index
 
-`-b [toothpaste_brand]` pick the toothpaste by brand
+`-b --brand [toothpaste_brand]` pick the toothpaste by brand
 
-`-z [delta_hours]` set the timezone hours [-11,11] lag manually
+`-z --timezone [delta_hours]` set the timezone hours [-11,11] lag manually
 
-`-d [delta_days]` pick the toothpaste with default method in the future or the past
+`-d --delta [delta_days]` pick the toothpaste with default method in the future or the past
 
 `toothpastes_path` path to the toothpastes CSV file
 
