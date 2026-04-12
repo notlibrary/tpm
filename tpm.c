@@ -37,6 +37,29 @@ static const char* times_of_day[TOTAL_TIMES_OF_DAY]={
 	"Day",
 	"Evening"
 	
+};
+
+
+static struct option long_options[] = {
+    {"rating",     no_argument, 0, 'a'},
+    {"weight",  no_argument,       0, 'w'},
+    {"json",  no_argument, 0, 'j'},
+    {"version", no_argument,       0, 'v'},
+    {"random", no_argument,       0, 'x'},
+    {"quiet", no_argument,       0, 'q'},
+    {"list", no_argument,       0, 'l'},
+    {"random", no_argument,       0, 'x'},	
+	{"reset", no_argument,       0, 'r'},	
+	{"output", required_argument,0, 'o'},
+	{"config", required_argument,0, 'c'},		
+	{"stats", required_argument,0, 't'},			
+	{"counter", required_argument,0, 's'},	
+	{"index", required_argument,0, 'i'},
+	{"type", required_argument,0, 'p'},	
+	{"brand", required_argument,0, 'b'},	
+	{"delta", required_argument,0, 'd'},
+	{"timezone", required_argument,0, 'z'},		
+    {0, 0, 0, 0} 
 };	
 
 static const char stats_file_name[MAX_PATH] ="pickstats";
@@ -921,7 +944,8 @@ main(int argc, char* argv[])
 	toothpaste_pick_t* pick;
 	char* user_home_dir=get_user_home_dir();
 	toothpaste_pick_options_t topts;
-	struct cfg_struct* cfg; 
+	struct cfg_struct* cfg;
+	int option_index = 0;
 	
 #ifdef _WIN32
 	strncat(user_home_dir,"\\tpm\\",MAX_PATH);
@@ -943,7 +967,7 @@ main(int argc, char* argv[])
 	free(user_home_dir);
 	topts=read_config(config_file_path_final);
 	config_load_failure=!file_exists_fopen(config_file_path_final);
-	while ((opt = getopt(argc, argv, "awjvxqlrt:o:c:s:p:i:b:z:d:")) != -1) 
+	while ((opt = getopt_long(argc, argv, "awjvxqlrt:o:c:s:p:i:b:z:d:",long_options,&option_index)) != -1) 
 	{
         switch (opt) 
 		{
