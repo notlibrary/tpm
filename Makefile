@@ -21,9 +21,12 @@ $(OBJECTS): $(SOURCES)
 	$(CC) $(CFLAGS) -c $(SOURCES)
 install:
 	cp $(CURRENT_DIR)/tpm /usr/local/bin/
+	gzip -k tpm.1
+	cp tpm.1.gz /usr/share/man/man1/tpm.1.gz
 clean:	
 	rm $(CURRENT_DIR)/tpm $(OBJECTS)
 	rm -rf tpm-linux-bin-amd64
+	rm tpm.1.gz
 distr:
 	mkdir -p tpm-linux-bin-amd64
 	cp tpm.conf.sample toothpastes.sample tpm README.md tpm-linux-bin-amd64

@@ -1,0 +1,47 @@
+.TH TPM "1" "April 2026" "Toothpaste Picking Manager" "User Commands"
+.SH NAME
+tpm \- toothpaste picking manager
+.SH SYNOPSIS
+.B tpm
+[\fI\,OPTION\/\fR]... [\fI\,TOOTHPASTES_LIST\/\fR]...
+.SH DESCRIPTION
+.\" Add any additional description here
+.PP
+Output toothpaste picking string
+.PP
+Mandatory arguments to long options are mandatory for short options too.
+.TP
+\fB\-a\fR, \fB\-\-rating\fR
+pick the toothpaste with highest rating
+
+.TP
+\fB\-w\fR, \fB\-\-weight\fR
+ pick the toothpaste with highest tube weight
+.TP
+\fB\-j\fR, \fB\-\-json\fR
+ output the JSON with last pick info instead toothpaste picking string
+.TP
+\fB\-v\fR, \fB\-\-version\fR
+show the toothpaste picking manager version
+.TP
+\fB\-x\fR, \fB\-\-random\fR
+perform a random toothpaste pick
+.TP
+\fB\-q\fR, \fB\-\-quiet\fR
+the quiet toothpaste pick
+.TP
+\fB\-l\fR, \fB\-\-list\fR
+list the available toothpastes
+.TP
+\fB\-r\fR, \fB\-\-reset\fR
+reset the total toothpaste picks counter
+.TP
+.SH AUTHOR
+Written by notlibrary and others.
+
+.SH COPYRIGHT
+License 0-BSD
+.br
+.SH "SEE ALSO"
+https://github.com/notlibrary/tpm/README.md
+
