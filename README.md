@@ -32,6 +32,9 @@ task as they wish it's simple enough operation for most systems
 
 Tiny simple terminal console C program with maximum utility
 and zero maintenance burden
+
+What if Chekhov is alive and is a C programmer?
+
 ## Sample terminal output from verbose mode:
 ```
 Good Morning Serenity Welcome to the toothpaste picking manager

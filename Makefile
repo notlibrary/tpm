@@ -14,14 +14,15 @@ OBJECTS=    tpm.o \
 
 .PHONY: all install clean
 
-all: tpm install clean
+all: tpm docs install clean
 tpm: $(OBJECTS)
 	$(CC) $(CFLAGS) $(OBJECTS) -o tpm
 $(OBJECTS): $(SOURCES)
 	$(CC) $(CFLAGS) -c $(SOURCES)
+docs:
+	gzip -k tpm.1
 install:
 	cp $(CURRENT_DIR)/tpm /usr/local/bin/
-	gzip -k tpm.1
 	cp tpm.1.gz /usr/share/man/man1/tpm.1.gz
 clean:	
 	rm $(CURRENT_DIR)/tpm $(OBJECTS)
@@ -29,5 +30,5 @@ clean:
 	rm tpm.1.gz
 distr:
 	mkdir -p tpm-linux-bin-amd64
-	cp tpm.conf.sample toothpastes.sample tpm README.md tpm-linux-bin-amd64
+	cp tpm.conf.sample toothpastes.sample tpm README.md tpm.1.gz tpm-linux-bin-amd64
 	tar -czf tpm-linux-bin-amd64.tar.gz tpm-linux-bin-amd64
