@@ -244,4 +244,8 @@ Judge for yourself if this is a good deal or not and why
 - It has perfectly fine sane regular ordinary usual predictable behavior(almost pedantic) that makes perfect sense 
 - And finally it's the tiny size less than 32KB almost two times smaller than LMDB (Windows .exe however has 200KB builtin .ico)
 
+OK program is good users are bad what now?
+
+You are getting it just pick again you have ~30000 tries per lifetime
+
 P.S. Do not forget to brush your hard disk with `dd` and `rm -rf /` toothpastes twice a day
