@@ -86,6 +86,8 @@ till the heat death of Universe probably
 Moreover it does not even care about the download counter if you do not brush your teeth
 you end with dental rot plague sad but true software nerds has little to offer here
 
+To cope you may try to treat it as a hobby bird watching butterfly collecting fishing toothpaste picking
+
 
 ## Command line options
 `-a --rating` pick the toothpaste with highest rating
