@@ -28,12 +28,14 @@ and each user has different brush time different timezone and different terminal
 it's users who should spent 5 minutes to figure things out and schedule the underlying 
 task as they wish it's simple enough operation for most systems
 
-3. Enjoy the machine doing it for you
+3. Enjoy the machine doing it for you 
 
 Tiny simple terminal console C program with maximum utility
 and zero maintenance burden
 
 What if Chekhov is alive and is a C programmer?
+
+Linux build also has `tpm.1` manual included
 
 ## Sample terminal output from verbose mode:
 ```
