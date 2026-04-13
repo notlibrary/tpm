@@ -245,7 +245,8 @@ Judge for yourself if this is a good deal or not and why
 - And finally it's the tiny size less than 32KB almost two times smaller than LMDB (Windows .exe however has 200KB builtin .ico)
 
 OK program is good users are bad what now?
-
 You are getting it just pick again you have ~30000 tries per lifetime
+Also this program itself defines the whole new software genre "toothpaste picking managers" like file managers window managers database managers
+device managers etc
 
 P.S. Do not forget to brush your hard disk with `dd` and `rm -rf /` toothpastes twice a day
