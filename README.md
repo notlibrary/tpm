@@ -251,4 +251,6 @@ You are getting it just pick again you have ~30000 tries per lifetime
 Also this program itself defines the whole new software genre "toothpaste picking managers" like file managers window managers database managers
 device managers etc
 
+I'm not joking if you know how to do it better make pull request and show me the code
+
 P.S. Do not forget to brush your hard disk with `dd` and `rm -rf /` toothpastes twice a day
