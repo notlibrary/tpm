@@ -209,6 +209,10 @@ moreover you can recursively pick the toothpaste pick type(method) itself
 but there is no meaning in it `pick the toothpaste in the bathroom` is obvious useful
 default solution for most people
 
+The default guardian line limit is set to 1024
+
+The max brand string length is 128
+
 ## Per component reverse engineering and pick by AI
 This is the advanced topic the key point is that make a new toothpaste is cheaper
 than reverse engineer the old one so AI simply has not enough data to base on 
