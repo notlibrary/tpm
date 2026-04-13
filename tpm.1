@@ -62,15 +62,60 @@ set the timezone hours [-11,11] lag manually
 .TP
 \fB\-d\fR,\fB\-\-delta\fR[=\fI\,DELTA_DAYS\/\fR]
 pick the toothpaste with default method in the future or the past
+
+.SH CONFIGURATION
+.PP
+The configuration is located in \f[C]\[ti]/tpm/tpm.conf\f[R] file
+It\[cq]s options:
+.PP
+\f[C]LOAD_CONFIG\f[R] loads the configuration file \f[C]tpm.conf\f[R]
+from specific path
+.PP
+\f[C]USERNAME\f[R] override the username
+.PP
+\f[C]PICK_TYPE\f[R] set the toothpaste pick type [0,7] number for
+\f[C]Default, Random, By index, By brand, Max rating, Max tube mass, Min rating, Min tube mas\f[R]
+.PP
+\f[C]VERBOSE\f[R] 0 for the quiet toothpaste pick
+.PP
+\f[C]TOOTHPASTES\f[R] the toothpastes list CSV full file name
+.PP
+\f[C]LAST_PICK\f[R] the last pick file location
+.PP
+\f[C]PICK_STATS\f[R] the pick stats file location
+.PP
+\f[C]LIST_TOOTHPASTES\f[R] 1 to list the available toothpastes
+.PP
+\f[C]OUTPUT_JSON\f[R] 1 to output the JSON with toothpaste pick
+.PP
+\f[C]OUTPUT_FILE\f[R] 1 to output to the file
+\f[C]\[ti]tpm/last_pick\f[R]
+.PP
+\f[C]PICK_INDEX\f[R] pick the toothpaste by this index if
+\f[C]PICK_TYPE=2\f[R]
+.PP
+\f[C]BRAND\f[R] pick the toothpaste by this brand if
+\f[C]PICK_TYPE=3\f[R]
+.PP
+\f[C]RESET_COUNTER\f[R] 1 to reset the toothpaste pick counter
+.PP
+\f[C]SET_COUNTER\f[R] not 0 to set the toothpaste pick counter
+.PP
+\f[C]TIMEZONE\f[R] set the timezone hours [-11,11] lag manually
+.PP
+\f[C]DELTA_DAYS\f[R] pick the toothpaste with default method in the
+future or the past
+
 .SH FILES
 .PP
-"~/tpm/toothpastes" the CSV toothpastes list
+\f[C]\[ti]/tpm/toothpastes\f[R] the CSV toothpastes list
+.PP
+\f[C]\[ti]/tpm/tpm.conf\f[R] the TPM configuration file
+.PP
+\f[C]\[ti]/tpm/pickstats\f[R] the toothpaste pick stats binary file
+.PP
+\f[C]\[ti]/tpm/last_pick\f[R] the last toothpaste pick output message string or JSON file
 
-"~/tpm/tpm.conf" the TPM configuration file
-
-"~/tpm/pickstats" the toothpaste pick stats binary file
-
-"~/tpm/last_pick" the last toothpaste pick output message string or JSON file
 .SH AUTHOR
 Written by notlibrary and others.
 
