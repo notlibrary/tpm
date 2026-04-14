@@ -87,7 +87,7 @@ Moreover it does not even care about the download counter if you do not brush yo
 you end with dental rot plague sad but true software nerds has little to offer here
 
 To cope you may try to treat it as a hobby bird watching butterfly collecting fishing toothpaste picking
-still better than being rotten teeth open source bum
+still better than being stereotypical rotten teeth open source bum
 
 
 ## Command line options
