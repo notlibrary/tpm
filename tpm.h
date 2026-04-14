@@ -70,6 +70,11 @@ memcpy(&y,&x,       sizeof(x)); \
 memcpy(&x,swap_temp,sizeof(x)); \
 } while(0)
 
+#ifdef _WIN32
+#define LINE_FORMAT "%s %u %s %llu  \n"
+#else
+#define LINE_FORMAT "%s %u %s %lu  \n"
+#endif
 typedef enum
 {
 	PICK_DEFAULT,

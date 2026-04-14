@@ -39,7 +39,6 @@ static const char* times_of_day[TOTAL_TIMES_OF_DAY]={
 	
 };
 
-
 static struct option long_options[] = {
     {"rating",     no_argument, 0, 'a'},
     {"weight",  no_argument,       0, 'w'},
@@ -735,8 +734,7 @@ tpm_pick_toothpaste(list_node_t* head,toothpaste_pick_options_t topts)
 		
 		snprintf(line,MAX_LINE_LENGTH,"%s %s %s (%ug) [%u/100] %s %s %s %u %s %u/%u \n", "Toothpaste:", ">>>", pick.what.toothpaste_brand, pick.what.tube_mass_g, pick.what.rating, "<<<", "Day:" ,days_of_week[j],day, "Toothpaste index:",i,pick.total_toothpastes);
 		strncat(pick.message,line,MAX_LINE_LENGTH);
-		
-		snprintf(line,MAX_LINE_LENGTH,"%s %u %s %lu  \n", "Total picks:", pick.stats.total_picks, "Last pick time:" ,pick.stats.last_pick_time);
+		snprintf(line,MAX_LINE_LENGTH,LINE_FORMAT, "Total picks:", pick.stats.total_picks, "Last pick time:" ,pick.stats.last_pick_time);
 		strncat(pick.message,line,MAX_LINE_LENGTH);
 	
 	}
