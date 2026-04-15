@@ -714,7 +714,7 @@ tpm_pick_toothpaste(list_node_t* head,toothpaste_pick_options_t topts)
 		pick.stats.last_pick_time=total_seconds;
 		write_counters(pick.stats);
 		
-		if (pick.stats.total_picks % (365 /topts.formula.swap_toothbrush_times_per_year) ==0)
+		if (pick.stats.total_picks % (DAYS_PER_YEAR /topts.formula.swap_toothbrush_times_per_year) ==0)
 		{
 			 if (topts.verbose) 
 			 { 
@@ -723,7 +723,7 @@ tpm_pick_toothpaste(list_node_t* head,toothpaste_pick_options_t topts)
 			 }
 		}
 		
-		if (pick.stats.total_picks % (365 /topts.formula.visit_dentist_times_per_year) ==0)
+		if (pick.stats.total_picks % (DAYS_PER_YEAR /topts.formula.visit_dentist_times_per_year) ==0)
 		{
 			 if (topts.verbose) 
 			 { 
@@ -741,10 +741,10 @@ tpm_pick_toothpaste(list_node_t* head,toothpaste_pick_options_t topts)
 		}
 		snprintf(line,MAX_TOOTHPASTE_LINE,"%s\n", pick_type_strings[topts.ptype] );
 		strncat(pick.message,line,MAX_LINE_LENGTH);
-		snprintf(line,MAX_TOOTHPASTE_LINE,"Dental Formula: %u-%u-%u-%u \n", topts.formula.brush_times_per_day ,topts.formula.minutes_per_brush , topts.formula.swap_toothbrush_times_per_year , topts.formula.visit_dentist_times_per_year);
-		strncat(pick.message,line,MAX_LINE_LENGTH);
 		
 		snprintf(line,MAX_LINE_LENGTH,"%s %s %s (%ug) [%u/100] %s %s %s %u %s %u/%u \n", "Toothpaste:", ">>>", pick.what.toothpaste_brand, pick.what.tube_mass_g, pick.what.rating, "<<<", "Day:" ,days_of_week[j],day, "Toothpaste index:",i,pick.total_toothpastes);
+		strncat(pick.message,line,MAX_LINE_LENGTH);
+		snprintf(line,MAX_TOOTHPASTE_LINE,"Dental Formula: %u-%u-%u-%u \n", topts.formula.brush_times_per_day ,topts.formula.minutes_per_brush , topts.formula.swap_toothbrush_times_per_year , topts.formula.visit_dentist_times_per_year);
 		strncat(pick.message,line,MAX_LINE_LENGTH);
 		snprintf(line,MAX_LINE_LENGTH,LINE_FORMAT, "Total picks:", pick.stats.total_picks, "Last pick time:" ,pick.stats.last_pick_time);
 		strncat(pick.message,line,MAX_LINE_LENGTH);
@@ -873,8 +873,17 @@ read_config(const char* src)
 		recursion++;
 		opts=read_config(value);
 	}
-	opts.username = (cfg_get_rec(cfg, "USERNAME"));
-	opts.formula=parse_dental_formula(cfg_get_rec(cfg,"DENTAL_FORMULA")); 
+	value = cfg_get_rec(cfg, "USERNAME");
+	if (value!=NULL)
+	{		
+		opts.username = value; 
+	}	
+	value = cfg_get_rec(cfg,"DENTAL_FORMULA");
+	if (value!=NULL)
+	{		
+		opts.formula=parse_dental_formula(value); 
+	}
+	
 	value = cfg_get_rec(cfg, "TIMEZONE");
 	if ((value!=NULL) && atoi(value)>=-MAX_TIMEZONE_DELTA && atoi(value)<=MAX_TIMEZONE_DELTA) 
 	{
