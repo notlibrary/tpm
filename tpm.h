@@ -45,6 +45,7 @@ extern "C" {
 #define SECONDS_PER_HOUR 3600
 #define PICK_TIMEOUT_SECONDS 300
 #define TOOTHBRUSH_TIMESPAN_DAYS 180
+#define DEFAULT_DENTAL_FORMULA "2-2-2-2"
 #ifndef MAX_PATH
 #define MAX_PATH 256
 #endif
@@ -95,6 +96,14 @@ typedef struct
 	unsigned int total_picks;
 }toothpaste_pick_stats_t;
 
+typedef struct
+{
+	unsigned int brush_times_per_day;
+	unsigned int minutes_per_brush;
+	unsigned int swap_toothbrush_times_per_year;
+	unsigned int visit_dentist_times_per_year;
+}dental_formula_t;
+
 
 typedef struct {
     unsigned int index;
@@ -118,6 +127,7 @@ typedef struct {
 	unsigned int pick_by_index_index;
 	const char* username;
 	const char* brand_string;
+	dental_formula_t formula;
 }toothpaste_pick_options_t;
 
 typedef struct {
@@ -164,6 +174,7 @@ static int get_current_username(char* buffer, size_t buffer_size);
 static void version(void);
 static const char* cfg_get_rec(const struct cfg_struct* cfg, const char* key);
 static toothpaste_pick_options_t read_config(const char* src);
+static dental_formula_t parse_dental_formula(const char* formula_str);
 static void save_default_config(struct cfg_struct* cfg);
 static int file_exists_fopen(const char *filename);
 static uint64_t rand_range(uint64_t min, uint64_t max);

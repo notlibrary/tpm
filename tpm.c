@@ -48,6 +48,7 @@ static struct option long_options[] = {
     {"quiet", no_argument,       0, 'q'},
     {"list", no_argument,       0, 'l'},
 	{"reset", no_argument,       0, 'r'},	
+    {"formula", required_argument, 0, 'f'},
 	{"output", required_argument,0, 'o'},
 	{"config", required_argument,0, 'c'},		
 	{"stats", required_argument,0, 't'},			
@@ -713,11 +714,20 @@ tpm_pick_toothpaste(list_node_t* head,toothpaste_pick_options_t topts)
 		pick.stats.last_pick_time=total_seconds;
 		write_counters(pick.stats);
 		
-		if (pick.stats.total_picks % TOOTHBRUSH_TIMESPAN_DAYS ==0)
+		if (pick.stats.total_picks % (365 /topts.formula.swap_toothbrush_times_per_year) ==0)
 		{
 			 if (topts.verbose) 
 			 { 
-					snprintf(line,MAX_TOOTHPASTE_LINE,"%s", "180 days toothbrush time span over swap the toothbrush(or order new one) \n"); 
+					snprintf(line,MAX_TOOTHPASTE_LINE,"%s", "Toothbrush time span over swap the toothbrush(or order new one) \n"); 
+					strncat(pick.message,line,MAX_LINE_LENGTH);
+			 }
+		}
+		
+		if (pick.stats.total_picks % (365 /topts.formula.visit_dentist_times_per_year) ==0)
+		{
+			 if (topts.verbose) 
+			 { 
+					snprintf(line,MAX_TOOTHPASTE_LINE,"%s", "Time span over please visit dentist \n"); 
 					strncat(pick.message,line,MAX_LINE_LENGTH);
 			 }
 		}
@@ -730,6 +740,8 @@ tpm_pick_toothpaste(list_node_t* head,toothpaste_pick_options_t topts)
 			strncat(pick.message,line,MAX_LINE_LENGTH);	
 		}
 		snprintf(line,MAX_TOOTHPASTE_LINE,"%s\n", pick_type_strings[topts.ptype] );
+		strncat(pick.message,line,MAX_LINE_LENGTH);
+		snprintf(line,MAX_TOOTHPASTE_LINE,"Dental Formula: %u-%u-%u-%u \n", topts.formula.brush_times_per_day ,topts.formula.minutes_per_brush , topts.formula.swap_toothbrush_times_per_year , topts.formula.visit_dentist_times_per_year);
 		strncat(pick.message,line,MAX_LINE_LENGTH);
 		
 		snprintf(line,MAX_LINE_LENGTH,"%s %s %s (%ug) [%u/100] %s %s %s %u %s %u/%u \n", "Toothpaste:", ">>>", pick.what.toothpaste_brand, pick.what.tube_mass_g, pick.what.rating, "<<<", "Day:" ,days_of_week[j],day, "Toothpaste index:",i,pick.total_toothpastes);
@@ -758,6 +770,7 @@ save_default_config(struct cfg_struct* cfg)
 	cfg_set(cfg,"USERNAME","\"Anonymous\"");
 	cfg_set(cfg,"DELTA_DAYS","0");
 	cfg_set(cfg,"PICK_TYPE","0");
+	cfg_set(cfg,"DENTAL_FORMULA","\"2-2-2-2\"");
 	cfg_set(cfg,"VERBOSE","1");
 	cfg_set(cfg,"LIST_TOOTHPASTES","0");
 	cfg_set(cfg,"OUTPUT_JSON","0");
@@ -813,6 +826,20 @@ file_exists_fopen(const char *filename)
     }
 }
 
+static dental_formula_t
+parse_dental_formula(const char* formula_str)
+{
+	dental_formula_t formula={2,2,2,2};
+	
+	sscanf(formula_str,"%u-%u-%u-%u",&(formula.brush_times_per_day),&(formula.minutes_per_brush),&(formula.swap_toothbrush_times_per_year),&(formula.visit_dentist_times_per_year));
+	
+	if (formula.swap_toothbrush_times_per_year ==0) formula.swap_toothbrush_times_per_year=1;
+	
+	if (formula.visit_dentist_times_per_year ==0) formula.visit_dentist_times_per_year=1;
+	
+	return formula;
+}
+
 static toothpaste_pick_options_t
 read_config(const char* src)
 {
@@ -822,6 +849,9 @@ read_config(const char* src)
 	int set_counters_v=0;
 	const char* value = NULL;
 	static int recursion =0;
+	dental_formula_t formula=parse_dental_formula(DEFAULT_DENTAL_FORMULA); 
+	
+	opts.formula=formula;
 	opts.ptype=pick_type;
 	opts.verbose=verbose;
 	opts.lat_flag=lat_flag;
@@ -838,14 +868,13 @@ read_config(const char* src)
 		return opts;
     }
 	value = cfg_get_rec(cfg, "LOAD_CONFIG");
-	
 	if ((value!=NULL) && (strcmp(src,value)==0) && (recursion < MAX_CONFIG_RECURSION)) 		
 	{
 		recursion++;
 		opts=read_config(value);
 	}
-	
 	opts.username = (cfg_get_rec(cfg, "USERNAME"));
+	opts.formula=parse_dental_formula(cfg_get_rec(cfg,"DENTAL_FORMULA")); 
 	value = cfg_get_rec(cfg, "TIMEZONE");
 	if ((value!=NULL) && atoi(value)>=-MAX_TIMEZONE_DELTA && atoi(value)<=MAX_TIMEZONE_DELTA) 
 	{
@@ -928,7 +957,6 @@ read_config(const char* src)
 	{ 
 		set_counters(&set_counters_v);
 	}
-	
 	return opts;
 }
 
@@ -964,7 +992,7 @@ main(int argc, char* argv[])
 	free(user_home_dir);
 	topts=read_config(config_file_path_final);
 	config_load_failure=!file_exists_fopen(config_file_path_final);
-	while ((opt = getopt_long(argc, argv, "awjvxqlrt:o:c:s:p:i:b:z:d:",long_options,&option_index)) != -1) 
+	while ((opt = getopt_long(argc, argv, "awjvxqlrf:t:o:c:s:p:i:b:z:d:",long_options,&option_index)) != -1) 
 	{
         switch (opt) 
 		{
@@ -991,6 +1019,9 @@ main(int argc, char* argv[])
 			break;
 			case 'r':
 			reset_counters();
+			break;
+			case 'f':
+			topts.formula=parse_dental_formula(optarg);
 			break;
 			case 'c':
 				topts=read_config(optarg);
@@ -1023,7 +1054,7 @@ main(int argc, char* argv[])
 				delta_days=atoi(optarg);
 			break; 	
 			case '?': 
-				fprintf(stderr, "Usage: %s [-awjvxqlr] [-c config_file] [-o pick output file] [-t stats file] [-s total_picks value] [-p pick_type_value] [-i toothpaste_index] [-b brand_string -z delta_hours -d delta_days] [toothpastes_file] \n", argv[0]);
+				fprintf(stderr, "Usage: %s [-awjvxqlr] [-f dental-formula] [-c config_file] [-o pick output file] [-t stats file] [-s total_picks value] [-p pick_type_value] [-i toothpaste_index] [-b brand_string -z delta_hours -d delta_days] [toothpastes_file] \n", argv[0]);
 				exit(EXIT_FAILURE);
 			default:
 				break;
