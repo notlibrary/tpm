@@ -977,28 +977,30 @@ main(int argc, char* argv[])
 	FILE* output_file;
 	toothpaste_pick_t* pick;
 	char* user_home_dir=get_user_home_dir();
+	char user_home_dir_static[MAX_PATH];
 	toothpaste_pick_options_t topts;
 	struct cfg_struct* cfg;
 	int option_index = 0;
 	
+	strncpy(user_home_dir_static,user_home_dir,MAX_PATH);
+	free(user_home_dir);
 #ifdef _WIN32
-	strncat(user_home_dir,"\\tpm\\",MAX_PATH);
+	strncat(user_home_dir_static,"\\tpm\\",MAX_PATH/2);
 #else
-	strncat(user_home_dir,"/tpm/",MAX_PATH);
+	strncat(user_home_dir_static,"/tpm/",MAX_PATH/2);
 #endif
-	strncpy(stats_file_path_final,user_home_dir,MAX_PATH);
+	strncpy(stats_file_path_final,user_home_dir_static,MAX_PATH);
 	strncat(stats_file_path_final,stats_file_name,MAX_PATH/2);
 	
-	strncpy(toothpastes_file_path_final,user_home_dir,MAX_PATH);
+	strncpy(toothpastes_file_path_final,user_home_dir_static,MAX_PATH);
 	strncat(toothpastes_file_path_final,toothpastes_file_name,MAX_PATH/2);
 	
-	strncpy(output_file_path_final,user_home_dir,MAX_PATH);
+	strncpy(output_file_path_final,user_home_dir_static,MAX_PATH);
 	strncat(output_file_path_final,output_file_name,MAX_PATH/2);
 
-	strncpy(config_file_path_final,user_home_dir,MAX_PATH);
+	strncpy(config_file_path_final,user_home_dir_static,MAX_PATH);
 	strncat(config_file_path_final,config_file_name,MAX_PATH/2);
 	
-	free(user_home_dir);
 	topts=read_config(config_file_path_final);
 	config_load_failure=!file_exists_fopen(config_file_path_final);
 	while ((opt = getopt_long(argc, argv, "awjvxqlrf:t:o:c:s:p:i:b:z:d:",long_options,&option_index)) != -1) 
