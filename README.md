@@ -43,6 +43,7 @@ Good Morning Serenity Welcome to the toothpaste picking manager
 Already picked today
 Pick type: Default
 Toothpaste: >>> SENSODYNE (150g) [100/100] <<< Day: Saturday 20512 Toothpaste index: 1/3
+Dental Formula: 1-10-2-2
 Total picks: 7 Last pick time: 1772266460
 
 Press any key to continue . . .
@@ -89,6 +90,20 @@ you end with dental rot plague sad but true software nerds has little to offer h
 To cope you may try to treat it as a hobby bird watching butterfly collecting fishing toothpaste picking
 still better than being stereotypical rotten teeth open source bum
 
+##Dental formula
+The dental formula is an expression with format `W-X-Y-Z` where 
+
+`W` toothbrushes times per day 
+
+`X` minutes per toothbrush 
+
+`Y` toothbrushes swaps per year
+
+`Z` dentist visits per year  
+
+So default conventional formulas are `2-2-2-2` and `1-10-2-2`
+
+Also sometimes is possible to add 5th term toothpaste grams per nurdle but this program do not support it
 
 ## Command line options
 `-a --rating` pick the toothpaste with highest rating
@@ -106,6 +121,8 @@ still better than being stereotypical rotten teeth open source bum
 `-l --list` list the available toothpastes
 
 `-r --reset` reset the total toothpaste picks counter
+
+`-f --formula` set the dental formula `dental_formula`
 
 `-o --output pick_output_file` output toothpaste picking string or JSON to the text file `pick_output_file`
 
@@ -136,6 +153,8 @@ It's options:
 `USERNAME` override the username
 
 `PICK_TYPE` set the toothpaste pick type [0,7] number for `Default, Random, By index, By brand, Max rating, Max tube mass, Min rating, Min tube mas`
+
+`DENTAL_FORMULA` set the dental formula eg. "2-2-2-2"
 
 `VERBOSE` 0 for the quiet toothpaste pick
 
@@ -173,6 +192,7 @@ FALSE=0
 [GENERAL]
 USERNAME="Anonymous"
 PICK_TYPE=DEFAULT
+DENTAL_FORMULA="2-2-2-2"
 VERBOSE=TRUE
 TOOTHPASTES="C:\Users\Anonymous\tpm\toothpastes"
 LAST_PICK="C:\Users\Anonymous\tpm\last_pick"

@@ -7,6 +7,7 @@ FALSE=0
 [GENERAL]
 USERNAME="Anonymous"
 PICK_TYPE=DEFAULT
+DENTAL_FORMULA="2-2-2-2"
 VERBOSE=TRUE
 TOOTHPASTES="C:\Users\Anonymous\tpm\toothpastes"
 LAST_PICK="C:\Users\Anonymous\tpm\last_pick"
