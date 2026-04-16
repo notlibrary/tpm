@@ -90,7 +90,7 @@ you end with dental rot plague sad but true software nerds has little to offer h
 To cope you may try to treat it as a hobby bird watching butterfly collecting fishing toothpaste picking
 still better than being stereotypical rotten teeth open source bum
 
-##Dental formula
+## Dental formula
 The dental formula is an expression with format `W-X-Y-Z` where 
 
 `W` toothbrushes times per day 
