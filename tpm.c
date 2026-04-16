@@ -830,12 +830,13 @@ static dental_formula_t
 parse_dental_formula(const char* formula_str)
 {
 	dental_formula_t formula={2,2,2,2};
+	if (formula_str==NULL) { return formula; }
 	
 	sscanf(formula_str,"%u-%u-%u-%u",&(formula.brush_times_per_day),&(formula.minutes_per_brush),&(formula.swap_toothbrush_times_per_year),&(formula.visit_dentist_times_per_year));
 	
-	if (formula.swap_toothbrush_times_per_year ==0) formula.swap_toothbrush_times_per_year=1;
+	if (formula.swap_toothbrush_times_per_year ==0) { formula.swap_toothbrush_times_per_year=1; }
 	
-	if (formula.visit_dentist_times_per_year ==0) formula.visit_dentist_times_per_year=1;
+	if (formula.visit_dentist_times_per_year ==0) { formula.visit_dentist_times_per_year=1; }
 	
 	return formula;
 }
