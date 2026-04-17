@@ -21,7 +21,8 @@ Windows:
 Linux(Ubuntu):
 `crontab -e` 
 then append this line:
-`00 9 * * * /usr/local/bin/tpm`
+`00 9 * * * echo && /usr/local/bin/tpm > /dev/pts/0 2>&1
+`
 
 I don't do this step automatically from code because cron is not portable solution
 and each user has different brush time different timezone and different terminal
