@@ -66,7 +66,6 @@ task as they wish it's simple enough operation for most systems
 If setting the cron job is to hard another tactic is to make a new special dummy user which runs `tpm` on login
 I left this to an auditory as an exercise
 
-
 3. Enjoy the machine doing it for you 
 
 Tiny simple terminal console C program with maximum utility
