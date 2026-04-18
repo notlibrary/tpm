@@ -19,10 +19,26 @@ Windows:
 `schtasks /create /tn "TPM" /tr "C:\Program Files\tpm\tpm.exe" /sc daily /st 09:00`
 
 Linux(Ubuntu):
-`crontab -e` 
-then append this line:
-`00 9 * * * ( echo && /usr/local/bin/tpm ) > /dev/pts/1 2>&1
-`
+There are 3 ways to bring cron task to the foreground
+depending of what are you expecting as foreground
+
+- Identify and redirect output to active TTY 
+Identify TTY
+`tty`
+/dev/pts/1
+Add task with redirect to /dev/pts/1
+`cronrtab -e` append
+`00 9 * * * ( echo && /usr/local/bin/tpm ) > /dev/pts/1 2>&1`
+
+- Create tmux session
+`cronrtab -e` append
+`00 9 * * * /usr/bin/tmux new-session -d -s "tpn" "/usr/local/bin/tpm"`
+Attach session later
+`tmux attach-session -t tpm`
+
+- Open X windows terminal
+`cronrtab -e` append
+`00 9 * * * DISPLAY=:0 xterm -e /usr/local/bin/tpm`
 
 I don't do this step automatically from code because cron is not portable solution
 and each user has different brush time different timezone and different terminal
