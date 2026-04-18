@@ -40,7 +40,7 @@ Add task with redirect to /dev/pts/1
 
 `cronrtab -e` append
 
-`00 9 * * * /usr/bin/tmux new-session -d -s "tpn" "/usr/local/bin/tpm"`
+`00 9 * * * /usr/bin/tmux new-session -d -s "tpm" "/usr/local/bin/tpm"`
 
 Attach session later
 
