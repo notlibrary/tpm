@@ -40,6 +40,10 @@ Attach session later
 `cronrtab -e` append
 `00 9 * * * DISPLAY=:0 xterm -e /usr/local/bin/tpm`
 
+- Finally with simple crontab and configured MTA you can read cron mail with tpm output
+`crontab -e` append
+`00 9 * * * /usr/local/bin/tpm`
+
 I don't do this step automatically from code because cron is not portable solution
 and each user has different brush time different timezone and different terminal
 it's users who should spent 5 minutes to figure things out and schedule the underlying 
