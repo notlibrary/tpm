@@ -22,37 +22,37 @@ Linux(Ubuntu):
 There are 3 ways to bring cron task to the foreground
 depending of what are you expecting as foreground
 
-- Identify and redirect output to active TTY 
+- Identify and redirect output to the active TTY 
 
-Identify TTY
+Identify the TTY
 
 `tty`
 
 /dev/pts/1
 
-Add task with redirect to /dev/pts/1
+Add the task with redirect to /dev/pts/1
 
 `cronrtab -e` append
 
 `00 9 * * * ( echo && /usr/local/bin/tpm ) > /dev/pts/1 2>&1`
 
-- Create tmux session
+- Create the tmux session
 
 `cronrtab -e` append
 
 `00 9 * * * /usr/bin/tmux new-session -d -s "tpm" "/usr/local/bin/tpm"`
 
-Attach session later
+Attach the session later
 
 `tmux attach-session -t tpm`
 
-- Open X windows terminal
+- Open the default X windows terminal
 
 `cronrtab -e` append
 
 `00 9 * * * DISPLAY=:0 xterm -e /usr/local/bin/tpm`
 
-- Finally with simple crontab and configured MTA you can read cron mail with tpm output
+- Finally with the simple crontab and configured MTA you can read cron mail with the tpm output
 
 `crontab -e` append
 
@@ -63,7 +63,7 @@ and each user has different brush time different timezone and different terminal
 it's users who should spent 5 minutes to figure things out and schedule the underlying 
 task as they wish it's simple enough operation for most systems
 
-If setting the cron job is to hard another tactic is to make a new special dummy user which runs `tpm` on login
+If setting the cron job is too hard another tactic is to make a new special dummy user which runs `tpm` on login
 I left this to an auditory as an exercise
 
 3. Enjoy the machine doing it for you 
