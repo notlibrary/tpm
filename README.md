@@ -23,6 +23,7 @@ There are 3 ways to bring cron task to the foreground
 depending of what are you expecting as foreground
 
 - Identify and redirect output to active TTY 
+
 Identify TTY
 
 `tty`
