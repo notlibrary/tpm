@@ -285,25 +285,25 @@ The max brand string length is 128
 ## The biggest dental lie on the planet
 Here we go do some math again
 
-( mass = world population * brshes per lifetime * grams per nurdle ) / grams in kg
+mass = ( world population * brshes per lifetime * grams per nurdle ) / grams in kg
 
 $$
-( m = 8000000000 * 60000 * 2 ) / 1000 = kg = 960000000000 kg
+M = ( 8000000000 * 60000 * 2 ) / 1000 = kg = 960000000000 kg
 $$
 
 volume = mass/density 
 
 $$
-v = 960000000000 kg/3000 kg/m^3 = 320000000 m^3
+V = 960000000000 kg/3000 kg/m^3 = 320000000 m^3
 $$
 
 linear size m = cbroot(volume)
 
 $$
-l = \sqrt[3]{320000000} m^3 ~= 684m
+L = \sqrt[3]{320000000} m^3 ~= 684 m
 $$
 
-So you need the cube with the edge 684m filled with the toothpaste to brush them all for rest of their lives
+So you need the cube with the edge 684 meters filled with the toothpaste to brush them all for rest of their lives
 
 Good luck with that
 
