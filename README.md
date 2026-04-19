@@ -303,7 +303,7 @@ $$
 L = \sqrt[3]{320000000} m^3 ~= 684 m
 $$
 
-So you need the cube with the edge 684 meters filled with the toothpaste to brush them all for rest of their lives
+So you need the cube with the edge 684 meters filled with the toothpaste to brush them all for the rest of their lives
 
 Good luck with that
 
