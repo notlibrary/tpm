@@ -1,6 +1,8 @@
 ## TPM Toothpaste Picking Manager
 Let me pick the toothpaste for you(or how to brush your teeth admins way)
 
+> Brush your teeth kernel scum
+
 0. Clone the repository to `~/tpm` and make it:
 
 `git clone https://github.com/notlibrary/tpm.git`
