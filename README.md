@@ -288,7 +288,7 @@ Here we go do some math again
 mass = ( world population * brshes per lifetime * grams per nurdle ) / grams in kg
 
 $$
-M = ( 8000000000 * 60000 * 2 ) / 1000 = kg = 960000000000 kg
+M = ( 8000000000 * 60000 * 2 ) / 1000 kg = 960000000000 kg
 $$
 
 volume = mass/density 
