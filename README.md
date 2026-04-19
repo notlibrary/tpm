@@ -288,19 +288,19 @@ Here we go do some math again
 mass = ( world population * brshes per lifetime * grams per nurdle ) / grams in kg
 
 $$
-M = ( 8000000000 * 60000 * 2 ) / 1000 g = 960000000000 kg
+M = ( 8 000 000 000 * 60 000 * 2 ) / 1 000 g = 960 000 000 000 kg
 $$
 
 volume = mass/density 
 
 $$
-V = 960000000000 kg/3000 kg/m^3 = 320000000 m^3
+V = 960 000 000 000 kg/3000 kg/m^3 = 320 000 000 m^3
 $$
 
 linear size m = cbroot(volume)
 
 $$
-L = \sqrt[3]{320000000} m^3 ~= 684 m
+L = \sqrt[3]{320 000 000} m^3 ~= 684 m
 $$
 
 So you need the cube with the edge 684 meters filled with the toothpaste to brush them all for the rest of their lives
