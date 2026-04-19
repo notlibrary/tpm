@@ -285,7 +285,7 @@ The max brand string length is 128
 ## The biggest dental lie on the planet
 Here we go do some math again
 
-mass = ( world population * brshes per lifetime * grams per nurdle ) / grams in kg
+mass = ( world population * total brushes per lifetime * grams per nurdle ) / grams in kg
 
 $$
 M = ( 8 000 000 000 * 60 000 * 2 ) / 1 000 g = 960 000 000 000 kg
