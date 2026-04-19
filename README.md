@@ -66,6 +66,14 @@ task as they wish it's simple enough operation for most systems
 If setting the cron job is too hard another tactic is to make a new special dummy user which runs `tpm` on login
 I left this to an auditory as an exercise
 
+Spoiler add this to `~/.bashrc` to auto attach cron session on login via SSH
+
+```
+if [[ -z "$TMUX" ]] && [[ -n "$SSH_TTY" ]]; then
+    tmux attach-session -t tpm || tmux new-session -s ssh_tmux
+fi
+```
+
 3. Enjoy the machine doing it for you 
 
 Tiny simple terminal console C program with maximum utility
