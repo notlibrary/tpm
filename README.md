@@ -282,6 +282,31 @@ The default guardian line limit is set to 1024
 
 The max brand string length is 128
 
+## The biggest dental lie on the planet
+Here we go do some math again
+
+( mass = world population * brshes per lifetime * grams per nurdle ) / grams in kg
+
+$$
+( m = 8000000000 * 60000 * 2 ) / 1000 = kg = 960000000000 kg
+$$
+
+volume = mass/density 
+
+$$
+v = 960000000000 kg/3000 kg/m^3 = 320000000 m^3
+$$
+
+linear size m = cbroot(volume)
+
+$$
+l = \sqrt[3]{320000000} m^3 ~= 684m
+$$
+
+So you need the cube with the edge 684m filled with the toothpaste to brush them all for rest of their lives
+
+Good luck with that
+
 ## Per component reverse engineering and pick by AI
 This is the advanced topic the key point is that make a new toothpaste is cheaper
 than reverse engineer the old one so AI simply has not enough data to base on 
