@@ -133,7 +133,7 @@ It will be trying to use local computer terminals to pick up the toothpaste long
 till the heat death of Universe probably
 
 Moreover it does not even care about the download counter if you do not brush your teeth
-you end with dental rot plague sad but true software nerds has little to offer here
+you end with dental rot plaque sad but true software nerds has little to offer here
 
 To cope you may try to treat it as a hobby bird watching butterfly collecting fishing toothpaste picking
 still better than being stereotypical rotten teeth open source bum
@@ -308,6 +308,8 @@ $$
 So you need the cube with the edge 800 meters filled with the toothpaste to brush them all for the rest of their lives
 
 Good luck with that
+
+Who will win? Sysadmin tooth brushing program vs tartar dental plaque fight dental rot together
 
 ## Per component reverse engineering and pick by AI
 This is the advanced topic the key point is that make a new toothpaste is cheaper
