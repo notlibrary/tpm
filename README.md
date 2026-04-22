@@ -284,6 +284,8 @@ The default guardian line limit is set to 1024
 
 The max brand string length is 128
 
+The list consisting only from 1 item is perfectly fine
+
 ## The biggest dental lie on the planet
 Here we go let's do some math estimation again
 
