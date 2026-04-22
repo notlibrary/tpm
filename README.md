@@ -293,6 +293,12 @@ for each tube you got
 ## The biggest dental lie on the planet
 Here we go let's do some math estimation again
 
+total brushes per lifetime = average life expectancy * days per year * brushes per day
+
+$$ 
+B = 73 * 365 * 2  = 53 290 
+$$
+
 mass = ( world population * total brushes per lifetime * grams per nurdle ) / grams in kg
 
 $$
@@ -314,6 +320,8 @@ $$
 So you need the cube with the edge 800 meters filled with the toothpaste to brush them all for the rest of their lives
 
 Good luck with that
+
+This estimation does not take in account milk teeth gender country life expectancy differences and people age habits 
 
 Who will win? Sysadmin tooth brushing program vs tartar dental plaque fight dental rot together
 
