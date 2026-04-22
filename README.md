@@ -311,6 +311,8 @@ $$
 V = 663 460 500 000 kg / 1300 kg/m^3 = 510 354 230 m^3
 $$
 
+Around 7600 times lower than mt Everest volume
+
 linear size m = cbroot(volume)
 
 $$
