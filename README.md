@@ -308,7 +308,7 @@ $$
 linear size m = cbroot(volume)
 
 $$
-L = \sqrt[3]{510 354 230} m^3 ~= 800 m
+L = \sqrt[3]{510 354 230} m^3 \approx 800 m
 $$
 
 So you need the cube with the edge 800 meters filled with the toothpaste to brush them all for the rest of their lives
