@@ -284,8 +284,9 @@ The default guardian line limit is set to 1024
 
 The max brand string length is 128
 
-The list consisting only from 1 item is perfectly fine
-It's single item index should starts from 0 zero
+The list consisting only from 1 single item is perfectly fine
+It single item index should starts from 0 zero then
+it's called `0-paste`
 If you have few single brand tubes you may have different brand strings
 for each tube you got
 
