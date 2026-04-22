@@ -291,7 +291,7 @@ If you have few single brand tubes you may have different brand strings
 for each tube you got
 
 ## The biggest dental lie on the planet
-Here we go let's do some math estimation again
+Here we go let's do some math estimation again:
 
 total brushes per lifetime = average life expectancy * days per year * brushes per day
 
@@ -299,16 +299,16 @@ $$
 B = 73 * 365 * 2  = 53 290 
 $$
 
-mass = ( world population * total brushes per lifetime * grams per nurdle ) / grams in kg
+total toothpaste mass = ( world population * total brushes per lifetime * grams per nurdle ) / grams in kg
 
 $$
 M = ( 8 300 000 000 * 53 290 * 1.5 ) / 1 000 g = 663 460 500 000 kg
 $$
 
-volume = mass/density 
+total toothpaste volume = mass / density 
 
 $$
-V = 663 460 500 000 kg/ 1300 kg/m^3 = 510 354 230 m^3
+V = 663 460 500 000 kg / 1300 kg/m^3 = 510 354 230 m^3
 $$
 
 linear size m = cbroot(volume)
