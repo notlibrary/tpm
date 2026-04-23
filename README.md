@@ -290,7 +290,7 @@ it's called `0-paste`
 If you have few single brand tubes you may have different brand strings
 for each tube you got
 
-UPPERCASE brand string to ensure it's seen first through running down terminal with toothpaste picking string
+UPPERCASE the brand string to ensure it's seen first through running down terminal with the toothpaste picking string
 
 ## The biggest dental lie on the planet
 Here we go let's do some math estimation again:
