@@ -7,9 +7,9 @@ static pick_type_t pick_type =PICK_DEFAULT;
 static list_node_t* toothpastes_list;
 
 static const toothpaste_data_t toothpastes[TOTAL_TOOTHPASTES]={
-	{0,"Builtin Toothpaste 1",75,90},
-	{1,"Builtin Toothpaste 2",150,100},
-	{2,"Builtin Toothpaste 3",50,80}
+	{0,"BUILTIN TOOTHPASTE 1",75,90},
+	{1,"BUILTIN TOOTHPASTE 2",150,100},
+	{2,"BUILTIN TOOTHPASTE 3",50,80}
 };
 static const char* pick_type_strings[TOTAL_PICK_TYPE_STRINGS]={
 	"Pick type: Default",
@@ -656,7 +656,6 @@ tpm_pick_toothpaste(list_node_t* head,toothpaste_pick_options_t topts)
 	
 	if (topts.verbose)
 	{
-		
 		snprintf(line,MAX_TOOTHPASTE_LINE,"Good %s %s %s \n", times_of_day[i],pick.who ,"Welcome to the toothpaste picking manager");
 		strncat(pick.message,line,MAX_LINE_LENGTH);
 	}
