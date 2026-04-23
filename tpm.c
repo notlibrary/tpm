@@ -55,6 +55,7 @@ static struct option long_options[] = {
 	{"counter", required_argument,0, 's'},	
 	{"index", required_argument,0, 'i'},
 	{"type", required_argument,0, 'p'},	
+	{"UPPER", required_argument,0, 'U'},		
 	{"brand", required_argument,0, 'b'},	
 	{"delta", required_argument,0, 'd'},
 	{"timezone", required_argument,0, 'z'},		
@@ -77,7 +78,7 @@ static int json_flag =0;
 static int output_to_file =0;
 static int pick_by_index_index =0;
 static char* brand_string =NULL;
-
+static int upper_brands = 0;
 static int delta_days =0;
 static int delta_hours =0;
 
@@ -617,13 +618,14 @@ rand_range(uint64_t min, uint64_t max)
 TPM toothpaste_pick_t*
 tpm_pick_toothpaste(list_node_t* head,toothpaste_pick_options_t topts)
 {
-	int i,j;
+	int i,j,k;
 	static toothpaste_pick_t pick;
 	time_t total_seconds = time(NULL)+delta_days*SECONDS_PER_DAY+delta_hours*SECONDS_PER_HOUR;
 	unsigned int day;
 	char username[UNLEN + 1];
 	char line[MAX_LINE_LENGTH];
 	int new_pick_flag =0;
+	unsigned int brand_len;
 	
 	memset(line,0,MAX_LINE_LENGTH);
 	memset(username,0,UNLEN+1);
@@ -699,6 +701,14 @@ tpm_pick_toothpaste(list_node_t* head,toothpaste_pick_options_t topts)
 		pick.what=find_item_with_min_mass(pick.where);
 	}
 	
+	brand_len=strlen(pick.what.toothpaste_brand);
+	if (topts.upper_brands)
+	{	
+		for (k=0;k<brand_len;k++)
+		{
+			pick.what.toothpaste_brand[k]=toupper(pick.what.toothpaste_brand[k]);
+		}
+	}
 	j=(day)%TOTAL_DAYS_OF_WEEK;
 	
 	if ((total_seconds - pick.stats.last_pick_time) > (SECONDS_PER_DAY-PICK_TIMEOUT_SECONDS)) 
@@ -776,6 +786,7 @@ save_default_config(struct cfg_struct* cfg)
 	cfg_set(cfg,"OUTPUT_FILE","0");
 	cfg_set(cfg,"PICK_INDEX","0");
 	cfg_set(cfg,"BRAND","\"Unknown\"");
+	cfg_set(cfg,"UPPER_BRANDS","0");
 	cfg_set(cfg,"SET_COUNTER","0");
 	cfg_set(cfg,"RESET_COUNTER","0");
 	cfg_set(cfg,"PICK_STATS",stats_file_path_final);
@@ -859,6 +870,7 @@ read_config(const char* src)
 	opts.output_to_file=output_to_file;
 	opts.pick_by_index_index=pick_by_index_index;
 	opts.brand_string=brand_string;
+	opts.upper_brands = upper_brands;
 	
 	cfg = cfg_init();
 	if (cfg_load(cfg, src) < 0)
@@ -948,6 +960,11 @@ read_config(const char* src)
 	{
 		opts.brand_string = (value);
 	}
+	value = cfg_get_rec(cfg, "UPPER_BRANDS");
+	if (value!=NULL) 
+	{
+		opts.upper_brands = atoi(value);
+	}
 	value = cfg_get_rec(cfg, "RESET_COUNTER");
 	if (value!=NULL) 
 	{
@@ -1003,7 +1020,7 @@ main(int argc, char* argv[])
 	
 	topts=read_config(config_file_path_final);
 	config_load_failure=!file_exists_fopen(config_file_path_final);
-	while ((opt = getopt_long(argc, argv, "awjvxqlrf:t:o:c:s:p:i:b:z:d:",long_options,&option_index)) != -1) 
+	while ((opt = getopt_long(argc, argv, "awjvxqlrUf:t:o:c:s:p:i:b:z:d:",long_options,&option_index)) != -1) 
 	{
         switch (opt) 
 		{
@@ -1027,6 +1044,9 @@ main(int argc, char* argv[])
 			break;
 			case 'l':
 			topts.lat_flag=1;
+			break;
+			case 'U':
+			topts.upper_brands=1;
 			break;
 			case 'r':
 			reset_counters();
@@ -1065,7 +1085,7 @@ main(int argc, char* argv[])
 				delta_days=atoi(optarg);
 			break; 	
 			case '?': 
-				fprintf(stderr, "Usage: %s [-awjvxqlr] [-f dental-formula] [-c config_file] [-o pick output file] [-t stats file] [-s total_picks value] [-p pick_type_value] [-i toothpaste_index] [-b brand_string -z delta_hours -d delta_days] [toothpastes_file] \n", argv[0]);
+				fprintf(stderr, "Usage: %s [-awjvxqlrU] [-f dental-formula] [-c config_file] [-o pick output file] [-t stats file] [-s total_picks value] [-p pick_type_value] [-i toothpaste_index] [-b brand_string -z delta_hours -d delta_days] [toothpastes_file] \n", argv[0]);
 				exit(EXIT_FAILURE);
 			default:
 				break;

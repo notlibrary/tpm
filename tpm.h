@@ -10,7 +10,7 @@ extern "C" {
 #define TPM_STRING "tpm"
 #define TPM_VERSION_MAJOR 0
 #define TPM_VERSION_MINOR 4
-#define TPM_VERSION_PATCH 11
+#define TPM_VERSION_PATCH 12
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -127,6 +127,7 @@ typedef struct {
 	unsigned int pick_by_index_index;
 	const char* username;
 	const char* brand_string;
+	int upper_brands;
 	dental_formula_t formula;
 }toothpaste_pick_options_t;
 
