@@ -170,6 +170,8 @@ Also sometimes is possible to add 5th term toothpaste grams per nurdle but this 
 
 `-r --reset` reset the total toothpaste picks counter
 
+`-U --UPPER` convert brand string to UPPERCASE
+
 `-f --formula` set the dental formula `dental_formula`
 
 `-o --output pick_output_file` output toothpaste picking string or JSON to the text file `pick_output_file`
@@ -222,6 +224,8 @@ It's options:
 
 `BRAND` pick the toothpaste by this brand if `PICK_TYPE=3`
 
+`UPPER_BRANDS` 1 to convert brand string to UPPERCASE
+
 `RESET_COUNTER` 1 to reset the toothpaste pick counter
 
 `SET_COUNTER` not 0 to set the toothpaste pick counter
@@ -252,6 +256,7 @@ PICK_INDEX=0
 RESET_COUNTER=FALSE
 SET_COUNTER=0
 BRAND="Unknown"
+UPPER_BRANDS=0
 TIMEZONE=0
 DELTA_DAYS=0
 ```
