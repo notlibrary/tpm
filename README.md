@@ -322,7 +322,7 @@ $$
 V = 663 460 500 000 kg / 1300 kg/m^3 = 510 354 230 m^3
 $$
 
-Around 7600 times lower than mt Everest volume
+Around $ 20^3 $ times lower than mt Everest volume
 
 linear size m = cbroot(volume)
 
@@ -346,11 +346,10 @@ $$
 T = 510 354 230 m^3 / 73 / 195 / 75 ml * 1 000 000 ml/m^3 = 478 027 613
 $$
 
-Tubes per secomd = T / days in year / seconds per day
+Tubes per second = T / days in year / seconds per day
 
 $$
-TPS = 478 027 613 / 365 / 86400 = 15 75ml toothpaste tubes per second per country
-$$
+TPS = 478 027 613 / 365 / 86400 = 15 $$ 75ml toothpaste tubes per second per country
 
 Did your country produce enough? See the toothpaste business is walking devil in detail idiom
 
