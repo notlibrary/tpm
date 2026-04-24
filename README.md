@@ -338,6 +338,22 @@ This estimation does not take in account milk teeth gender country life expectan
 
 Who will win? Sysadmin tooth brushing program vs tartar dental plaque fight dental rot together
 
+Now let's recalculate on the 75 ml tubes per second per country basis
+
+Tubes per year = ( volume / average life expectancy / total countries in the world / ml per tube ) * ml in m^3
+
+$$
+T = 510 354 230 m^3 / 73 / 195 / 75 ml * 1 000 000 ml/m^3 = 478 027 613
+$$
+
+Tubes per secomd = T / days in year / seconds per day
+
+$$
+TPS = 478 027 613 / 365 / 86400 = 15 75ml toothpaste tubes per second per country
+$$
+
+Did your country produce enough? See the toothpaste business is walking devil in detail idiom
+
 ## Per component reverse engineering and pick by AI
 This is the advanced topic the key point is that make a new toothpaste is cheaper
 than reverse engineer the old one so AI simply has not enough data to base on 
