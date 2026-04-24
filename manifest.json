@@ -1,7 +1,7 @@
 {
   "id": "tpm",
   "name": "Toothpaste Picking Manager",
-  "version": "0.5.0",
+  "version": "0.5.1",
   "minAppVersion": "0.4.2",
   "description": "Toothpaste Picking Manager",
   "author": "notlibrary",
