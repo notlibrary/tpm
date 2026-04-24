@@ -348,9 +348,8 @@ $$
 
 Tubes per second = T / days in year / seconds per day
 
-$$
-TPS = 478 027 613 / 365 / 86400 = 15
-$$ 75ml toothpaste tubes per second per country
+$``TPS = 478 027 613 / 365 / 86400 = 15 ``$
+75ml toothpaste tubes per second per country
 
 Did your country produce enough? See the toothpaste business is walking devil in detail idiom
 
