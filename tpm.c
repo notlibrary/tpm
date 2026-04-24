@@ -574,6 +574,18 @@ static void
 version(void)
 {
 	printf("%s %u.%u.%u \n",TPM_STRING,TPM_VERSION_MAJOR,TPM_VERSION_MINOR,TPM_VERSION_PATCH);
+	printf("Compiled on: %s at %s\n", __DATE__, __TIME__);
+#if defined(__clang__)
+    printf("Compiler: Clang/LLVM\n");
+#elif defined(__GNUC__) || defined(__GNUG__)
+    printf("Compiler: GCC\n");
+#elif defined(_MSC_VER)
+    printf("Compiler: Microsoft Visual Studio\n");
+#elif defined(__INTEL_COMPILER)
+    printf("Compiler: Intel ICC\n");
+#else
+    printf("Compiler: Unknown\n");
+#endif
 	exit(EXIT_FAILURE);
 	return;
 }
