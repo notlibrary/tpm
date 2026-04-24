@@ -90,9 +90,13 @@ Linux build also has `tpm.1` manual included
 Good Morning Serenity Welcome to the toothpaste picking manager
 Already picked today
 Pick type: Default
-Toothpaste: >>> SENSODYNE (150g) [100/100] <<< Day: Saturday 20512 Toothpaste index: 1/3
+Toothpaste: >>> SENSODYNE (150g) [100/100] <<<
+Toothpaste index: 1/3
 Dental Formula: 1-10-2-2
-Total picks: 7 Last pick time: 1772266460
+Day: Saturday 20512 
+Total picks: 7
+Last pick time: Fri Apr 24 10:45:30 2026
+Source: C:\Users\Serenity\tpm\toothpastes
 
 Press any key to continue . . .
 ```

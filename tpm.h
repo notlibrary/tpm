@@ -10,7 +10,7 @@ extern "C" {
 #define TPM_STRING "tpm"
 #define TPM_VERSION_MAJOR 0
 #define TPM_VERSION_MINOR 5
-#define TPM_VERSION_PATCH 0
+#define TPM_VERSION_PATCH 1
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -71,11 +71,7 @@ memcpy(&y,&x,       sizeof(x)); \
 memcpy(&x,swap_temp,sizeof(x)); \
 } while(0)
 
-#ifdef _WIN32
-#define LINE_FORMAT "%s %u %s %llu \n"
-#else
-#define LINE_FORMAT "%s %u %s %lu \n"
-#endif
+#define LINE_FORMAT "%s %u \n%s %s"
 
 typedef enum
 {

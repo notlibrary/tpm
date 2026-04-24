@@ -751,11 +751,24 @@ tpm_pick_toothpaste(list_node_t* head,toothpaste_pick_options_t topts)
 		snprintf(line,MAX_TOOTHPASTE_LINE,"%s\n", pick_type_strings[topts.ptype] );
 		strncat(pick.message,line,MAX_LINE_LENGTH);
 		
-		snprintf(line,MAX_LINE_LENGTH,"%s %s %s (%ug) [%u/100] %s %s %s %u %s %u/%u \n", "Toothpaste:", ">>>", pick.what.toothpaste_brand, pick.what.tube_mass_g, pick.what.rating, "<<<", "Day:" ,days_of_week[j],day, "Toothpaste index:",i,pick.total_toothpastes);
+		snprintf(line,MAX_LINE_LENGTH,"%s %s %s (%ug) [%u/100] %s \n", "Toothpaste:", ">>>", pick.what.toothpaste_brand, pick.what.tube_mass_g, pick.what.rating, "<<<");
 		strncat(pick.message,line,MAX_LINE_LENGTH);
+		
+		snprintf(line,MAX_LINE_LENGTH,"%s %u/%u \n", "Toothpaste index:",i,pick.total_toothpastes);
+		strncat(pick.message,line,MAX_LINE_LENGTH);
+		
 		snprintf(line,MAX_TOOTHPASTE_LINE,"Dental Formula: %u-%u-%u-%u \n", topts.formula.brush_times_per_day ,topts.formula.minutes_per_brush , topts.formula.swap_toothbrush_times_per_year , topts.formula.visit_dentist_times_per_year);
 		strncat(pick.message,line,MAX_LINE_LENGTH);
-		snprintf(line,MAX_LINE_LENGTH,LINE_FORMAT, "Total picks:", pick.stats.total_picks, "Last pick time:" ,pick.stats.last_pick_time);
+		
+		
+		snprintf(line,MAX_LINE_LENGTH,"%s %s %u \n", "Day:" ,days_of_week[j],day);
+		strncat(pick.message,line,MAX_LINE_LENGTH);
+		
+		
+		
+		snprintf(line,MAX_LINE_LENGTH,LINE_FORMAT, "Total picks:", pick.stats.total_picks, "Last pick time:" ,ctime(&pick.stats.last_pick_time));
+		strncat(pick.message,line,MAX_LINE_LENGTH);
+		snprintf(line,MAX_LINE_LENGTH,"%s %s \n", "Source:", toothpastes_file_path_final);
 		strncat(pick.message,line,MAX_LINE_LENGTH);
 	
 	}
