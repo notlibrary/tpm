@@ -576,13 +576,13 @@ version(void)
 	printf("%s %u.%u.%u \n",TPM_STRING,TPM_VERSION_MAJOR,TPM_VERSION_MINOR,TPM_VERSION_PATCH);
 	printf("Compiled on: %s at %s\n", __DATE__, __TIME__);
 #if defined(__clang__)
-    printf("Compiler: Clang/LLVM\n");
+    printf("Compiler: Clang/LLVM\ %d.%d \n",__clang_major__,__clang_minor__);
 #elif defined(__GNUC__) || defined(__GNUG__)
-    printf("Compiler: GCC\n");
+    printf("Compiler: GCC %d.%d \n",__GNUC__,__GNUC_MINOR__);
 #elif defined(_MSC_VER)
-    printf("Compiler: Microsoft Visual Studio\n");
+    printf("Compiler: Microsoft Visual Studio %d\n",_MSC_VER);
 #elif defined(__INTEL_COMPILER)
-    printf("Compiler: Intel ICC\n");
+    printf("Compiler: Intel ICC %d \n",__INTEL_COMPILER);
 #else
     printf("Compiler: Unknown\n");
 #endif
@@ -1163,6 +1163,7 @@ main(int argc, char* argv[])
 	{
 		finish(SYSTEM_PAUSE,pick);
 	}
+	exit(EXIT_SUCCESS);
 }
 
 	
