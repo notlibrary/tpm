@@ -10,7 +10,7 @@ extern "C" {
 #define TPM_STRING "tpm"
 #define TPM_VERSION_MAJOR 0
 #define TPM_VERSION_MINOR 5
-#define TPM_VERSION_PATCH 1
+#define TPM_VERSION_PATCH 2
 
 #include <stdio.h>
 #include <stdlib.h>
