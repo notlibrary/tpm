@@ -1163,7 +1163,9 @@ main(int argc, char* argv[])
 	{
 		finish(SYSTEM_PAUSE,pick);
 	}
+	
 	exit(EXIT_SUCCESS);
+	return 0;
 }
 
 	
