@@ -200,14 +200,24 @@ display_list(list_node_t* head, toothpaste_pick_t* pick)
 	unsigned int cnt=0;
     list_node_t* current = head;
 	char line[MAX_TOOTHPASTE_LINE];
+	int i = 0;
+	unsigned int len =0;
 	
 	memset(line,0,MAX_TOOTHPASTE_LINE);
 	memset(pick->message,0,OUTPUT_BLOCK_SIZE);
 	
-	snprintf(pick->message,MAX_TOOTHPASTE_LINE,"Index | Brand | Tube Mass | Rating\n");
+	snprintf(pick->message,MAX_TOOTHPASTE_LINE,"# Index | Brand | Tube Mass | Rating\n");
 	while (current != NULL) 
 	{
-        snprintf(line,2*MAX_TOOTHPASTE_LINE,"%d %s %d %d\n", current->data.index, current->data.toothpaste_brand, current->data.tube_mass_g, current->data.rating);
+        if (pick->opts.upper_brands)
+		{
+			len = strlen(current->data.toothpaste_brand);
+			for (i =0; i<len; i++)
+			{
+				current->data.toothpaste_brand[i]=toupper(current->data.toothpaste_brand[i]);
+			}
+		}
+		snprintf(line,2*MAX_TOOTHPASTE_LINE,"%d,%s,%d,%d\n", current->data.index, current->data.toothpaste_brand, current->data.tube_mass_g, current->data.rating);
         strncat(pick->message,line,MAX_LINE_LENGTH);
 		current = current->next;
 		cnt++;
@@ -639,6 +649,7 @@ tpm_pick_toothpaste(list_node_t* head,toothpaste_pick_options_t topts)
 	int new_pick_flag =0;
 	unsigned int brand_len;
 	
+	pick.opts = topts;
 	memset(line,0,MAX_LINE_LENGTH);
 	memset(username,0,UNLEN+1);
 	pick.message=malloc(OUTPUT_BLOCK_SIZE);
@@ -791,7 +802,8 @@ tpm_pick_toothpaste(list_node_t* head,toothpaste_pick_options_t topts)
 	
 	snprintf(pick.JSON,MAX_LINE_LENGTH,"{\n\t \"who\":\"%s\",\n\t \"toothpaste\":\"%s\",\n\t \"tube_mass_g\":%u,\n\t \"rating\":%u \n}",pick.who,pick.what.toothpaste_brand,pick.what.tube_mass_g,pick.what.rating);
 	
-	if (topts.lat_flag) {
+	if (topts.lat_flag) 
+	{
 		list_available_toothpastes(&pick);
 	}	
 	return &pick;
@@ -1136,7 +1148,7 @@ main(int argc, char* argv[])
 	}
 	toothpastes_list=tpm_load_list_from_file(toothpastes_file_path_final);
 	pick=tpm_pick_toothpaste(toothpastes_list,topts);
-	if (json_flag)
+	if (topts.json_flag)
 	{
 		fprintf(output_file,"%s \n",tpm_get_toothpaste_picking_JSON(pick));
 	}
@@ -1155,7 +1167,7 @@ main(int argc, char* argv[])
 	}
 	
 	
-	if (json_flag) 
+	if (topts.json_flag) 
 	{
 		finish(NO_SYSTEM_PAUSE,pick);
 	}
