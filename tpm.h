@@ -72,6 +72,11 @@ memcpy(&x,swap_temp,sizeof(x)); \
 } while(0)
 
 #define LINE_FORMAT "%s %u \n%s %s"
+#ifdef _WIN32
+#define LINE_FORMAT_CSV "%u,%I64u,%s"
+#else
+#define LINE_FORMAT_CSV "%u,%lu,%s"
+#endif
 
 typedef enum
 {

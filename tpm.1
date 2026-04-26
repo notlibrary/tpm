@@ -20,6 +20,9 @@ pick the toothpaste with highest rating
 .TP
 \fB\-j\fR, \fB\-\-json\fR
  output the JSON with last pick info instead toothpaste picking string
+ .TP
+\fB\-C\fR, \fB\-\-csv\fR
+ output and append the CSV with last pick info instead toothpaste picking string
 .TP
 \fB\-v\fR, \fB\-\-version\fR
 show the toothpaste picking manager version
@@ -40,7 +43,7 @@ reset the total toothpaste picks counter
 convert brand string to UPPERCASE
 .TP
 \fB\-o\fR, \fB\-\-output\fR[=\fI\,PICK_OUTPUT_FILE\/\fR]
-output toothpaste picking string or JSON to the text file 
+output toothpaste picking string or JSON or CSV to the text file 
 .TP
 \fB\-f\fR, \fB\-\-formula\fR[=\fI\,DENTAL_FORMULA\/\fR]
 set dental formula eg. 2-2-2-2 
@@ -95,6 +98,8 @@ from specific path
 \f[C]LIST_TOOTHPASTES\f[R] 1 to list the available toothpastes
 .PP
 \f[C]OUTPUT_JSON\f[R] 1 to output the JSON with toothpaste pick
+.PP
+\f[C]OUTPUT_CSV\f[R] 1 to output and append the CSV with toothpaste pick
 .PP
 \f[C]OUTPUT_FILE\f[R] 1 to output to the file
 \f[C]\[ti]tpm/last_pick\f[R]

@@ -812,7 +812,7 @@ tpm_pick_toothpaste(list_node_t* head,toothpaste_pick_options_t topts)
 	
 	snprintf(pick.JSON,MAX_LINE_LENGTH,"{\n\t \"who\":\"%s\",\n\t \"toothpaste\":\"%s\",\n\t \"tube_mass_g\":%u,\n\t \"rating\":%u \n}",pick.who,pick.what.toothpaste_brand,pick.what.tube_mass_g,pick.what.rating);
 		
-	snprintf(line,MAX_LINE_LENGTH,"%s,%s,", pick.who,pick_type_strings[topts.ptype] );
+	snprintf(line,MAX_LINE_LENGTH,"%s,%s,",pick.who,pick_type_strings[topts.ptype] );
 	strncat(pick.CSV,line,MAX_LINE_LENGTH);
 	
 	snprintf(line,MAX_LINE_LENGTH,"%s,%d,%d,",  pick.what.toothpaste_brand, pick.what.tube_mass_g, pick.what.rating );
@@ -827,7 +827,7 @@ tpm_pick_toothpaste(list_node_t* head,toothpaste_pick_options_t topts)
 	snprintf(line,MAX_LINE_LENGTH,"%s,%u,", days_of_week[j],day);
 	strncat(pick.CSV,line,MAX_LINE_LENGTH);
 	
-	snprintf(line,MAX_LINE_LENGTH,"%u,%lu,%s", pick.stats.total_picks,pick.stats.last_pick_time,toothpastes_file_path_final);
+	snprintf(line,MAX_LINE_LENGTH,LINE_FORMAT_CSV, pick.stats.total_picks,pick.stats.last_pick_time,toothpastes_file_path_final);
 	strncat(pick.CSV,line,MAX_LINE_LENGTH);
 	
 	

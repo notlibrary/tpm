@@ -142,6 +142,10 @@ you end with dental rot plaque sad but true software nerds has little to offer h
 To cope you may try to treat it as a hobby bird watching butterfly collecting fishing toothpaste picking
 still better than being stereotypical rotten teeth open source bum
 
+There is also third output mode `CSV` for those who want to save pick info
+When active it auto appends current pick info to giant CSV with all picks collection `picks.CSV`
+This is purely optional
+
 ## Dental formula
 The dental formula is an expression with format `W-X-Y-Z` where 
 
@@ -164,6 +168,8 @@ Also sometimes is possible to add 5th term toothpaste grams per nurdle but this 
 
 `-j --json` output the JSON with last pick info instead toothpaste picking string
 
+`-C --csv` output and appends the CSV with last pick info instead toothpaste picking string
+
 `-v --version` show the toothpaste picking manager version
 
 `-x --random` perform a random toothpaste pick
@@ -178,7 +184,7 @@ Also sometimes is possible to add 5th term toothpaste grams per nurdle but this 
 
 `-f --formula` set the dental formula `dental_formula`
 
-`-o --output pick_output_file` output toothpaste picking string or JSON to the text file `pick_output_file`
+`-o --output pick_output_file` output toothpaste picking string or JSON or CSV to the text file `pick_output_file`
 
 `-c --config config_file` load the custom configuration file `config file`
 
@@ -222,6 +228,8 @@ It's options:
 
 `OUTPUT_JSON` 1 to output the JSON with toothpaste pick
 
+`OUTPUT_CSV` 1 to output and append the CSV with toothpaste pick
+
 `OUTPUT_FILE` 1 to output to the file `~tpm/last_pick`
 
 `PICK_INDEX` pick the toothpaste by this index if `PICK_TYPE=2`
@@ -255,6 +263,7 @@ LAST_PICK="C:\Users\Anonymous\tpm\last_pick"
 PICK_STATS="C:\Users\Anonymous\tpm\pickstats"
 LIST_TOOTHPASTES=FALSE
 OUTPUT_JSON=FALSE
+OUTPUT_CSV=FALSE
 OUTPUT_FILE=FALSE
 PICK_INDEX=0
 RESET_COUNTER=FALSE
