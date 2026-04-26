@@ -10,7 +10,7 @@ extern "C" {
 #define TPM_STRING "tpm"
 #define TPM_VERSION_MAJOR 0
 #define TPM_VERSION_MINOR 5
-#define TPM_VERSION_PATCH 2
+#define TPM_VERSION_PATCH 3
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -120,6 +120,7 @@ typedef struct {
 	int lat_flag;
 	int json_flag;
 	int output_to_file;
+	int csv_flag;
 	unsigned int pick_by_index_index;
 	const char* username;
 	const char* brand_string;
@@ -137,6 +138,7 @@ typedef struct {
 	unsigned int toothpaste_pick_index;
 	char* message;
 	char* JSON;
+	char* CSV;
 	toothpaste_pick_options_t opts;
 }toothpaste_pick_t;
 
@@ -144,6 +146,7 @@ TPM list_node_t* tpm_load_list_from_file(const char* filename);
 TPM toothpaste_pick_t* tpm_pick_toothpaste(list_node_t* head,toothpaste_pick_options_t topts);
 TPM char* tpm_get_toothpaste_picking_message(toothpaste_pick_t* pick);
 TPM char* tpm_get_toothpaste_picking_JSON(toothpaste_pick_t* pick);
+TPM char* tpm_get_toothpaste_picking_CSV(toothpaste_pick_t* pick);
 TPM int tpm_free_toothpaste_pick(toothpaste_pick_t* pick);
 
 static list_node_t* create_node(toothpaste_data_t p_data);

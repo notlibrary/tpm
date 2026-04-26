@@ -43,6 +43,7 @@ static struct option long_options[] = {
     {"rating",     no_argument, 0, 'a'},
     {"weight",  no_argument,       0, 'w'},
     {"json",  no_argument, 0, 'j'},
+    {"csv",  no_argument, 0, 'C'},
     {"version", no_argument,       0, 'v'},
     {"random", no_argument,       0, 'x'},
     {"quiet", no_argument,       0, 'q'},
@@ -75,6 +76,7 @@ static char config_file_path_final[MAX_PATH];
 static int verbose =1;
 static int lat_flag =0;
 static int json_flag =0;
+static int csv_flag =0;
 static int output_to_file =0;
 static int pick_by_index_index =0;
 static char* brand_string =NULL;
@@ -474,6 +476,7 @@ tpm_free_toothpaste_pick(toothpaste_pick_t* pick)
 {
 	free(pick->message);
 	free(pick->JSON);
+	free(pick->CSV);
 	free_list(pick->where);
 	return 0;
 }
@@ -611,6 +614,12 @@ tpm_get_toothpaste_picking_JSON(toothpaste_pick_t* pick)
 {
 	return pick->JSON;	
 }
+
+TPM char*
+tpm_get_toothpaste_picking_CSV(toothpaste_pick_t* pick)
+{
+	return pick->CSV;	
+}
 /*[min,max)*/
 static uint64_t
 rand_range(uint64_t min, uint64_t max)
@@ -654,9 +663,11 @@ tpm_pick_toothpaste(list_node_t* head,toothpaste_pick_options_t topts)
 	memset(username,0,UNLEN+1);
 	pick.message=malloc(OUTPUT_BLOCK_SIZE);
 	pick.JSON=malloc(OUTPUT_BLOCK_SIZE);
+	pick.CSV=malloc(OUTPUT_BLOCK_SIZE);
 	
 	memset(pick.JSON,0,OUTPUT_BLOCK_SIZE);	
 	memset(pick.message,0,OUTPUT_BLOCK_SIZE);
+	memset(pick.CSV,0,OUTPUT_BLOCK_SIZE);	
 	
 	if (get_current_username(username, sizeof(username)) == 0) 
 	{
@@ -783,14 +794,13 @@ tpm_pick_toothpaste(list_node_t* head,toothpaste_pick_options_t topts)
 		snprintf(line,MAX_TOOTHPASTE_LINE,"Dental Formula: %u-%u-%u-%u \n", topts.formula.brush_times_per_day ,topts.formula.minutes_per_brush , topts.formula.swap_toothbrush_times_per_year , topts.formula.visit_dentist_times_per_year);
 		strncat(pick.message,line,MAX_LINE_LENGTH);
 		
-		
 		snprintf(line,MAX_LINE_LENGTH,"%s %s %u \n", "Day:" ,days_of_week[j],day);
 		strncat(pick.message,line,MAX_LINE_LENGTH);
 		
 		
-		
 		snprintf(line,MAX_LINE_LENGTH,LINE_FORMAT, "Total picks:", pick.stats.total_picks, "Last pick time:" ,ctime(&pick.stats.last_pick_time));
 		strncat(pick.message,line,MAX_LINE_LENGTH);
+		
 		snprintf(line,MAX_LINE_LENGTH,"%s %s \n", "Source:", toothpastes_file_path_final);
 		strncat(pick.message,line,MAX_LINE_LENGTH);
 	
@@ -801,6 +811,25 @@ tpm_pick_toothpaste(list_node_t* head,toothpaste_pick_options_t topts)
 	}
 	
 	snprintf(pick.JSON,MAX_LINE_LENGTH,"{\n\t \"who\":\"%s\",\n\t \"toothpaste\":\"%s\",\n\t \"tube_mass_g\":%u,\n\t \"rating\":%u \n}",pick.who,pick.what.toothpaste_brand,pick.what.tube_mass_g,pick.what.rating);
+		
+	snprintf(line,MAX_LINE_LENGTH,"%s,%s,", pick.who,pick_type_strings[topts.ptype] );
+	strncat(pick.CSV,line,MAX_LINE_LENGTH);
+	
+	snprintf(line,MAX_LINE_LENGTH,"%s,%d,%d,",  pick.what.toothpaste_brand, pick.what.tube_mass_g, pick.what.rating );
+	strncat(pick.CSV,line,MAX_LINE_LENGTH);
+	
+	snprintf(line,MAX_LINE_LENGTH,"%d,%d,", i,pick.total_toothpastes );
+	strncat(pick.CSV,line,MAX_LINE_LENGTH);
+
+	snprintf(line,MAX_LINE_LENGTH,"%u-%u-%u-%u,", topts.formula.brush_times_per_day ,topts.formula.minutes_per_brush , topts.formula.swap_toothbrush_times_per_year, topts.formula.visit_dentist_times_per_year);
+	strncat(pick.CSV,line,MAX_LINE_LENGTH);
+	
+	snprintf(line,MAX_LINE_LENGTH,"%s,%u,", days_of_week[j],day);
+	strncat(pick.CSV,line,MAX_LINE_LENGTH);
+	
+	snprintf(line,MAX_LINE_LENGTH,"%u,%lu,%s", pick.stats.total_picks,pick.stats.last_pick_time,toothpastes_file_path_final);
+	strncat(pick.CSV,line,MAX_LINE_LENGTH);
+	
 	
 	if (topts.lat_flag) 
 	{
@@ -820,6 +849,7 @@ save_default_config(struct cfg_struct* cfg)
 	cfg_set(cfg,"VERBOSE","1");
 	cfg_set(cfg,"LIST_TOOTHPASTES","0");
 	cfg_set(cfg,"OUTPUT_JSON","0");
+	cfg_set(cfg,"OUTPUT_CSV","0");
 	cfg_set(cfg,"OUTPUT_FILE","0");
 	cfg_set(cfg,"PICK_INDEX","0");
 	cfg_set(cfg,"BRAND","\"Unknown\"");
@@ -904,6 +934,7 @@ read_config(const char* src)
 	opts.verbose=verbose;
 	opts.lat_flag=lat_flag;
 	opts.json_flag=json_flag;
+	opts.csv_flag=csv_flag;
 	opts.output_to_file=output_to_file;
 	opts.pick_by_index_index=pick_by_index_index;
 	opts.brand_string=brand_string;
@@ -982,6 +1013,11 @@ read_config(const char* src)
 	{
 		opts.json_flag =  atoi(value);
 	}
+	value = cfg_get_rec(cfg, "OUTPUT_CSV");
+	if (value!=NULL) 
+	{
+		opts.csv_flag =  atoi(value);
+	}
 	value = cfg_get_rec(cfg, "OUTPUT_FILE");
 	if (value!=NULL) 
 	{
@@ -1057,7 +1093,7 @@ main(int argc, char* argv[])
 	
 	topts=read_config(config_file_path_final);
 	config_load_failure=!file_exists_fopen(config_file_path_final);
-	while ((opt = getopt_long(argc, argv, "awjvxqlrUf:t:o:c:s:p:i:b:z:d:",long_options,&option_index)) != -1) 
+	while ((opt = getopt_long(argc, argv, "awjCvxqlrUf:t:o:c:s:p:i:b:z:d:",long_options,&option_index)) != -1) 
 	{
         switch (opt) 
 		{
@@ -1069,6 +1105,9 @@ main(int argc, char* argv[])
 			break;
 			case 'j':
 			topts.json_flag=1;
+			break;
+			case 'C':
+			topts.csv_flag=1;
 			break;
 			case 'v':
 			version();
@@ -1122,7 +1161,7 @@ main(int argc, char* argv[])
 				delta_days=atoi(optarg);
 			break; 	
 			case '?': 
-				fprintf(stderr, "Usage: %s [-awjvxqlrU] [-f dental-formula] [-c config_file] [-o pick output file] [-t stats file] [-s total_picks value] [-p pick_type_value] [-i toothpaste_index] [-b brand_string -z delta_hours -d delta_days] [toothpastes_file] \n", argv[0]);
+				fprintf(stderr, "Usage: %s [-awjCvxqlrU] [-f dental-formula] [-c config_file] [-o pick output file] [-t stats file] [-s total_picks value] [-p pick_type_value] [-i toothpaste_index] [-b brand_string -z delta_hours -d delta_days] [toothpastes_file] \n", argv[0]);
 				exit(EXIT_FAILURE);
 			default:
 				break;
@@ -1132,10 +1171,17 @@ main(int argc, char* argv[])
 	{
 		strncpy(toothpastes_file_path_final,argv[optind],MAX_PATH);
 	}	
-	if (output_to_file)
+	if (topts.output_to_file)
 	{
 		printf("%s %s \n","Output pick to file ",output_file_path_final);
-		output_file=fopen(output_file_path_final,"w");
+		if (topts.csv_flag) 
+		{
+			output_file=fopen(output_file_path_final,"a");
+		}
+		else
+		{
+			output_file=fopen(output_file_path_final,"w");
+		}
 		if (output_file == NULL) 
 		{
 			perror("Error opening last_pick file for writing");
@@ -1152,7 +1198,11 @@ main(int argc, char* argv[])
 	{
 		fprintf(output_file,"%s \n",tpm_get_toothpaste_picking_JSON(pick));
 	}
-	else
+	else if (topts.csv_flag)
+	{
+		 fprintf(output_file,"%s \n",tpm_get_toothpaste_picking_CSV(pick));
+	}
+	else		
 	{
 		fprintf(output_file,"%s \n",tpm_get_toothpaste_picking_message(pick));
 	}
@@ -1167,7 +1217,7 @@ main(int argc, char* argv[])
 	}
 	
 	
-	if (topts.json_flag) 
+	if ((topts.json_flag) || (topts.csv_flag)) 
 	{
 		finish(NO_SYSTEM_PAUSE,pick);
 	}
