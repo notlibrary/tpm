@@ -259,7 +259,7 @@ display_list(list_node_t* head, toothpaste_pick_t* pick)
 	memset(line,0,MAX_TOOTHPASTE_LINE);
 	memset(pick->message,0,OUTPUT_BLOCK_SIZE);
 	
-	snprintf(pick->message,MAX_TOOTHPASTE_LINE,user_strings[MSG_COMMENT]);
+	snprintf(pick->message,MAX_TOOTHPASTE_LINE,"%s",user_strings[MSG_COMMENT]);
 	while (current != NULL) 
 	{
         if (pick->opts.upper_brands)
@@ -515,7 +515,7 @@ stop_system(void)
 {
     int c;
 	
-    printf(user_strings[MSG_PAUSE]);
+    printf("%s",user_strings[MSG_PAUSE]);
     while ((c = getchar()) != EOF && c != '\n');
     getchar(); 
 	
@@ -1000,7 +1000,7 @@ read_config(const char* src)
 	cfg = cfg_init();
 	if (cfg_load(cfg, src) < 0)
 	{
-		fprintf(stderr, error_strings[CONFIG_LOAD_FAILED]);
+		fprintf(stderr,"%s", error_strings[CONFIG_LOAD_FAILED]);
 		config_load_failure=1;
 		return opts;
     }
