@@ -55,6 +55,28 @@ static const char* error_strings[TOTAL_ERROR_MESSAGES]={
 	"Unable to load config ~tpm/tpm.conf\n",
 	"Error opening last_pick file for writing"
 };
+static const char* user_strings[TOTAL_USER_MESSAGES]={
+	
+	"Pick counter clear\n",
+	"# Index | Brand | Tube Mass | Rating\n",
+	"Pick counter set\n",
+	"Welcome to the toothpaste picking manager",
+	"New next pick stats updated \n",
+	"Toothbrush time span over swap the toothbrush(or order new one) \n",
+	"Time span over please visit dentist \n",
+	"Already picked today \n",
+	"Pick type",
+	"Toothpaste:",
+	"Toothpaste index:",
+	"Toothpaste type:",
+	"Dental Formula:",
+	"Day:",
+	"Total picks:",
+	"Source:",
+	"Last pick time:",
+	"Good"
+	
+};
 
 static struct option long_options[] = {
     {"rating",     no_argument, 0, 'a'},
@@ -239,7 +261,7 @@ display_list(list_node_t* head, toothpaste_pick_t* pick)
 	memset(line,0,MAX_TOOTHPASTE_LINE);
 	memset(pick->message,0,OUTPUT_BLOCK_SIZE);
 	
-	snprintf(pick->message,MAX_TOOTHPASTE_LINE,"# Index | Brand | Tube Mass | Rating\n");
+	snprintf(pick->message,MAX_TOOTHPASTE_LINE,user_strings[MSG_COMMENT]);
 	while (current != NULL) 
 	{
         if (pick->opts.upper_brands)
@@ -415,7 +437,7 @@ reset_counters(void)
 	fwrite(&zero, sizeof(int), 1, file_ptr);
 	fwrite(&zero_time, sizeof(time_t), 1, file_ptr);
 	fclose(file_ptr);
-	printf("%s", "Pick counter clear\n"); 
+	printf("%s", user_strings[MSG_PICK_COUNTER_C]); 
 	return 0;
 }
 
@@ -438,7 +460,7 @@ set_counters(void* optarg)
 	fwrite(&zero, sizeof(int), 1, file_ptr);
 	fwrite(&total_seconds, sizeof(time_t), 1, file_ptr);
 	fclose(file_ptr);
-	printf("%s", "Pick counter set\n"); 
+	printf("%s", user_strings[MSG_PICK_COUNTER_S]); 
 
 	return 0;
 }
@@ -723,7 +745,7 @@ tpm_pick_toothpaste(list_node_t* head,toothpaste_pick_options_t topts)
 	
 	if (topts.verbose)
 	{
-		snprintf(line,MAX_TOOTHPASTE_LINE,"Good %s %s %s \n", times_of_day[i],pick.who ,"Welcome to the toothpaste picking manager");
+		snprintf(line,MAX_TOOTHPASTE_LINE,"%s %s %s %s \n", user_strings[MSG_GOOD], times_of_day[i],pick.who ,user_strings[MSG_WELCOME]);
 		strncat(pick.message,line,MAX_LINE_LENGTH);
 	}
 	
@@ -780,7 +802,7 @@ tpm_pick_toothpaste(list_node_t* head,toothpaste_pick_options_t topts)
 	{
 		if (topts.verbose) 
 		{
-			snprintf(line,MAX_TOOTHPASTE_LINE,"%s", "New next pick stats updated \n");
+			snprintf(line,MAX_TOOTHPASTE_LINE,"%s", user_strings[MSG_NEXT_PICK]);
 			strncat(pick.message,line,MAX_LINE_LENGTH);
 		}
 		new_pick_flag=1;
@@ -792,7 +814,7 @@ tpm_pick_toothpaste(list_node_t* head,toothpaste_pick_options_t topts)
 		{
 			 if (topts.verbose) 
 			 { 
-					snprintf(line,MAX_TOOTHPASTE_LINE,"%s", "Toothbrush time span over swap the toothbrush(or order new one) \n"); 
+					snprintf(line,MAX_TOOTHPASTE_LINE,"%s", user_strings[MSG_TOOTHBRUSH]); 
 					strncat(pick.message,line,MAX_LINE_LENGTH);
 			 }
 		}
@@ -801,7 +823,7 @@ tpm_pick_toothpaste(list_node_t* head,toothpaste_pick_options_t topts)
 		{
 			 if (topts.verbose) 
 			 { 
-					snprintf(line,MAX_TOOTHPASTE_LINE,"%s", "Time span over please visit dentist \n"); 
+					snprintf(line,MAX_TOOTHPASTE_LINE,"%s", user_strings[MSG_DENTIST]); 
 					strncat(pick.message,line,MAX_LINE_LENGTH);
 			 }
 		}
@@ -810,32 +832,32 @@ tpm_pick_toothpaste(list_node_t* head,toothpaste_pick_options_t topts)
 	{
 		if (new_pick_flag==0)
 		{	
-			snprintf(line,MAX_TOOTHPASTE_LINE,"%s", "Already picked today \n");
+			snprintf(line,MAX_TOOTHPASTE_LINE,"%s", user_strings[MSG_ALREADY]);
 			strncat(pick.message,line,MAX_LINE_LENGTH);	
 		}
-		snprintf(line,MAX_TOOTHPASTE_LINE,"%s: %s\n", "Pick type", pick_type_strings[topts.ptype] );
+		snprintf(line,MAX_TOOTHPASTE_LINE,"%s: %s\n", user_strings[MSG_PICK_TYPE], pick_type_strings[topts.ptype] );
 		strncat(pick.message,line,MAX_LINE_LENGTH);
 		
-		snprintf(line,MAX_LINE_LENGTH,"%s %s %s (%ug) [%u/100] %s \n", "Toothpaste:", ">>>", pick.what.toothpaste_brand, pick.what.tube_mass_g, pick.what.rating, "<<<");
+		snprintf(line,MAX_LINE_LENGTH,"%s %s %s (%ug) [%u/100] %s \n", user_strings[MSG_TOOTHPASTE], ">>>", pick.what.toothpaste_brand, pick.what.tube_mass_g, pick.what.rating, "<<<");
 		strncat(pick.message,line,MAX_LINE_LENGTH);
 		
-		snprintf(line,MAX_LINE_LENGTH,"%s %u/%u \n", "Toothpaste index:",i,pick.total_toothpastes);
+		snprintf(line,MAX_LINE_LENGTH,"%s %u/%u \n", user_strings[MSG_TOOTHPASTE_I],i,pick.total_toothpastes);
 		strncat(pick.message,line,MAX_LINE_LENGTH);
 		
-		snprintf(line,MAX_LINE_LENGTH,"%s %s \n", "Toothpaste type:",toothpaste_type_strings[pick.what.type]);
+		snprintf(line,MAX_LINE_LENGTH,"%s %s \n", user_strings[MSG_TOOTHPASTE_T],toothpaste_type_strings[pick.what.type]);
 		strncat(pick.message,line,MAX_LINE_LENGTH);
 		
-		snprintf(line,MAX_TOOTHPASTE_LINE,"Dental Formula: %u-%u-%u-%u \n", topts.formula.brush_times_per_day ,topts.formula.minutes_per_brush , topts.formula.swap_toothbrush_times_per_year , topts.formula.visit_dentist_times_per_year);
+		snprintf(line,MAX_TOOTHPASTE_LINE,"%s %u-%u-%u-%u \n", user_strings[MSG_DENTAL] , topts.formula.brush_times_per_day ,topts.formula.minutes_per_brush , topts.formula.swap_toothbrush_times_per_year , topts.formula.visit_dentist_times_per_year);
 		strncat(pick.message,line,MAX_LINE_LENGTH);
 		
-		snprintf(line,MAX_LINE_LENGTH,"%s %s %u \n", "Day:" ,days_of_week[j],day);
+		snprintf(line,MAX_LINE_LENGTH,"%s %s %u \n", user_strings[MSG_DAY] ,days_of_week[j],day);
 		strncat(pick.message,line,MAX_LINE_LENGTH);
 		
 		
-		snprintf(line,MAX_LINE_LENGTH,LINE_FORMAT, "Total picks:", pick.stats.total_picks, "Last pick time:" ,ctime(&pick.stats.last_pick_time));
+		snprintf(line,MAX_LINE_LENGTH,LINE_FORMAT, user_strings[MSG_TOTAL_PICKS], pick.stats.total_picks, user_strings[MSG_LAST_PICK_TIME] ,ctime(&pick.stats.last_pick_time));
 		strncat(pick.message,line,MAX_LINE_LENGTH);
 		
-		snprintf(line,MAX_LINE_LENGTH,"%s %s \n", "Source:", toothpastes_file_path_final);
+		snprintf(line,MAX_LINE_LENGTH,"%s %s \n", user_strings[MSG_SOURCE], toothpastes_file_path_final);
 		strncat(pick.message,line,MAX_LINE_LENGTH);
 	
 	}

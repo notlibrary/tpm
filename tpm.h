@@ -80,6 +80,31 @@ memcpy(&x,swap_temp,sizeof(x)); \
 
 #define TOTAL_TOOTHPASTE_TYPES 5
 #define TOTAL_ERROR_MESSAGES 7
+#define TOTAL_USER_MESSAGES 18
+
+typedef enum user_msg_t
+{
+	MSG_PICK_COUNTER_C,
+	MSG_COMMENT,
+	MSG_PICK_COUNTER_S,
+	MSG_WELCOME,
+	MSG_NEXT_PICK,
+	MSG_TOOTHBRUSH,
+	MSG_DENTIST,
+	MSG_ALREADY,
+    MSG_PICK_TYPE,
+	MSG_TOOTHPASTE,
+	MSG_TOOTHPASTE_I,
+	MSG_TOOTHPASTE_T,
+	MSG_DENTAL,
+	MSG_DAY,
+	MSG_TOTAL_PICKS,
+	MSG_SOURCE,
+	MSG_LAST_PICK_TIME,
+	MSG_GOOD
+	
+	
+}user_msg_t;
 
 typedef enum pick_type_t
 {
@@ -93,6 +118,7 @@ typedef enum pick_type_t
 	PICK_MIN_MASS
 
 }pick_type_t;
+
 typedef enum error_msg_t
 {
 	MALLOC_FAILED,
