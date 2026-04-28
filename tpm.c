@@ -12,14 +12,14 @@ static const toothpaste_data_t toothpastes[TOTAL_TOOTHPASTES]={
 	{PASTE_BUILTIN,2,"BUILTIN TOOTHPASTE 3",50,80}
 };
 static const char* pick_type_strings[TOTAL_PICK_TYPE_STRINGS]={
-	"Pick type: Default",
-	"Pick type: Random",
-	"Pick type: By index",
-	"Pick type: By brand",
-	"Pick type: Max rating",
-	"Pick type: Max tube mass",
-	"Pick type: Min rating",
-	"Pick type: Min tube mass"
+	"Default",
+	"Random",
+	"By index",
+	"By brand",
+	"Max rating",
+	"Max tube mass",
+	"Min rating",
+	"Min tube mass"
 };
 static const char* toothpaste_type_strings[TOTAL_TOOTHPASTE_TYPES]={
 	"Random", 
@@ -803,7 +803,7 @@ tpm_pick_toothpaste(list_node_t* head,toothpaste_pick_options_t topts)
 			snprintf(line,MAX_TOOTHPASTE_LINE,"%s", "Already picked today \n");
 			strncat(pick.message,line,MAX_LINE_LENGTH);	
 		}
-		snprintf(line,MAX_TOOTHPASTE_LINE,"%s\n", pick_type_strings[topts.ptype] );
+		snprintf(line,MAX_TOOTHPASTE_LINE,"%s: %s\n", "Pick type", pick_type_strings[topts.ptype] );
 		strncat(pick.message,line,MAX_LINE_LENGTH);
 		
 		snprintf(line,MAX_LINE_LENGTH,"%s %s %s (%ug) [%u/100] %s \n", "Toothpaste:", ">>>", pick.what.toothpaste_brand, pick.what.tube_mass_g, pick.what.rating, "<<<");
