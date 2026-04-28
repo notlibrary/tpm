@@ -70,7 +70,7 @@ I left this to an auditory as an exercise
 
 Spoiler add this to `~/.bashrc` to auto attach cron session on login via SSH
 
-```
+```bash
 if [[ -z "$TMUX" ]] && [[ -n "$SSH_TTY" ]]; then
     tmux attach-session -t tpm || tmux new-session -s ssh_tmux
 fi
@@ -85,6 +85,8 @@ What if Chekhov is alive and is a C programmer?
 
 Linux build also has `tpm.1` manual included
 
+If everything failed another way is to setup daily anacron task
+
 ## Sample terminal output from verbose mode:
 ```
 Good Morning Serenity Welcome to the toothpaste picking manager
@@ -92,6 +94,7 @@ Already picked today
 Pick type: Default
 Toothpaste: >>> SENSODYNE (150g) [100/100] <<<
 Toothpaste index: 1/3
+Toothpaste type: Random
 Dental Formula: 1-10-2-2
 Day: Saturday 20512 
 Total picks: 7
@@ -145,6 +148,15 @@ still better than being stereotypical rotten teeth open source bum
 There is also third output mode `CSV` for those who want to save pick info
 When active it auto appends current pick info to giant CSV with all picks collection `picks.CSV`
 This is purely optional
+
+## Inner toothpaste types 
+There are 5 supported toothpaste types
+They are not pick types
+- Random: Default toothpaste type
+- Nothing: No toothpaste
+- Unknown: Unknown toothpaste
+- 0-paste: last tube of `Random` toothpaste with index 0
+- builtin: no or error reading `~/toothpastes` file fallback toothpaste
 
 ## Dental formula
 The dental formula is an expression with format `W-X-Y-Z` where 
@@ -309,6 +321,17 @@ If you have few single brand tubes you may have different brand strings
 for each tube you got
 
 UPPERCASE the brand string to ensure it's seen first through running down terminal with the toothpaste picking string
+
+## Shell tips and tricks
+A few shell one-liners demonstrating tpm usage
+```bash
+	echo hi | tpm | grep oo`
+	tpm -qU`
+	echo | hi | tpm | head -n 4 | tail -n 1
+	tpm -C >> picks.csv
+	tpm -v | grep Compiler
+	man tpm
+```
 
 ## The biggest dental lie on the planet
 Here we go let's do some math estimation again:
