@@ -36,16 +36,13 @@ static const char* days_of_week[TOTAL_DAYS_OF_WEEK]={
 	"Monday",
 	"Tuesday",
 	"Wednesday"
-	
-};	
+};
 static const char* times_of_day[TOTAL_TIMES_OF_DAY]={
 	"Night",
 	"Morning",
 	"Day",
 	"Evening"
-	
 };
-
 static const char* error_strings[TOTAL_ERROR_MESSAGES]={
 	"Memory allocation failed",
 	"Error opening toothpastes file falling back to default",
@@ -56,7 +53,6 @@ static const char* error_strings[TOTAL_ERROR_MESSAGES]={
 	"Error opening last_pick file for writing"
 };
 static const char* user_strings[TOTAL_USER_MESSAGES]={
-	
 	"Pick counter clear\n",
 	"# Index | Brand | Tube Mass | Rating\n",
 	"Pick counter set\n",
@@ -74,8 +70,10 @@ static const char* user_strings[TOTAL_USER_MESSAGES]={
 	"Total picks:",
 	"Source:",
 	"Last pick time:",
-	"Good"
-	
+	"Good",
+	"Press Enter to continue...",
+	"Compiler:",
+	"Compiled on:"
 };
 
 static struct option long_options[] = {
@@ -517,7 +515,7 @@ stop_system(void)
 {
     int c;
 	
-    printf("Press Enter to continue...");
+    printf(user_strings[MSG_PAUSE]);
     while ((c = getchar()) != EOF && c != '\n');
     getchar(); 
 	
@@ -640,17 +638,17 @@ static void
 version(void)
 {
 	printf("%s %u.%u.%u \n",TPM_STRING,TPM_VERSION_MAJOR,TPM_VERSION_MINOR,TPM_VERSION_PATCH);
-	printf("Compiled on: %s at %s\n", __DATE__, __TIME__);
+	printf("%s %s at %s\n",user_strings[MSG_COMPILED] , __DATE__, __TIME__);
 #if defined(__clang__)
-    printf("Compiler: Clang/LLVM\ %d.%d \n",__clang_major__,__clang_minor__);
+    printf("%s Clang/LLVM\ %d.%d \n",user_strings[MSG_COMPILER],__clang_major__,__clang_minor__);
 #elif defined(__GNUC__) || defined(__GNUG__)
-    printf("Compiler: GCC %d.%d \n",__GNUC__,__GNUC_MINOR__);
+    printf("%s GCC %d.%d \n", user_strings[MSG_COMPILER], __GNUC__,__GNUC_MINOR__);
 #elif defined(_MSC_VER)
-    printf("Compiler: Microsoft Visual Studio %d\n",_MSC_VER);
+    printf("%s Microsoft Visual Studio %d\n",user_strings[MSG_COMPILER],_MSC_VER);
 #elif defined(__INTEL_COMPILER)
-    printf("Compiler: Intel ICC %d \n",__INTEL_COMPILER);
+    printf("%s Intel ICC %d \n",user_strings[MSG_COMPILER]__INTEL_COMPILER);
 #else
-    printf("Compiler: Unknown\n");
+    printf("%s Unknown\n",user_strings[MSG_COMPILER]);
 #endif
 	exit(EXIT_FAILURE);
 	return;
