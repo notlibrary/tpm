@@ -76,7 +76,8 @@ static const char* user_strings[TOTAL_USER_MESSAGES]={
 	"Compiler:",
 	"Compiled on:",
 	"Anonymous",
-	"Output pick to file "
+	"Output pick to file ",
+	"Usage:"
 };
 
 static struct option long_options[] = {
@@ -1221,7 +1222,7 @@ main(int argc, char* argv[])
 				delta_days=atoi(optarg);
 			break; 	
 			case '?': 
-				fprintf(stderr, "Usage: %s [-awjCvxqlrU] [-f dental-formula] [-c config_file] [-o pick output file] [-t stats file] [-s total_picks value] [-p pick_type_value] [-i toothpaste_index] [-b brand_string -z delta_hours -d delta_days] [toothpastes_file] \n", argv[0]);
+				fprintf(stderr, "%s %s [-awjCvxqlrU] [-f dental-formula] [-c config_file] [-o pick output file] [-t stats file] [-s total_picks value] [-p pick_type_value] [-i toothpaste_index] [-b brand_string -z delta_hours -d delta_days] [toothpastes_file] \n",user_strings[MSG_USAGE], argv[0]);
 				exit(EXIT_FAILURE);
 			default:
 				break;
