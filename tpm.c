@@ -25,7 +25,8 @@ static const char* toothpaste_type_strings[TOTAL_TOOTHPASTE_TYPES]={
 	"Random", 
 	"Nothing",
 	"Unknown",
-	"0-paste",	
+	"0-paste",
+	"Builtin"
 	
 };	
 static const char* days_of_week[TOTAL_DAYS_OF_WEEK]={
@@ -73,7 +74,9 @@ static const char* user_strings[TOTAL_USER_MESSAGES]={
 	"Good",
 	"Press Enter to continue...",
 	"Compiler:",
-	"Compiled on:"
+	"Compiled on:",
+	"Anonymous",
+	"Output pick to file "
 };
 
 static struct option long_options[] = {
@@ -226,13 +229,13 @@ tpm_load_list_from_file(const char* filename)
 		{
 			ltrim(rtrim(temp_data.toothpaste_brand));
 			temp_data.type=PASTE_RANNDOM;
-			if (0==strcmp("Nothing",temp_data.toothpaste_brand))
+			if (0==strcmp(toothpaste_type_strings[1],temp_data.toothpaste_brand))
 			{
 				temp_data.type=PASTE_NOTHING;
 			}
 			
 		
-			if (0==strcmp("Unknown",temp_data.toothpaste_brand))
+			if (0==strcmp(toothpaste_type_strings[2],temp_data.toothpaste_brand))
 			{
 				temp_data.type=PASTE_UNKNOWN;	
 			}		
@@ -296,7 +299,7 @@ count_list(list_node_t* head)
 static toothpaste_data_t 
 get_item_by_index(list_node_t* head,unsigned int i) 
 {
-    toothpaste_data_t empty ={PASTE_RANNDOM,0,"None",0}; 
+    toothpaste_data_t empty ={PASTE_RANNDOM,0,user_strings[MSG_BRAND_NONE],0}; 
 	list_node_t* current = head;
 	
     while (current != NULL) 
@@ -313,7 +316,7 @@ get_item_by_index(list_node_t* head,unsigned int i)
 static toothpaste_data_t 
 get_item_by_brand_string(list_node_t* head,const char* str) 
 {
-    toothpaste_data_t empty ={PASTE_RANNDOM,0,"None",0}; 
+    toothpaste_data_t empty ={PASTE_RANNDOM,0,user_strings[MSG_BRAND_NONE],0}; 
 	list_node_t* current = head;
 	
     while (current != NULL) 
@@ -648,7 +651,7 @@ version(void)
 #elif defined(__INTEL_COMPILER)
     printf("%s Intel ICC %d \n",user_strings[MSG_COMPILER]__INTEL_COMPILER);
 #else
-    printf("%s Unknown\n",user_strings[MSG_COMPILER]);
+    printf("%s %s","%s\n",user_strings[MSG_COMPILER],user_strings[MSG_COMPILER_UNKNOWN]);
 #endif
 	exit(EXIT_FAILURE);
 	return;
@@ -728,7 +731,7 @@ tpm_pick_toothpaste(list_node_t* head,toothpaste_pick_options_t topts)
     }
 	else 
 	{
-        pick.who="Anonymous";
+        pick.who=user_strings[MSG_ANON];
     }
 	
 	pick.total_toothpastes = count_list(head);
@@ -1230,7 +1233,7 @@ main(int argc, char* argv[])
 	}	
 	if (topts.output_to_file)
 	{
-		printf("%s %s \n","Output pick to file ",output_file_path_final);
+		printf("%s %s \n",user_strings[MSG_PICK_FILE],output_file_path_final);
 		if (topts.csv_flag) 
 		{
 			output_file=fopen(output_file_path_final,"a");
