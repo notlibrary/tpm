@@ -78,7 +78,9 @@ memcpy(&x,swap_temp,sizeof(x)); \
 #define LINE_FORMAT_CSV "%u,%lu,%s"
 #endif
 
-typedef enum
+#define TOTAL_TOOTHPASTE_TYPES 5
+
+typedef enum pick_type_t
 {
 	PICK_DEFAULT,
 	PICK_RANDOM,
@@ -91,13 +93,13 @@ typedef enum
 
 }pick_type_t;
 
-typedef struct
+typedef struct toothpaste_pick_stats_t
 {
 	time_t last_pick_time;
 	unsigned int total_picks;
 }toothpaste_pick_stats_t;
 
-typedef struct
+typedef struct dental_formula_t
 {
 	unsigned int brush_times_per_day;
 	unsigned int minutes_per_brush;
@@ -105,21 +107,34 @@ typedef struct
 	unsigned int visit_dentist_times_per_year;
 }dental_formula_t;
 
-
-typedef struct {
-    unsigned int index;
+typedef enum toothpaste_type_t
+{
+	PASTE_RANNDOM,
+	PASTE_NOTHING,
+    PASTE_UNKNOWN,
+	PASTE_NULL,
+	PASTE_BUILTIN
+	
+}toothpaste_type_t;
+typedef struct toothpaste_data_t
+{
+    toothpaste_type_t type;
+	unsigned int index;
 	char toothpaste_brand[MAX_TOOTHPASTE_LINE];
 	unsigned int tube_mass_g;
 	unsigned int rating;
+	
 } toothpaste_data_t;
 
 	
-typedef struct list_node_t {
+typedef struct list_node_t 
+{
     toothpaste_data_t data;
     struct list_node_t *next;
 } list_node_t;
 
-typedef struct {
+typedef struct toothpaste_pick_options_t
+{
 	pick_type_t ptype;
 	int verbose;
 	int lat_flag;
@@ -133,7 +148,8 @@ typedef struct {
 	dental_formula_t formula;
 }toothpaste_pick_options_t;
 
-typedef struct {
+typedef struct toothpaste_pick_t
+{
 	const char* who;
 	toothpaste_data_t what;
 	list_node_t* where;

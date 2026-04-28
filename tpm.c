@@ -7,9 +7,9 @@ static pick_type_t pick_type =PICK_DEFAULT;
 static list_node_t* toothpastes_list;
 
 static const toothpaste_data_t toothpastes[TOTAL_TOOTHPASTES]={
-	{0,"BUILTIN TOOTHPASTE 1",75,90},
-	{1,"BUILTIN TOOTHPASTE 2",150,100},
-	{2,"BUILTIN TOOTHPASTE 3",50,80}
+	{PASTE_BUILTIN,0,"BUILTIN TOOTHPASTE 1",75,90},
+	{PASTE_BUILTIN, 1,"BUILTIN TOOTHPASTE 2",150,100},
+	{PASTE_BUILTIN,2,"BUILTIN TOOTHPASTE 3",50,80}
 };
 static const char* pick_type_strings[TOTAL_PICK_TYPE_STRINGS]={
 	"Pick type: Default",
@@ -21,6 +21,13 @@ static const char* pick_type_strings[TOTAL_PICK_TYPE_STRINGS]={
 	"Pick type: Min rating",
 	"Pick type: Min tube mass"
 };
+static const char* toothpaste_type_strings[TOTAL_TOOTHPASTE_TYPES]={
+	"Random", 
+	"Nothing",
+	"Unknown",
+	"0-paste",	
+	
+};	
 static const char* days_of_week[TOTAL_DAYS_OF_WEEK]={
 	"Thursday", /*1 jan 1970 epoch start is Thursday*/
 	"Friday",
@@ -168,6 +175,7 @@ tpm_load_list_from_file(const char* filename)
 		{
 		  temp_data=toothpastes[i];
 		  head = add_to_list(head, temp_data);	
+		  
 		}
 		return head;
     }
@@ -187,11 +195,24 @@ tpm_load_list_from_file(const char* filename)
 		if (sscanf(current, "%u, %[^,],%u,%u\n", &temp_data.index,temp_data.toothpaste_brand ,&temp_data.tube_mass_g,&temp_data.rating) == 4) 
 		{
 			ltrim(rtrim(temp_data.toothpaste_brand));
+			temp_data.type=PASTE_RANNDOM;
+			if (0==strcmp("Nothing",temp_data.toothpaste_brand))
+			{
+				temp_data.type=PASTE_NOTHING;
+			}
+			
+		
+			if (0==strcmp("Unknown",temp_data.toothpaste_brand))
+			{
+				temp_data.type=PASTE_UNKNOWN;	
+			}		
 			head = add_to_list(head, temp_data);	
 			cnt++;
 			if (cnt>MAX_TOOTHPASTE_LINES){break;}
-		}		
-    }
+		}
+		
+	}
+	if (cnt==1) head->data.type=PASTE_NULL;
     fclose(file);
     return head;
 }
@@ -245,7 +266,7 @@ count_list(list_node_t* head)
 static toothpaste_data_t 
 get_item_by_index(list_node_t* head,unsigned int i) 
 {
-    toothpaste_data_t empty ={0,"None",0}; 
+    toothpaste_data_t empty ={PASTE_RANNDOM,0,"None",0}; 
 	list_node_t* current = head;
 	
     while (current != NULL) 
@@ -262,7 +283,7 @@ get_item_by_index(list_node_t* head,unsigned int i)
 static toothpaste_data_t 
 get_item_by_brand_string(list_node_t* head,const char* str) 
 {
-    toothpaste_data_t empty ={0,"None",0}; 
+    toothpaste_data_t empty ={PASTE_RANNDOM,0,"None",0}; 
 	list_node_t* current = head;
 	
     while (current != NULL) 
@@ -427,8 +448,8 @@ get_counters(toothpaste_pick_stats_t* stats)
         return 1;
     }
 
-   fread(&stats->total_picks, sizeof(unsigned int), 1, file_ptr);
-   fread(&stats->last_pick_time, sizeof(time_t), 1, file_ptr);
+    fread(&stats->total_picks, sizeof(unsigned int), 1, file_ptr);
+    fread(&stats->last_pick_time, sizeof(time_t), 1, file_ptr);
    
     fclose(file_ptr);	
 	return 0;
@@ -791,6 +812,9 @@ tpm_pick_toothpaste(list_node_t* head,toothpaste_pick_options_t topts)
 		snprintf(line,MAX_LINE_LENGTH,"%s %u/%u \n", "Toothpaste index:",i,pick.total_toothpastes);
 		strncat(pick.message,line,MAX_LINE_LENGTH);
 		
+		snprintf(line,MAX_LINE_LENGTH,"%s %s \n", "Toothpaste type:",toothpaste_type_strings[pick.what.type]);
+		strncat(pick.message,line,MAX_LINE_LENGTH);
+		
 		snprintf(line,MAX_TOOTHPASTE_LINE,"Dental Formula: %u-%u-%u-%u \n", topts.formula.brush_times_per_day ,topts.formula.minutes_per_brush , topts.formula.swap_toothbrush_times_per_year , topts.formula.visit_dentist_times_per_year);
 		strncat(pick.message,line,MAX_LINE_LENGTH);
 		
@@ -819,6 +843,9 @@ tpm_pick_toothpaste(list_node_t* head,toothpaste_pick_options_t topts)
 	strncat(pick.CSV,line,MAX_LINE_LENGTH);
 	
 	snprintf(line,MAX_LINE_LENGTH,"%d,%d,", i,pick.total_toothpastes );
+	strncat(pick.CSV,line,MAX_LINE_LENGTH);
+	
+	snprintf(line,MAX_LINE_LENGTH,"%s," ,toothpaste_type_strings[pick.what.type]);
 	strncat(pick.CSV,line,MAX_LINE_LENGTH);
 
 	snprintf(line,MAX_LINE_LENGTH,"%u-%u-%u-%u,", topts.formula.brush_times_per_day ,topts.formula.minutes_per_brush , topts.formula.swap_toothbrush_times_per_year, topts.formula.visit_dentist_times_per_year);
