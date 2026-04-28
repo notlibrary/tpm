@@ -79,6 +79,7 @@ memcpy(&x,swap_temp,sizeof(x)); \
 #endif
 
 #define TOTAL_TOOTHPASTE_TYPES 5
+#define TOTAL_ERROR_MESSAGES 7
 
 typedef enum pick_type_t
 {
@@ -92,6 +93,17 @@ typedef enum pick_type_t
 	PICK_MIN_MASS
 
 }pick_type_t;
+typedef enum error_msg_t
+{
+	MALLOC_FAILED,
+	TOOTHPASTES_FAILED,
+	PICKSTATS_WRITE_FAILED,
+	PICKSTATS_READ_FAILED,
+	NO_TOOTHPASTES_LOADED,
+	CONFIG_LOAD_FAILED,
+	LAST_PICK_WRITING_FAILED
+	
+}error_msg_t;
 
 typedef struct toothpaste_pick_stats_t
 {

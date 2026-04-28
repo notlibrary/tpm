@@ -46,6 +46,16 @@ static const char* times_of_day[TOTAL_TIMES_OF_DAY]={
 	
 };
 
+static const char* error_strings[TOTAL_ERROR_MESSAGES]={
+	"Memory allocation failed",
+	"Error opening toothpastes file falling back to default",
+	"Error opening pickstats file for writing",
+	"Error opening pickstats file for reading",
+	"No toothpastes file loaded",
+	"Unable to load config ~tpm/tpm.conf\n",
+	"Error opening last_pick file for writing"
+};
+
 static struct option long_options[] = {
     {"rating",     no_argument, 0, 'a'},
     {"weight",  no_argument,       0, 'w'},
@@ -100,7 +110,7 @@ create_node(toothpaste_data_t p_data)
     
 	if (new_node == NULL) 
 	{
-        perror("Memory allocation failed");
+        perror(error_strings[MALLOC_FAILED]);
         exit(EXIT_FAILURE);
     }
     new_node->data = p_data;
@@ -170,7 +180,7 @@ tpm_load_list_from_file(const char* filename)
 	
     if (file == NULL) 
 	{
-        perror("Error opening toothpastes file falling back to default");
+        perror(error_strings[TOOTHPASTES_FAILED]);
 		for (i=0;i<TOTAL_TOOTHPASTES;i++)
 		{
 		  temp_data=toothpastes[i];
@@ -398,7 +408,7 @@ reset_counters(void)
 	file_ptr = fopen(stats_file_path_final, "wb");
 	if (file_ptr == NULL) 
 	{
-		perror("Error opening pickstats file for writing");
+		perror(error_strings[PICKSTATS_WRITE_FAILED]);
 		return 1;
 	}	
 
@@ -420,7 +430,7 @@ set_counters(void* optarg)
 	file_ptr = fopen(stats_file_path_final, "wb");
 	if (file_ptr == NULL) 
 	{
-		perror("Error opening pickstats file for writing");
+		perror(error_strings[PICKSTATS_WRITE_FAILED]);
 		return 1;
 	}	
 
@@ -444,7 +454,7 @@ get_counters(toothpaste_pick_stats_t* stats)
 	file_ptr = fopen(stats_file_path_final, "rb");
     if (file_ptr == NULL) 
 	{
-        perror("Error opening pickstats file for reading");
+        perror(error_strings[PICKSTATS_WRITE_FAILED]);
         return 1;
     }
 
@@ -470,7 +480,7 @@ write_counters(toothpaste_pick_stats_t stats)
 	file_ptr = fopen(stats_file_path_final, "wb");
 	if (file_ptr == NULL) 
 	{
-		perror("Error opening pickstats file for writing");
+		perror(error_strings[PICKSTATS_WRITE_FAILED]);
 		return 1;
 	}
 	fwrite(&stats.total_picks, sizeof(int), 1, file_ptr);
@@ -704,7 +714,7 @@ tpm_pick_toothpaste(list_node_t* head,toothpaste_pick_options_t topts)
 	pick.total_toothpastes = count_list(head);
 	if (0==pick.total_toothpastes) 
 	{
-			perror("No toothpastes file loaded");
+			perror(error_strings[NO_TOOTHPASTES_LOADED]);
 	}
 	get_counters(&pick.stats);
 	pick.toothpaste_pick_index=pick.stats.total_picks;
@@ -970,7 +980,7 @@ read_config(const char* src)
 	cfg = cfg_init();
 	if (cfg_load(cfg, src) < 0)
 	{
-		fprintf(stderr, "Unable to load config ~tpm/tpm.conf\n");
+		fprintf(stderr, error_strings[CONFIG_LOAD_FAILED]);
 		config_load_failure=1;
 		return opts;
     }
@@ -1211,7 +1221,7 @@ main(int argc, char* argv[])
 		}
 		if (output_file == NULL) 
 		{
-			perror("Error opening last_pick file for writing");
+			perror(error_strings[LAST_PICK_WRITING_FAILED]);
 
 		}		
 	}
