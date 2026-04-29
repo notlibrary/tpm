@@ -54,14 +54,14 @@ static const char* error_strings[TOTAL_ERROR_MESSAGES]={
 	"Error opening last_pick file for writing"
 };
 static const char* user_strings[TOTAL_USER_MESSAGES]={
-	"Pick counter clear\n",
-	"# Index | Brand | Tube Mass | Rating\n",
-	"Pick counter set\n",
+	"Pick counter clear",
+	"# Index | Brand | Tube Mass | Rating",
+	"Pick counter set",
 	"Welcome to the toothpaste picking manager",
-	"New next pick stats updated \n",
-	"Toothbrush time span over swap the toothbrush(or order new one) \n",
-	"Time span over please visit dentist \n",
-	"Already picked today \n",
+	"New next pick stats updated",
+	"Toothbrush time span over swap the toothbrush(or order new one)",
+	"Time span over please visit dentist",
+	"Already picked today",
 	"Pick type",
 	"Toothpaste:",
 	"Toothpaste index:",
@@ -278,7 +278,7 @@ display_list(list_node_t* head, toothpaste_pick_t* pick)
 	memset(line,0,MAX_TOOTHPASTE_LINE);
 	memset(pick->message,0,OUTPUT_BLOCK_SIZE);
 	
-	snprintf(pick->message,MAX_TOOTHPASTE_LINE,"%s",user_strings[MSG_COMMENT]);
+	snprintf(pick->message,MAX_TOOTHPASTE_LINE,"%s \n",user_strings[MSG_COMMENT]);
 	while (current != NULL) 
 	{
         if (pick->opts.upper_brands)
@@ -457,7 +457,7 @@ reset_counters(void)
 	fwrite(&zero, sizeof(int), 1, file_ptr);
 	fwrite(&zero_time, sizeof(time_t), 1, file_ptr);
 	fclose(file_ptr);
-	printf("%s", user_strings[MSG_PICK_COUNTER_C]); 
+	printf("%s \n", user_strings[MSG_PICK_COUNTER_C]); 
 	return 0;
 }
 
@@ -480,7 +480,7 @@ set_counters(void* optarg)
 	fwrite(&zero, sizeof(int), 1, file_ptr);
 	fwrite(&total_seconds, sizeof(time_t), 1, file_ptr);
 	fclose(file_ptr);
-	printf("%s", user_strings[MSG_PICK_COUNTER_S]); 
+	printf("%s \n", user_strings[MSG_PICK_COUNTER_S]); 
 
 	return 0;
 }
@@ -824,7 +824,7 @@ tpm_pick_toothpaste(list_node_t* head,toothpaste_pick_options_t topts)
 	{
 		if (topts.verbose) 
 		{
-			snprintf(line,MAX_TOOTHPASTE_LINE,"%s", user_strings[MSG_NEXT_PICK]);
+			snprintf(line,MAX_TOOTHPASTE_LINE,"%s \n", user_strings[MSG_NEXT_PICK]);
 			strncat(pick.message,line,MAX_LINE_LENGTH);
 		}
 		new_pick_flag=1;
@@ -836,7 +836,7 @@ tpm_pick_toothpaste(list_node_t* head,toothpaste_pick_options_t topts)
 		{
 			 if (topts.verbose) 
 			 { 
-					snprintf(line,MAX_TOOTHPASTE_LINE,"%s", user_strings[MSG_TOOTHBRUSH]); 
+					snprintf(line,MAX_TOOTHPASTE_LINE,"%s \n", user_strings[MSG_TOOTHBRUSH]); 
 					strncat(pick.message,line,MAX_LINE_LENGTH);
 			 }
 		}
@@ -845,7 +845,7 @@ tpm_pick_toothpaste(list_node_t* head,toothpaste_pick_options_t topts)
 		{
 			 if (topts.verbose) 
 			 { 
-					snprintf(line,MAX_TOOTHPASTE_LINE,"%s", user_strings[MSG_DENTIST]); 
+					snprintf(line,MAX_TOOTHPASTE_LINE,"%s \n", user_strings[MSG_DENTIST]); 
 					strncat(pick.message,line,MAX_LINE_LENGTH);
 			 }
 		}
@@ -854,7 +854,7 @@ tpm_pick_toothpaste(list_node_t* head,toothpaste_pick_options_t topts)
 	{
 		if (new_pick_flag==0)
 		{	
-			snprintf(line,MAX_TOOTHPASTE_LINE,"%s", user_strings[MSG_ALREADY]);
+			snprintf(line,MAX_TOOTHPASTE_LINE,"%s \n", user_strings[MSG_ALREADY]);
 			strncat(pick.message,line,MAX_LINE_LENGTH);	
 		}
 		snprintf(line,MAX_TOOTHPASTE_LINE,"%s: %s\n", user_strings[MSG_PICK_TYPE], pick_type_strings[topts.ptype] );
