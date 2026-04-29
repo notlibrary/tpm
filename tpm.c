@@ -232,7 +232,7 @@ tpm_load_list_from_file(const char* filename)
 		{
             continue; 
         }
-		if (sscanf(current, "%u, %[^,],%u,%u\n", &temp_data.index,temp_data.toothpaste_brand ,&temp_data.tube_mass_g,&temp_data.rating) == 4) 
+		if (sscanf(current, "%u, %128[^,],%u,%u\n", &temp_data.index,temp_data.toothpaste_brand ,&temp_data.tube_mass_g,&temp_data.rating) == 4) 
 		{
 			ltrim(rtrim(temp_data.toothpaste_brand));
 			temp_data.type=PASTE_RANNDOM;
@@ -922,11 +922,13 @@ tpm_pick_toothpaste(list_node_t* head,toothpaste_pick_options_t topts)
 static void 
 save_default_config(struct cfg_struct* cfg)
 {
-	cfg_set(cfg, "TIMEZONE","0");
+	char brand[MAX_TOOTHPASTE_LINE];
 	char username[UNLEN];
-	snprintf(username, UNLEN, "%s%s%s", "\"" ,user_strings[MSG_ANON], "\"" );
 	
-	cfg_set(cfg,"USERNAME","\"Anonymous\"");
+	cfg_set(cfg, "TIMEZONE","0");
+	snprintf(username, UNLEN, "%s%s%s", "\"" ,user_strings[MSG_ANON], "\"" );
+	snprintf(brand, MAX_TOOTHPASTE_LINE, "%s%s%s", "\"" ,toothpaste_type_strings[PASTE_UNKNOWN], "\"" );
+	cfg_set(cfg,"USERNAME",username);
 	cfg_set(cfg,"DELTA_DAYS","0");
 	cfg_set(cfg,"PICK_TYPE","0");
 	cfg_set(cfg,"DENTAL_FORMULA","\"2-2-2-2\"");
@@ -936,7 +938,7 @@ save_default_config(struct cfg_struct* cfg)
 	cfg_set(cfg,"OUTPUT_CSV","0");
 	cfg_set(cfg,"OUTPUT_FILE","0");
 	cfg_set(cfg,"PICK_INDEX","0");
-	cfg_set(cfg,"BRAND","\"Unknown\"");
+	cfg_set(cfg,"BRAND",brand);
 	cfg_set(cfg,"UPPER_BRANDS","0");
 	cfg_set(cfg,"SET_COUNTER","0");
 	cfg_set(cfg,"RESET_COUNTER","0");
@@ -1313,5 +1315,3 @@ main(int argc, char* argv[])
 	exit(EXIT_SUCCESS);
 	return 0;
 }
-
-	
