@@ -8,7 +8,7 @@ static list_node_t* toothpastes_list;
 
 static const toothpaste_data_t toothpastes[TOTAL_TOOTHPASTES]={
 	{PASTE_BUILTIN,0,"BUILTIN TOOTHPASTE 1",75,90},
-	{PASTE_BUILTIN, 1,"BUILTIN TOOTHPASTE 2",150,100},
+	{PASTE_BUILTIN,1,"BUILTIN TOOTHPASTE 2",150,100},
 	{PASTE_BUILTIN,2,"BUILTIN TOOTHPASTE 3",50,80}
 };
 static const char* pick_type_strings[TOTAL_PICK_TYPE_STRINGS]={
@@ -77,8 +77,14 @@ static const char* user_strings[TOTAL_USER_MESSAGES]={
 	"Compiled on:",
 	"Anonymous",
 	"Output pick to file ",
-	"Usage:"
+	"Usage:",
+	"BUILTIN TOOTHPASTE 1",
+	"BUILTIN TOOTHPASTE 2",
+	"BUILTIN TOOTHPASTE 3"
 };
+
+static const char left_armour[TOTAL_USER_ARMOUR]={"<<<"};
+static const char right_armour[TOTAL_USER_ARMOUR]={">>>"};
 
 static struct option long_options[] = {
     {"rating",     no_argument, 0, 'a'},
@@ -247,6 +253,15 @@ tpm_load_list_from_file(const char* filename)
 		
 	}
 	if (cnt==1) head->data.type=PASTE_NULL;
+	if (cnt==0)
+	{
+		for (i=0;i<TOTAL_TOOTHPASTES;i++)
+		{
+		  temp_data=toothpastes[i];
+		  head = add_to_list(head, temp_data);	
+		  
+		}
+	}
     fclose(file);
     return head;
 }
@@ -300,8 +315,10 @@ count_list(list_node_t* head)
 static toothpaste_data_t 
 get_item_by_index(list_node_t* head,unsigned int i) 
 {
-    toothpaste_data_t empty ={PASTE_RANNDOM,0,user_strings[MSG_BRAND_NONE],0}; 
+ 
+    toothpaste_data_t empty ={PASTE_RANNDOM,0,"None",0}; 
 	list_node_t* current = head;
+	strcpy (empty.toothpaste_brand,user_strings[MSG_BRAND_NONE]);
 	
     while (current != NULL) 
 	{
@@ -317,8 +334,9 @@ get_item_by_index(list_node_t* head,unsigned int i)
 static toothpaste_data_t 
 get_item_by_brand_string(list_node_t* head,const char* str) 
 {
-    toothpaste_data_t empty ={PASTE_RANNDOM,0,user_strings[MSG_BRAND_NONE],0}; 
+    toothpaste_data_t empty ={PASTE_RANNDOM,0,"None",0}; 
 	list_node_t* current = head;
+	strcpy (empty.toothpaste_brand,user_strings[MSG_BRAND_NONE]);
 	
     while (current != NULL) 
 	{
@@ -753,7 +771,9 @@ tpm_pick_toothpaste(list_node_t* head,toothpaste_pick_options_t topts)
 	
 	day = total_seconds/SECONDS_PER_DAY;
 	
-	i=day%pick.total_toothpastes;
+	if (pick.total_toothpastes!=0)  
+		i=day%pick.total_toothpastes;
+	
 	if (topts.ptype==PICK_BY_INDEX) 
 	{
 	    if (topts.pick_by_index_index>=pick.total_toothpastes)
@@ -781,7 +801,7 @@ tpm_pick_toothpaste(list_node_t* head,toothpaste_pick_options_t topts)
 	{
 		pick.what=find_item_with_max_mass(pick.where);
 	}
-		if (topts.ptype==PICK_MIN_RATING)
+	if (topts.ptype==PICK_MIN_RATING)
 	{
 		pick.what=find_item_with_min_rating(pick.where);
 	}
@@ -840,7 +860,7 @@ tpm_pick_toothpaste(list_node_t* head,toothpaste_pick_options_t topts)
 		snprintf(line,MAX_TOOTHPASTE_LINE,"%s: %s\n", user_strings[MSG_PICK_TYPE], pick_type_strings[topts.ptype] );
 		strncat(pick.message,line,MAX_LINE_LENGTH);
 		
-		snprintf(line,MAX_LINE_LENGTH,"%s %s %s (%ug) [%u/100] %s \n", user_strings[MSG_TOOTHPASTE], ">>>", pick.what.toothpaste_brand, pick.what.tube_mass_g, pick.what.rating, "<<<");
+		snprintf(line,MAX_LINE_LENGTH,"%s %s %s (%ug) [%u/100] %s \n", user_strings[MSG_TOOTHPASTE], right_armour, pick.what.toothpaste_brand, pick.what.tube_mass_g, pick.what.rating, left_armour);
 		strncat(pick.message,line,MAX_LINE_LENGTH);
 		
 		snprintf(line,MAX_LINE_LENGTH,"%s %u/%u \n", user_strings[MSG_TOOTHPASTE_I],i,pick.total_toothpastes);
@@ -903,6 +923,9 @@ static void
 save_default_config(struct cfg_struct* cfg)
 {
 	cfg_set(cfg, "TIMEZONE","0");
+	char username[UNLEN];
+	snprintf(username, UNLEN, "%s%s%s", "\"" ,user_strings[MSG_ANON], "\"" );
+	
 	cfg_set(cfg,"USERNAME","\"Anonymous\"");
 	cfg_set(cfg,"DELTA_DAYS","0");
 	cfg_set(cfg,"PICK_TYPE","0");

@@ -80,7 +80,8 @@ memcpy(&x,swap_temp,sizeof(x)); \
 
 #define TOTAL_TOOTHPASTE_TYPES 5
 #define TOTAL_ERROR_MESSAGES 7
-#define TOTAL_USER_MESSAGES 26
+#define TOTAL_USER_MESSAGES 30
+#define TOTAL_USER_ARMOUR 10
 
 typedef enum user_msg_t
 {
@@ -109,7 +110,10 @@ typedef enum user_msg_t
 	MSG_PICK_FILE,
 	MSG_BRAND_NONE,
 	MSG_COMPILER_UNKNOWN,
-	MSG_USAGE
+	MSG_USAGE,
+	MSG_USER_TOOTHPASTE_1,
+	MSG_USER_TOOTHPASTE_2,
+	MSG_USER_TOOTHPASTE_3
 }user_msg_t;
 
 typedef enum pick_type_t
