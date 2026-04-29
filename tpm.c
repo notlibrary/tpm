@@ -318,7 +318,7 @@ get_item_by_index(list_node_t* head,unsigned int i)
  
     toothpaste_data_t empty ={PASTE_RANNDOM,0,"None",0}; 
 	list_node_t* current = head;
-	strcpy (empty.toothpaste_brand,user_strings[MSG_BRAND_NONE]);
+	strncpy (empty.toothpaste_brand,user_strings[MSG_BRAND_NONE],MAX_TOOTHPASTE_LINE);
 	
     while (current != NULL) 
 	{
@@ -336,7 +336,7 @@ get_item_by_brand_string(list_node_t* head,const char* str)
 {
     toothpaste_data_t empty ={PASTE_RANNDOM,0,"None",0}; 
 	list_node_t* current = head;
-	strcpy (empty.toothpaste_brand,user_strings[MSG_BRAND_NONE]);
+	strncpy (empty.toothpaste_brand,user_strings[MSG_BRAND_NONE],MAX_TOOTHPASTE_LINE);
 	
     while (current != NULL) 
 	{
@@ -875,8 +875,10 @@ tpm_pick_toothpaste(list_node_t* head,toothpaste_pick_options_t topts)
 		snprintf(line,MAX_LINE_LENGTH,"%s %s %u \n", user_strings[MSG_DAY] ,days_of_week[j],day);
 		strncat(pick.message,line,MAX_LINE_LENGTH);
 		
+		snprintf(line,MAX_LINE_LENGTH,"%s %u \n", user_strings[MSG_TOTAL_PICKS], pick.stats.total_picks);
+		strncat(pick.message,line,MAX_LINE_LENGTH);
 		
-		snprintf(line,MAX_LINE_LENGTH,LINE_FORMAT, user_strings[MSG_TOTAL_PICKS], pick.stats.total_picks, user_strings[MSG_LAST_PICK_TIME] ,ctime(&pick.stats.last_pick_time));
+		snprintf(line,MAX_LINE_LENGTH,"%s %s", user_strings[MSG_LAST_PICK_TIME] ,ctime(&pick.stats.last_pick_time));
 		strncat(pick.message,line,MAX_LINE_LENGTH);
 		
 		snprintf(line,MAX_LINE_LENGTH,"%s %s \n", user_strings[MSG_SOURCE], toothpastes_file_path_final);
