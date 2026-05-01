@@ -85,7 +85,7 @@ What if Chekhov is alive and is a C programmer?
 
 Linux build also has `tpm.1` manual included
 
-If everything failed another way is to setup daily anacron task
+If everything failed another way is to setup the daily anacron task
 
 ## Sample terminal output from verbose mode:
 ```

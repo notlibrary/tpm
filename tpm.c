@@ -662,13 +662,15 @@ version(void)
 	printf("%s %u.%u.%u \n",TPM_STRING,TPM_VERSION_MAJOR,TPM_VERSION_MINOR,TPM_VERSION_PATCH);
 	printf("%s %s at %s\n",user_strings[MSG_COMPILED] , __DATE__, __TIME__);
 #if defined(__clang__)
-    printf("%s Clang/LLVM\ %d.%d \n",user_strings[MSG_COMPILER],__clang_major__,__clang_minor__);
+    printf("%s Clang/LLVM %d.%d \n",user_strings[MSG_COMPILER],__clang_major__,__clang_minor__);
 #elif defined(__GNUC__) || defined(__GNUG__)
     printf("%s GCC %d.%d \n", user_strings[MSG_COMPILER], __GNUC__,__GNUC_MINOR__);
 #elif defined(_MSC_VER)
     printf("%s Microsoft Visual Studio %d\n",user_strings[MSG_COMPILER],_MSC_VER);
 #elif defined(__INTEL_COMPILER)
-    printf("%s Intel ICC %d \n",user_strings[MSG_COMPILER]__INTEL_COMPILER);
+    printf("%s Intel ICC %d \n",user_strings[MSG_COMPILER],__INTEL_COMPILER);
+#elif defined(__TINYC__ )
+    printf("%s Tiny CC %d \n",user_strings[MSG_COMPILER],__TINYC__);
 #else
     printf("%s %s","%s\n",user_strings[MSG_COMPILER],user_strings[MSG_COMPILER_UNKNOWN]);
 #endif
@@ -912,7 +914,6 @@ tpm_pick_toothpaste(list_node_t* head,toothpaste_pick_options_t topts)
 	
 	snprintf(line,MAX_LINE_LENGTH,LINE_FORMAT_CSV, pick.stats.total_picks,pick.stats.last_pick_time,toothpastes_file_path_final);
 	strncat(pick.CSV,line,MAX_LINE_LENGTH);
-	
 	
 	if (topts.lat_flag) 
 	{

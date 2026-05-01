@@ -10,7 +10,12 @@ extern "C" {
 #define TPM_STRING "tpm"
 #define TPM_VERSION_MAJOR 0
 #define TPM_VERSION_MINOR 5
-#define TPM_VERSION_PATCH 6
+#define TPM_VERSION_PATCH 7
+
+#undef _CRT_NONSTDC_NO_DEPRECATE 
+#define _CRT_NONSTDC_NO_DEPRECATE 
+#undef _CRT_SECURE_NO_WARNINGS
+#define _CRT_SECURE_NO_WARNINGS
 
 #include <stdio.h>
 #include <stdlib.h>
