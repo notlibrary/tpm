@@ -449,7 +449,8 @@ void cfg_delete(struct cfg_struct* cfg, const char* key)
   if (tkey == NULL) return;
 
   /* search list for existing key */
-  cur = cfg->head;
+ cur = cfg->head; 
+ prev = cur->next;
   do
   {
     if (strcmp(tkey, cur->key) == 0)
@@ -545,7 +546,8 @@ void cfg_prune(struct cfg_struct* cfg, const char* keys[], const size_t count)
   }
 
   /* Now iterate through the cfg struct and test every entry */
-  cur = cfg->head;
+ cur = cfg->head; 
+ prev = cur->next;
   do
   {
     for (i = 0; i < j; i ++)
