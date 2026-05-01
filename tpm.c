@@ -289,7 +289,7 @@ display_list(list_node_t* head, toothpaste_pick_t* pick)
 				current->data.toothpaste_brand[i]=toupper(current->data.toothpaste_brand[i]);
 			}
 		}
-		snprintf(line,2*MAX_TOOTHPASTE_LINE,"%d,%s,%d,%d\n", current->data.index, current->data.toothpaste_brand, current->data.tube_mass_g, current->data.rating);
+		snprintf(line,2*MAX_TOOTHPASTE_LINE,"%d,%.120s,%d,%d\n", current->data.index, current->data.toothpaste_brand, current->data.tube_mass_g, current->data.rating);
         strncat(pick->message,line,MAX_LINE_LENGTH);
 		current = current->next;
 		cnt++;
@@ -485,10 +485,11 @@ set_counters(void* optarg)
 	return 0;
 }
 
-static int
+static unsigned int
 get_counters(toothpaste_pick_stats_t* stats)
 {
 	FILE* file_ptr;
+	unsigned int nbytes=0;
 	
 	stats->total_picks=0;
 	stats->last_pick_time=0;
@@ -500,11 +501,11 @@ get_counters(toothpaste_pick_stats_t* stats)
         return 1;
     }
 
-    fread(&stats->total_picks, sizeof(unsigned int), 1, file_ptr);
-    fread(&stats->last_pick_time, sizeof(time_t), 1, file_ptr);
+    nbytes=fread(&stats->total_picks, sizeof(unsigned int), 1, file_ptr);
+    nbytes+=fread(&stats->last_pick_time, sizeof(time_t), 1, file_ptr);
    
     fclose(file_ptr);	
-	return 0;
+	return nbytes;
 }
 
 static int
