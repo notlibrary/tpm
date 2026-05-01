@@ -289,7 +289,7 @@ display_list(list_node_t* head, toothpaste_pick_t* pick)
 				current->data.toothpaste_brand[i]=toupper(current->data.toothpaste_brand[i]);
 			}
 		}
-		snprintf(line,2*MAX_TOOTHPASTE_LINE,"%d,%.120s,%d,%d\n", current->data.index, current->data.toothpaste_brand, current->data.tube_mass_g, current->data.rating);
+		snprintf(line,MAX_TOOTHPASTE_LINE,"%d,%.120s,%d,%d\n", current->data.index, current->data.toothpaste_brand, current->data.tube_mass_g, current->data.rating);
         strncat(pick->message,line,MAX_LINE_LENGTH);
 		current = current->next;
 		cnt++;
