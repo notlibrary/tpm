@@ -1149,7 +1149,7 @@ read_config(const char* src)
 	return opts;
 }
 
-int
+TPM int
 main(int argc, char* argv[])
 {
 
