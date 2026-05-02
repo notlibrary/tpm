@@ -327,7 +327,7 @@ A few shell one-liners demonstrating tpm usage
 ```bash
 	echo hi | tpm | grep oo
 	tpm -qU
-	echo | hi | tpm | head -n 4 | tail -n 1
+	echo hi | tpm | head -n 4 | tail -n 1
 	tpm -C >> picks.csv
 	tpm -v | grep Compiler
 	man tpm
