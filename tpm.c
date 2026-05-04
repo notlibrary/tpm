@@ -672,6 +672,8 @@ version(void)
     printf("%s Intel ICC %d \n",user_strings[MSG_COMPILER],__INTEL_COMPILER);
 #elif defined(__TINYC__ )
     printf("%s Tiny CC %d \n",user_strings[MSG_COMPILER],__TINYC__);
+#elif defined(__EMSCRIPTEN__)
+    printf("%s Emscripten %d.%d \n",user_strings[MSG_COMPILER],__EMSCRIPTEN_major__, __EMSCRIPTEN_minor__);	
 #else
     printf("%s %s","%s\n",user_strings[MSG_COMPILER],user_strings[MSG_COMPILER_UNKNOWN]);
 #endif
