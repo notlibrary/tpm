@@ -327,6 +327,7 @@ A few shell one-liners demonstrating tpm usage
 ```bash
 	tpm -c tpm.conf.sample toothpastes.sample
 	echo hi | tpm | grep oo
+	tpm -l > toothpastes
 	tpm -qU
 	echo hi | tpm | head -n 4 | tail -n 1
 	tpm -C >> picks.csv
