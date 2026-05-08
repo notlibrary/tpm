@@ -211,6 +211,7 @@ tpm_load_list_from_file(const char* filename)
 	
 	memset(long_line,0,4*MAX_LINE_LENGTH);
 	memset(line,0,MAX_LINE_LENGTH);
+	memset(temp_data.toothpaste_brand,0,MAX_TOOTHPASTE_LINE);
 	
     if (file == NULL) 
 	{
