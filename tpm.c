@@ -207,6 +207,10 @@ tpm_load_list_from_file(const char* filename)
     toothpaste_data_t temp_data;
 	char line[MAX_LINE_LENGTH];
 	char* current = line;
+	char long_line[4*MAX_LINE_LENGTH];
+	
+	memset(long_line,0,4*MAX_LINE_LENGTH);
+	memset(line,0,MAX_LINE_LENGTH);
 	
     if (file == NULL) 
 	{
@@ -232,8 +236,9 @@ tpm_load_list_from_file(const char* filename)
 		{
             continue; 
         }
-		if (sscanf(current, "%u, %128[^,],%u,%u\n", &temp_data.index,temp_data.toothpaste_brand ,&temp_data.tube_mass_g,&temp_data.rating) == 4) 
+		if (sscanf(current, "%u, %4096[^,],%u,%u\n", &temp_data.index,long_line ,&temp_data.tube_mass_g,&temp_data.rating) == 4) 
 		{
+			strncpy(temp_data.toothpaste_brand,long_line,MAX_TOOTHPASTE_LINE);
 			ltrim(rtrim(temp_data.toothpaste_brand));
 			temp_data.type=PASTE_RANNDOM;
 			if (0==strcmp(toothpaste_type_strings[1],temp_data.toothpaste_brand))
@@ -865,7 +870,7 @@ tpm_pick_toothpaste(list_node_t* head,toothpaste_pick_options_t topts)
 		snprintf(line,MAX_TOOTHPASTE_LINE,"%s: %s\n", user_strings[MSG_PICK_TYPE], pick_type_strings[topts.ptype] );
 		strncat(pick.message,line,MAX_LINE_LENGTH);
 		
-		snprintf(line,MAX_LINE_LENGTH,"%s %s %s (%ug) [%u/100] %s \n", user_strings[MSG_TOOTHPASTE], right_armour, pick.what.toothpaste_brand, pick.what.tube_mass_g, pick.what.rating, left_armour);
+		snprintf(line,MAX_LINE_LENGTH,"%s %s %.128s (%ug) [%u/100] %s \n", user_strings[MSG_TOOTHPASTE], right_armour, pick.what.toothpaste_brand, pick.what.tube_mass_g, pick.what.rating, left_armour);
 		strncat(pick.message,line,MAX_LINE_LENGTH);
 		
 		snprintf(line,MAX_LINE_LENGTH,"%s %u/%u \n", user_strings[MSG_TOOTHPASTE_I],i,pick.total_toothpastes);
@@ -892,10 +897,10 @@ tpm_pick_toothpaste(list_node_t* head,toothpaste_pick_options_t topts)
 	}
 	else 
 	{
-		snprintf(pick.message,2*MAX_TOOTHPASTE_LINE,"%s (%ug) [%u/100] \n", pick.what.toothpaste_brand,pick.what.tube_mass_g, pick.what.rating);	
+		snprintf(pick.message,2*MAX_TOOTHPASTE_LINE,"%.128s (%ug) [%u/100] \n", pick.what.toothpaste_brand,pick.what.tube_mass_g, pick.what.rating);	
 	}
 	
-	snprintf(pick.JSON,MAX_LINE_LENGTH,"{\n\t \"who\":\"%s\",\n\t \"toothpaste\":\"%s\",\n\t \"tube_mass_g\":%u,\n\t \"rating\":%u \n}",pick.who,pick.what.toothpaste_brand,pick.what.tube_mass_g,pick.what.rating);
+	snprintf(pick.JSON,MAX_LINE_LENGTH,"{\n\t \"who\":\"%s\",\n\t \"toothpaste\":\"%.128s\",\n\t \"tube_mass_g\":%u,\n\t \"rating\":%u \n}",pick.who,pick.what.toothpaste_brand,pick.what.tube_mass_g,pick.what.rating);
 		
 	snprintf(line,MAX_LINE_LENGTH,"%s,%s,",pick.who,pick_type_strings[topts.ptype] );
 	strncat(pick.CSV,line,MAX_LINE_LENGTH);

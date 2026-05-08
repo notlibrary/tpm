@@ -97,8 +97,8 @@ Toothpaste index: 1/3
 Toothpaste type: Random
 Dental Formula: 1-10-2-2
 Day: Saturday 20512 
-Total picks: 7
-Last pick time: Fri Apr 24 10:45:30 2026
+Total picks: 73
+Last pick time: Fri May  8 12:00:02 2026
 Source: C:\Users\Serenity\tpm\toothpastes
 
 Press any key to continue . . .
@@ -417,7 +417,7 @@ Judge for yourself if this is a good deal or not and why
 - It serves the basic crucial user need independently OS type SQL support just does not matter
 - It helps utilize the 5$ VPSes and old computers including SBCs by running on them useful payload
 - It has perfectly fine sane regular ordinary usual predictable behavior(almost pedantic) that makes perfect sense 
-- And finally it's the tiny size less than 32KB almost two times smaller than LMDB (Windows .exe however has 200KB builtin .ico)
+- And finally it's the tiny size less than 40KB with `-Os` flag almost two times smaller than LMDB (Windows .exe however has 200KB builtin .ico)
 
 OK program is good users are bad what now?
 You are getting it just pick again you have ~30000 tries per lifetime
