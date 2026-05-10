@@ -336,6 +336,12 @@ A few shell one-liners demonstrating tpm usage
 	echo "Done" | tpm | nc -u -b 192.168.1.255 12345
 ```
 
+Long Windows PowerShell command to append Anonymous last toothpaste pick info into `picks.csv`
+
+```powershell
+	& ("C:\Program Files\tpm\tpm.exe") -C >> "C:\Users\Anonymous\tpm\picks.csv"
+```
+
 ## The biggest dental lie on the planet
 Here we go let's do some math estimation again:
 
