@@ -532,7 +532,7 @@ write_counters(toothpaste_pick_stats_t stats)
 		perror(error_strings[PICKSTATS_WRITE_FAILED]);
 		return 1;
 	}
-	fwrite(&stats.total_picks, sizeof(int), 1, file_ptr);
+	fwrite(&stats.total_picks, sizeof(unsigned int), 1, file_ptr);
 	fwrite(&stats.last_pick_time, sizeof(time_t), 1, file_ptr);
 	fclose(file_ptr);
 	
