@@ -96,9 +96,9 @@ Toothpaste: >>> SENSODYNE (150g) [100/100] <<<
 Toothpaste index: 1/3
 Toothpaste type: Random
 Dental Formula: 1-10-2-2
-Day: Saturday 20512 
-Total picks: 73
-Last pick time: Fri May  8 12:00:02 2026
+Day: Sunday 20583
+Total picks: 75
+Last pick time: Sun May 10 09:00:02 2026
 Source: C:\Users\Serenity\tpm\toothpastes
 
 Press any key to continue . . .
@@ -156,7 +156,7 @@ They are not pick types
 - Nothing: No toothpaste
 - Unknown: Unknown toothpaste
 - 0-paste: last tube of `Random` toothpaste with index 0
-- builtin: no or error reading `~/toothpastes` file fallback toothpaste
+- builtin: no or error reading `~/tpm/toothpastes` file fallback toothpaste
 
 ## Dental formula
 The dental formula is an expression with format `W-X-Y-Z` where 

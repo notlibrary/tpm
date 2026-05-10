@@ -889,6 +889,7 @@ tpm_pick_toothpaste(list_node_t* head,toothpaste_pick_options_t topts)
 		snprintf(line,MAX_LINE_LENGTH,"%s %u \n", user_strings[MSG_TOTAL_PICKS], pick.stats.total_picks);
 		strncat(pick.message,line,MAX_LINE_LENGTH);
 		
+		pick.stats.last_pick_time=pick.stats.last_pick_time-delta_hours*SECONDS_PER_HOUR;
 		snprintf(line,MAX_LINE_LENGTH,"%s %s", user_strings[MSG_LAST_PICK_TIME] ,ctime(&pick.stats.last_pick_time));
 		strncat(pick.message,line,MAX_LINE_LENGTH);
 		

@@ -10,7 +10,7 @@ extern "C" {
 #define TPM_STRING "tpm"
 #define TPM_VERSION_MAJOR 0
 #define TPM_VERSION_MINOR 5
-#define TPM_VERSION_PATCH 10
+#define TPM_VERSION_PATCH 11
 
 #undef _CRT_NONSTDC_NO_DEPRECATE 
 #define _CRT_NONSTDC_NO_DEPRECATE 
@@ -145,6 +145,16 @@ typedef enum error_msg_t
 	
 }error_msg_t;
 
+typedef enum toothpaste_type_t
+{
+	PASTE_RANNDOM,
+	PASTE_NOTHING,
+    PASTE_UNKNOWN,
+	PASTE_NULL,
+	PASTE_BUILTIN
+	
+}toothpaste_type_t;
+
 typedef struct toothpaste_pick_stats_t
 {
 	time_t last_pick_time;
@@ -159,15 +169,7 @@ typedef struct dental_formula_t
 	unsigned int visit_dentist_times_per_year;
 }dental_formula_t;
 
-typedef enum toothpaste_type_t
-{
-	PASTE_RANNDOM,
-	PASTE_NOTHING,
-    PASTE_UNKNOWN,
-	PASTE_NULL,
-	PASTE_BUILTIN
-	
-}toothpaste_type_t;
+
 typedef struct toothpaste_data_t
 {
     toothpaste_type_t type;
