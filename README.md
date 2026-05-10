@@ -30,9 +30,9 @@ Identify the TTY
 
 `tty`
 
-/dev/pts/1
+`/dev/pts/1`
 
-Add the task with redirect to /dev/pts/1
+Add the task with redirect to `/dev/pts/1`
 
 `cronrtab -e` append
 
