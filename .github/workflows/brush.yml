@@ -14,4 +14,6 @@ jobs:
     # Bump the version number
     - name: Brush
       run: |
+        cd /home/runner/work/tpm/tpm/tpm-linux-bin-amd64
         echo | ./tpm toothpastes.sample
+        
