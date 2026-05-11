@@ -1,6 +1,5 @@
 .mode csv
-.import --csv --skip 1 toothpastes toothpastes
-.import --csv --skip 1 picks.csv picks
+.headers on
 
 CREATE TABLE IF NOT EXISTS toothpastes (
     id INTEGER,
@@ -8,6 +7,16 @@ CREATE TABLE IF NOT EXISTS toothpastes (
 	tube_mass_g INTEGER,
 	rating INTEGER
 );
+
+INSERT INTO toothpastes (id, brand_string, tube_mass_g,rating) VALUES (0,'RANDOM TOOTHPASTE 1', 100, 100);
+INSERT INTO toothpastes (id, brand_string, tube_mass_g,rating) VALUES (1,'RANDOM TOOTHPASTE 2', 100, 100);
+INSERT INTO toothpastes (id, brand_string, tube_mass_g,rating) VALUES (2,'RANDOM TOOTHPASTE 3', 100, 100);
+INSERT INTO toothpastes (id, brand_string, tube_mass_g,rating) VALUES (3,'RANDOM TOOTHPASTE 4', 100, 100);
+INSERT INTO toothpastes (id, brand_string, tube_mass_g,rating) VALUES (4,'Nothing', 0, 0);
+
+.output toothpastes.csv
+SELECT * FROM toothpastes;
+
 CREATE TABLE IF NOT EXISTS picks (
 	 username TEXT, 
 	 pick_type TEXT, 
@@ -24,11 +33,9 @@ CREATE TABLE IF NOT EXISTS picks (
 	 last_pick_time INTEGER,
 	 toothpastes_file_path TEXT
 );
-INSERT INTO toothpastes (id, brand_string, tube_mass_g,rating) VALUES (0,'RANDOM TOOTHPASTE 1', 100, 100);
-INSERT INTO toothpastes (id, brand_string, tube_mass_g,rating) VALUES (1,'RANDOM TOOTHPASTE 2', 100, 100);
-INSERT INTO toothpastes (id, brand_string, tube_mass_g,rating) VALUES (2,'RANDOM TOOTHPASTE 3', 100, 100);
-INSERT INTO toothpastes (id, brand_string, tube_mass_g,rating) VALUES (3,'RANDOM TOOTHPASTE 4', 100, 100);
-INSERT INTO toothpastes (id, brand_string, tube_mass_g,rating) VALUES (4,'Nothing', 0, 0);
+
+.import --csv --skip 1 picks.csv picks
+
 
 SELECT * FROM toothpastes WHERE id=mod((SELECT CAST(unixepoch('now') / 86400 AS INTEGER)), (SELECT COUNT(*) FROM toothpastes)) LIMIT 1;
 SELECT * FROM toothpastes ORDER BY rating DESC LIMIT 1;
