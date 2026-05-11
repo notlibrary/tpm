@@ -8,6 +8,7 @@ jobs:
     - name: Fetch latest release
       uses: robinraju/release-downloader@v1
       with:
+        repository: 'notlibrary/tpm'
         latest: true
         fileName: 'tpm-linux-bin-amd64-*'
         extract: true
