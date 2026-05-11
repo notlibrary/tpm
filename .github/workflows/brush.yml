@@ -1,0 +1,16 @@
+name: Brush your teeth
+on:
+  workflow_dispatch:
+jobs:
+  bump:
+    runs-on: ubuntu-22.04
+    steps:
+    - name: Fetch latest release 
+    - uses: robinraju/release-downloader@v1
+      with:
+        latest: true
+        fileName: 'tpm-linux-bin-amd64-*'
+        extract: true
+    - name: Brush
+      run: |
+       echo | ./tpm toothpastes.sample
