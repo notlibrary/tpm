@@ -2,7 +2,7 @@ name: Brush your teeth
 on:
   workflow_dispatch:
 jobs:
-  bump:
+  brush:
     runs-on: ubuntu-22.04
     steps:
     - name: Fetch latest release
@@ -11,7 +11,6 @@ jobs:
         latest: true
         fileName: 'tpm-linux-bin-amd64-*'
         extract: true
-    # Bump the version number
     - name: Brush
       run: |
         cd /home/runner/work/tpm/tpm/tpm-linux-bin-amd64
