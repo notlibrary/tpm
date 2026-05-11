@@ -87,6 +87,9 @@ Linux build also has `tpm.1` manual included
 
 If everything failed another way is to setup the daily anacron task
 
+Finally the last nice alternative is free tooth brushing in GitHub actions runner container
+See `.github/workflows/brush.yml` for workflow details
+
 ## Sample terminal output from verbose mode:
 ```
 Good Morning Serenity Welcome to the toothpaste picking manager
