@@ -20,6 +20,9 @@ SELECT * FROM toothpastes;
 CREATE TABLE IF NOT EXISTS picks (
 	 username TEXT, 
 	 pick_type TEXT, 
+	 new_pick_flag INTEGER,
+	 new_toothbrush_flag INTEGER,
+	 new_dentist_visit INTEGER,
 	 toothpaste_brand TEXT,
 	 tube_mass_g INTEGER,
 	 toothpaste_rating INTEGER,

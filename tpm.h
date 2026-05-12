@@ -10,7 +10,7 @@ extern "C" {
 #define TPM_STRING "tpm"
 #define TPM_VERSION_MAJOR 0
 #define TPM_VERSION_MINOR 5
-#define TPM_VERSION_PATCH 11
+#define TPM_VERSION_PATCH 12
 
 #undef _CRT_NONSTDC_NO_DEPRECATE 
 #define _CRT_NONSTDC_NO_DEPRECATE 
@@ -242,7 +242,7 @@ static toothpaste_data_t find_item_with_min_rating(list_node_t* where);
 static void free_list(list_node_t* head);
 static int reset_counters(void);
 static int set_counters(void* optarg);
-static unsigned int get_counters(toothpaste_pick_stats_t* stats,int fake_stats);
+static unsigned int read_counters(toothpaste_pick_stats_t* stats,int fake_stats);
 static int list_available_toothpastes(toothpaste_pick_t* pick);
 static int write_counters(toothpaste_pick_stats_t stats,int fake_stats);
 static void stop_system(void);

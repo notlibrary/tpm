@@ -494,7 +494,7 @@ set_counters(void* optarg)
 }
 
 static unsigned int
-get_counters(toothpaste_pick_stats_t* stats,int fake_stats)
+read_counters(toothpaste_pick_stats_t* stats,int fake_stats)
 {
 	FILE* file_ptr;
 	unsigned int nbytes=0;
@@ -506,7 +506,7 @@ get_counters(toothpaste_pick_stats_t* stats,int fake_stats)
 		file_ptr = fopen(stats_file_path_final, "rb");
 		if (file_ptr == NULL) 
 		{
-			perror(error_strings[PICKSTATS_WRITE_FAILED]);
+			perror(error_strings[PICKSTATS_READ_FAILED]);
 			return 1;
 		}
 
@@ -751,6 +751,8 @@ tpm_pick_toothpaste(list_node_t* head,toothpaste_pick_options_t topts)
 	char username[UNLEN + 1];
 	char line[MAX_LINE_LENGTH];
 	int new_pick_flag =0;
+	int dentist_flag=0;
+	int toothbrush_flag=0;
 	unsigned int brand_len;
 	
 	pick.opts = topts;
@@ -780,7 +782,7 @@ tpm_pick_toothpaste(list_node_t* head,toothpaste_pick_options_t topts)
 	{
 			perror(error_strings[NO_TOOTHPASTES_LOADED]);
 	}
-	get_counters(&pick.stats,pick.opts.fake_stats);
+	read_counters(&pick.stats,pick.opts.fake_stats);
 	pick.toothpaste_pick_index=pick.stats.total_picks;
 	pick.when=total_seconds;
 	i=(total_seconds)/(SECONDS_PER_DAY/TOTAL_TIMES_OF_DAY)%(TOTAL_TIMES_OF_DAY);
@@ -861,6 +863,7 @@ tpm_pick_toothpaste(list_node_t* head,toothpaste_pick_options_t topts)
 					snprintf(line,MAX_TOOTHPASTE_LINE,"%s \n", user_strings[MSG_TOOTHBRUSH]); 
 					strncat(pick.message,line,MAX_LINE_LENGTH);
 			 }
+		toothbrush_flag = 1;
 		}
 		
 		if (pick.stats.total_picks % (DAYS_PER_YEAR /topts.formula.visit_dentist_times_per_year) ==0)
@@ -870,6 +873,7 @@ tpm_pick_toothpaste(list_node_t* head,toothpaste_pick_options_t topts)
 					snprintf(line,MAX_TOOTHPASTE_LINE,"%s \n", user_strings[MSG_DENTIST]); 
 					strncat(pick.message,line,MAX_LINE_LENGTH);
 			 }
+			 dentist_flag = 1;
 		}
 	}
 	if (topts.verbose) 
@@ -919,6 +923,9 @@ tpm_pick_toothpaste(list_node_t* head,toothpaste_pick_options_t topts)
 	snprintf(pick.JSON,MAX_LINE_LENGTH,"{\n\t \"who\":\"%s\",\n\t \"toothpaste\":\"%.128s\",\n\t \"tube_mass_g\":%u,\n\t \"rating\":%u \n}",pick.who,pick.what.toothpaste_brand,pick.what.tube_mass_g,pick.what.rating);
 		
 	snprintf(line,MAX_LINE_LENGTH,"%s,%s,",pick.who,pick_type_strings[topts.ptype] );
+	strncat(pick.CSV,line,MAX_LINE_LENGTH);
+	
+	snprintf(line,MAX_LINE_LENGTH,"%d,%d,%d,",new_pick_flag,toothbrush_flag,dentist_flag );
 	strncat(pick.CSV,line,MAX_LINE_LENGTH);
 	
 	snprintf(line,MAX_LINE_LENGTH,"%s,%d,%d,",  pick.what.toothpaste_brand, pick.what.tube_mass_g, pick.what.rating );
