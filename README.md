@@ -1,5 +1,7 @@
-![GitHub License](https://img.shields.io/github/license/notlibrary/tpm)
-![GitHub manifest version](https://img.shields.io/github/manifest-json/v/notlibrary/tpm)
+<p align="center">
+   <img src="https://img.shields.io/github/license/notlibrary/tpm" alt="License	">
+   <img src="https://img.shields.io/github/manifest-json/v/notlibrary/tpm" alt="Version">
+</p>
 
 ## TPM Toothpaste Picking Manager
 Let me pick the toothpaste for you(or how to brush your teeth admins way)
