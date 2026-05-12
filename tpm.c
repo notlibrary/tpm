@@ -95,7 +95,8 @@ static struct option long_options[] = {
     {"random", no_argument,       0, 'x'},
     {"quiet", no_argument,       0, 'q'},
     {"list", no_argument,       0, 'l'},
-	{"reset", no_argument,       0, 'r'},	
+	{"reset", no_argument,       0, 'r'},
+	{"fake_stats", no_argument,       0, 'F'},
     {"formula", required_argument, 0, 'f'},
 	{"output", required_argument,0, 'o'},
 	{"config", required_argument,0, 'c'},		
@@ -130,6 +131,7 @@ static char* brand_string =NULL;
 static int upper_brands = 0;
 static int delta_days =0;
 static int delta_hours =0;
+static int fake_stats =0;
 
 static int config_load_failure =0;
 
@@ -492,25 +494,33 @@ set_counters(void* optarg)
 }
 
 static unsigned int
-get_counters(toothpaste_pick_stats_t* stats)
+get_counters(toothpaste_pick_stats_t* stats,int fake_stats)
 {
 	FILE* file_ptr;
 	unsigned int nbytes=0;
 	
 	stats->total_picks=0;
 	stats->last_pick_time=0;
-	
-	file_ptr = fopen(stats_file_path_final, "rb");
-    if (file_ptr == NULL) 
-	{
-        perror(error_strings[PICKSTATS_WRITE_FAILED]);
-        return 1;
-    }
+	if (!fake_stats)
+	{	
+		file_ptr = fopen(stats_file_path_final, "rb");
+		if (file_ptr == NULL) 
+		{
+			perror(error_strings[PICKSTATS_WRITE_FAILED]);
+			return 1;
+		}
 
-    nbytes=fread(&(stats->total_picks), sizeof(unsigned int), 1, file_ptr);
-    nbytes+=fread(&(stats->last_pick_time), sizeof(time_t), 1, file_ptr);
-   
-    fclose(file_ptr);	
+		nbytes=fread(&(stats->total_picks), sizeof(unsigned int), 1, file_ptr);
+		nbytes+=fread(&(stats->last_pick_time), sizeof(time_t), 1, file_ptr);
+	   
+		fclose(file_ptr);	
+	}
+	else 
+	{
+		seed_xrp32(time(NULL));
+		stats->total_picks=rand_range(0,BRUSHES_PER_LIFETIME);
+		stats->last_pick_time=time(NULL)-SECONDS_PER_DAY+delta_hours*SECONDS_PER_HOUR;
+	}
 	return nbytes;
 }
 
@@ -522,20 +532,21 @@ list_available_toothpastes(toothpaste_pick_t* pick)
 }
 
 static int
-write_counters(toothpaste_pick_stats_t stats)
+write_counters(toothpaste_pick_stats_t stats,int fake_stats)
 {
 	FILE* file_ptr;
-	
-	file_ptr = fopen(stats_file_path_final, "wb");
-	if (file_ptr == NULL) 
+	if (!fake_stats)
 	{
-		perror(error_strings[PICKSTATS_WRITE_FAILED]);
-		return 1;
+		file_ptr = fopen(stats_file_path_final, "wb");
+		if (file_ptr == NULL) 
+		{
+			perror(error_strings[PICKSTATS_WRITE_FAILED]);
+			return 1;
+		}
+		fwrite(&stats.total_picks, sizeof(unsigned int), 1, file_ptr);
+		fwrite(&stats.last_pick_time, sizeof(time_t), 1, file_ptr);
+		fclose(file_ptr);
 	}
-	fwrite(&stats.total_picks, sizeof(unsigned int), 1, file_ptr);
-	fwrite(&stats.last_pick_time, sizeof(time_t), 1, file_ptr);
-	fclose(file_ptr);
-	
 	return 0;
 }
 
@@ -769,7 +780,7 @@ tpm_pick_toothpaste(list_node_t* head,toothpaste_pick_options_t topts)
 	{
 			perror(error_strings[NO_TOOTHPASTES_LOADED]);
 	}
-	get_counters(&pick.stats);
+	get_counters(&pick.stats,pick.opts.fake_stats);
 	pick.toothpaste_pick_index=pick.stats.total_picks;
 	pick.when=total_seconds;
 	i=(total_seconds)/(SECONDS_PER_DAY/TOTAL_TIMES_OF_DAY)%(TOTAL_TIMES_OF_DAY);
@@ -841,7 +852,7 @@ tpm_pick_toothpaste(list_node_t* head,toothpaste_pick_options_t topts)
 		new_pick_flag=1;
 		pick.stats.total_picks++;
 		pick.stats.last_pick_time=total_seconds;
-		write_counters(pick.stats);
+		write_counters(pick.stats,pick.opts.fake_stats);
 		
 		if (pick.stats.total_picks % (DAYS_PER_YEAR /topts.formula.swap_toothbrush_times_per_year) ==0)
 		{
@@ -886,7 +897,10 @@ tpm_pick_toothpaste(list_node_t* head,toothpaste_pick_options_t topts)
 		snprintf(line,MAX_LINE_LENGTH,"%s %s %u \n", user_strings[MSG_DAY] ,days_of_week[j],day);
 		strncat(pick.message,line,MAX_LINE_LENGTH);
 		
-		snprintf(line,MAX_LINE_LENGTH,"%s %u \n", user_strings[MSG_TOTAL_PICKS], pick.stats.total_picks);
+		if (topts.fake_stats)
+			snprintf(line,MAX_LINE_LENGTH,"%s ~%u \n", user_strings[MSG_TOTAL_PICKS], pick.stats.total_picks);
+		else
+			snprintf(line,MAX_LINE_LENGTH,"%s %u \n", user_strings[MSG_TOTAL_PICKS], pick.stats.total_picks);
 		strncat(pick.message,line,MAX_LINE_LENGTH);
 		
 		pick.stats.last_pick_time=pick.stats.last_pick_time-delta_hours*SECONDS_PER_HOUR;
@@ -949,6 +963,7 @@ save_default_config(struct cfg_struct* cfg)
 	cfg_set(cfg,"LIST_TOOTHPASTES","0");
 	cfg_set(cfg,"OUTPUT_JSON","0");
 	cfg_set(cfg,"OUTPUT_CSV","0");
+	cfg_set(cfg,"FAKE_STATS","0");	
 	cfg_set(cfg,"OUTPUT_FILE","0");
 	cfg_set(cfg,"PICK_INDEX","0");
 	cfg_set(cfg,"BRAND",brand);
@@ -1034,6 +1049,7 @@ read_config(const char* src)
 	opts.lat_flag=lat_flag;
 	opts.json_flag=json_flag;
 	opts.csv_flag=csv_flag;
+	opts.fake_stats=fake_stats;
 	opts.output_to_file=output_to_file;
 	opts.pick_by_index_index=pick_by_index_index;
 	opts.brand_string=brand_string;
@@ -1117,6 +1133,11 @@ read_config(const char* src)
 	{
 		opts.csv_flag =  atoi(value);
 	}
+	value = cfg_get_rec(cfg, "FAKE_STATS");
+	if (value!=NULL) 
+	{
+		opts.fake_stats =  atoi(value);
+	}
 	value = cfg_get_rec(cfg, "OUTPUT_FILE");
 	if (value!=NULL) 
 	{
@@ -1192,7 +1213,7 @@ main(int argc, char* argv[])
 	
 	topts=read_config(config_file_path_final);
 	config_load_failure=!file_exists_fopen(config_file_path_final);
-	while ((opt = getopt_long(argc, argv, "awjCvxqlrUf:t:o:c:s:p:i:b:z:d:",long_options,&option_index)) != -1) 
+	while ((opt = getopt_long(argc, argv, "awjCvxqlrUFf:t:o:c:s:p:i:b:z:d:",long_options,&option_index)) != -1) 
 	{
         switch (opt) 
 		{
@@ -1225,6 +1246,9 @@ main(int argc, char* argv[])
 			break;
 			case 'r':
 			reset_counters();
+			break;
+			case 'F':
+			topts.fake_stats=1;
 			break;
 			case 'f':
 			topts.formula=parse_dental_formula(optarg);
@@ -1260,7 +1284,7 @@ main(int argc, char* argv[])
 				delta_days=atoi(optarg);
 			break; 	
 			case '?': 
-				fprintf(stderr, "%s %s [-awjCvxqlrU] [-f dental-formula] [-c config_file] [-o pick output file] [-t stats file] [-s total_picks value] [-p pick_type_value] [-i toothpaste_index] [-b brand_string -z delta_hours -d delta_days] [toothpastes_file] \n",user_strings[MSG_USAGE], argv[0]);
+				fprintf(stderr, "%s %s [-awjCvxqlrUF] [-f dental-formula] [-c config_file] [-o pick output file] [-t stats file] [-s total_picks value] [-p pick_type_value] [-i toothpaste_index] [-b brand_string -z delta_hours -d delta_days] [toothpastes_file] \n",user_strings[MSG_USAGE], argv[0]);
 				exit(EXIT_FAILURE);
 			default:
 				break;

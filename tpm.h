@@ -87,6 +87,8 @@ memcpy(&x,swap_temp,sizeof(x)); \
 #define TOTAL_USER_MESSAGES 30
 #define TOTAL_USER_ARMOUR 10
 
+#define BRUSHES_PER_LIFETIME 30000
+
 typedef enum user_msg_t
 {
 	MSG_PICK_COUNTER_C,
@@ -193,6 +195,7 @@ typedef struct toothpaste_pick_options_t
 	int verbose;
 	int lat_flag;
 	int json_flag;
+	int fake_stats;
 	int output_to_file;
 	int csv_flag;
 	unsigned int pick_by_index_index;
@@ -239,9 +242,9 @@ static toothpaste_data_t find_item_with_min_rating(list_node_t* where);
 static void free_list(list_node_t* head);
 static int reset_counters(void);
 static int set_counters(void* optarg);
-static unsigned int get_counters(toothpaste_pick_stats_t* stats);
+static unsigned int get_counters(toothpaste_pick_stats_t* stats,int fake_stats);
 static int list_available_toothpastes(toothpaste_pick_t* pick);
-static int write_counters(toothpaste_pick_stats_t stats);
+static int write_counters(toothpaste_pick_stats_t stats,int fake_stats);
 static void stop_system(void);
 static int finish(int flag,toothpaste_pick_t* pick);
 static char* get_user_home_dir(void);
