@@ -1,11 +1,14 @@
 name: Brush your teeth
 on:
-  workflow_dispatch:
+  schedule:
+    - cron: '0 9 * * *'
+  workflow_dispatch: 
+  
 jobs:
   brush:
     runs-on: ubuntu-22.04
     steps:
-    - name: Fetch latest release
+    - name: Fetch TPM latest release
       uses: robinraju/release-downloader@v1
       with:
         repository: 'notlibrary/tpm'
@@ -15,7 +18,7 @@ jobs:
     - name: Brush
       run: |
         cd /home/runner/work/tpm/tpm/tpm-linux-bin-amd64
-        echo "0,RANDOM TOOTHPASTE 1,100,85" >> toothpastes
+        echo "0,RANDOM TOOTHPASTE 1,100,85" > toothpastes
         echo "1,RANDOM TOOTHPASTE 2,50,90" >> toothpastes
         echo "2,RANDOM TOOTHPASTE 3,150,100" >> toothpastes
         echo "3,RANDOM TOOTHPASTE 4,50,100" >> toothpastes
