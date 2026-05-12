@@ -1,3 +1,6 @@
+![GitHub License](https://img.shields.io/github/license/notlibrary/tpm)
+![GitHub manifest version](https://img.shields.io/github/manifest-json/v/notlibrary/tpm)
+
 ## TPM Toothpaste Picking Manager
 Let me pick the toothpaste for you(or how to brush your teeth admins way)
 
