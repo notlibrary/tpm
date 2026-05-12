@@ -2,7 +2,7 @@ name: Brush your teeth
 on:
   schedule:
     - cron: '14 6 * * *'
-#  workflow_dispatch: 
+  workflow_dispatch: 
   
 jobs:
   brush:
