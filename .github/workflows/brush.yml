@@ -23,4 +23,4 @@ jobs:
         echo "2,RANDOM TOOTHPASTE 3,150,100" >> toothpastes
         echo "3,RANDOM TOOTHPASTE 4,50,100" >> toothpastes
         echo "4,Nothing,0,0" >> toothpastes
-        echo | ./tpm toothpastes
+        echo | ./tpm --fake_stats toothpastes

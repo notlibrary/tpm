@@ -197,6 +197,8 @@ Also sometimes is possible to add 5th term toothpaste grams per nurdle but this 
 
 `-r --reset` reset the total toothpaste picks counter
 
+`-F --fake_stats` use PRNG to get total toothpaste picks counter
+
 `-U --UPPER` convert brand string to UPPERCASE
 
 `-f --formula` set the dental formula `dental_formula`
@@ -247,6 +249,8 @@ It's options:
 
 `OUTPUT_CSV` 1 to output and append the CSV with toothpaste pick
 
+`FAKE_STATS` use PRNG to get total toothpaste picks counter
+
 `OUTPUT_FILE` 1 to output to the file `~tpm/last_pick`
 
 `PICK_INDEX` pick the toothpaste by this index if `PICK_TYPE=2`
@@ -282,6 +286,7 @@ LIST_TOOTHPASTES=FALSE
 OUTPUT_JSON=FALSE
 OUTPUT_CSV=FALSE
 OUTPUT_FILE=FALSE
+FAKE_STATS=FALSE
 PICK_INDEX=0
 RESET_COUNTER=FALSE
 SET_COUNTER=0
