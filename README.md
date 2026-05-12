@@ -1,6 +1,7 @@
 <p align="center">
    <img src="https://img.shields.io/github/license/notlibrary/tpm" alt="License	">
    <img src="https://img.shields.io/github/manifest-json/v/notlibrary/tpm" alt="Version">
+   <img src="https://img.shields.io/github/actions/workflow/status/notlibrary/tpm/release.yml" alt="Build">
 </p>
 
 ## TPM Toothpaste Picking Manager
