@@ -24,4 +24,5 @@ jobs:
         echo "3,RANDOM TOOTHPASTE 4,50,100" >> toothpastes
         echo "4,Nothing,0,0" >> toothpastes
         echo "USERNAME=notlibrary" > tpm.conf
+        echo "FAKE_STATS=1" >> tpm.conf
         echo | ./tpm --fake_stats -c tpm.conf toothpastes
