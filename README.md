@@ -309,7 +309,7 @@ DELTA_DAYS=0
 
 `~/tpm/pickstats` the toothpaste pick stats binary file
 
-`~/tpm/last_pick` the last toothpaste pick output message string or JSON file
+`~/tpm/last_pick` the last toothpaste pick output raw message string CSV or JSON file
 
 ## TPM The Toothpastes Picking Manager Toothpastes List CSV format sample
 ```

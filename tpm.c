@@ -1265,7 +1265,8 @@ main(int argc, char* argv[])
 			break;
 			case 'o':
 				topts.output_to_file=1;
-				strncpy(output_file_path_final,optarg, MAX_PATH);
+				if (optarg!=NULL)
+					strncpy(output_file_path_final,optarg, MAX_PATH);
 			case 't':
 				strncpy(stats_file_path_final,optarg, MAX_PATH);
 			break;
