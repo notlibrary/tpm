@@ -757,6 +757,7 @@ report_wasted_tubes(list_node_t* head,toothpaste_pick_stats_t* stats)
 	
 	memset(report_term,0,10);
 	rip_tubes=malloc(sizeof(unsigned int)*total_toothpastes);
+	memset(rip_tubes,0,sizeof(unsigned int)*total_toothpastes);
 	report=malloc(total_toothpastes*10);
 	memset(report,0,total_toothpastes*10);
 	list_node_t* current = head;
@@ -779,15 +780,15 @@ report_wasted_tubes(list_node_t* head,toothpaste_pick_stats_t* stats)
 		 if (current->data.type==PASTE_NOTHING) 
 		 {	
 			rip_tubes[i]=0;
-			total_nulls++;
 		 }
 		 else
 		 {
 			rip_tubes[i]=(real_stats.total_picks/(total_toothpastes-total_nulls))*GRAMS_PER_NURDLE/current->data.tube_mass_g;
 		 }       
-		i++;
+		
         total_wasted+=rip_tubes[i];
-		current = current->next;	
+		current = current->next;
+		i++;		
 	}
 	for (i=0;i<total_toothpastes;i++)
 	{
