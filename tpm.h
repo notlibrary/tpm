@@ -77,9 +77,9 @@ memcpy(&x,swap_temp,sizeof(x)); \
 } while(0)
 
 #ifdef _WIN32
-#define LINE_FORMAT_CSV "%u,%I64u,%s"
+#define LINE_FORMAT_CSV "%u,%I64u,%s,%s"
 #else
-#define LINE_FORMAT_CSV "%u,%lu,%s"
+#define LINE_FORMAT_CSV "%u,%lu,%s,%s"
 #endif
 
 #define TOTAL_TOOTHPASTE_TYPES 5
@@ -88,6 +88,7 @@ memcpy(&x,swap_temp,sizeof(x)); \
 #define TOTAL_USER_ARMOUR 10
 
 #define BRUSHES_PER_LIFETIME 30000
+#define GRAMS_PER_NURDLE 2
 
 typedef enum user_msg_t
 {
@@ -106,6 +107,7 @@ typedef enum user_msg_t
 	MSG_DENTAL,
 	MSG_DAY,
 	MSG_TOTAL_PICKS,
+	MSG_TUBES_WASTED,
 	MSG_SOURCE,
 	MSG_LAST_PICK_TIME,
 	MSG_GOOD,
@@ -217,6 +219,7 @@ typedef struct toothpaste_pick_t
 	char* message;
 	char* JSON;
 	char* CSV;
+	char* waste_report;
 	toothpaste_pick_options_t opts;
 }toothpaste_pick_t;
 

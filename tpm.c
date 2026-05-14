@@ -69,6 +69,7 @@ static const char* user_strings[TOTAL_USER_MESSAGES]={
 	"Dental Formula:",
 	"Day:",
 	"Total picks:",
+	"Tubes wasted:"
 	"Source:",
 	"Last pick time:",
 	"Good",
@@ -568,6 +569,7 @@ tpm_free_toothpaste_pick(toothpaste_pick_t* pick)
 	free(pick->message);
 	free(pick->JSON);
 	free(pick->CSV);
+	free(pick->waste_report);
 	free_list(pick->where);
 	return 0;
 }
@@ -741,6 +743,70 @@ rand_range(uint64_t min, uint64_t max)
     return (r % (max - min)) + min; 
 }
 
+char* 
+report_wasted_tubes(list_node_t* head,toothpaste_pick_stats_t* stats)
+{
+	char* report;
+	unsigned int* rip_tubes;
+	unsigned int total_toothpastes=count_list(head);
+	int i=0;
+	unsigned int total_wasted=0;
+	char report_term[10];
+	unsigned int total_nulls=0;
+	toothpaste_pick_stats_t real_stats;
+	
+	memset(report_term,0,10);
+	rip_tubes=malloc(sizeof(unsigned int)*total_toothpastes);
+	report=malloc(total_toothpastes*10);
+	memset(report,0,total_toothpastes*10);
+	list_node_t* current = head;
+	
+	
+	
+    while (current != NULL) 
+	{
+		if (current->data.type==PASTE_NOTHING) 
+		{	
+			total_nulls++;
+		}	
+		current = current->next;	
+	}
+	
+	real_stats.total_picks=stats->total_picks*(total_toothpastes-total_nulls)/total_toothpastes;
+	current = head;
+	while (current != NULL) 
+	{
+		 if (current->data.type==PASTE_NOTHING) 
+		 {	
+			rip_tubes[i]=0;
+			total_nulls++;
+		 }
+		 else
+		 {
+			rip_tubes[i]=(real_stats.total_picks/(total_toothpastes-total_nulls))*GRAMS_PER_NURDLE/current->data.tube_mass_g;
+		 }       
+		i++;
+        total_wasted+=rip_tubes[i];
+		current = current->next;	
+	}
+	for (i=0;i<total_toothpastes;i++)
+	{
+		if (i==total_toothpastes-1)
+		{
+			snprintf(report_term,20,"%u=%u",rip_tubes[i],total_wasted);
+			strncat(report,report_term,20);
+		}
+		else
+		{
+			snprintf(report_term,10,"%u+",rip_tubes[i]);
+			strncat(report,report_term,10);
+		}	
+	}
+	
+	free(rip_tubes);
+	return report;
+}
+
 TPM toothpaste_pick_t*
 tpm_pick_toothpaste(list_node_t* head,toothpaste_pick_options_t topts)
 {
@@ -783,6 +849,7 @@ tpm_pick_toothpaste(list_node_t* head,toothpaste_pick_options_t topts)
 			perror(error_strings[NO_TOOTHPASTES_LOADED]);
 	}
 	read_counters(&pick.stats,pick.opts.fake_stats);
+	pick.waste_report=report_wasted_tubes(toothpastes_list,&pick.stats);
 	pick.toothpaste_pick_index=pick.stats.total_picks;
 	pick.when=total_seconds;
 	i=(total_seconds)/(SECONDS_PER_DAY/TOTAL_TIMES_OF_DAY)%(TOTAL_TIMES_OF_DAY);
@@ -911,6 +978,10 @@ tpm_pick_toothpaste(list_node_t* head,toothpaste_pick_options_t topts)
 		snprintf(line,MAX_LINE_LENGTH,"%s %s", user_strings[MSG_LAST_PICK_TIME] ,ctime(&pick.stats.last_pick_time));
 		strncat(pick.message,line,MAX_LINE_LENGTH);
 		
+		memset(line,0,MAX_LINE_LENGTH);
+		snprintf(line,MAX_LINE_LENGTH,"%s %s \n", user_strings[MSG_TUBES_WASTED], pick.waste_report);
+		strncat(pick.message,line,MAX_LINE_LENGTH);
+		
 		snprintf(line,MAX_LINE_LENGTH,"%s %s \n", user_strings[MSG_SOURCE], toothpastes_file_path_final);
 		strncat(pick.message,line,MAX_LINE_LENGTH);
 	
@@ -943,7 +1014,7 @@ tpm_pick_toothpaste(list_node_t* head,toothpaste_pick_options_t topts)
 	snprintf(line,MAX_LINE_LENGTH,"%s,%u,", days_of_week[j],day);
 	strncat(pick.CSV,line,MAX_LINE_LENGTH);
 	
-	snprintf(line,MAX_LINE_LENGTH,LINE_FORMAT_CSV, pick.stats.total_picks,pick.stats.last_pick_time,toothpastes_file_path_final);
+	snprintf(line,MAX_LINE_LENGTH,LINE_FORMAT_CSV, pick.stats.total_picks,pick.stats.last_pick_time,pick.waste_report,toothpastes_file_path_final);
 	strncat(pick.CSV,line,MAX_LINE_LENGTH);
 	
 	if (topts.lat_flag) 
