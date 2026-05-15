@@ -825,7 +825,7 @@ tpm_pick_toothpaste(list_node_t* head,toothpaste_pick_options_t topts)
 	pick.opts = topts;
 	memset(line,0,MAX_LINE_LENGTH);
 	memset(username,0,UNLEN+1);
-	pick.message=malloc(2*OUTPUT_BLOCK_SIZE);
+	pick.message=malloc(OUTPUT_BLOCK_SIZE);
 	pick.JSON=malloc(OUTPUT_BLOCK_SIZE);
 	pick.CSV=malloc(OUTPUT_BLOCK_SIZE);
 	pick.waste_report=NULL;
