@@ -351,6 +351,7 @@ A few shell one-liners demonstrating tpm usage
 	tpm -C >> picks.csv
 	tpm -v | grep Compiler
 	man tpm
+    echo | ./tpm --fake_stats -c tpm.conf toothpastes
 	echo "Done" | tpm | nc -u -b 192.168.1.255 12345
 ```
 
