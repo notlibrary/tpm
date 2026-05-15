@@ -9,8 +9,8 @@ extern "C" {
 
 #define TPM_STRING "tpm"
 #define TPM_VERSION_MAJOR 0
-#define TPM_VERSION_MINOR 5
-#define TPM_VERSION_PATCH 12
+#define TPM_VERSION_MINOR 6
+#define TPM_VERSION_PATCH 0
 
 #undef _CRT_NONSTDC_NO_DEPRECATE 
 #define _CRT_NONSTDC_NO_DEPRECATE 
@@ -89,7 +89,7 @@ memcpy(&x,swap_temp,sizeof(x)); \
 
 #define BRUSHES_PER_LIFETIME 30000
 #define GRAMS_PER_NURDLE 2
-
+#define MAX_REPORT_TERM 10
 typedef enum user_msg_t
 {
 	MSG_PICK_COUNTER_C,

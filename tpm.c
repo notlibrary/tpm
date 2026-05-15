@@ -751,15 +751,15 @@ report_wasted_tubes(list_node_t* head,toothpaste_pick_stats_t* stats)
 	unsigned int total_toothpastes=count_list(head);
 	int i=0;
 	unsigned int total_wasted=0;
-	char report_term[20];
+	char report_term[MAX_REPORT_TERM];
 	unsigned int total_nulls=0;
 	toothpaste_pick_stats_t real_stats;
 	
-	memset(report_term,0,20);
+	memset(report_term,0,MAX_REPORT_TERM);
 	rip_tubes=malloc(sizeof(unsigned int)*total_toothpastes);
 	memset(rip_tubes,0,sizeof(unsigned int)*total_toothpastes);
-	report=malloc(total_toothpastes*10);
-	memset(report,0,total_toothpastes*10);
+	report=malloc(total_toothpastes*MAX_REPORT_TERM);
+	memset(report,0,total_toothpastes*MAX_REPORT_TERM);
 	list_node_t* current = head;
 	
 	
@@ -794,14 +794,13 @@ report_wasted_tubes(list_node_t* head,toothpaste_pick_stats_t* stats)
 	{
 		if (i==total_toothpastes-1)
 		{
-			snprintf(report_term,20,"%u=%u",rip_tubes[i],total_wasted);
-			strncat(report,report_term,20);
+			snprintf(report_term,MAX_REPORT_TERM,"%u=%u",rip_tubes[i],total_wasted);
 		}
 		else
 		{
-			snprintf(report_term,20,"%u+",rip_tubes[i]);
-			strncat(report,report_term,20);
+			snprintf(report_term,MAX_REPORT_TERM,"%u+",rip_tubes[i]);
 		}	
+		strncat(report,report_term,MAX_REPORT_TERM);
 	}
 	
 	free(rip_tubes);
