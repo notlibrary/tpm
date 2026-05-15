@@ -95,7 +95,7 @@ If everything failed another way is to setup the daily anacron task
 
 Finally the last nice alternative is free tooth brushing in GitHub actions runner container
 See `.github/workflows/brush.yml` for workflow details and 
-(https://github.com/notlibrary/tpm/actions/runs/25910447433/job/76153967460)[raw action runner logs]
+[raw action runner logs](https://github.com/notlibrary/tpm/actions/runs/25910447433/job/76153967460)
 
 ## Sample terminal output from verbose mode:
 ```
