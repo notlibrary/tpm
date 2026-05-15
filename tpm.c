@@ -751,11 +751,11 @@ report_wasted_tubes(list_node_t* head,toothpaste_pick_stats_t* stats)
 	unsigned int total_toothpastes=count_list(head);
 	int i=0;
 	unsigned int total_wasted=0;
-	char report_term[10];
+	char report_term[20];
 	unsigned int total_nulls=0;
 	toothpaste_pick_stats_t real_stats;
 	
-	memset(report_term,0,10);
+	memset(report_term,0,20);
 	rip_tubes=malloc(sizeof(unsigned int)*total_toothpastes);
 	memset(rip_tubes,0,sizeof(unsigned int)*total_toothpastes);
 	report=malloc(total_toothpastes*10);
@@ -799,8 +799,8 @@ report_wasted_tubes(list_node_t* head,toothpaste_pick_stats_t* stats)
 		}
 		else
 		{
-			snprintf(report_term,10,"%u+",rip_tubes[i]);
-			strncat(report,report_term,10);
+			snprintf(report_term,20,"%u+",rip_tubes[i]);
+			strncat(report,report_term,20);
 		}	
 	}
 	
