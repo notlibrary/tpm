@@ -69,7 +69,7 @@ static const char* user_strings[TOTAL_USER_MESSAGES]={
 	"Dental Formula:",
 	"Day:",
 	"Total picks:",
-	"Tubes wasted:"
+	"Tubes wasted:",
 	"Source:",
 	"Last pick time:",
 	"Good",
@@ -743,7 +743,7 @@ rand_range(uint64_t min, uint64_t max)
     return (r % (max - min)) + min; 
 }
 
-char* 
+static char* 
 report_wasted_tubes(list_node_t* head,toothpaste_pick_stats_t* stats)
 {
 	char* report;
@@ -825,9 +825,10 @@ tpm_pick_toothpaste(list_node_t* head,toothpaste_pick_options_t topts)
 	pick.opts = topts;
 	memset(line,0,MAX_LINE_LENGTH);
 	memset(username,0,UNLEN+1);
-	pick.message=malloc(OUTPUT_BLOCK_SIZE);
+	pick.message=malloc(2*OUTPUT_BLOCK_SIZE);
 	pick.JSON=malloc(OUTPUT_BLOCK_SIZE);
 	pick.CSV=malloc(OUTPUT_BLOCK_SIZE);
+	pick.waste_report=NULL;
 	
 	memset(pick.JSON,0,OUTPUT_BLOCK_SIZE);	
 	memset(pick.message,0,OUTPUT_BLOCK_SIZE);
@@ -981,11 +982,11 @@ tpm_pick_toothpaste(list_node_t* head,toothpaste_pick_options_t topts)
 		
 		memset(line,0,MAX_LINE_LENGTH);
 		snprintf(line,MAX_LINE_LENGTH,"%s %s \n", user_strings[MSG_TUBES_WASTED], pick.waste_report);
-		strncat(pick.message,line,MAX_LINE_LENGTH);
-		
+		strncat(pick.message,line,MAX_LINE_LENGTH);	
+	
 		snprintf(line,MAX_LINE_LENGTH,"%s %s \n", user_strings[MSG_SOURCE], toothpastes_file_path_final);
 		strncat(pick.message,line,MAX_LINE_LENGTH);
-	
+		
 	}
 	else 
 	{

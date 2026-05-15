@@ -259,7 +259,7 @@ static dental_formula_t parse_dental_formula(const char* formula_str);
 static void save_default_config(struct cfg_struct* cfg);
 static int file_exists_fopen(const char *filename);
 static uint64_t rand_range(uint64_t min, uint64_t max);
-
+static char* report_wasted_tubes(list_node_t* head,toothpaste_pick_stats_t* stats);
 #ifdef __cplusplus
 }
 #endif /*__cpluplus*/

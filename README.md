@@ -108,6 +108,7 @@ Dental Formula: 1-10-2-2
 Day: Sunday 20583
 Total picks: 75
 Last pick time: Sun May 10 09:00:02 2026
+Tubes wasted: 0+0+0=0
 Source: C:\Users\Serenity\tpm\toothpastes
 
 Press any key to continue . . .
@@ -157,8 +158,8 @@ still better than being stereotypical rotten teeth open source bum
 There is also third output mode `CSV` for those who want to save pick info
 When active it auto appends current pick info to giant CSV with all picks collection `picks.CSV`
 This is purely optional
-The CSV record format for CSV mode follows default mode total 17 attributes:
-`#username, pick_type, new_pick_flag,new_toothbrush_flag,new_dentist_visit, toothpaste_brand, tube_mass_g, toothpaste_rating, toothpaste_index, total_toothpastes, toothpaste_type, dental_formula, day_of_the_week, day_counter,total_picks,last_pick_time,toothpastes_file_path `
+The CSV record format for CSV mode follows default mode total 18 attributes:
+`#username, pick_type, new_pick_flag,new_toothbrush_flag,new_dentist_visit, toothpaste_brand, tube_mass_g, toothpaste_rating, toothpaste_index, total_toothpastes, toothpaste_type, dental_formula, day_of_the_week, day_counter,total_picks,last_pick_time,wasted_tubes_report,toothpastes_file_path `
 
 ## Inner toothpaste types 
 There are 5 supported toothpaste types
