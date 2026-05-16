@@ -6,7 +6,7 @@ on:
   
 jobs:
   brush:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     steps:
     - name: Fetch TPM latest release
       uses: robinraju/release-downloader@v1

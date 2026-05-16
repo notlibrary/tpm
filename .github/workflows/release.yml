@@ -10,16 +10,22 @@ env:
 
 jobs:
   build:
-    runs-on: windows-latest
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest]
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+      
       - name: Setup VS PS
+        if: runner.os == 'Windows'
         uses: ilammy/msvc-dev-cmd@v1 
         with:
             arch: x64
-      - name: Build
+      - name: Build on Windows
+        if: runner.os == 'Windows'
         id: build        
         shell: powershell
         run: |
@@ -37,6 +43,13 @@ jobs:
           Remove-Item -LiteralPath "tpm.lib" -Force -Recurse -Confirm:$false
           Remove-Item -LiteralPath "tpm.res" -Force -Recurse -Confirm:$false
           
+      - name: Build on Linux
+        if: runner.os != 'Windows'
+        id: build
+        shell: bash
+        run: |
+            make tpm docs distr clean
+        
       - name: Create Release
         id: create_release
         uses: softprops/action-gh-release@v1
@@ -49,3 +62,4 @@ jobs:
           token: ${{ secrets.PAT3 }}
           files: |
             tpm-win-bin-amd64.zip
+            tpm-linux-bin-amd64.tar.gz
