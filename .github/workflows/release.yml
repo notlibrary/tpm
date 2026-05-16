@@ -6,9 +6,22 @@ on:
       - "*"
 
 env:
-  APP_NAME: tpm-win-bin-amd64
-
+  APP_NAME: tpm-win-bin-amd64  
 jobs:
+  create-release:
+    runs-on: ubuntu-latest
+    outputs:
+      release_id: ${{ steps.create.outputs.id }}
+    steps:
+      - uses: softprops/action-gh-release@v2
+        id: create
+        with:
+          tag_name: ${{ github.ref }}
+          name: TPM 
+          draft: false
+          prerelease: false
+          body: Toothpaste picking manager
+          token: ${{ secrets.PAT3 }}
   build:
     runs-on: ${{ matrix.os }}
     strategy:
@@ -42,23 +55,20 @@ jobs:
           Remove-Item -LiteralPath "tpm.exp" -Force -Recurse -Confirm:$false
           Remove-Item -LiteralPath "tpm.lib" -Force -Recurse -Confirm:$false
           Remove-Item -LiteralPath "tpm.res" -Force -Recurse -Confirm:$false
+      - name: Upload to Release Win
+        if: runner.os == 'Windows'       
+        uses: softprops/action-gh-release@v2
+        with:
+          files: tpm-win-bin-amd64.zip 
           
       - name: Build on Linux
         if: runner.os != 'Windows'
         shell: bash
         run: |
             make tpm docs distr clean
-        
-      - name: Create Release
-        id: create_release
-        uses: softprops/action-gh-release@v1
+
+      - name: Upload to Release Linux
+        if: runner.os != 'Windows'       
+        uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ github.ref }}
-          name: TPM 
-          draft: false
-          prerelease: false
-          body: Toothpaste picking manager
-          token: ${{ secrets.PAT3 }}
-          files: |
-            tpm-win-bin-amd64.zip
-            tpm-linux-bin-amd64.tar.gz
+          files: tpm-linux-bin-amd64.tar.gz         
