@@ -59,6 +59,7 @@ jobs:
         if: runner.os == 'Windows'       
         uses: softprops/action-gh-release@v2
         with:
+          token: ${{ secrets.PAT3 }}
           files: tpm-win-bin-amd64.zip 
           
       - name: Build on Linux
@@ -71,4 +72,5 @@ jobs:
         if: runner.os != 'Windows'       
         uses: softprops/action-gh-release@v2
         with:
-          files: tpm-linux-bin-amd64.tar.gz         
+          token: ${{ secrets.PAT3 }}
+          files: tpm-linux-bin-amd64.tar.gz 
