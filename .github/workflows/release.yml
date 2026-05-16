@@ -45,7 +45,6 @@ jobs:
           
       - name: Build on Linux
         if: runner.os != 'Windows'
-        id: build
         shell: bash
         run: |
             make tpm docs distr clean
