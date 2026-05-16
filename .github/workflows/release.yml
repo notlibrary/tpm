@@ -16,7 +16,7 @@ jobs:
       - uses: softprops/action-gh-release@v2
         id: create
         with:
-          tag_name: ${{ github.ref }}
+          tag_name: ${{ github.ref_name }}
           name: TPM 
           draft: false
           prerelease: false
@@ -49,6 +49,7 @@ jobs:
           cp tpm.conf.sample ${{ env.APP_NAME }}
           cp README.md ${{ env.APP_NAME }}
           Compress-Archive -Path tpm-win-bin-amd64 -DestinationPath tpm-win-bin-amd64.zip
+          Move-Item -Path tpm-win-bin-amd64.zip -Destination tpm-win-bin-amd64-${{ github.ref_name }}.zip
           Remove-Item -LiteralPath "tpm-win-bin-amd64" -Force -Recurse -Confirm:$false
           Remove-Item -LiteralPath "tpm.exe" -Force -Recurse -Confirm:$false
           Remove-Item -LiteralPath "*.obj" -Force -Recurse -Confirm:$false
@@ -60,17 +61,18 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           token: ${{ secrets.PAT3 }}
-          files: tpm-win-bin-amd64.zip 
+          files: tpm-win-bin-amd64-${{ github.ref_name }}.zip 
           
       - name: Build on Linux
         if: runner.os != 'Windows'
         shell: bash
         run: |
             make tpm docs distr clean
-
+            mv tpm-linux-bin-amd64.tar.gz tpm-linux-bin-amd64-${{ github.ref_name }}.tar.gz
+            
       - name: Upload to Release Linux
         if: runner.os != 'Windows'       
         uses: softprops/action-gh-release@v2
         with:
           token: ${{ secrets.PAT3 }}
-          files: tpm-linux-bin-amd64.tar.gz 
+          files: tpm-linux-bin-amd64-${{ github.ref_name }}.tar.gz 
