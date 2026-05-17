@@ -67,7 +67,7 @@ jobs:
         if: runner.os != 'Windows'
         shell: bash
         run: |
-            make tpm docs distr clean
+            make -f tpm-ubuntu.mk tpm docs distr clean
             mv tpm-linux-bin-amd64.tar.gz tpm-linux-bin-amd64-${{ github.ref_name }}.tar.gz
             
       - name: Upload to Release Linux
@@ -76,3 +76,20 @@ jobs:
         with:
           token: ${{ secrets.PAT3 }}
           files: tpm-linux-bin-amd64-${{ github.ref_name }}.tar.gz 
+
+      - name: Reconfigure build env
+        if: runner.os != 'Windows'
+        shell: bash
+        run: |
+            autoreconf -ivf
+            tar -czf tpm-unix-tarball-amd64.tar.gz /home/runner/work/tpm/tpm
+            mv tpm-unix-tarball-amd64.tar.gz tpm-unix-tarball-amd64-${{ github.ref_name }}.tar.gz
+      
+      - name: Upload Unix tarball to Release
+        if: runner.os != 'Windows'
+        uses: softprops/action-gh-release@v2
+        with:
+          token: ${{ secrets.PAT3 }}
+          files: tpm-unix-tarball-amd64-${{ github.ref_name }}.tar.gz 
+
+     

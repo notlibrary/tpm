@@ -1,12 +1,16 @@
+#Used to manually build on ubuntu 
+#Alternative to other unixes is autotools tarball build
+
 CC=gcc
 CP=cp -f
 MKDIR=mkdir -p
 RM=rm
 CFLAGS=-Wall -Os
 CURRENT_DIR=$(CURDIR)
-SOURCES=    tpm.c \
-			prng64_xrp32.c \
-			cfg_parse.c
+SRC=src
+SOURCES=    $(SRC)/tpm.c \
+			$(SRC)/prng64_xrp32.c \
+			$(SRC)/cfg_parse.c
 			
 OBJECTS=    tpm.o \
 			prng64_xrp32.o \

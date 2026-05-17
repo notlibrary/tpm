@@ -14,11 +14,18 @@ Let me pick the toothpaste for you(or how to brush your teeth admins way)
 `git clone https://github.com/notlibrary/tpm.git`
 
 Linux(Ubuntu):
-`make`
+`make -f tpm-ubuntu.mk`
 
 Windows:
 `nmake.exe /f .\Makefile.msc`
 
+Unix autotools tarball: 
+
+```
+./configure
+make 
+make install
+```
 1. Define the available(what is in the bathroom) toothpastes in the CSV format file with path `~/tpm/toothpastes`
 see `~/tpm/toothpastes.sample` below for format details
 2. Put TPM in the daily crontab or task scheduler task to run it daily(or twice a day)
@@ -26,7 +33,7 @@ see `~/tpm/toothpastes.sample` below for format details
 Windows:
 `schtasks /create /tn "TPM" /tr "C:\Program Files\tpm\tpm.exe" /sc daily /st 09:00`
 
-Linux(Ubuntu):
+Linux(Ubuntu and other distros):
 There are 3 ways to bring cron task to the foreground
 depending of what are you expecting as foreground
 
