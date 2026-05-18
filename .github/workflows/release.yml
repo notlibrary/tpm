@@ -89,13 +89,9 @@ jobs:
         shell: bash
         run: |
             autoreconf -ivf
-      - name: Create tarball 
-        if: runner.os != 'Windows'
-        shell: bash
-        run: | 
-            cd ${{ github.workspace }}
-            tar --exclude='.*' -czvf tpm-unix-tarball-amd64.tar.gz -C ${{ github.workspace }} .
-            mv tpm-unix-tarball-amd64.tar.gz tpm-unix-tarball-amd64-${{ github.ref_name }}.tar.gz
+            ./configure
+            make dist
+            mv tpm-${{ github.ref_name }}.tar.gz tpm-unix-tarball-amd64-${{ github.ref_name }}.tar.gz  
       
       - name: Upload Unix tarball to Release
         if: runner.os != 'Windows'
