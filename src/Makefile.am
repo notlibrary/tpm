@@ -1,6 +1,10 @@
-AM_CFLAGS = -Os -Wall 
+AM_CFLAGS = -Os -Wall
 bin_PROGRAMS = tpm
-tpm_SOURCES = \
-        tpm.c \
-		prng64_xrp32.c \
-		cfg_parse.c
+tpm_SOURCES = tpm.c cfg_parse.c prng64_xrp32.c
+tpm_LINK = $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
+OBJECTS=    tpm.o prng64_xrp32.o cfg_parse.o
+			
+tpm: $(OBJECTS)
+	$(CC) $(AM_CFLAGS) $(OBJECTS) -o tpm
+$(OBJECTS): $(rpm_SOURCES)
+	$(CC) $(AM_CFLAGS) -c $(tpm_SOURCES)

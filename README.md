@@ -21,6 +21,8 @@ Windows:
 
 Unix autotools tarball: 
 
+Fetch the `tpm-unix-tarball-amd64-x.y.z.tar.gz` tarball from GitHub release page unpack then
+
 ```
 ./configure
 make 

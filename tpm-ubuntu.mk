@@ -1,4 +1,5 @@
-#Used to manually build on ubuntu 
+#TPM Linux makefile
+#Used to manually build on Ubuntu 
 #Alternative to other unixes is autotools tarball build
 
 CC=gcc
