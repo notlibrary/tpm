@@ -75,9 +75,16 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           token: ${{ secrets.PAT3 }}
-          files: tpm-linux-bin-amd64-${{ github.ref_name }}.tar.gz 
-
-      - name: Reconfigure build env
+          files: tpm-linux-bin-amd64-${{ github.ref_name }}.tar.gz       
+      
+      - name: Install autotools
+        if: runner.os != 'Windows'
+        shell: bash
+        run: |
+            sudo apt-get update
+            sudo apt-get install -y autoconf automake libtool  
+            
+      - name: Reconfigure build env 
         if: runner.os != 'Windows'
         shell: bash
         run: |
