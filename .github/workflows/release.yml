@@ -89,7 +89,7 @@ jobs:
         shell: bash
         run: |
             autoreconf -ivf
-            tar -czf tpm-unix-tarball-amd64.tar.gz /home/runner/work/tpm/tpm
+            tar --exclude='.*' -czvf tpm-unix-tarball-amd64.tar.gz -C /home/runner/work/tpm/tpm .
             mv tpm-unix-tarball-amd64.tar.gz tpm-unix-tarball-amd64-${{ github.ref_name }}.tar.gz
       
       - name: Upload Unix tarball to Release
