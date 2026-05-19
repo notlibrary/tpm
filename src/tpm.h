@@ -79,9 +79,8 @@ memcpy(swap_temp,&y,sizeof(x)); \
 memcpy(&y,&x,       sizeof(x)); \
 memcpy(&x,swap_temp,sizeof(x)); \
 } while(0)
-
-#ifdef _WIN32
-#define LINE_FORMAT_CSV "%u,%I64u,%s,%s"
+#if defined(_WIN32) || defined(__clang__) || defined(__EMSCRIPTEN__)
+#define LINE_FORMAT_CSV "%u,%llu,%s,%s"
 #else
 #define LINE_FORMAT_CSV "%u,%lu,%s,%s"
 #endif

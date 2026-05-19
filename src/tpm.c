@@ -240,7 +240,7 @@ tpm_load_list_from_file(const char* filename)
 		{
             continue; 
         }
-		if (sscanf(current, "%u, %4096[^,],%u,%u\n", &temp_data.index,long_line ,&temp_data.tube_mass_g,&temp_data.rating) == 4) 
+		if (sscanf(current, "%u, %4095[^,],%u,%u\n", &temp_data.index,long_line ,&temp_data.tube_mass_g,&temp_data.rating) == 4) 
 		{
 			strncpy(temp_data.toothpaste_brand,long_line,MAX_TOOTHPASTE_LINE);
 			ltrim(rtrim(temp_data.toothpaste_brand));
