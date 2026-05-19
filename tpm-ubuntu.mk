@@ -33,7 +33,7 @@ clean:
 	rm $(CURRENT_DIR)/tpm $(OBJECTS)
 	rm -rf tpm-linux-bin-amd64
 	rm tpm.1.gz
-distr:
+dist:
 	mkdir -p tpm-linux-bin-amd64
 	cp tpm.conf.sample toothpastes.sample tpm README.md tpm.1.gz tpm-linux-bin-amd64
 	tar -czf tpm-linux-bin-amd64.tar.gz tpm-linux-bin-amd64
