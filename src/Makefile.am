@@ -8,5 +8,5 @@ EXTRA_DIST = tpm.h prng64_xrp32.h cfg_parse.h
 
 tpm: $(OBJECTS)
 	$(CC) $(AM_CFLAGS) $(OBJECTS) -o tpm
-$(OBJECTS): $(rpm_SOURCES)
+$(OBJECTS): $(tpm_SOURCES)
 	$(CC) $(AM_CFLAGS) -c $(tpm_SOURCES)
