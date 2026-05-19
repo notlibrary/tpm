@@ -75,7 +75,25 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           token: ${{ secrets.PAT3 }}
-          files: tpm-linux-bin-amd64-${{ github.ref_name }}.tar.gz       
+          files: tpm-linux-bin-amd64-${{ github.ref_name }}.tar.gz   
+          
+      - name: Setup emcc
+        uses: emscripten-core/setup-emsdk@v15
+      
+      - name: Build on WASM
+        if: runner.os != 'Windows'
+        shell: bash
+        run: |
+            make -f tpm-wasm.mk tpm.wasm dist clean
+            mv tpm-wasm-bin-amd64.tar.gz tpm-wasm-bin-amd64-${{ github.ref_name }}.tar.gz
+            
+      - name: Upload to Release WASM
+        if: runner.os != 'Windows'       
+        uses: softprops/action-gh-release@v2
+        with:
+          token: ${{ secrets.PAT3 }}
+          files: tpm-wasm-bin-amd64-${{ github.ref_name }}.tar.gz  
+          
       
       - name: Install autotools
         if: runner.os != 'Windows'
