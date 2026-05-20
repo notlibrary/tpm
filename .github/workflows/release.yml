@@ -52,8 +52,7 @@ jobs:
         shell: powershell
         run: |
           nmake.exe /f .\Makefile.msc tpm.exe
-          candle.exe tpm.wxs
-          light.exe tpm.wixobj -o tpm-win-bin-amd64-${{ github.ref_name }}.msi
+          wix build -acceptEula wix7 tpm.wxs -out tpm-win-bin-amd64-${{ github.ref_name }}.msi
           Remove-Item -LiteralPath "tpm.exe" -Force -Recurse -Confirm:$false
           Remove-Item -LiteralPath "*.obj" -Force -Recurse -Confirm:$false
           Remove-Item -LiteralPath "tpm.exp" -Force -Recurse -Confirm:$false
