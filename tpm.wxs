@@ -1,37 +1,38 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
-  <Package Id="tpm" Name="Toothpaste Picking Manager" Scope="perMachine" Compressed="yes" InstallerVersion="200" Manufacturer="Serenity Software" Version="0.6.2" UpgradeCode="69AF8A56-9550-427C-AE60-AE13108B9105">
-    <MediaTemplate EmbedCab="yes" />
-    <Feature Id="MainFeature" Title="Main Application" Level="1">
-      <!-- Reference the group containing your multiple files -->
-      <ComponentGroupRef Id="AppFiles" />
-    </Feature>
+<Package Id="tpm" Name="Toothpaste Picking Manager" Scope="perMachine" Compressed="yes" InstallerVersion="200" Manufacturer="Serenity Software" Version="0.6.2" UpgradeCode="69AF8A56-9550-427C-AE60-AE13108B9105">
+<MediaTemplate EmbedCab="yes" />
+<MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." />
+<Feature Id="MainFeature" Title="Main Application" Level="1">
+  <!-- Reference the group containing your multiple files -->
+  <ComponentGroupRef Id="AppFiles" />
+</Feature>
 
-    <StandardDirectory Id="ProgramFilesFolder">
-      <Directory Id="INSTALLFOLDER" Name="tpm" />
-    </StandardDirectory>
+<StandardDirectory Id="ProgramFilesFolder">
+  <Directory Id="INSTALLFOLDER" Name="tpm" />
+</StandardDirectory>
 
    
-      <ComponentGroup Id="AppFiles" Directory="INSTALLFOLDER">
-        <!-- File 1: Main Executable -->
-        <Component Id="MainExecutable" Guid="*">
-          <File Id="AppEXE" Source="tpm.exe" KeyPath="yes" />
-        </Component>
-        
-        <!-- File 2: Configuration File -->
-        <Component Id="AppConfig" Guid="*">
-          <File Id="AppCONFIG" Source="tpm.conf.sample" />
-        </Component>
-        
-        <!-- File 3: Help Documentation -->
-        <Component Id="HelpDoc" Guid="*">
-          <File Id="ReadMe" Source="README.md" />
-        </Component>
-        
-		<Component Id="Toothpastes" Guid="*">
-          <File Id="Toothpastes" Source="toothpastes.sample" />
-        </Component>
-      </ComponentGroup>
+<ComponentGroup Id="AppFiles" Directory="INSTALLFOLDER">
+<!-- File 1: Main Executable -->
+<Component Id="MainExecutable" >
+  <File Id="AppEXE" Source="tpm.exe" KeyPath="yes" />
+</Component>
+
+<!-- File 2: Configuration File -->
+<Component Id="AppConfig">
+  <File Id="AppCONFIG" Source="tpm.conf.sample" />
+</Component>
+
+<!-- File 3: Help Documentation -->
+<Component Id="HelpDoc">
+  <File Id="ReadMe" Source="README.md" />
+</Component>
+
+<Component Id="Toothpastes">
+  <File Id="Toothpastes" Source="toothpastes.sample" />
+</Component>
+</ComponentGroup>
     
 
   </Package>
