@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
-  <Package Name="TPM" Compressed="yes" Manufacturer="Serenity Software" Version="0.6.2" UpgradeCode="69AF8A56-9550-427C-AE60-AE13108B9105">
+  <Package Id="tpm" Name="Toothpaste Picking Manager" Scope="perMachine" Compressed="yes" InstallerVersion="200" Manufacturer="Serenity Software" Version="0.6.2" UpgradeCode="69AF8A56-9550-427C-AE60-AE13108B9105">
     <MediaTemplate EmbedCab="yes" />
     <Feature Id="MainFeature" Title="Main Application" Level="1">
       <!-- Reference the group containing your multiple files -->
