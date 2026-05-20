@@ -37,20 +37,23 @@ jobs:
         uses: ilammy/msvc-dev-cmd@v1 
         with:
             arch: x64
+      - name: Setup .NET
+        if: runner.os == 'Windows'
+        uses: actions/setup-dotnet@v4
+        with:
+            dotnet-version: '8.0.x'
+      - name: Install WiX
+        if: runner.os == 'Windows'
+        run: dotnet tool install --global wix  
+        
       - name: Build on Windows
         if: runner.os == 'Windows'
         id: build        
         shell: powershell
         run: |
           nmake.exe /f .\Makefile.msc tpm.exe
-          mkdir ${{ env.APP_NAME }}
-          cp tpm.exe ${{ env.APP_NAME }}
-          cp toothpastes.sample ${{ env.APP_NAME }}
-          cp tpm.conf.sample ${{ env.APP_NAME }}
-          cp README.md ${{ env.APP_NAME }}
-          Compress-Archive -Path tpm-win-bin-amd64 -DestinationPath tpm-win-bin-amd64.zip
-          Move-Item -Path tpm-win-bin-amd64.zip -Destination tpm-win-bin-amd64-${{ github.ref_name }}.zip
-          Remove-Item -LiteralPath "tpm-win-bin-amd64" -Force -Recurse -Confirm:$false
+          candle.exe tpm.wxs
+          light.exe tpm.wixobj -o tpm-win-bin-amd64-${{ github.ref_name }}.msi
           Remove-Item -LiteralPath "tpm.exe" -Force -Recurse -Confirm:$false
           Remove-Item -LiteralPath "*.obj" -Force -Recurse -Confirm:$false
           Remove-Item -LiteralPath "tpm.exp" -Force -Recurse -Confirm:$false
@@ -61,7 +64,7 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           token: ${{ secrets.PAT3 }}
-          files: tpm-win-bin-amd64-${{ github.ref_name }}.zip 
+          files: tpm-win-bin-amd64-${{ github.ref_name }}.msi
           
       - name: Build on Linux
         if: runner.os != 'Windows'

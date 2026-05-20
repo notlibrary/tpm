@@ -1,0 +1,31 @@
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+  <Package Id="TPM.App" Name="Toothpaste picking manager" Manufacturer="Serenity Software" Version="0.6.2" UpgradeCode="69AF8A56-9550-427C-AE60-AE13108B9105">
+    
+    <!-- Define the installation directory structure -->
+    <StandardDirectory Id="ProgramFiles64Folder">
+      <Directory Id="INSTALLFOLDER" Name="tpm" />
+    </StandardDirectory>
+
+    <!-- Define the files to be installed -->
+    <ComponentGroup Id="MainComponents" Directory="INSTALLFOLDER">
+      <Component>
+        <File Source="tpm.exe" />
+      </Component>
+      <Component>
+        <File Source="README.md" />
+      </Component>
+	        <Component>
+        <File Source="toothpastes.sample" />
+      </Component>
+	        <Component>
+        <File Source="tpm.conf.sample" />
+      </Component>
+    </ComponentGroup>
+
+    <!-- Link everything to a Feature -->
+    <Feature Id="Main" Title="Main Application" Level="1">
+      <ComponentGroupRef Id="MainComponents" />
+    </Feature>
+
+  </Package>
+</Wix>
