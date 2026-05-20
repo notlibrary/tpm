@@ -28,6 +28,10 @@ Fetch the `tpm-unix-tarball-amd64-x.y.z.tar.gz` tarball from GitHub release page
 make 
 make install
 ```
+
+WASM:
+Unpack `tpm.wasm` from `tpm-wasm-bin-amd64-x.y.z.tar.gz` and run it with preferred runtime
+
 1. Define the available(what is in the bathroom) toothpastes in the CSV format file with path `~/tpm/toothpastes`
 see `~/tpm/toothpastes.sample` below for format details
 2. Put TPM in the daily crontab or task scheduler task to run it daily(or twice a day)
@@ -105,6 +109,9 @@ If everything failed another way is to setup the daily anacron task
 Finally the last nice alternative is free tooth brushing in GitHub actions runner container
 See `.github/workflows/brush.yml` for workflow details and 
 [raw action runner logs](https://github.com/notlibrary/tpm/actions/runs/25910447433/job/76153967460)
+
+Moreover autotools WASM and code Babylonian nature provided us a giant leap of portability forward theoretically we can push
+even further by running it on WRT router or motherboard UEFI IPMI more than enough this may interest Chinese users
 
 ## Sample terminal output from verbose mode:
 ```
