@@ -12,35 +12,35 @@
     <MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." />
     
     <Feature Id="MainFeature" Title="Main Application" Level="1">
-      <ComponentGroupRef Id="AppFiles" />
+    <ComponentGroupRef Id="AppFiles" />
     </Feature>
-
-	<StandardDirectory Id="ProgramFiles64Folder">
-	  <Directory Id="INSTALLFOLDER" Name="tpm" />
-	</StandardDirectory>	
-
+	
+    <StandardDirectory Id="ProgramFiles64Folder">
+    <Directory Id="INSTALLFOLDER" Name="tpm" />
+    </StandardDirectory>	
+	
     <ComponentGroup Id="AppFiles" Directory="INSTALLFOLDER">
 	
       <Component Id="MainExecutable" Guid="1C2B3E4F-5A6B-7C8D-9E0F-1A2B3C4D5E6F">
-        <File Id="AppEXE" Source="tpm.exe" KeyPath="yes" />
+      <File Id="AppEXE" Source="tpm.exe" KeyPath="yes" />
       </Component>
 
       <Component Id="AppConfig" Guid="2A3B4C5D-6E7F-8A9B-0C1D-2E3F4A5B6C7D">
-        <File Id="AppCONFIG" Source="tpm.conf.sample" />
+      <File Id="AppCONFIG" Source="tpm.conf.sample" KeyPath="yes" />
       </Component>
 
-      <Component Id="HelpDoc" Guid="3B4C5D6E-7F8A-9B0C-1D2E-3F4A5B6C7D8E">
-        <File Id="ReadMe" Source="README.md" />
+      <Component Id="HelpDoc" Guid="3B4C5D6E-7F8A-9B0C-1D2E-3F4A5B6C7D8E" >
+      <File Id="ReadMe" Source="README.md" KeyPath="yes" />
       </Component>
 
       <Component Id="Toothpastes" Guid="4C5D6E7F-8A9B-0C1D-2E3F-4A5B6C7D8E9F">
-        <File Id="Toothpastes" Source="toothpastes.sample" />
+      <File Id="ToothpastesFile" Source="toothpastes.sample" KeyPath="yes" />
       </Component>
 	 
-	    <Component Id="AppLicense" Guid="8431BC14-5A35-44C1-AAC3-AA9D3EF96283">
-        <File Id="License" Source="LICENSE" />
+      <Component Id="AppLicense" Guid="8431BC14-5A35-44C1-AAC3-AA9D3EF96283">
+      <File Id="License" Source="LICENSE" KeyPath="yes" />
       </Component>
 	  
-    </ComponentGroup>    
+    </ComponentGroup> 
   </Package>
 </Wix>
