@@ -27,5 +27,5 @@ clean:
 	rm -rf tpm-wasm-bin-amd64
 dist:
 	mkdir -p tpm-wasm-bin-amd64
-	cp tpm.conf.sample toothpastes.sample tpm.wasm README.md tpm-wasm-bin-amd64
+	cp tpm.conf.sample toothpastes.sample tpm.wasm README.md LICENSE tpm-wasm-bin-amd64
 	tar -czf tpm-wasm-bin-amd64.tar.gz tpm-wasm-bin-amd64
