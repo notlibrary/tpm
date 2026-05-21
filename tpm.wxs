@@ -26,16 +26,21 @@
       </Component>
 
       <Component Id="AppConfig" Guid="2A3B4C5D-6E7F-8A9B-0C1D-2E3F4A5B6C7D">
-        <File Id="AppCONFIG" Source="tpm.conf.sample" KeyPath="yes" />
+        <File Id="AppCONFIG" Source="tpm.conf.sample" />
       </Component>
 
       <Component Id="HelpDoc" Guid="3B4C5D6E-7F8A-9B0C-1D2E-3F4A5B6C7D8E">
-        <File Id="ReadMe" Source="README.md" KeyPath="yes" />
+        <File Id="ReadMe" Source="README.md" />
       </Component>
 
       <Component Id="Toothpastes" Guid="4C5D6E7F-8A9B-0C1D-2E3F-4A5B6C7D8E9F">
-        <File Id="Toothpastes" Source="toothpastes.sample" KeyPath="yes" />
+        <File Id="Toothpastes" Source="toothpastes.sample" />
       </Component>
+	 
+	    <Component Id="AppLicense" Guid="8431BC14-5A35-44C1-AAC3-AA9D3EF96283">
+        <File Id="License" Source="LICENSE" />
+      </Component>
+	  
     </ComponentGroup>    
   </Package>
 </Wix>
