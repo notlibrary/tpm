@@ -368,6 +368,7 @@ A few shell one-liners demonstrating tpm usage
 	tpm -v | grep Compiler
 	man tpm
     echo | ./tpm --fake_stats -c tpm.conf toothpastes
+	wasmtime --dir=. tpm.wasm
 	echo "Done" | tpm | nc -u -b 192.168.1.255 12345
 ```
 
