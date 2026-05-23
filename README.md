@@ -483,4 +483,7 @@ There are 3 different versions of origin of this code pick and like one that fit
 This is only the main identity vector sure it needs some diversification through identity zoo
 this all is up to you while my business here is almost done
 
+Another nice take is constant flame debating whether whole this thing is a joke or a serious business
+We don't have an exact answer perhaps you should observe and experience it yourself to form an opinion
+
 P.S. Do not forget to brush your hard disk with `dd` and `rm -rf /` toothpastes twice a day
