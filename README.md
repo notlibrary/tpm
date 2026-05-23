@@ -473,4 +473,11 @@ TPM is a **fully functional, lightweight, and portable utility** wrapped in a la
 
 For the exact build steps, all available command-line flags, and the complete configuration options, checking the project's `README.md` and source files on its GitHub page is the best approach.
 
+## Origin analysis
+There are 3 different versions of origin of this code pick and like one that fits more for your character:
+
+- American The Man just trolling enterprise software company production process whole thing is a clever joke 
+- Chinese tries to master the single ubiquitous tooth brushing task then giant leap forward to 9000 more platforms with it
+- Russian anykey admin tries to get rid of 3 empty toothpaste tubes in the bathroom then whole thing happens
+
 P.S. Do not forget to brush your hard disk with `dd` and `rm -rf /` toothpastes twice a day
