@@ -113,6 +113,8 @@ See `.github/workflows/brush.yml` for workflow details and
 Moreover autotools WASM and code Babylonian nature provided us a giant leap of portability forward theoretically we can push
 even further by running it on WRT router or motherboard UEFI IPMI more than enough this may interest Chinese users
 
+Another one alternative OS dependable schedule strategy is to bind <kbd>F3</kbd> hotkey to run `tpm`
+
 ## Sample terminal output from verbose mode:
 ```
 Good Morning Serenity Welcome to the toothpaste picking manager
