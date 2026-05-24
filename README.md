@@ -371,6 +371,7 @@ A few shell one-liners demonstrating tpm usage
 	man tpm
     echo | ./tpm --fake_stats -c tpm.conf toothpastes
 	wasmtime --dir=. tpm.wasm
+	bind '"\eOR":"tpm \n"'
 	echo "Done" | tpm | nc -u -b 192.168.1.255 12345
 ```
 
