@@ -67,7 +67,7 @@ Attach the session later
 
 `tmux attach-session -t tpm`
 
-- Open the default X windows terminal
+- Open the default X Window System terminal
 
 `cronrtab -e` append
 
@@ -110,8 +110,8 @@ Finally the last nice alternative is free tooth brushing in GitHub actions runne
 See `.github/workflows/brush.yml` for workflow details and 
 [raw action runner logs](https://github.com/notlibrary/tpm/actions/runs/25910447433/job/76153967460)
 
-Moreover autotools WASM and code Babylonian nature provided us a giant leap of portability forward theoretically we can push
-even further by running it on WRT router or motherboard UEFI IPMI more than enough this may interest Chinese users
+Moreover GNU Autotools WASM and code Babylonian nature provided us a giant leap of portability forward theoretically we can push
+even further by running it on OpenWrt router or motherboard UEFI IPMI more than enough this may interest Chinese users
 
 Another one alternative OS dependable schedule strategy is to bind <kbd>F3</kbd> hotkey to run `tpm`
 
@@ -150,15 +150,15 @@ I started coding it when found 3 different toothpaste tubes in the bathroom stil
 It supports 8 toothpaste picking methods calling picking types: 
 `Default, Random, By index, By Brand, Max rating, Max tube mass, Min rating, Min tube mas`
 
-Here is the analog sqlite query that do default picking type:
+Here is the analog SQLite circular query that do default picking type:
 
 ```sql
 SELECT * FROM toothpastes WHERE id=mod((SELECT CAST(unixepoch('now') / 86400 AS INTEGER)), (SELECT COUNT(*) FROM toothpastes)) LIMIT 1;
 ```
 
-Also the `pick.sql` contains other sql queries for different picking types.
+Also the `pick.sql` contains other SQL queries for different picking types.
 
-The point is in fact you do not need sqlite postgres or lmdb to perform a single pick operation
+The point is in fact you do not need SQLite PostgreSQL or LMDB to perform a single pick operation
 and sometimes even the single pick is more than enough
 
 How many sqliters does it take to pick the toothpaste? `NULL`
@@ -341,7 +341,7 @@ DELTA_DAYS=0
 4,Nothing,0,0
 ```
 Sure you can pick anything this way not only toothpastes
-Food beverages clothes gym exercises meds even linux commands
+Food beverages clothes gym exercises meds even Linux commands
 moreover you can recursively pick the toothpaste pick type(method) itself
 but there is no meaning in it `pick the toothpaste in the bathroom` is obvious useful
 default solution for most people
@@ -471,7 +471,7 @@ device managers etc
 
 I'm not joking if you know how to do it better make the pull request thread and show me the code
 
-## Deepseek review
+## DeepSeek review
 TPM is a **fully functional, lightweight, and portable utility** wrapped in a layer of humor. It takes a simple concept (choosing a toothpaste) and implements it with the rigor of an enterprise software project, complete with multiple build systems, output formats, and scheduling instructions. It's a playful tool for command-line enthusiasts who appreciate automation and a good joke.
 
 For the exact build steps, all available command-line flags, and the complete configuration options, checking the project's `README.md` and source files on its GitHub page is the best approach.
