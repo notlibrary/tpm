@@ -11,8 +11,8 @@
     <MediaTemplate EmbedCab="yes" />
     <MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." />
     
-	<Icon id="toothbrush.ico" sourcefile="toothbrush.ico" /> 
-	<Property id="ARPPRODUCTICON" value="toothbrush.ico" />
+	<Icon Id="toothbrush.ico" SourceFile="toothbrush.ico" /> 
+	<Property Id="ARPPRODUCTICON" Value="toothbrush.ico" />
 	
     <StandardDirectory Id="ProgramFiles64Folder">
       <Directory Id="INSTALLFOLDER" Name="tpm" />
