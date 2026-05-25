@@ -823,7 +823,7 @@ tpm_pick_toothpaste(list_node_t* head,toothpaste_pick_options_t topts)
 	
 	pick.opts = topts;
 	memset(line,0,MAX_LINE_LENGTH);
-	memset(username,0,UNLEN+1);
+	memset(username,0,UNLEN);
 	pick.message=malloc(OUTPUT_BLOCK_SIZE);
 	pick.JSON=malloc(OUTPUT_BLOCK_SIZE);
 	pick.CSV=malloc(OUTPUT_BLOCK_SIZE);
@@ -843,7 +843,6 @@ tpm_pick_toothpaste(list_node_t* head,toothpaste_pick_options_t topts)
 	{
         pick.who=user_strings[MSG_ANON];
     }
-	
 	pick.total_toothpastes = count_list(head);
 	if (0==pick.total_toothpastes) 
 	{
@@ -857,9 +856,16 @@ tpm_pick_toothpaste(list_node_t* head,toothpaste_pick_options_t topts)
 	
 	if (topts.verbose)
 	{
-		snprintf(line,MAX_TOOTHPASTE_LINE,"%s %s %s %s \n", user_strings[MSG_GOOD], times_of_day[i],pick.who ,user_strings[MSG_WELCOME]);
+		snprintf(line,MAX_TOOTHPASTE_LINE,"%s %s ", user_strings[MSG_GOOD], times_of_day[i]);
+		strncat(pick.message,line,MAX_LINE_LENGTH);
+		
+		snprintf(line,UNLEN,"%s " ,pick.who-1);
+		strncat(pick.message,line,MAX_LINE_LENGTH);
+		
+		snprintf(line,MAX_TOOTHPASTE_LINE,"%s \n" ,user_strings[MSG_WELCOME]);
 		strncat(pick.message,line,MAX_LINE_LENGTH);
 	}
+	
 	
 	day = total_seconds/SECONDS_PER_DAY;
 	
@@ -992,9 +998,9 @@ tpm_pick_toothpaste(list_node_t* head,toothpaste_pick_options_t topts)
 		snprintf(pick.message,2*MAX_TOOTHPASTE_LINE,"%.127s (%ug) [%u/100] \n", pick.what.toothpaste_brand,pick.what.tube_mass_g, pick.what.rating);	
 	}
 	
-	snprintf(pick.JSON,MAX_LINE_LENGTH,"{\n\t \"who\":\"%s\",\n\t \"toothpaste\":\"%.127s\",\n\t \"tube_mass_g\":%u,\n\t \"rating\":%u \n}",pick.who,pick.what.toothpaste_brand,pick.what.tube_mass_g,pick.what.rating);
+	snprintf(pick.JSON,MAX_LINE_LENGTH,"{\n\t \"who\":\"%s\",\n\t \"toothpaste\":\"%.127s\",\n\t \"tube_mass_g\":%u,\n\t \"rating\":%u \n}",pick.who-1,pick.what.toothpaste_brand,pick.what.tube_mass_g,pick.what.rating);
 		
-	snprintf(line,MAX_LINE_LENGTH,"%s,%s,",pick.who,pick_type_strings[topts.ptype] );
+	snprintf(line,MAX_LINE_LENGTH,"%s,%s,",pick.who-1,pick_type_strings[topts.ptype] );
 	strncat(pick.CSV,line,MAX_LINE_LENGTH);
 	
 	snprintf(line,MAX_LINE_LENGTH,"%d,%d,%d,",new_pick_flag,toothbrush_flag,dentist_flag );
