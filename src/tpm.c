@@ -954,7 +954,7 @@ tpm_pick_toothpaste(list_node_t* head,toothpaste_pick_options_t topts)
 		snprintf(line,MAX_TOOTHPASTE_LINE,"%s: %s\n", user_strings[MSG_PICK_TYPE], pick_type_strings[topts.ptype] );
 		strncat(pick.message,line,MAX_LINE_LENGTH);
 		
-		snprintf(line,MAX_LINE_LENGTH,"%s %s %.128s (%ug) [%u/100] %s \n", user_strings[MSG_TOOTHPASTE], right_armour, pick.what.toothpaste_brand, pick.what.tube_mass_g, pick.what.rating, left_armour);
+		snprintf(line,MAX_LINE_LENGTH,"%s %s %.127s (%ug) [%u/100] %s \n", user_strings[MSG_TOOTHPASTE], right_armour, pick.what.toothpaste_brand, pick.what.tube_mass_g, pick.what.rating, left_armour);
 		strncat(pick.message,line,MAX_LINE_LENGTH);
 		
 		snprintf(line,MAX_LINE_LENGTH,"%s %u/%u \n", user_strings[MSG_TOOTHPASTE_I],i,pick.total_toothpastes);
@@ -989,10 +989,10 @@ tpm_pick_toothpaste(list_node_t* head,toothpaste_pick_options_t topts)
 	}
 	else 
 	{
-		snprintf(pick.message,2*MAX_TOOTHPASTE_LINE,"%.128s (%ug) [%u/100] \n", pick.what.toothpaste_brand,pick.what.tube_mass_g, pick.what.rating);	
+		snprintf(pick.message,2*MAX_TOOTHPASTE_LINE,"%.127s (%ug) [%u/100] \n", pick.what.toothpaste_brand,pick.what.tube_mass_g, pick.what.rating);	
 	}
 	
-	snprintf(pick.JSON,MAX_LINE_LENGTH,"{\n\t \"who\":\"%s\",\n\t \"toothpaste\":\"%.128s\",\n\t \"tube_mass_g\":%u,\n\t \"rating\":%u \n}",pick.who,pick.what.toothpaste_brand,pick.what.tube_mass_g,pick.what.rating);
+	snprintf(pick.JSON,MAX_LINE_LENGTH,"{\n\t \"who\":\"%s\",\n\t \"toothpaste\":\"%.127s\",\n\t \"tube_mass_g\":%u,\n\t \"rating\":%u \n}",pick.who,pick.what.toothpaste_brand,pick.what.tube_mass_g,pick.what.rating);
 		
 	snprintf(line,MAX_LINE_LENGTH,"%s,%s,",pick.who,pick_type_strings[topts.ptype] );
 	strncat(pick.CSV,line,MAX_LINE_LENGTH);
@@ -1255,6 +1255,7 @@ read_config(const char* src)
 	{ 
 		set_counters(&set_counters_v);
 	}
+	cfg_free(cfg);
 	return opts;
 }
 
@@ -1413,6 +1414,7 @@ main(int argc, char* argv[])
 	{
 		cfg=cfg_init(); 
 		save_default_config(cfg);
+		cfg_free(cfg);
 	}
 	if ((output_file)!=stdout)
 	{
