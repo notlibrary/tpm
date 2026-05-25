@@ -836,12 +836,12 @@ tpm_pick_toothpaste(list_node_t* head,toothpaste_pick_options_t topts)
 	if (get_current_username(username, sizeof(username)) == 0) 
 	{
 		if (topts.username == NULL)
-		{topts.username =username;}
-		pick.who=topts.username;
+		{strncpy(topts.username,username,UNLEN);}
+		strncpy(pick.who,topts.username,UNLEN);
     }
 	else 
 	{
-        pick.who=user_strings[MSG_ANON];
+        strncpy(pick.who,user_strings[MSG_ANON],UNLEN);
     }
 	pick.total_toothpastes = count_list(head);
 	if (0==pick.total_toothpastes) 
@@ -859,7 +859,7 @@ tpm_pick_toothpaste(list_node_t* head,toothpaste_pick_options_t topts)
 		snprintf(line,MAX_TOOTHPASTE_LINE,"%s %s ", user_strings[MSG_GOOD], times_of_day[i]);
 		strncat(pick.message,line,MAX_LINE_LENGTH);
 		
-		snprintf(line,UNLEN,"%s " ,pick.who-1);
+		snprintf(line,UNLEN+1,"%s " ,pick.who);
 		strncat(pick.message,line,MAX_LINE_LENGTH);
 		
 		snprintf(line,MAX_TOOTHPASTE_LINE,"%s \n" ,user_strings[MSG_WELCOME]);
@@ -998,9 +998,9 @@ tpm_pick_toothpaste(list_node_t* head,toothpaste_pick_options_t topts)
 		snprintf(pick.message,2*MAX_TOOTHPASTE_LINE,"%.127s (%ug) [%u/100] \n", pick.what.toothpaste_brand,pick.what.tube_mass_g, pick.what.rating);	
 	}
 	
-	snprintf(pick.JSON,MAX_LINE_LENGTH,"{\n\t \"who\":\"%s\",\n\t \"toothpaste\":\"%.127s\",\n\t \"tube_mass_g\":%u,\n\t \"rating\":%u \n}",pick.who-1,pick.what.toothpaste_brand,pick.what.tube_mass_g,pick.what.rating);
+	snprintf(pick.JSON,MAX_LINE_LENGTH,"{\n\t \"who\":\"%s\",\n\t \"toothpaste\":\"%.127s\",\n\t \"tube_mass_g\":%u,\n\t \"rating\":%u \n}",pick.who,pick.what.toothpaste_brand,pick.what.tube_mass_g,pick.what.rating);
 		
-	snprintf(line,MAX_LINE_LENGTH,"%s,%s,",pick.who-1,pick_type_strings[topts.ptype] );
+	snprintf(line,MAX_LINE_LENGTH,"%s,%s,",pick.who,pick_type_strings[topts.ptype] );
 	strncat(pick.CSV,line,MAX_LINE_LENGTH);
 	
 	snprintf(line,MAX_LINE_LENGTH,"%d,%d,%d,",new_pick_flag,toothbrush_flag,dentist_flag );
@@ -1153,10 +1153,11 @@ read_config(const char* src)
 		recursion++;
 		opts=read_config(value);
 	}
+	memset(opts.username,0,UNLEN);
 	value = cfg_get_rec(cfg, "USERNAME");
 	if (value!=NULL)
 	{		
-		opts.username = value; 
+		strncpy(opts.username, value,UNLEN); 
 	}	
 	value = cfg_get_rec(cfg,"DENTAL_FORMULA");
 	if (value!=NULL)

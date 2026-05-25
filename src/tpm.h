@@ -204,7 +204,7 @@ typedef struct toothpaste_pick_options_t
 	int output_to_file;
 	int csv_flag;
 	unsigned int pick_by_index_index;
-	const char* username;
+	char username[UNLEN];
 	const char* brand_string;
 	int upper_brands;
 	dental_formula_t formula;
@@ -212,7 +212,7 @@ typedef struct toothpaste_pick_options_t
 
 typedef struct toothpaste_pick_t
 {
-	const char* who;
+	char who[UNLEN];
 	toothpaste_data_t what;
 	list_node_t* where;
 	unsigned int total_toothpastes;	
