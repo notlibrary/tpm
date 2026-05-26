@@ -5,6 +5,7 @@ AC_CONFIG_HEADERS([src/config.h])
 AC_CONFIG_FILES([
  Makefile
  src/Makefile
+ tests/Makefile
 ])
 AC_CHECK_HEADERS([getopt.h])
 AC_CHECK_FUNCS([getopt getopt_long])
