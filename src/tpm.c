@@ -52,6 +52,7 @@ static const char* error_strings[TOTAL_ERROR_MESSAGES]={
 	"No toothpastes file loaded",
 	"Unable to load config ~tpm/tpm.conf\n",
 	"Error opening last_pick file for writing"
+	"Pick is NULL perform pick first"
 };
 static const char* user_strings[TOTAL_USER_MESSAGES]={
 	"Pick counter clear",
@@ -566,12 +567,20 @@ stop_system(void)
 TPM int 
 tpm_free_toothpaste_pick(toothpaste_pick_t* pick)
 {
-	free(pick->message);
-	free(pick->JSON);
-	free(pick->CSV);
-	free(pick->waste_report);
-	free_list(pick->where);
-	return 0;
+	if (pick!=NULL)
+	{
+		free(pick->message);
+		free(pick->JSON);
+		free(pick->CSV);
+		free(pick->waste_report);
+		free_list(pick->where);
+		return 0;
+	}
+	else 
+	{
+		perror(error_strings[PICK_NULL]);
+		return 1;
+	}
 }
 
 static int 
@@ -703,18 +712,33 @@ version(void)
 TPM char* 
 tpm_get_toothpaste_picking_message(toothpaste_pick_t* pick)
 {
+	if (pick==NULL) 
+	{
+		perror(error_strings[PICK_NULL]);
+		return NULL;
+	}
 	return pick->message;
 }
 
 TPM char*
 tpm_get_toothpaste_picking_JSON(toothpaste_pick_t* pick)
 {
-	return pick->JSON;	
+	if (pick==NULL) 
+	{
+		perror(error_strings[PICK_NULL]);
+		return NULL;
+	}
+	return pick->JSON;
 }
 
 TPM char*
 tpm_get_toothpaste_picking_CSV(toothpaste_pick_t* pick)
 {
+	if (pick==NULL) 
+	{
+		perror(error_strings[PICK_NULL]);
+		return NULL;
+	}
 	return pick->CSV;	
 }
 /*[min,max)*/
