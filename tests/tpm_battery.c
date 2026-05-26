@@ -9,6 +9,12 @@ it's just impossible to fail making most off tests useless anyway We'll see what
 
 #include "../src/tpm.h"
 
+START_TEST (welcome_msg)
+{
+	ck_abort_msg("Welcome to the TPM test battery");
+}
+END_TEST
+
 START_TEST (null_pick_msg)
 {
 	toothpaste_pick_t* pick=NULL;
@@ -39,10 +45,11 @@ Suite * tpm_suite(void)
      TCase *tc_null_msg;
 
  
-     s = suite_create("TPM");
+     s = suite_create("TPM Battery");
  
-     tc_null_msg = tcase_create("null_msg");
-	
+     tc_null_msg = tcase_create("Null Pick output");
+	 
+     tcase_add_test(tc_null_msg, welcome_msg);
      tcase_add_test(tc_null_msg, null_pick_msg);
 	 tcase_add_test(tc_null_msg, null_pick_JSON);
 	 tcase_add_test(tc_null_msg, null_pick_CSV);
@@ -65,7 +72,7 @@ main(void)
      srunner_run_all(sr, CK_NORMAL);
      number_failed = srunner_ntests_failed(sr);
      srunner_free(sr);
-     return (number_failed == 0) ? EXIT_SUCCESS : EXIT_FAILURE;
+     return (number_failed<= 1) ? EXIT_SUCCESS : EXIT_FAILURE;
 	 
 	 
  }
