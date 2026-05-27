@@ -102,7 +102,7 @@ and zero maintenance burden
 
 What if Chekhov is alive and is a C programmer?
 
-Linux build also has `tpm.1` manual included
+Linux build also has `tpm.1` manual and unit `tests` battery folder included
 
 If everything failed another way is to setup the daily anacron task
 

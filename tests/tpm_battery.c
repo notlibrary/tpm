@@ -2,7 +2,7 @@
 This is basically for unbelievers and skeptics we ran unit test battery consist of as
 much tests as possible against TPM API using oldest and most reliable C unit test framework libcheck
 I believe in dead simplicity theory underlying circular query algorithm is so dead simple that 
-it's just impossible to fail making most off tests useless anyway We'll see what really happens here
+it's just impossible to fail making most of tests useless anyway We'll see what really happens here
 */
 
 #include <check.h>
