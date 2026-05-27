@@ -39,7 +39,7 @@ START_TEST (null_pick_CSV)
 }
 END_TEST
 
-Suite * tpm_suite(void)
+Suite* tpm_suite(void)
 {
      Suite *s;
      TCase *tc_null_msg;

@@ -1290,8 +1290,13 @@ read_config(const char* src)
 	return opts;
 }
 
+#ifdef HAVE_MAIN
 TPM int
 main(int argc, char* argv[])
+#else
+TPM int
+do_not_test_me(int argc, char* argv[])	
+#endif
 {
 
 	int opt;

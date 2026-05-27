@@ -4,7 +4,7 @@ CC=emcc
 CP=cp -f
 MKDIR=mkdir -p
 RM=rm
-CFLAGS=-Wall -Os -sSTANDALONE_WASM=1 --minify=0 -sMODULARIZE=0 
+CFLAGS=-Wall -Os -sSTANDALONE_WASM=1 -DHAVE_MAIN --minify=0 -sMODULARIZE=0 
 CURRENT_DIR=$(CURDIR)
 SRC=src
 SOURCES=    $(SRC)/tpm.c \
