@@ -8,8 +8,9 @@
 */
 
 #include <check.h>
-
+#include <string.h>
 #include "../src/tpm.h"
+
 
 START_TEST (welcome_msg)
 {
@@ -52,7 +53,7 @@ START_TEST (length_pick_CSV)
 	pick=tpm_pick_toothpaste(toothpastes_list,topts);
 	char* out=tpm_get_toothpaste_picking_CSV(pick);
 	len=strlen(out);
-	ck_assert_int_ge(0,len);
+	ck_assert_int_gt(0,len);
 }
 END_TEST
 
@@ -67,7 +68,7 @@ START_TEST (length_pick_CSV)
 	pick=tpm_pick_toothpaste(toothpastes_list,topts);
 	char* out=tpm_get_toothpaste_picking_JSON(pick);
 	len=strlen(out);
-	ck_assert_int_ge(0,len);
+	ck_assert_int_gt(0,len);
 }
 END_TEST
 
@@ -82,7 +83,7 @@ START_TEST (length_pick_CSV)
 	pick=tpm_pick_toothpaste(toothpastes_list,topts);
 	char* out=tpm_get_toothpaste_picking_message(pick);
 	len=strlen(out);
-	ck_assert_int_ge(0,len);
+	ck_assert_int_gt(0,len);
 }
 END_TEST
 
