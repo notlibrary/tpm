@@ -48,13 +48,16 @@ START_TEST (length_pick_CSV)
 	static list_node_t* toothpastes_list;
 	toothpaste_pick_t* pick;
 	toothpaste_pick_options_t topts;
+	topts.formula.visit_dentist_times_per_year=2;
+	topts.formula.swap_toothbrush_times_per_year=2;
+	topts.ptype=0;
 	int len;
 	
 	toothpastes_list=tpm_load_list_from_file("not/existimg/path");
 	pick=tpm_pick_toothpaste(toothpastes_list,topts);
 	char* out=tpm_get_toothpaste_picking_CSV(pick);
 	len=strlen(out);
-	ck_assert_int_gt(0,len);
+	ck_assert_int_gt(len,0);
 }
 END_TEST
 
@@ -63,13 +66,16 @@ START_TEST (length_pick_JSON)
 	static list_node_t* toothpastes_list;
 	toothpaste_pick_t* pick;
 	toothpaste_pick_options_t topts;
+	topts.formula.visit_dentist_times_per_year=2;
+	topts.formula.swap_toothbrush_times_per_year=2;;
+	topts.ptype=0;
 	int len;
 	
 	toothpastes_list=tpm_load_list_from_file("not/existimg/path");
 	pick=tpm_pick_toothpaste(toothpastes_list,topts);
 	char* out=tpm_get_toothpaste_picking_JSON(pick);
 	len=strlen(out);
-	ck_assert_int_gt(0,len);
+	ck_assert_int_gt(len,0);
 }
 END_TEST
 
@@ -78,13 +84,16 @@ START_TEST (length_pick_msg)
 	static list_node_t* toothpastes_list;
 	toothpaste_pick_t* pick;
 	toothpaste_pick_options_t topts;
+	topts.formula.visit_dentist_times_per_year=2;
+	topts.formula.swap_toothbrush_times_per_year=2;
+	topts.ptype=0;
 	int len;
 	
 	toothpastes_list=tpm_load_list_from_file("not/existimg/path");
 	pick=tpm_pick_toothpaste(toothpastes_list,topts);
 	char* out=tpm_get_toothpaste_picking_message(pick);
 	len=strlen(out);
-	ck_assert_int_gt(0,len);
+	ck_assert_int_gt(len,0);
 }
 END_TEST
 
