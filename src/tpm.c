@@ -791,13 +791,16 @@ report_wasted_tubes(list_node_t* head,toothpaste_pick_stats_t* stats)
     while (current != NULL) 
 	{
 		if (current->data.type==PASTE_NOTHING) 
-		{	
+		{
+			rip_tubes[total_nulls]=0;
 			total_nulls++;
 		}	
 		current = current->next;	
 	}
-	
-	real_stats.total_picks=stats->total_picks*(total_toothpastes-total_nulls)/total_toothpastes;
+	if (total_toothpastes==total_nulls)
+		real_stats.total_picks=stats->total_picks;
+	else
+		real_stats.total_picks=stats->total_picks*(total_toothpastes-total_nulls)/total_toothpastes;
 	current = head;
 	while (current != NULL) 
 	{
@@ -807,7 +810,10 @@ report_wasted_tubes(list_node_t* head,toothpaste_pick_stats_t* stats)
 		 }
 		 else
 		 {
-			rip_tubes[i]=(real_stats.total_picks/(total_toothpastes-total_nulls))*GRAMS_PER_NURDLE/current->data.tube_mass_g;
+			if (total_toothpastes==total_nulls)
+				rip_tubes[i]=0;
+			else
+				rip_tubes[i]=(real_stats.total_picks/(total_toothpastes-total_nulls))*GRAMS_PER_NURDLE/current->data.tube_mass_g;
 		 }       
 		
         total_wasted+=rip_tubes[i];
