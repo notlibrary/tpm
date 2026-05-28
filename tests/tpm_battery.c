@@ -9,6 +9,7 @@
 
 #include <check.h>
 #include <string.h>
+#include <time.h>
 #include "../src/tpm.h"
 
 
@@ -45,7 +46,7 @@ END_TEST
 START_TEST (length_pick_CSV)
 {
 	static list_node_t* toothpastes_list;
-	toothpaste_pick_t pick;
+	toothpaste_pick_t* pick;
 	toothpaste_pick_options_t topts;
 	int len;
 	
@@ -57,10 +58,10 @@ START_TEST (length_pick_CSV)
 }
 END_TEST
 
-START_TEST (length_pick_CSV)
+START_TEST (length_pick_JSON)
 {
 	static list_node_t* toothpastes_list;
-	toothpaste_pick_t pick;
+	toothpaste_pick_t* pick;
 	toothpaste_pick_options_t topts;
 	int len;
 	
@@ -72,10 +73,10 @@ START_TEST (length_pick_CSV)
 }
 END_TEST
 
-START_TEST (length_pick_CSV)
+START_TEST (length_pick_msg)
 {
 	static list_node_t* toothpastes_list;
-	toothpaste_pick_t pick;
+	toothpaste_pick_t* pick;
 	toothpaste_pick_options_t topts;
 	int len;
 	
@@ -87,16 +88,35 @@ START_TEST (length_pick_CSV)
 }
 END_TEST
 
+START_TEST (prng_100_tries)
+{
+	int i = 0;
+	unsigned long j=0;
+	seed_xrp32(time(NULL));
+	
+	for (i=0;i<100;i++)
+	{
+		j = prng64_xrp32();
+		ck_assert_uint_gt(j,0);
+	}
+	
+}   
+END_TEST
+
+
+
 
 Suite* tpm_suite(void)
 {
      Suite *s;
      TCase *tc_null_msg;
+	 TCase *tc_prng;
 
  
      s = suite_create("TPM Battery");
  
      tc_null_msg = tcase_create("Null Pick output");
+	 tc_prng = tcase_create("PRNG");
 	 
      tcase_add_test(tc_null_msg, welcome_msg);
      tcase_add_test(tc_null_msg, null_pick_msg);
@@ -106,7 +126,10 @@ Suite* tpm_suite(void)
 	 tcase_add_test(tc_null_msg, length_pick_JSON);
 	 tcase_add_test(tc_null_msg, length_pick_CSV);
 	 
+	 tcase_add_test(tc_prng, prng_100_tries);
+	 
      suite_add_tcase(s, tc_null_msg);
+	 suite_add_tcase(s, tc_prng);
      
      return s;
  }
