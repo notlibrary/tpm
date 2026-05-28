@@ -23,7 +23,7 @@ START_TEST (null_pick_msg)
 {
 	toothpaste_pick_t* pick=NULL;
 	char* out=tpm_get_toothpaste_picking_message(pick);
-	ck_assert_str_eq(out,NULL);
+	ck_assert_ptr_null(out);
 }
 END_TEST
 
@@ -31,7 +31,7 @@ START_TEST (null_pick_JSON)
 {
 	toothpaste_pick_t* pick=NULL;
 	char* out=tpm_get_toothpaste_picking_JSON(pick);
-	ck_assert_str_eq(out,NULL);
+	ck_assert_ptr_null(out);
 }
 END_TEST
 
@@ -39,7 +39,7 @@ START_TEST (null_pick_CSV)
 {
 	toothpaste_pick_t* pick=NULL;
 	char* out=tpm_get_toothpaste_picking_CSV(pick);
-	ck_assert_str_eq(out,NULL);
+	ck_assert_ptr_null (out);
 }
 END_TEST
 
