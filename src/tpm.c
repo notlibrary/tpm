@@ -243,7 +243,8 @@ tpm_load_list_from_file(const char* filename)
         }
 		if (sscanf(current, "%u, %4095[^,],%u,%u\n", &temp_data.index,long_line ,&temp_data.tube_mass_g,&temp_data.rating) == 4) 
 		{
-			strncpy(temp_data.toothpaste_brand,long_line,MAX_TOOTHPASTE_LINE);
+			strncpy(temp_data.toothpaste_brand,long_line,MAX_TOOTHPASTE_LINE-1);
+			temp_data.toothpaste_brand[sizeof(temp_data.toothpaste_brand) - 1] = '\0';
 			ltrim(rtrim(temp_data.toothpaste_brand));
 			temp_data.type=PASTE_RANNDOM;
 			if (0==strcmp(toothpaste_type_strings[1],temp_data.toothpaste_brand))
@@ -665,7 +666,7 @@ get_current_username(char* buffer, size_t buffer_size)
 	
     if (pw != NULL) 
 	{
-        strncpy(buffer, pw->pw_name, buffer_size);
+        strncpy(buffer, pw->pw_name, buffer_size-1);
         buffer[buffer_size - 1] = '\0';
         return 0; 
     }
@@ -677,7 +678,7 @@ get_current_username(char* buffer, size_t buffer_size)
     }
     if (user_env != NULL) 
 	{
-        strncpy(buffer, user_env, buffer_size);
+        strncpy(buffer, user_env, buffer_size-1);
         buffer[buffer_size - 1] = '\0';
         return 0;
     }
@@ -1314,7 +1315,7 @@ do_not_test_me(int argc, char* argv[])
 	struct cfg_struct* cfg;
 	int option_index = 0;
 	
-	strncpy(user_home_dir_static,user_home_dir,MAX_PATH);
+	strncpy(user_home_dir_static,user_home_dir,MAX_PATH-1);
 	free(user_home_dir);
 #ifdef _WIN32
 	strncat(user_home_dir_static,"\\tpm\\",MAX_PATH/2);
@@ -1381,9 +1382,9 @@ do_not_test_me(int argc, char* argv[])
 			case 'o':
 				topts.output_to_file=1;
 				if (optarg!=NULL)
-					strncpy(output_file_path_final,optarg, MAX_PATH);
+					strncpy(output_file_path_final,optarg, MAX_PATH-1);
 			case 't':
-				strncpy(stats_file_path_final,optarg, MAX_PATH);
+				strncpy(stats_file_path_final,optarg, MAX_PATH-1);
 			break;
 			case 's':
 				set_counters(optarg);
@@ -1415,7 +1416,7 @@ do_not_test_me(int argc, char* argv[])
 	}
 	if (argv[optind]!=NULL)
 	{
-		strncpy(toothpastes_file_path_final,argv[optind],MAX_PATH);
+		strncpy(toothpastes_file_path_final,argv[optind],MAX_PATH-1);
 	}	
 	if (topts.output_to_file)
 	{
