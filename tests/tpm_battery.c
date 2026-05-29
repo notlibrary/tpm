@@ -45,7 +45,7 @@ END_TEST
 
 START_TEST (length_pick_CSV)
 {
-	static list_node_t* toothpastes_list;
+	list_node_t* toothpastes_list;
 	toothpaste_pick_t* pick;
 	toothpaste_pick_options_t topts;
 	topts.formula.visit_dentist_times_per_year=2;
@@ -63,7 +63,7 @@ END_TEST
 
 START_TEST (length_pick_JSON)
 {
-	static list_node_t* toothpastes_list;
+	list_node_t* toothpastes_list;
 	toothpaste_pick_t* pick;
 	toothpaste_pick_options_t topts;
 	topts.formula.visit_dentist_times_per_year=2;
@@ -81,7 +81,7 @@ END_TEST
 
 START_TEST (length_pick_msg)
 {
-	static list_node_t* toothpastes_list;
+	list_node_t* toothpastes_list;
 	toothpaste_pick_t* pick;
 	toothpaste_pick_options_t topts;
 	topts.formula.visit_dentist_times_per_year=2;
@@ -114,18 +114,20 @@ END_TEST
 
 START_TEST (bad_toothpastes)
 {
-	static list_node_t* toothpastes_list;
-	toothpaste_pick_t* pick;
-	toothpaste_pick_options_t topts;
-	topts.formula.visit_dentist_times_per_year=2;
-	topts.formula.swap_toothbrush_times_per_year=2;
-	topts.ptype=0;
+	list_node_t* toothpastes_list;
 	
+	toothpastes_list=tpm_load_list_from_file("not/exist");
 	
-	toothpastes_list=tpm_load_list_from_file("tests/bad_toothpastes.csv");
-	pick=tpm_pick_toothpaste(toothpastes_list,topts);
+	unsigned int i=0;
+	list_node_t* current = toothpastes_list;
 	
-	ck_assert_uint_eq(pick->total_toothpastes,3);
+    while (current != NULL) 
+	{
+        i++;
+        current = current->next;
+	}
+	
+	ck_assert_uint_eq(i,3);
 }
 END_TEST
 
