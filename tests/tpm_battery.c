@@ -112,6 +112,23 @@ START_TEST (prng_100_tries)
 }   
 END_TEST
 
+START_TEST (bad_toothpastes)
+{
+	static list_node_t* toothpastes_list;
+	toothpaste_pick_t* pick;
+	toothpaste_pick_options_t topts;
+	topts.formula.visit_dentist_times_per_year=2;
+	topts.formula.swap_toothbrush_times_per_year=2;
+	topts.ptype=0;
+	
+	
+	toothpastes_list=tpm_load_list_from_file("tests/bad_toothpastes.csv");
+	pick=tpm_pick_toothpaste(toothpastes_list,topts);
+	
+	ck_assert_uint_eq(pick->total_toothpastes,3);
+}
+END_TEST
+
 
 
 
@@ -120,12 +137,13 @@ Suite* tpm_suite(void)
      Suite *s;
      TCase *tc_null_msg;
 	 TCase *tc_prng;
-
+	 TCase* tc_wrong_file;
  
      s = suite_create("TPM Battery");
  
      tc_null_msg = tcase_create("Null Pick output");
 	 tc_prng = tcase_create("PRNG");
+	 tc_wrong_file = tcase_create("Bad toothpastes");
 	 
      tcase_add_test(tc_null_msg, welcome_msg);
      tcase_add_test(tc_null_msg, null_pick_msg);
@@ -137,9 +155,11 @@ Suite* tpm_suite(void)
 	 
 	 tcase_add_test(tc_prng, prng_100_tries);
 	 
+	 tcase_add_test(tc_wrong_file, bad_toothpastes);
+	 
      suite_add_tcase(s, tc_null_msg);
 	 suite_add_tcase(s, tc_prng);
-     
+     suite_add_tcase(s, tc_wrong_file);
      return s;
  }
 
