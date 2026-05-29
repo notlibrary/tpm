@@ -6,6 +6,6 @@ tpm_battery_SOURCES = \
     $(top_srcdir)/src/prng64_xrp32.c
 
 tpm_battery_CFLAGS = -Wall -g -I$(top_srcdir)/src -DTESTING
-tpm_battery_LDADD = -lcheck -lsubunit -lrt -lm -lpthread
+tpm_battery_LDADD = -lcheck_pic -lcheck -lpthread -lrt -lm -lsubunit
 TESTS = tpm_battery
 EXTRA_DIST = tpm_battery.c
