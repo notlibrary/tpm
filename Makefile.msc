@@ -2,7 +2,7 @@
 CC = cl.exe
 LINKER = link.exe
 MKDIR = mkdir
-CFLAGS = /c /EHsc /Fo
+CFLAGS = /DHAVE_MAIN /c /EHsc /Fo
 LFLAGS = /OUT:
 TARGET_DIR ="C:\Program Files\tpm"
 SRC=src
@@ -10,7 +10,7 @@ SOURCES = \
 	$(SRC)\tpm.c\
 	$(SRC)\prng64_xrp32.c\
 	$(SRC)\cfg_parse.c\
-	$(SRC)\getopt.c
+	$(SRC)\win\getopt.c
 OBJECTS = \
 	tpm.obj\
 	prng64_xrp32.obj\
