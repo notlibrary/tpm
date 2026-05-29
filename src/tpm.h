@@ -37,7 +37,7 @@ extern "C" {
 #include <direct.h>
 #include <Lmcons.h>
 #define STATIC_GETOPT
-#include "getopt.h"
+#include "win\getopt.h"
 #pragma comment(lib, "advapi32.lib")
 #else
 #include <unistd.h>
