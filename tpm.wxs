@@ -5,7 +5,7 @@
            Compressed="yes" 
            InstallerVersion="200" 
            Manufacturer="Serenity Software" 
-           Version="0.6.3" 
+           Version="0.6.4" 
 		   UpgradeCode="69AF8A56-9550-427C-AE60-AE13108B9105">
     
     <MediaTemplate EmbedCab="yes" />

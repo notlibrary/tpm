@@ -1,5 +1,5 @@
-AC_INIT([tpm], [0.6.3], [yendorium@gmail.com])
-AM_INIT_AUTOMAKE([foreign])
+AC_INIT([tpm], [0.6.4], [yendorium@gmail.com])
+AM_INIT_AUTOMAKE([foreign subdir-objects])
 AC_PROG_CC
 AC_CONFIG_HEADERS([src/config.h])
 AC_CONFIG_FILES([
