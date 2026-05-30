@@ -1,0 +1,19 @@
+Toothpaste Picking Manager TODO list:
+
+Android port
+iOS port
+Open/Free/NetBSD ports
+macOS port
+OpenWrt package
+
+Dynamic type system
+Output templates
+
++CSV output
++GitHub actions release
++Config file
++Windows installer
++Unit tests
++WASM build
++Autotools build
++Valgrind check mem leaks
