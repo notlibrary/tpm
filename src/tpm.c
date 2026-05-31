@@ -72,6 +72,7 @@ static const char* user_strings[TOTAL_USER_MESSAGES]={
 	"Total picks:",
 	"Tubes wasted:",
 	"Source:",
+	"Meme:",
 	"Last pick time:",
 	"Good",
 	"Press Enter to continue...",
@@ -109,7 +110,8 @@ static struct option long_options[] = {
 	{"UPPER", required_argument,0, 'U'},		
 	{"brand", required_argument,0, 'b'},	
 	{"delta", required_argument,0, 'd'},
-	{"timezone", required_argument,0, 'z'},		
+	{"timezone", required_argument,0, 'z'},
+	{"meme", required_argument,0, 'm'},	
     {0, 0, 0, 0} 
 };	
 
@@ -1022,6 +1024,9 @@ tpm_pick_toothpaste(list_node_t* head,toothpaste_pick_options_t topts)
 	
 		snprintf(line,MAX_LINE_LENGTH,"%s %s \n", user_strings[MSG_SOURCE], toothpastes_file_path_final);
 		strncat(pick.message,line,MAX_LINE_LENGTH);
+
+		snprintf(line,MAX_LINE_LENGTH,"%s %s \n", user_strings[MSG_MEME], topts.meme_payload);
+		strncat(pick.message,line,MAX_LINE_LENGTH);
 		
 	}
 	else 
@@ -1052,7 +1057,7 @@ tpm_pick_toothpaste(list_node_t* head,toothpaste_pick_options_t topts)
 	snprintf(line,MAX_LINE_LENGTH,"%s,%u,", days_of_week[j],day);
 	strncat(pick.CSV,line,MAX_LINE_LENGTH);
 	
-	snprintf(line,MAX_LINE_LENGTH,LINE_FORMAT_CSV, pick.stats.total_picks,pick.stats.last_pick_time,pick.waste_report,toothpastes_file_path_final);
+	snprintf(line,MAX_LINE_LENGTH,LINE_FORMAT_CSV, pick.stats.total_picks,pick.stats.last_pick_time,pick.waste_report,toothpastes_file_path_final,topts.meme_payload);
 	strncat(pick.CSV,line,MAX_LINE_LENGTH);
 	
 	if (topts.lat_flag) 
@@ -1090,7 +1095,7 @@ save_default_config(struct cfg_struct* cfg)
 	cfg_set(cfg,"LAST_PICK",output_file_path_final);
 	cfg_set(cfg,"TOOTHPASTES",toothpastes_file_path_final);
 	cfg_set(cfg,"LOAD_CONFIG",config_file_path_final);
-	
+	cfg_set(cfg,"MEME","42");
 	cfg_save(cfg,config_file_path_final);
 	
 	return;
@@ -1159,6 +1164,7 @@ read_config(const char* src)
 	static int recursion =0;
 	dental_formula_t formula=parse_dental_formula(DEFAULT_DENTAL_FORMULA); 
 	
+	memset(opts.meme_payload,0,MAX_TOOTHPASTE_LINE-1);
 	opts.formula=formula;
 	opts.ptype=pick_type;
 	opts.verbose=verbose;
@@ -1206,6 +1212,13 @@ read_config(const char* src)
 	{	
 		delta_days = atoi(value);
 	}
+	
+	value = cfg_get_rec(cfg, "MEME");
+	if (value!=NULL)
+	{	
+		strncpy(opts.meme_payload,value,MAX_TOOTHPASTE_LINE-1);
+	}
+	
 	value = cfg_get_rec(cfg, "PICK_TYPE");
 	if ((value!=NULL) && atoi(value)>=0 && atoi(value)<TOTAL_PICK_TYPE_STRINGS)
 	{
@@ -1336,7 +1349,7 @@ do_not_test_me(int argc, char* argv[])
 	
 	topts=read_config(config_file_path_final);
 	config_load_failure=!file_exists_fopen(config_file_path_final);
-	while ((opt = getopt_long(argc, argv, "awjCvxqlrUFf:t:o:c:s:p:i:b:z:d:",long_options,&option_index)) != -1) 
+	while ((opt = getopt_long(argc, argv, "awjCvxqlrUFf:t:o:c:s:p:i:b:z:d:m:",long_options,&option_index)) != -1) 
 	{
         switch (opt) 
 		{
@@ -1407,8 +1420,11 @@ do_not_test_me(int argc, char* argv[])
 			case 'd':
 				delta_days=atoi(optarg);
 			break; 	
+			case 'm':
+				strncpy(topts.meme_payload,optarg,MAX_TOOTHPASTE_LINE);
+			break; 	
 			case '?': 
-				fprintf(stderr, "%s %s [-awjCvxqlrUF] [-f dental-formula] [-c config_file] [-o pick output file] [-t stats file] [-s total_picks value] [-p pick_type_value] [-i toothpaste_index] [-b brand_string -z delta_hours -d delta_days] [toothpastes_file] \n",user_strings[MSG_USAGE], argv[0]);
+				fprintf(stderr, "%s %s [-awjCvxqlrUF] [-f dental-formula] [-c config_file] [-o pick output file] [-t stats file] [-s total_picks value] [-p pick_type_value] [-i toothpaste_index] [-b brand_string -z delta_hours -d delta_days -m meme_payload] [toothpastes_file] \n",user_strings[MSG_USAGE], argv[0]);
 				exit(EXIT_FAILURE);
 			default:
 				break;

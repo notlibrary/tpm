@@ -129,6 +129,7 @@ Total picks: 75
 Last pick time: Sun May 10 09:00:02 2026
 Tubes wasted: 0+0+0=0
 Source: C:\Users\Serenity\tpm\toothpastes
+Meme: https://www.youtube.com/watch?v=dQw4w9WgXcQ
 
 Press any key to continue . . .
 ```
@@ -177,8 +178,8 @@ still better than being stereotypical rotten teeth open source bum
 There is also third output mode `CSV` for those who want to save pick info
 When active it auto appends current pick info to giant CSV with all picks collection `picks.CSV`
 This is purely optional
-The CSV record format for CSV mode follows default mode total 18 attributes:
-`#username, pick_type, new_pick_flag,new_toothbrush_flag,new_dentist_visit, toothpaste_brand, tube_mass_g, toothpaste_rating, toothpaste_index, total_toothpastes, toothpaste_type, dental_formula, day_of_the_week, day_counter,total_picks,last_pick_time,wasted_tubes_report,toothpastes_file_path `
+The CSV record format for CSV mode follows default mode total 19 attributes:
+`#username, pick_type, new_pick_flag,new_toothbrush_flag,new_dentist_visit, toothpaste_brand, tube_mass_g, toothpaste_rating, toothpaste_index, total_toothpastes, toothpaste_type, dental_formula, day_of_the_week, day_counter,total_picks,last_pick_time,wasted_tubes_report,toothpastes_file_path,meme_payload `
 
 ## Inner toothpaste types 
 There are 5 supported toothpaste types
@@ -247,6 +248,8 @@ Also sometimes is possible to add 5th term toothpaste grams per nurdle but this 
 
 `-d --delta [delta_days]` pick the toothpaste with default method in the future or the past
 
+`-m --meme [meme_payload]` carry user cultural info unit to the toothpaste picking message 
+
 `toothpastes_path` path to the toothpastes CSV file
 
 ## Configuration file options
@@ -293,6 +296,8 @@ It's options:
 
 `DELTA_DAYS` pick the toothpaste with default method in the future or the past
 
+`MEME` carry user cultural info unit to the toothpaste picking message
+
 ## TPM Toothpastes Picking Manager Configuration Sample
 ```
 [CONSTANTS]
@@ -320,6 +325,7 @@ BRAND="Unknown"
 UPPER_BRANDS=0
 TIMEZONE=0
 DELTA_DAYS=0
+MEME=42
 ```
 
 ## TPM The Toothpastes Picking Manager Files List
@@ -372,6 +378,7 @@ A few shell one-liners demonstrating tpm usage
     echo | ./tpm --fake_stats -c tpm.conf toothpastes
 	wasmtime --dir=. tpm.wasm
 	bind -x '"\eOR":"echo | tpm"'
+	tpm -m=sup/b/
 	echo "Done" | tpm | nc -u -b 192.168.1.255 12345
 ```
 

@@ -35,7 +35,8 @@ CREATE TABLE IF NOT EXISTS picks (
 	 total_picks INTEGER,
 	 last_pick_time INTEGER,
 	 wasted_tubes_report TEXT,
-	 toothpastes_file_path TEXT
+	 toothpastes_file_path TEXT,
+	 meme_payload TEXT
 );
 
 .import --csv --skip 1 picks.csv picks

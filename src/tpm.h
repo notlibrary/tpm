@@ -80,9 +80,9 @@ memcpy(&y,&x,       sizeof(x)); \
 memcpy(&x,swap_temp,sizeof(x)); \
 } while(0)
 #if defined(_WIN32) || defined(__clang__) || defined(__EMSCRIPTEN__)
-#define LINE_FORMAT_CSV "%u,%llu,%s,%s"
+#define LINE_FORMAT_CSV "%u,%llu,%s,%s,%s"
 #else
-#define LINE_FORMAT_CSV "%u,%lu,%s,%s"
+#define LINE_FORMAT_CSV "%u,%lu,%s,%s,%s"
 #endif
 
 #define TOTAL_TOOTHPASTE_TYPES 5
@@ -112,6 +112,7 @@ typedef enum user_msg_t
 	MSG_TOTAL_PICKS,
 	MSG_TUBES_WASTED,
 	MSG_SOURCE,
+	MSG_MEME,
 	MSG_LAST_PICK_TIME,
 	MSG_GOOD,
 	MSG_PAUSE,
@@ -209,6 +210,7 @@ typedef struct toothpaste_pick_options_t
 	const char* brand_string;
 	int upper_brands;
 	dental_formula_t formula;
+	char meme_payload[MAX_TOOTHPASTE_LINE];
 }toothpaste_pick_options_t;
 
 typedef struct toothpaste_pick_t
