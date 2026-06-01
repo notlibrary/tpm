@@ -1216,10 +1216,25 @@ tpm_pick_toothpaste(list_node_t* head,toothpaste_pick_options_t topts)
 	toothpaste_strings[17] = 	str_meme(&pick,&topts);
 	toothpaste_strings[18] = 	str_quiet(&pick,&topts);
 	
-	for (ti=0;ti<TOTAL_OUTPUT_STRINGS;ti++)
+	if (topts.verbose)
+	{	
+		strcat(pick.message,toothpaste_strings[0]);
+		strcat(pick.message,toothpaste_strings[1]);
+		strcat(pick.message,toothpaste_strings[2]);
+		if (new_pick_flag)
+			strcat(pick.message,toothpaste_strings[3]);
+		if (toothbrush_flag)
+			strcat(pick.message,toothpaste_strings[4]);
+		if (dentist_flag)
+			strcat(pick.message,toothpaste_strings[5]);
+		if (!new_pick_flag)
+			strcat(pick.message,toothpaste_strings[6]);
+	    for (ti=7;ti<TOTAL_OUTPUT_STRINGS-1;ti++)
+			strcat(pick.message,toothpaste_strings[ti]);
+	}
+	else
 	{
-		strcat(pick.message,toothpaste_strings[ti]);
-
+		strcat(pick.message,toothpaste_strings[18]);
 	}
 	for (ti=0;ti<TOTAL_OUTPUT_STRINGS;ti++)
 	{
