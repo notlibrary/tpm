@@ -6,9 +6,7 @@ Open/Free/NetBSD ports
 macOS port
 OpenWrt package
 
-Dynamic type system
-Output templates
-
++Output templates
 +CSV output
 +GitHub actions release
 +Config file

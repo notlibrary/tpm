@@ -1087,8 +1087,88 @@ str_quiet(toothpaste_pick_t* pick,toothpaste_pick_options_t* topts)
 	return line;
 }
 
-
-
+static int 
+check_visibility(int input_id, int new_pick_flag, int toothbrush_flag, int dentist_flag )
+{
+	if ((input_id >=7) || (input_id <=2))
+		return 1;
+	if ((input_id==3) && (new_pick_flag))
+		return 1;
+	if ((input_id==4) && (toothbrush_flag))
+		return 1;
+	if ((input_id==5) && (dentist_flag))
+		return 1;
+	if ((input_id==6) && (!new_pick_flag)) {
+		return 1;
+	}
+	return 0;
+}
+static int
+char_to_strnum(char input)
+{
+	switch(input)
+	{
+		case 'g':
+		return 0;
+		break;
+		case 'u':
+		return 1;
+		break;
+		case 'w':
+		return 2;
+		break;
+		case 'n':
+		return 3;
+		break;
+		case 't':
+		return 4;
+		break;
+		case 'd':
+		return 5;
+		break;
+		case 'a':
+		return 6;
+		break;	
+		case 'p':
+		return 7;
+		break;
+		case 'o':
+		return 8;
+		break;
+		case 'i':
+		return 9;
+		break;
+		case 'T':
+		return 10;
+		break;		
+		case 'f':
+		return 11;
+		break;		
+		case 'W':
+		return 12;
+		break;		
+		case 'P':
+		return 13;
+		break;		
+		case 'l':
+		return 14;
+		break;		
+		case 'U':
+		return 15;
+		break;		
+		case 's':
+		return 16;
+		break;		
+		case 'm':
+		return 17;
+		break;		
+		
+		default:
+			return -1;
+			break;
+	}
+	return -1;
+}
 
 
 TPM toothpaste_pick_t*
@@ -1103,7 +1183,8 @@ tpm_pick_toothpaste(list_node_t* head,toothpaste_pick_options_t topts)
 	int toothbrush_flag=0;
 	unsigned int brand_len;
 	char* toothpaste_strings[TOTAL_OUTPUT_STRINGS];
-	
+	char* template_str ="guwntdapoiTfWPlUsm";
+	char c=template_str[0];
 	pick.opts = topts;
 	memset(line,0,MAX_LINE_LENGTH);
 
@@ -1216,26 +1297,15 @@ tpm_pick_toothpaste(list_node_t* head,toothpaste_pick_options_t topts)
 	toothpaste_strings[17] = 	str_meme(&pick,&topts);
 	toothpaste_strings[18] = 	str_quiet(&pick,&topts);
 	
-	if (topts.verbose)
-	{	
-		strcat(pick.message,toothpaste_strings[0]);
-		strcat(pick.message,toothpaste_strings[1]);
-		strcat(pick.message,toothpaste_strings[2]);
-		if (new_pick_flag)
-			strcat(pick.message,toothpaste_strings[3]);
-		if (toothbrush_flag)
-			strcat(pick.message,toothpaste_strings[4]);
-		if (dentist_flag)
-			strcat(pick.message,toothpaste_strings[5]);
-		if (!new_pick_flag)
-			strcat(pick.message,toothpaste_strings[6]);
-	    for (ti=7;ti<TOTAL_OUTPUT_STRINGS-1;ti++)
-			strcat(pick.message,toothpaste_strings[ti]);
-	}
-	else
+	ti=0;
+	while (c!='\0')
 	{
-		strcat(pick.message,toothpaste_strings[18]);
+		c=template_str[ti++];
+		if (check_visibility(char_to_strnum(c),new_pick_flag,toothbrush_flag,dentist_flag))
+		if (char_to_strnum(c)!=-1)	
+		strcat(pick.message,toothpaste_strings[char_to_strnum(c)]);
 	}
+
 	for (ti=0;ti<TOTAL_OUTPUT_STRINGS;ti++)
 	{
 		free(toothpaste_strings[ti]);

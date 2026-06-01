@@ -293,7 +293,8 @@ static char* str_meme(toothpaste_pick_t* pick,toothpaste_pick_options_t* topts);
 static char* str_quiet(toothpaste_pick_t* pick,toothpaste_pick_options_t* topts);
 static int eval_username(toothpaste_pick_t* pick,toothpaste_pick_options_t* topts);
 static int eval_total_toothpastes(toothpaste_pick_t* pick,toothpaste_pick_options_t* topts);
-
+static int char_to_strnum(char input);
+static int check_visibility(int input_id, int new_pick_flag, int toothbrush_flag, int dentist_flag );
 #ifdef __cplusplus
 }
 #endif /*__cpluplus*/
