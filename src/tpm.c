@@ -1088,7 +1088,7 @@ str_quiet(toothpaste_pick_t* pick,toothpaste_pick_options_t* topts)
 }
 
 static int 
-check_visibility(int input_id, int new_pick_flag, int toothbrush_flag, int dentist_flag ,int verbose)
+check_visibility(int input_id, int new_pick_flag, int toothbrush_flag, int dentist_flag,int verbose)
 {
 	if (verbose)
 	{
