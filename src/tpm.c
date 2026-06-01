@@ -880,6 +880,7 @@ str_good_day(toothpaste_pick_t* pick,toothpaste_pick_options_t* topts)
 {
 	char* line = malloc(MAX_TOOTHPASTE_LINE);
 	if (topts==NULL || pick == NULL) return NULL;	
+	memset(line,0,MAX_TOOTHPASTE_LINE);
 	snprintf(line,MAX_TOOTHPASTE_LINE,"%s %s ", user_strings[MSG_GOOD], times_of_day[topts->time_of_day_ind]);
 
 	return line;
@@ -890,6 +891,7 @@ str_anon_username(toothpaste_pick_t* pick,toothpaste_pick_options_t* topts)
 {
 	char* line = malloc(UNLEN);
 	if (topts==NULL || pick == NULL) return NULL;
+	memset(line,0,UNLEN);
 	snprintf(line,UNLEN+1,"%s " ,pick->who);
 	
 	return line;
@@ -900,6 +902,7 @@ str_welcome(toothpaste_pick_t* pick,toothpaste_pick_options_t* topts)
 {
 	char* line = malloc(MAX_TOOTHPASTE_LINE);
 	if (topts==NULL || pick == NULL) return NULL;	
+	memset(line,0,MAX_TOOTHPASTE_LINE);
 	snprintf(line,MAX_TOOTHPASTE_LINE,"%s \n" ,user_strings[MSG_WELCOME]);
 	
 	return line;
@@ -910,6 +913,7 @@ str_next_pick(toothpaste_pick_t* pick,toothpaste_pick_options_t* topts)
 {
 	char* line = malloc(MAX_TOOTHPASTE_LINE);
 	if (topts==NULL || pick == NULL) return NULL;	
+	memset(line,0,MAX_TOOTHPASTE_LINE);
 	snprintf(line,MAX_TOOTHPASTE_LINE,"%s \n", user_strings[MSG_NEXT_PICK]);
 	
 	return line;
@@ -920,6 +924,7 @@ str_new_toothbrush(toothpaste_pick_t* pick,toothpaste_pick_options_t* topts)
 {
 	char* line = malloc(MAX_TOOTHPASTE_LINE);
 	if (topts==NULL || pick == NULL) return NULL;	
+	memset(line,0,MAX_TOOTHPASTE_LINE);	
 	snprintf(line,MAX_TOOTHPASTE_LINE,"%s \n", user_strings[MSG_TOOTHBRUSH]);
 	
 	return line;
@@ -930,6 +935,7 @@ str_visit_dentist(toothpaste_pick_t* pick,toothpaste_pick_options_t* topts)
 {
 	char* line = malloc(MAX_TOOTHPASTE_LINE);
 	if (topts==NULL || pick == NULL) return NULL;		
+	memset(line,0,MAX_TOOTHPASTE_LINE);	
 	snprintf(line,MAX_TOOTHPASTE_LINE,"%s \n", user_strings[MSG_DENTIST]);
 		
 	return line;
@@ -940,6 +946,7 @@ str_already_picked(toothpaste_pick_t* pick,toothpaste_pick_options_t* topts)
 {
 	char* line = malloc(MAX_TOOTHPASTE_LINE);
 	if (topts==NULL || pick == NULL) return NULL;		
+	memset(line,0,MAX_TOOTHPASTE_LINE);	
 	snprintf(line,MAX_TOOTHPASTE_LINE,"%s \n", user_strings[MSG_ALREADY]);
 		
 	return line;
@@ -950,6 +957,7 @@ str_pick_type(toothpaste_pick_t* pick,toothpaste_pick_options_t* topts)
 {
 	char* line = malloc(MAX_TOOTHPASTE_LINE);
 	if (topts==NULL || pick == NULL) return NULL;		
+	memset(line,0,MAX_TOOTHPASTE_LINE);	
 	snprintf(line,MAX_TOOTHPASTE_LINE,"%s: %s\n", user_strings[MSG_PICK_TYPE], pick_type_strings[topts->ptype]);
 		
 	return line;
@@ -960,6 +968,7 @@ str_toothpaste(toothpaste_pick_t* pick,toothpaste_pick_options_t* topts)
 {
 	char* line = malloc(MAX_LINE_LENGTH);
 	if (topts==NULL || pick == NULL) return NULL;		
+	memset(line,0,MAX_LINE_LENGTH);	
 	snprintf(line,MAX_LINE_LENGTH,"%s %s %.127s (%ug) [%u/100] %s \n", user_strings[MSG_TOOTHPASTE], right_armour, pick->what.toothpaste_brand, pick->what.tube_mass_g, pick->what.rating, left_armour);
 		
 	return line;
@@ -970,7 +979,8 @@ str_toothpaste_index(toothpaste_pick_t* pick,toothpaste_pick_options_t* topts)
 {
 	char* line = malloc(MAX_TOOTHPASTE_LINE);
 	if (topts==NULL || pick == NULL) return NULL;		
-	snprintf(line,MAX_LINE_LENGTH,"%s %u/%u \n", user_strings[MSG_TOOTHPASTE_I],pick->toothpaste_pick_index,pick->total_toothpastes);
+	memset(line,0,MAX_TOOTHPASTE_LINE);	
+	snprintf(line,MAX_TOOTHPASTE_LINE,"%s %u/%u \n", user_strings[MSG_TOOTHPASTE_I],pick->toothpaste_pick_index,pick->total_toothpastes);
 		
 	return line;
 }
@@ -980,6 +990,7 @@ str_toothpaste_type(toothpaste_pick_t* pick,toothpaste_pick_options_t* topts)
 {
 	char* line = malloc(MAX_TOOTHPASTE_LINE);
 	if (topts==NULL || pick == NULL) return NULL;		
+	memset(line,0,MAX_TOOTHPASTE_LINE);		
 	snprintf(line,MAX_LINE_LENGTH,"%s %s \n", user_strings[MSG_TOOTHPASTE_T],toothpaste_type_strings[pick->what.type]);
 		
 	return line;
@@ -990,6 +1001,7 @@ str_dental_formula(toothpaste_pick_t* pick,toothpaste_pick_options_t* topts)
 {
 	char* line = malloc(MAX_TOOTHPASTE_LINE);
 	if (topts==NULL || pick == NULL) return NULL;		
+	memset(line,0,MAX_TOOTHPASTE_LINE);		
 	snprintf(line,MAX_TOOTHPASTE_LINE,"%s %u-%u-%u-%u \n", user_strings[MSG_DENTAL] , topts->formula.brush_times_per_day ,topts->formula.minutes_per_brush , topts->formula.swap_toothbrush_times_per_year , topts->formula.visit_dentist_times_per_year);
 		
 	return line;
@@ -1000,6 +1012,7 @@ str_day_of_the_week(toothpaste_pick_t* pick,toothpaste_pick_options_t* topts)
 {
 	char* line = malloc(MAX_LINE_LENGTH);
 	if (topts==NULL || pick == NULL) return NULL;		
+	memset(line,0,MAX_LINE_LENGTH);	
 	snprintf(line,MAX_LINE_LENGTH,"%s %s %u \n", user_strings[MSG_DAY] ,days_of_week[pick->j],pick->day);
 		
 	return line;
@@ -1010,6 +1023,7 @@ str_total_picks(toothpaste_pick_t* pick,toothpaste_pick_options_t* topts)
 {
 	char* line = malloc(MAX_TOOTHPASTE_LINE);
 	if (topts==NULL || pick == NULL) return NULL;	
+		memset(line,0,MAX_TOOTHPASTE_LINE);		
 		if (topts->fake_stats)
 			snprintf(line,MAX_LINE_LENGTH,"%s ~%u \n", user_strings[MSG_TOTAL_PICKS], pick->stats.total_picks);
 		else
@@ -1023,6 +1037,7 @@ str_last_pick_time(toothpaste_pick_t* pick,toothpaste_pick_options_t* topts)
 {
 	char* line = malloc(MAX_TOOTHPASTE_LINE);
 	if (topts==NULL || pick == NULL) return NULL;		
+	memset(line,0,MAX_TOOTHPASTE_LINE);			
 	snprintf(line,MAX_LINE_LENGTH,"%s %s", user_strings[MSG_LAST_PICK_TIME] ,ctime(&pick->stats.last_pick_time));
 		
 	return line;
@@ -1033,6 +1048,7 @@ str_tubes_wasted(toothpaste_pick_t* pick,toothpaste_pick_options_t* topts)
 {
 	char* line = malloc(MAX_TOOTHPASTE_LINE);
 	if (topts==NULL || pick == NULL) return NULL;		
+	memset(line,0,MAX_TOOTHPASTE_LINE);			
 	snprintf(line,MAX_LINE_LENGTH,"%s %s \n", user_strings[MSG_TUBES_WASTED], pick->waste_report);
 		
 	return line;
@@ -1043,6 +1059,7 @@ str_source(toothpaste_pick_t* pick,toothpaste_pick_options_t* topts)
 {
 	char* line = malloc(MAX_TOOTHPASTE_LINE);
 	if (topts==NULL || pick == NULL) return NULL;		
+	memset(line,0,MAX_TOOTHPASTE_LINE);			
 	snprintf(line,MAX_LINE_LENGTH,"%s %s \n", user_strings[MSG_SOURCE], toothpastes_file_path_final);
 		
 	return line;
@@ -1054,6 +1071,7 @@ str_meme(toothpaste_pick_t* pick,toothpaste_pick_options_t* topts)
 	char* line = malloc(MAX_TOOTHPASTE_LINE);
 	
 	if (topts==NULL || pick == NULL) return NULL;	
+	memset(line,0,MAX_TOOTHPASTE_LINE);			
 	snprintf(line,MAX_LINE_LENGTH,"%s %s \n", user_strings[MSG_MEME], topts->meme_payload);
 	return line;
 }
@@ -1064,6 +1082,7 @@ str_quiet(toothpaste_pick_t* pick,toothpaste_pick_options_t* topts)
 	char* line = malloc(MAX_TOOTHPASTE_LINE);
 	
 	if (topts==NULL || pick == NULL) return NULL;	
+	memset(line,0,MAX_TOOTHPASTE_LINE);			
 	snprintf(pick->message,2*MAX_TOOTHPASTE_LINE,"%.127s (%ug) [%u/100] \n", pick->what.toothpaste_brand,pick->what.tube_mass_g, pick->what.rating);
 	return line;
 }
