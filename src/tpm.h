@@ -93,6 +93,8 @@ memcpy(&x,swap_temp,sizeof(x)); \
 #define BRUSHES_PER_LIFETIME 30000
 #define GRAMS_PER_NURDLE 2
 #define MAX_REPORT_TERM 10
+#define TOTAL_OUTPUT_STRINGS 19
+
 typedef enum user_msg_t
 {
 	MSG_PICK_COUNTER_C,
@@ -211,6 +213,7 @@ typedef struct toothpaste_pick_options_t
 	int upper_brands;
 	dental_formula_t formula;
 	char meme_payload[MAX_TOOTHPASTE_LINE];
+	int time_of_day_ind;
 }toothpaste_pick_options_t;
 
 typedef struct toothpaste_pick_t
@@ -227,6 +230,9 @@ typedef struct toothpaste_pick_t
 	char* CSV;
 	char* waste_report;
 	toothpaste_pick_options_t opts;
+	struct list_node_t* head;
+	int j;
+	unsigned int day;
 }toothpaste_pick_t;
 
 TPM list_node_t* tpm_load_list_from_file(const char* filename);
@@ -266,6 +272,28 @@ static void save_default_config(struct cfg_struct* cfg);
 static int file_exists_fopen(const char *filename);
 static uint64_t rand_range(uint64_t min, uint64_t max);
 static char* report_wasted_tubes(list_node_t* head,toothpaste_pick_stats_t* stats);
+static char* str_good_day(toothpaste_pick_t* pick,toothpaste_pick_options_t* topts);
+static char* str_anon_username(toothpaste_pick_t* pick,toothpaste_pick_options_t* topts);
+static char* str_welcome(toothpaste_pick_t* pick,toothpaste_pick_options_t* topts);
+static char* str_next_pick(toothpaste_pick_t* pick,toothpaste_pick_options_t* topts);
+static char* str_new_toothbrush(toothpaste_pick_t* pick,toothpaste_pick_options_t* topts);
+static char* str_visit_dentist(toothpaste_pick_t* pick,toothpaste_pick_options_t* topts);
+static char* str_already_picked(toothpaste_pick_t* pick,toothpaste_pick_options_t* topts);
+static char* str_pick_type(toothpaste_pick_t* pick,toothpaste_pick_options_t* topts);
+static char* str_toothpaste(toothpaste_pick_t* pick,toothpaste_pick_options_t* topts);
+static char* str_toothpaste_index(toothpaste_pick_t* pick,toothpaste_pick_options_t* topts);
+static char* str_toothpaste_type(toothpaste_pick_t* pick,toothpaste_pick_options_t* topts);
+static char* str_dental_formula(toothpaste_pick_t* pick,toothpaste_pick_options_t* topts);
+static char* str_day_of_the_week(toothpaste_pick_t* pick,toothpaste_pick_options_t* topts);
+static char* str_total_picks(toothpaste_pick_t* pick,toothpaste_pick_options_t* topts);
+static char* str_last_pick_time(toothpaste_pick_t* pick,toothpaste_pick_options_t* topts);
+static char* str_tubes_wasted(toothpaste_pick_t* pick,toothpaste_pick_options_t* topts);
+static char* str_source(toothpaste_pick_t* pick,toothpaste_pick_options_t* topts);
+static char* str_meme(toothpaste_pick_t* pick,toothpaste_pick_options_t* topts);
+static char* str_quiet(toothpaste_pick_t* pick,toothpaste_pick_options_t* topts);
+static int eval_username(toothpaste_pick_t* pick,toothpaste_pick_options_t* topts);
+static int eval_total_toothpastes(toothpaste_pick_t* pick,toothpaste_pick_options_t* topts);
+
 #ifdef __cplusplus
 }
 #endif /*__cpluplus*/

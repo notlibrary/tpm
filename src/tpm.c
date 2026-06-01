@@ -840,70 +840,275 @@ report_wasted_tubes(list_node_t* head,toothpaste_pick_stats_t* stats)
 	return report;
 }
 
+static int
+eval_total_toothpastes(toothpaste_pick_t* pick,toothpaste_pick_options_t* topts)
+{
+	if (topts==NULL || pick == NULL) return 1;
+	pick->total_toothpastes = count_list(pick->head);
+	if (0==pick->total_toothpastes) 
+	{
+			perror(error_strings[NO_TOOTHPASTES_LOADED]);
+	}
+	return 0;
+}
+
+
+static int
+eval_username(toothpaste_pick_t* pick,toothpaste_pick_options_t* topts)
+{
+	char username[UNLEN + 1];
+	if (topts==NULL || pick == NULL) return 1;
+	memset(username,0,UNLEN);
+		
+	if (get_current_username(username, sizeof(username)) == 0) 
+	{
+		if (topts->username == NULL)
+		{
+			strncpy(topts->username,username,UNLEN);
+		}
+		strncpy(pick->who,topts->username,UNLEN);
+    }
+	else 
+	{
+        strncpy(pick->who,user_strings[MSG_ANON],UNLEN);
+    }
+	return 0;
+}
+
+static char*
+str_good_day(toothpaste_pick_t* pick,toothpaste_pick_options_t* topts)
+{
+	char* line = malloc(MAX_TOOTHPASTE_LINE);
+	if (topts==NULL || pick == NULL) return NULL;	
+	snprintf(line,MAX_TOOTHPASTE_LINE,"%s %s ", user_strings[MSG_GOOD], times_of_day[topts->time_of_day_ind]);
+
+	return line;
+}
+
+static char*
+str_anon_username(toothpaste_pick_t* pick,toothpaste_pick_options_t* topts)
+{
+	char* line = malloc(UNLEN);
+	if (topts==NULL || pick == NULL) return NULL;
+	snprintf(line,UNLEN+1,"%s " ,pick->who);
+	
+	return line;
+}
+
+static char*
+str_welcome(toothpaste_pick_t* pick,toothpaste_pick_options_t* topts)
+{
+	char* line = malloc(MAX_TOOTHPASTE_LINE);
+	if (topts==NULL || pick == NULL) return NULL;	
+	snprintf(line,MAX_TOOTHPASTE_LINE,"%s \n" ,user_strings[MSG_WELCOME]);
+	
+	return line;
+}
+
+static char*
+str_next_pick(toothpaste_pick_t* pick,toothpaste_pick_options_t* topts)
+{
+	char* line = malloc(MAX_TOOTHPASTE_LINE);
+	if (topts==NULL || pick == NULL) return NULL;	
+	snprintf(line,MAX_TOOTHPASTE_LINE,"%s \n", user_strings[MSG_NEXT_PICK]);
+	
+	return line;
+}
+
+static char*
+str_new_toothbrush(toothpaste_pick_t* pick,toothpaste_pick_options_t* topts)
+{
+	char* line = malloc(MAX_TOOTHPASTE_LINE);
+	if (topts==NULL || pick == NULL) return NULL;	
+	snprintf(line,MAX_TOOTHPASTE_LINE,"%s \n", user_strings[MSG_TOOTHBRUSH]);
+	
+	return line;
+}
+
+static char*
+str_visit_dentist(toothpaste_pick_t* pick,toothpaste_pick_options_t* topts)
+{
+	char* line = malloc(MAX_TOOTHPASTE_LINE);
+	if (topts==NULL || pick == NULL) return NULL;		
+	snprintf(line,MAX_TOOTHPASTE_LINE,"%s \n", user_strings[MSG_DENTIST]);
+		
+	return line;
+}
+
+static char*
+str_already_picked(toothpaste_pick_t* pick,toothpaste_pick_options_t* topts)
+{
+	char* line = malloc(MAX_TOOTHPASTE_LINE);
+	if (topts==NULL || pick == NULL) return NULL;		
+	snprintf(line,MAX_TOOTHPASTE_LINE,"%s \n", user_strings[MSG_ALREADY]);
+		
+	return line;
+}
+
+static char*
+str_pick_type(toothpaste_pick_t* pick,toothpaste_pick_options_t* topts)
+{
+	char* line = malloc(MAX_TOOTHPASTE_LINE);
+	if (topts==NULL || pick == NULL) return NULL;		
+	snprintf(line,MAX_TOOTHPASTE_LINE,"%s: %s\n", user_strings[MSG_PICK_TYPE], pick_type_strings[topts->ptype]);
+		
+	return line;
+}
+
+static char*
+str_toothpaste(toothpaste_pick_t* pick,toothpaste_pick_options_t* topts)
+{
+	char* line = malloc(MAX_LINE_LENGTH);
+	if (topts==NULL || pick == NULL) return NULL;		
+	snprintf(line,MAX_LINE_LENGTH,"%s %s %.127s (%ug) [%u/100] %s \n", user_strings[MSG_TOOTHPASTE], right_armour, pick->what.toothpaste_brand, pick->what.tube_mass_g, pick->what.rating, left_armour);
+		
+	return line;
+}
+
+static char*
+str_toothpaste_index(toothpaste_pick_t* pick,toothpaste_pick_options_t* topts)
+{
+	char* line = malloc(MAX_TOOTHPASTE_LINE);
+	if (topts==NULL || pick == NULL) return NULL;		
+	snprintf(line,MAX_LINE_LENGTH,"%s %u/%u \n", user_strings[MSG_TOOTHPASTE_I],pick->toothpaste_pick_index,pick->total_toothpastes);
+		
+	return line;
+}
+
+static char*
+str_toothpaste_type(toothpaste_pick_t* pick,toothpaste_pick_options_t* topts)
+{
+	char* line = malloc(MAX_TOOTHPASTE_LINE);
+	if (topts==NULL || pick == NULL) return NULL;		
+	snprintf(line,MAX_LINE_LENGTH,"%s %s \n", user_strings[MSG_TOOTHPASTE_T],toothpaste_type_strings[pick->what.type]);
+		
+	return line;
+}
+
+static char*
+str_dental_formula(toothpaste_pick_t* pick,toothpaste_pick_options_t* topts)
+{
+	char* line = malloc(MAX_TOOTHPASTE_LINE);
+	if (topts==NULL || pick == NULL) return NULL;		
+	snprintf(line,MAX_TOOTHPASTE_LINE,"%s %u-%u-%u-%u \n", user_strings[MSG_DENTAL] , topts->formula.brush_times_per_day ,topts->formula.minutes_per_brush , topts->formula.swap_toothbrush_times_per_year , topts->formula.visit_dentist_times_per_year);
+		
+	return line;
+}
+
+static char*
+str_day_of_the_week(toothpaste_pick_t* pick,toothpaste_pick_options_t* topts)
+{
+	char* line = malloc(MAX_LINE_LENGTH);
+	if (topts==NULL || pick == NULL) return NULL;		
+	snprintf(line,MAX_LINE_LENGTH,"%s %s %u \n", user_strings[MSG_DAY] ,days_of_week[pick->j],pick->day);
+		
+	return line;
+}
+
+static char*
+str_total_picks(toothpaste_pick_t* pick,toothpaste_pick_options_t* topts)
+{
+	char* line = malloc(MAX_TOOTHPASTE_LINE);
+	if (topts==NULL || pick == NULL) return NULL;	
+		if (topts->fake_stats)
+			snprintf(line,MAX_LINE_LENGTH,"%s ~%u \n", user_strings[MSG_TOTAL_PICKS], pick->stats.total_picks);
+		else
+			snprintf(line,MAX_LINE_LENGTH,"%s %u \n", user_strings[MSG_TOTAL_PICKS], pick->stats.total_picks);
+		
+	return line;
+}
+
+static char*
+str_last_pick_time(toothpaste_pick_t* pick,toothpaste_pick_options_t* topts)
+{
+	char* line = malloc(MAX_TOOTHPASTE_LINE);
+	if (topts==NULL || pick == NULL) return NULL;		
+	snprintf(line,MAX_LINE_LENGTH,"%s %s", user_strings[MSG_LAST_PICK_TIME] ,ctime(&pick->stats.last_pick_time));
+		
+	return line;
+}
+
+static char*
+str_tubes_wasted(toothpaste_pick_t* pick,toothpaste_pick_options_t* topts)
+{
+	char* line = malloc(MAX_TOOTHPASTE_LINE);
+	if (topts==NULL || pick == NULL) return NULL;		
+	snprintf(line,MAX_LINE_LENGTH,"%s %s \n", user_strings[MSG_TUBES_WASTED], pick->waste_report);
+		
+	return line;
+}
+
+static char*
+str_source(toothpaste_pick_t* pick,toothpaste_pick_options_t* topts)
+{
+	char* line = malloc(MAX_TOOTHPASTE_LINE);
+	if (topts==NULL || pick == NULL) return NULL;		
+	snprintf(line,MAX_LINE_LENGTH,"%s %s \n", user_strings[MSG_SOURCE], toothpastes_file_path_final);
+		
+	return line;
+}
+
+static char*
+str_meme(toothpaste_pick_t* pick,toothpaste_pick_options_t* topts)
+{
+	char* line = malloc(MAX_TOOTHPASTE_LINE);
+	
+	if (topts==NULL || pick == NULL) return NULL;	
+	snprintf(line,MAX_LINE_LENGTH,"%s %s \n", user_strings[MSG_MEME], topts->meme_payload);
+	return line;
+}
+
+static char*
+str_quiet(toothpaste_pick_t* pick,toothpaste_pick_options_t* topts)
+{
+	char* line = malloc(MAX_TOOTHPASTE_LINE);
+	
+	if (topts==NULL || pick == NULL) return NULL;	
+	snprintf(pick->message,2*MAX_TOOTHPASTE_LINE,"%.127s (%ug) [%u/100] \n", pick->what.toothpaste_brand,pick->what.tube_mass_g, pick->what.rating);
+	return line;
+}
+
+
+
+
+
 TPM toothpaste_pick_t*
 tpm_pick_toothpaste(list_node_t* head,toothpaste_pick_options_t topts)
 {
-	int i,j,k;
+	int i=0,k,ti;
 	static toothpaste_pick_t pick;
 	time_t total_seconds = time(NULL)+delta_days*SECONDS_PER_DAY+delta_hours*SECONDS_PER_HOUR;
-	unsigned int day;
-	char username[UNLEN + 1];
 	char line[MAX_LINE_LENGTH];
 	int new_pick_flag =0;
 	int dentist_flag=0;
 	int toothbrush_flag=0;
 	unsigned int brand_len;
+	char* toothpaste_strings[TOTAL_OUTPUT_STRINGS];
 	
 	pick.opts = topts;
 	memset(line,0,MAX_LINE_LENGTH);
-	memset(username,0,UNLEN);
+
 	pick.message=malloc(OUTPUT_BLOCK_SIZE);
 	pick.JSON=malloc(OUTPUT_BLOCK_SIZE);
 	pick.CSV=malloc(OUTPUT_BLOCK_SIZE);
 	pick.waste_report=NULL;
-	
+	pick.head=head;
 	memset(pick.JSON,0,OUTPUT_BLOCK_SIZE);	
 	memset(pick.message,0,OUTPUT_BLOCK_SIZE);
 	memset(pick.CSV,0,OUTPUT_BLOCK_SIZE);	
 	
-	if (get_current_username(username, sizeof(username)) == 0) 
-	{
-		if (topts.username == NULL)
-		{strncpy(topts.username,username,UNLEN);}
-		strncpy(pick.who,topts.username,UNLEN);
-    }
-	else 
-	{
-        strncpy(pick.who,user_strings[MSG_ANON],UNLEN);
-    }
-	pick.total_toothpastes = count_list(head);
-	if (0==pick.total_toothpastes) 
-	{
-			perror(error_strings[NO_TOOTHPASTES_LOADED]);
-	}
+	eval_username(&pick,&topts);
+	eval_total_toothpastes(&pick,&topts);
 	read_counters(&pick.stats,pick.opts.fake_stats);
 	pick.waste_report=report_wasted_tubes(toothpastes_list,&pick.stats);
 	pick.toothpaste_pick_index=pick.stats.total_picks;
 	pick.when=total_seconds;
-	i=(total_seconds)/(SECONDS_PER_DAY/TOTAL_TIMES_OF_DAY)%(TOTAL_TIMES_OF_DAY);
+	topts.time_of_day_ind=(total_seconds)/(SECONDS_PER_DAY/TOTAL_TIMES_OF_DAY)%(TOTAL_TIMES_OF_DAY);
 	
-	if (topts.verbose)
-	{
-		snprintf(line,MAX_TOOTHPASTE_LINE,"%s %s ", user_strings[MSG_GOOD], times_of_day[i]);
-		strncat(pick.message,line,MAX_LINE_LENGTH);
-		
-		snprintf(line,UNLEN+1,"%s " ,pick.who);
-		strncat(pick.message,line,MAX_LINE_LENGTH);
-		
-		snprintf(line,MAX_TOOTHPASTE_LINE,"%s \n" ,user_strings[MSG_WELCOME]);
-		strncat(pick.message,line,MAX_LINE_LENGTH);
-	}
-	
-	
-	day = total_seconds/SECONDS_PER_DAY;
+	pick.day = total_seconds/SECONDS_PER_DAY;
 	
 	if (pick.total_toothpastes!=0)  
-		i=day%pick.total_toothpastes;
+		i=pick.day%pick.total_toothpastes;
 	
 	if (topts.ptype==PICK_BY_INDEX) 
 	{
@@ -949,15 +1154,10 @@ tpm_pick_toothpaste(list_node_t* head,toothpaste_pick_options_t topts)
 			pick.what.toothpaste_brand[k]=toupper(pick.what.toothpaste_brand[k]);
 		}
 	}
-	j=(day)%TOTAL_DAYS_OF_WEEK;
+	pick.j=(pick.day)%TOTAL_DAYS_OF_WEEK;
 	
 	if ((total_seconds - pick.stats.last_pick_time) > (SECONDS_PER_DAY-PICK_TIMEOUT_SECONDS)) 
 	{
-		if (topts.verbose) 
-		{
-			snprintf(line,MAX_TOOTHPASTE_LINE,"%s \n", user_strings[MSG_NEXT_PICK]);
-			strncat(pick.message,line,MAX_LINE_LENGTH);
-		}
 		new_pick_flag=1;
 		pick.stats.total_picks++;
 		pick.stats.last_pick_time=total_seconds;
@@ -965,74 +1165,49 @@ tpm_pick_toothpaste(list_node_t* head,toothpaste_pick_options_t topts)
 		
 		if (pick.stats.total_picks % (DAYS_PER_YEAR /topts.formula.swap_toothbrush_times_per_year) ==0)
 		{
-			 if (topts.verbose) 
-			 { 
-					snprintf(line,MAX_TOOTHPASTE_LINE,"%s \n", user_strings[MSG_TOOTHBRUSH]); 
-					strncat(pick.message,line,MAX_LINE_LENGTH);
-			 }
-		toothbrush_flag = 1;
+			toothbrush_flag = 1;
 		}
 		
 		if (pick.stats.total_picks % (DAYS_PER_YEAR /topts.formula.visit_dentist_times_per_year) ==0)
 		{
-			 if (topts.verbose) 
-			 { 
-					snprintf(line,MAX_TOOTHPASTE_LINE,"%s \n", user_strings[MSG_DENTIST]); 
-					strncat(pick.message,line,MAX_LINE_LENGTH);
-			 }
-			 dentist_flag = 1;
+			dentist_flag = 1;
 		}
 	}
-	if (topts.verbose) 
-	{
-		if (new_pick_flag==0)
-		{	
-			snprintf(line,MAX_TOOTHPASTE_LINE,"%s \n", user_strings[MSG_ALREADY]);
-			strncat(pick.message,line,MAX_LINE_LENGTH);	
-		}
-		snprintf(line,MAX_TOOTHPASTE_LINE,"%s: %s\n", user_strings[MSG_PICK_TYPE], pick_type_strings[topts.ptype] );
-		strncat(pick.message,line,MAX_LINE_LENGTH);
+	pick.stats.last_pick_time=pick.stats.last_pick_time-delta_hours*SECONDS_PER_HOUR;
 		
-		snprintf(line,MAX_LINE_LENGTH,"%s %s %.127s (%ug) [%u/100] %s \n", user_strings[MSG_TOOTHPASTE], right_armour, pick.what.toothpaste_brand, pick.what.tube_mass_g, pick.what.rating, left_armour);
-		strncat(pick.message,line,MAX_LINE_LENGTH);
-		
-		snprintf(line,MAX_LINE_LENGTH,"%s %u/%u \n", user_strings[MSG_TOOTHPASTE_I],i,pick.total_toothpastes);
-		strncat(pick.message,line,MAX_LINE_LENGTH);
-		
-		snprintf(line,MAX_LINE_LENGTH,"%s %s \n", user_strings[MSG_TOOTHPASTE_T],toothpaste_type_strings[pick.what.type]);
-		strncat(pick.message,line,MAX_LINE_LENGTH);
-		
-		snprintf(line,MAX_TOOTHPASTE_LINE,"%s %u-%u-%u-%u \n", user_strings[MSG_DENTAL] , topts.formula.brush_times_per_day ,topts.formula.minutes_per_brush , topts.formula.swap_toothbrush_times_per_year , topts.formula.visit_dentist_times_per_year);
-		strncat(pick.message,line,MAX_LINE_LENGTH);
-		
-		snprintf(line,MAX_LINE_LENGTH,"%s %s %u \n", user_strings[MSG_DAY] ,days_of_week[j],day);
-		strncat(pick.message,line,MAX_LINE_LENGTH);
-		
-		if (topts.fake_stats)
-			snprintf(line,MAX_LINE_LENGTH,"%s ~%u \n", user_strings[MSG_TOTAL_PICKS], pick.stats.total_picks);
-		else
-			snprintf(line,MAX_LINE_LENGTH,"%s %u \n", user_strings[MSG_TOTAL_PICKS], pick.stats.total_picks);
-		strncat(pick.message,line,MAX_LINE_LENGTH);
-		
-		pick.stats.last_pick_time=pick.stats.last_pick_time-delta_hours*SECONDS_PER_HOUR;
-		snprintf(line,MAX_LINE_LENGTH,"%s %s", user_strings[MSG_LAST_PICK_TIME] ,ctime(&pick.stats.last_pick_time));
-		strncat(pick.message,line,MAX_LINE_LENGTH);
-		
-		memset(line,0,MAX_LINE_LENGTH);
-		snprintf(line,MAX_LINE_LENGTH,"%s %s \n", user_strings[MSG_TUBES_WASTED], pick.waste_report);
-		strncat(pick.message,line,MAX_LINE_LENGTH);	
+	pick.toothpaste_pick_index=i;
 	
-		snprintf(line,MAX_LINE_LENGTH,"%s %s \n", user_strings[MSG_SOURCE], toothpastes_file_path_final);
-		strncat(pick.message,line,MAX_LINE_LENGTH);
-
-		snprintf(line,MAX_LINE_LENGTH,"%s %s \n", user_strings[MSG_MEME], topts.meme_payload);
-		strncat(pick.message,line,MAX_LINE_LENGTH);
-		
-	}
-	else 
+	toothpaste_strings[0] = 	str_good_day(&pick,&topts);
+	toothpaste_strings[1] = 	str_anon_username(&pick,&topts);
+	toothpaste_strings[2] = 	str_welcome(&pick,&topts);
+	toothpaste_strings[3] = 	str_next_pick(&pick,&topts);
+	toothpaste_strings[4] = 	str_new_toothbrush(&pick,&topts);
+	toothpaste_strings[5] = 	str_visit_dentist(&pick,&topts);
+	toothpaste_strings[6] = 	str_already_picked(&pick,&topts);
+	toothpaste_strings[7] = 	str_pick_type(&pick,&topts);
+	toothpaste_strings[8] = 	str_toothpaste(&pick,&topts);
+	toothpaste_strings[9] = 	str_toothpaste_index(&pick,&topts);
+	toothpaste_strings[10] = 	str_toothpaste_type(&pick,&topts);
+	toothpaste_strings[11] = 	str_dental_formula(&pick,&topts);
+	toothpaste_strings[12] = 	str_day_of_the_week(&pick,&topts);
+	toothpaste_strings[13] = 	str_total_picks(&pick,&topts);
+	toothpaste_strings[14] = 	str_last_pick_time(&pick,&topts);
+	toothpaste_strings[15] = 	str_tubes_wasted(&pick,&topts);
+	toothpaste_strings[16] = 	str_source(&pick,&topts);
+	toothpaste_strings[17] = 	str_meme(&pick,&topts);
+	toothpaste_strings[18] = 	str_quiet(&pick,&topts);
+	
+	for (ti=0;ti<TOTAL_OUTPUT_STRINGS;ti++)
 	{
-		snprintf(pick.message,2*MAX_TOOTHPASTE_LINE,"%.127s (%ug) [%u/100] \n", pick.what.toothpaste_brand,pick.what.tube_mass_g, pick.what.rating);	
+		strcat(pick.message,toothpaste_strings[ti]);
+
 	}
+	for (ti=0;ti<TOTAL_OUTPUT_STRINGS;ti++)
+	{
+		free(toothpaste_strings[ti]);
+
+	}
+	
 	
 	snprintf(pick.JSON,MAX_LINE_LENGTH,"{\n\t \"who\":\"%s\",\n\t \"toothpaste\":\"%.127s\",\n\t \"tube_mass_g\":%u,\n\t \"rating\":%u \n}",pick.who,pick.what.toothpaste_brand,pick.what.tube_mass_g,pick.what.rating);
 		
@@ -1054,7 +1229,7 @@ tpm_pick_toothpaste(list_node_t* head,toothpaste_pick_options_t topts)
 	snprintf(line,MAX_LINE_LENGTH,"%u-%u-%u-%u,", topts.formula.brush_times_per_day ,topts.formula.minutes_per_brush , topts.formula.swap_toothbrush_times_per_year, topts.formula.visit_dentist_times_per_year);
 	strncat(pick.CSV,line,MAX_LINE_LENGTH);
 	
-	snprintf(line,MAX_LINE_LENGTH,"%s,%u,", days_of_week[j],day);
+	snprintf(line,MAX_LINE_LENGTH,"%s,%u,", days_of_week[pick.j],pick.day);
 	strncat(pick.CSV,line,MAX_LINE_LENGTH);
 	
 	snprintf(line,MAX_LINE_LENGTH,LINE_FORMAT_CSV, pick.stats.total_picks,pick.stats.last_pick_time,pick.waste_report,toothpastes_file_path_final,topts.meme_payload);
