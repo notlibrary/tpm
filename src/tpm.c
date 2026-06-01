@@ -1088,17 +1088,23 @@ str_quiet(toothpaste_pick_t* pick,toothpaste_pick_options_t* topts)
 }
 
 static int 
-check_visibility(int input_id, int new_pick_flag, int toothbrush_flag, int dentist_flag )
+check_visibility(int input_id, int new_pick_flag, int toothbrush_flag, int dentist_flag ,int verbose)
 {
-	if ((input_id >=7) || (input_id <=2))
-		return 1;
-	if ((input_id==3) && (new_pick_flag))
-		return 1;
-	if ((input_id==4) && (toothbrush_flag))
-		return 1;
-	if ((input_id==5) && (dentist_flag))
-		return 1;
-	if ((input_id==6) && (!new_pick_flag)) {
+	if (verbose)
+	{
+		if ((input_id >=7) || (input_id <=2))
+			return 1;
+		if ((input_id==3) && (new_pick_flag))
+			return 1;
+		if ((input_id==4) && (toothbrush_flag))
+			return 1;
+		if ((input_id==5) && (dentist_flag))
+			return 1;
+		if ((input_id==6) && (!new_pick_flag)) {
+			return 1;
+		}
+	}
+	if ((input_id ==18)&& !verbose) {
 		return 1;
 	}
 	return 0;
@@ -1161,7 +1167,10 @@ char_to_strnum(char input)
 		break;		
 		case 'm':
 		return 17;
-		break;		
+		break;
+		case 'I':
+		return 18;
+		break;			
 		
 		default:
 			return -1;
@@ -1183,7 +1192,7 @@ tpm_pick_toothpaste(list_node_t* head,toothpaste_pick_options_t topts)
 	int toothbrush_flag=0;
 	unsigned int brand_len;
 	char* toothpaste_strings[TOTAL_OUTPUT_STRINGS];
-	char* template_str ="guwntdapoiTfWPlUsm";
+	char* template_str ="guwntdapoiTfWPlUsmI";
 	char c=template_str[0];
 	pick.opts = topts;
 	memset(line,0,MAX_LINE_LENGTH);
@@ -1301,7 +1310,7 @@ tpm_pick_toothpaste(list_node_t* head,toothpaste_pick_options_t topts)
 	while (c!='\0')
 	{
 		c=template_str[ti++];
-		if (check_visibility(char_to_strnum(c),new_pick_flag,toothbrush_flag,dentist_flag))
+		if (check_visibility(char_to_strnum(c),new_pick_flag,toothbrush_flag,dentist_flag, topts.verbose))
 		if (char_to_strnum(c)!=-1)	
 		strcat(pick.message,toothpaste_strings[char_to_strnum(c)]);
 	}
