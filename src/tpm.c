@@ -1083,7 +1083,7 @@ str_quiet(toothpaste_pick_t* pick,toothpaste_pick_options_t* topts)
 	
 	if (topts==NULL || pick == NULL) return NULL;	
 	memset(line,0,MAX_TOOTHPASTE_LINE);			
-	snprintf(pick->message,2*MAX_TOOTHPASTE_LINE,"%.127s (%ug) [%u/100] \n", pick->what.toothpaste_brand,pick->what.tube_mass_g, pick->what.rating);
+	snprintf(line,2*MAX_TOOTHPASTE_LINE,"%.127s (%ug) [%u/100] \n", pick->what.toothpaste_brand,pick->what.tube_mass_g, pick->what.rating);
 	return line;
 }
 
