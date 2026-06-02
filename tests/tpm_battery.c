@@ -87,6 +87,8 @@ START_TEST (length_pick_msg)
 	topts.formula.visit_dentist_times_per_year=2;
 	topts.formula.swap_toothbrush_times_per_year=2;
 	topts.ptype=0;
+	strcpy(topts.tpm_template,"guwntdapoiTfWPlUsmI");
+	strcpy(topts.meme_payload,"moot");
 	int len;
 	
 	toothpastes_list=tpm_load_list_from_file("not/existimg/path");
