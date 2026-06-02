@@ -862,10 +862,6 @@ eval_username(toothpaste_pick_t* pick,toothpaste_pick_options_t* topts)
 		
 	if (get_current_username(username, sizeof(username)) == 0) 
 	{
-		if (topts->username == NULL)
-		{
-			strncpy(topts->username,username,UNLEN);
-		}
 		strncpy(pick->who,topts->username,UNLEN);
     }
 	else 
@@ -1025,9 +1021,9 @@ str_total_picks(toothpaste_pick_t* pick,toothpaste_pick_options_t* topts)
 	if (topts==NULL || pick == NULL) return NULL;	
 		memset(line,0,MAX_TOOTHPASTE_LINE);		
 		if (topts->fake_stats)
-			snprintf(line,MAX_LINE_LENGTH,"%s ~%u \n", user_strings[MSG_TOTAL_PICKS], pick->stats.total_picks);
+			snprintf(line,MAX_TOOTHPASTE_LINE,"%s ~%u \n", user_strings[MSG_TOTAL_PICKS], pick->stats.total_picks);
 		else
-			snprintf(line,MAX_LINE_LENGTH,"%s %u \n", user_strings[MSG_TOTAL_PICKS], pick->stats.total_picks);
+			snprintf(line,MAX_TOOTHPASTE_LINE,"%s %u \n", user_strings[MSG_TOTAL_PICKS], pick->stats.total_picks);
 		
 	return line;
 }
@@ -1038,7 +1034,7 @@ str_last_pick_time(toothpaste_pick_t* pick,toothpaste_pick_options_t* topts)
 	char* line = malloc(MAX_TOOTHPASTE_LINE);
 	if (topts==NULL || pick == NULL) return NULL;		
 	memset(line,0,MAX_TOOTHPASTE_LINE);			
-	snprintf(line,MAX_LINE_LENGTH,"%s %s", user_strings[MSG_LAST_PICK_TIME] ,ctime(&pick->stats.last_pick_time));
+	snprintf(line,MAX_TOOTHPASTE_LINE-2,"%s %s", user_strings[MSG_LAST_PICK_TIME] ,ctime(&pick->stats.last_pick_time));
 		
 	return line;
 }
@@ -1049,7 +1045,7 @@ str_tubes_wasted(toothpaste_pick_t* pick,toothpaste_pick_options_t* topts)
 	char* line = malloc(MAX_TOOTHPASTE_LINE);
 	if (topts==NULL || pick == NULL) return NULL;		
 	memset(line,0,MAX_TOOTHPASTE_LINE);			
-	snprintf(line,MAX_LINE_LENGTH,"%s %s \n", user_strings[MSG_TUBES_WASTED], pick->waste_report);
+	snprintf(line,MAX_TOOTHPASTE_LINE-2,"%s %s \n", user_strings[MSG_TUBES_WASTED], pick->waste_report);
 		
 	return line;
 }
@@ -1060,7 +1056,7 @@ str_source(toothpaste_pick_t* pick,toothpaste_pick_options_t* topts)
 	char* line = malloc(MAX_TOOTHPASTE_LINE);
 	if (topts==NULL || pick == NULL) return NULL;		
 	memset(line,0,MAX_TOOTHPASTE_LINE);			
-	snprintf(line,MAX_LINE_LENGTH,"%s %s \n", user_strings[MSG_SOURCE], toothpastes_file_path_final);
+	snprintf(line,MAX_TOOTHPASTE_LINE,"%s %s \n", user_strings[MSG_SOURCE], toothpastes_file_path_final);
 		
 	return line;
 }
@@ -1072,7 +1068,7 @@ str_meme(toothpaste_pick_t* pick,toothpaste_pick_options_t* topts)
 	
 	if (topts==NULL || pick == NULL) return NULL;	
 	memset(line,0,MAX_TOOTHPASTE_LINE);			
-	snprintf(line,MAX_LINE_LENGTH,"%s %s \n", user_strings[MSG_MEME], topts->meme_payload);
+	snprintf(line,MAX_TOOTHPASTE_LINE,"%s %s \n", user_strings[MSG_MEME], topts->meme_payload);
 	return line;
 }
 
@@ -1083,7 +1079,7 @@ str_quiet(toothpaste_pick_t* pick,toothpaste_pick_options_t* topts)
 	
 	if (topts==NULL || pick == NULL) return NULL;	
 	memset(line,0,MAX_TOOTHPASTE_LINE);			
-	snprintf(line,2*MAX_TOOTHPASTE_LINE,"%.127s (%ug) [%u/100] \n", pick->what.toothpaste_brand,pick->what.tube_mass_g, pick->what.rating);
+	snprintf(line,MAX_TOOTHPASTE_LINE,"%.127s (%ug) [%u/100] \n", pick->what.toothpaste_brand,pick->what.tube_mass_g, pick->what.rating);
 	return line;
 }
 
