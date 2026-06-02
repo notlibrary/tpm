@@ -1056,13 +1056,12 @@ str_tubes_wasted(toothpaste_pick_t* pick,toothpaste_pick_options_t* topts)
 static char*
 str_source(toothpaste_pick_t* pick, toothpaste_pick_options_t* topts)
 {
-
     if (topts == NULL || pick == NULL) return NULL;		
     
-    const char* source_str = user_strings[MSG_SOURCE];;
+    const char* source_str = user_strings[MSG_SOURCE];
     const char* path_str = toothpastes_file_path_final;
 
-    size_t needed = strlen(source_str) + strlen(path_str) + 3;
+    size_t needed = strlen(source_str) + strlen(path_str) + 4;
 
     char* line = malloc(needed);
     if (line == NULL) return NULL; 
