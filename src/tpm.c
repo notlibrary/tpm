@@ -885,8 +885,7 @@ str_good_day(toothpaste_pick_t* pick,toothpaste_pick_options_t* topts)
 static char*
 str_anon_username(toothpaste_pick_t* pick, toothpaste_pick_options_t* topts)
 {
-    if (topts == NULL || pick == NULL || pick->who == NULL) return NULL;
-
+    
     size_t buffer_size = UNLEN + 2; 
     char* line = malloc(buffer_size);
     if (line == NULL) return NULL;
@@ -1080,7 +1079,6 @@ static char*
 str_meme(toothpaste_pick_t* pick, toothpaste_pick_options_t* topts)
 {
     if (topts == NULL || pick == NULL) return NULL;	
-    if (user_strings[MSG_MEME] == NULL || topts->meme_payload == NULL) return NULL;
 
 
     size_t needed = strlen(user_strings[MSG_MEME]) + strlen(topts->meme_payload) + 3;
