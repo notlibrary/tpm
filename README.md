@@ -250,6 +250,8 @@ Also sometimes is possible to add 5th term toothpaste grams per nurdle but this 
 
 `-m --meme [meme_payload]` carry user cultural info unit to the toothpaste picking message 
 
+`-T --template [template]` set output template
+
 `toothpastes_path` path to the toothpastes CSV file
 
 ## Configuration file options
@@ -298,6 +300,8 @@ It's options:
 
 `MEME` carry user cultural info unit to the toothpaste picking message
 
+`TEMPLATE` set output template 	
+
 ## TPM Toothpastes Picking Manager Configuration Sample
 ```
 [CONSTANTS]
@@ -326,6 +330,7 @@ UPPER_BRANDS=0
 TIMEZONE=0
 DELTA_DAYS=0
 MEME=42
+TEMPLATE="guwntdapoiTfWPlUsmI"
 ```
 
 ## TPM The Toothpastes Picking Manager Files List
@@ -364,6 +369,49 @@ for each tube you got
 
 UPPERCASE the brand string to ensure it's seen first through running down terminal with the toothpaste picking string
 
+## Templater output table
+Templater is used to control the TPM output
+
+`guwntdapoiTfWPlUsmI` is a standard default TPM output template
+
+`g` good time of the day
+
+`u` username
+
+`w` welcome
+
+`n` new pick
+
+`t` new toothbrush
+
+`d` new dentist visit
+
+`a` already picked
+
+`p` pick type
+
+`o` toothpaste
+
+`i` toothpaste index
+
+`T` toothpaste type
+
+`f` dental formula
+
+`W` day of the week
+
+`P` total picks
+
+`l` last pick time
+
+`U` tubes wasted
+
+`s` toothpastes source path
+
+`m` meme
+
+`I` quiet mode string
+
 ## Shell tips and tricks
 A few shell one-liners demonstrating tpm usage
 ```bash
@@ -379,6 +427,7 @@ A few shell one-liners demonstrating tpm usage
 	wasmtime --dir=. tpm.wasm
 	bind -x '"\eOR":"echo | tpm"'
 	tpm -m=sup/b/
+	tpm -T mmm
 	echo "Done" | tpm | nc -u -b 192.168.1.255 12345
 ```
 
@@ -469,7 +518,7 @@ Judge for yourself if this is a good deal or not and why
 - It serves the basic crucial user need independently OS type SQL support just does not matter
 - It helps utilize the 5$ VPSes and old computers including SBCs by running on them useful payload
 - It has perfectly fine sane regular ordinary usual predictable behavior(almost pedantic) that makes perfect sense 
-- And finally it's the tiny size less than 40KB with `-Os` flag almost two times smaller than LMDB (Windows .exe however has 200KB builtin .ico)
+- And finally it's the tiny size less than 44KB with `-Os` flag almost 1.5 times smaller than LMDB (Windows .exe however has 200KB builtin .ico)
 
 OK program is good users are bad what now?
 You are getting it just pick again you have ~30000 tries per lifetime

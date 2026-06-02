@@ -25,4 +25,5 @@ jobs:
         echo "4,Nothing,0,0" >> toothpastes
         echo "USERNAME=notlibrary" > tpm.conf
         echo "FAKE_STATS=1" >> tpm.conf
+        echo "MEME=OVER9000" >> tpm.conf
         echo | ./tpm --fake_stats -c tpm.conf toothpastes
