@@ -1102,6 +1102,10 @@ str_quiet(toothpaste_pick_t* pick,toothpaste_pick_options_t* topts)
 static int 
 check_visibility(int input_id, int new_pick_flag, int toothbrush_flag, int dentist_flag,int verbose)
 {
+		if ((input_id ==18)&& verbose) {
+		return 0;
+	}
+	
 	if (verbose)
 	{
 		if ((input_id >=7) || (input_id <=2))
@@ -1119,6 +1123,7 @@ check_visibility(int input_id, int new_pick_flag, int toothbrush_flag, int denti
 	if ((input_id ==18)&& !verbose) {
 		return 1;
 	}
+	
 	return 0;
 }
 static int
@@ -1476,7 +1481,7 @@ read_config(const char* src)
 	opts.pick_by_index_index=pick_by_index_index;
 	opts.brand_string=brand_string;
 	opts.upper_brands = upper_brands;
-	strncpy(opts.tpm_template,"guwntdapoiTfWPlUsmI",TOTAL_OUTPUT_STRINGS+1);
+	strncpy(opts.tpm_template,DEFAULT_OUTPUT_TEMPLATE,TOTAL_OUTPUT_STRINGS+1);
 	
 	cfg = cfg_init();
 	if (cfg_load(cfg, src) < 0)
