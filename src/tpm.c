@@ -987,7 +987,7 @@ str_toothpaste_type(toothpaste_pick_t* pick,toothpaste_pick_options_t* topts)
 	char* line = malloc(MAX_TOOTHPASTE_LINE);
 	if (topts==NULL || pick == NULL) return NULL;		
 	memset(line,0,MAX_TOOTHPASTE_LINE);		
-	snprintf(line,MAX_LINE_LENGTH,"%s %s \n", user_strings[MSG_TOOTHPASTE_T],toothpaste_type_strings[pick->what.type]);
+	snprintf(line,MAX_TOOTHPASTE_LINE,"%s %s \n", user_strings[MSG_TOOTHPASTE_T],toothpaste_type_strings[pick->what.type]);
 		
 	return line;
 }
@@ -1053,23 +1053,43 @@ str_tubes_wasted(toothpaste_pick_t* pick,toothpaste_pick_options_t* topts)
 static char*
 str_source(toothpaste_pick_t* pick,toothpaste_pick_options_t* topts)
 {
-	char* line = malloc(MAX_TOOTHPASTE_LINE);
-	if (topts==NULL || pick == NULL) return NULL;		
-	memset(line,0,MAX_TOOTHPASTE_LINE);			
-	snprintf(line,MAX_TOOTHPASTE_LINE,"%s %s \n", user_strings[MSG_SOURCE], toothpastes_file_path_final);
+    if (topts == NULL || pick == NULL) return NULL;		
+    if (user_strings[MSG_SOURCE] == NULL || toothpastes_file_path_final == NULL) return NULL;
+
+    size_t needed = strlen(user_strings[MSG_SOURCE]) + strlen(toothpastes_file_path_final) + 3;
+
+    char* line = malloc(needed);
+    if (line == NULL) return NULL;
+    
+    // Сохраняем результат snprintf
+    int res = snprintf(line, needed, "%s %s \n", user_strings[MSG_SOURCE], toothpastes_file_path_final);
+    
+    // Проверка для компилятора: если что-то пошло не так (усечение или ошибка)
+    if (res < 0 || (size_t)res >= needed) {
+        free(line);
+        return NULL;
+    }
 		
-	return line;
+    return line;
 }
 
+
 static char*
-str_meme(toothpaste_pick_t* pick,toothpaste_pick_options_t* topts)
+str_meme(toothpaste_pick_t* pick, toothpaste_pick_options_t* topts)
 {
-	char* line = malloc(MAX_TOOTHPASTE_LINE);
-	
-	if (topts==NULL || pick == NULL) return NULL;	
-	memset(line,0,MAX_TOOTHPASTE_LINE);			
-	snprintf(line,MAX_TOOTHPASTE_LINE,"%s %s \n", user_strings[MSG_MEME], topts->meme_payload);
-	return line;
+    if (topts == NULL || pick == NULL) return NULL;	
+    if (user_strings[MSG_MEME] == NULL || topts->meme_payload == NULL) return NULL;
+
+
+    size_t needed = strlen(user_strings[MSG_MEME]) + strlen(topts->meme_payload) + 3;
+
+    char* line = malloc(needed);
+    if (line == NULL) return NULL;
+    
+
+    snprintf(line, needed, "%s %s \n", user_strings[MSG_MEME], topts->meme_payload);
+    
+    return line;
 }
 
 static char*
@@ -1079,7 +1099,7 @@ str_quiet(toothpaste_pick_t* pick,toothpaste_pick_options_t* topts)
 	
 	if (topts==NULL || pick == NULL) return NULL;	
 	memset(line,0,MAX_TOOTHPASTE_LINE);			
-	snprintf(line,MAX_TOOTHPASTE_LINE,"%.127s (%ug) [%u/100] \n", pick->what.toothpaste_brand,pick->what.tube_mass_g, pick->what.rating);
+	snprintf(line,MAX_TOOTHPASTE_LINE,"%.94s (%ug) [%u/100] \n", pick->what.toothpaste_brand,pick->what.tube_mass_g, pick->what.rating);
 	return line;
 }
 
