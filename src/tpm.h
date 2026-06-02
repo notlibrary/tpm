@@ -94,6 +94,7 @@ memcpy(&x,swap_temp,sizeof(x)); \
 #define GRAMS_PER_NURDLE 2
 #define MAX_REPORT_TERM 10
 #define TOTAL_OUTPUT_STRINGS 19
+#define DEFAULT_OUTPUT_TEMPLATE "guwntdapoiTfWPlUsmI"
 
 typedef enum user_msg_t
 {
