@@ -1083,7 +1083,7 @@ str_meme(toothpaste_pick_t* pick, toothpaste_pick_options_t* topts)
     if (line == NULL) return NULL;
     
 
-    snprintf(line, needed, "%s %s \n", user_strings[MSG_MEME], topts->meme_payload);
+    snprintf(line, needed, "%s %s\n", user_strings[MSG_MEME], topts->meme_payload);
     
     return line;
 }
@@ -1103,8 +1103,8 @@ static int
 check_visibility(int input_id, int new_pick_flag, int toothbrush_flag, int dentist_flag,int verbose)
 {
 		if ((input_id ==18)&& verbose) {
-		return 0;
-	}
+			return 0;
+		}
 	
 	if (verbose)
 	{
@@ -1733,11 +1733,11 @@ do_not_test_me(int argc, char* argv[])
 				delta_days=atoi(optarg);
 			break; 	
 			case 'm':
-				strncpy(topts.meme_payload,optarg,MAX_TOOTHPASTE_LINE);
-			break;
-			case 'T':
-				strncpy(topts.tpm_template,optarg,TOTAL_OUTPUT_STRINGS+1);
-			break; 				
+                snprintf(topts.meme_payload, MAX_TOOTHPASTE_LINE, "%s", optarg);
+                break;
+            case 'T':
+                snprintf(topts.tpm_template, TOTAL_OUTPUT_STRINGS + 1, "%s", optarg);
+            break;		
 			case '?': 
 				fprintf(stderr, "%s %s [-awjCvxqlrUF] [-f dental-formula] [-c config_file] [-o pick output file] [-t stats file] [-s total_picks value] [-p pick_type_value] [-i toothpaste_index] [-b brand_string [-z delta_hours] [-d delta_days] [-m meme_payload] [-T output_template] [toothpastes_file] \n",user_strings[MSG_USAGE], argv[0]);
 				exit(EXIT_FAILURE);
