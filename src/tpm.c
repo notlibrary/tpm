@@ -1062,10 +1062,8 @@ str_source(toothpaste_pick_t* pick,toothpaste_pick_options_t* topts)
     char* line = malloc(needed);
     if (line == NULL) return NULL;
     
-    // Сохраняем результат snprintf
     int res = snprintf(line, needed, "%s %s \n", user_strings[MSG_SOURCE], toothpastes_file_path_final);
     
-    // Проверка для компилятора: если что-то пошло не так (усечение или ошибка)
     if (res < 0 || (size_t)res >= needed) {
         free(line);
         return NULL;
