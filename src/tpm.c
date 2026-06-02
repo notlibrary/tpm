@@ -883,14 +883,17 @@ str_good_day(toothpaste_pick_t* pick,toothpaste_pick_options_t* topts)
 }
 
 static char*
-str_anon_username(toothpaste_pick_t* pick,toothpaste_pick_options_t* topts)
+str_anon_username(toothpaste_pick_t* pick, toothpaste_pick_options_t* topts)
 {
-	char* line = malloc(UNLEN);
-	if (topts==NULL || pick == NULL) return NULL;
-	memset(line,0,UNLEN);
-	snprintf(line,UNLEN+1,"%s " ,pick->who);
+    if (topts == NULL || pick == NULL || pick->who == NULL) return NULL;
+
+    size_t buffer_size = UNLEN + 2; 
+    char* line = malloc(buffer_size);
+    if (line == NULL) return NULL;
+
+    snprintf(line, buffer_size, "%s ", pick->who);
 	
-	return line;
+    return line;
 }
 
 static char*
@@ -1054,8 +1057,7 @@ static char*
 str_source(toothpaste_pick_t* pick,toothpaste_pick_options_t* topts)
 {
     if (topts == NULL || pick == NULL) return NULL;		
-    if (user_strings[MSG_SOURCE] == NULL || toothpastes_file_path_final == NULL) return NULL;
-
+    
     size_t needed = strlen(user_strings[MSG_SOURCE]) + strlen(toothpastes_file_path_final) + 3;
 
     char* line = malloc(needed);
