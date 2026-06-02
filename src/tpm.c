@@ -112,6 +112,7 @@ static struct option long_options[] = {
 	{"delta", required_argument,0, 'd'},
 	{"timezone", required_argument,0, 'z'},
 	{"meme", required_argument,0, 'm'},	
+	{"template", required_argument,0, 'T'},		
     {0, 0, 0, 0} 
 };	
 
@@ -1053,25 +1054,23 @@ str_tubes_wasted(toothpaste_pick_t* pick,toothpaste_pick_options_t* topts)
 }
 
 static char*
-str_source(toothpaste_pick_t* pick,toothpaste_pick_options_t* topts)
+str_source(toothpaste_pick_t* pick, toothpaste_pick_options_t* topts)
 {
+
     if (topts == NULL || pick == NULL) return NULL;		
     
-    size_t needed = strlen(user_strings[MSG_SOURCE]) + strlen(toothpastes_file_path_final) + 3;
+    const char* source_str = user_strings[MSG_SOURCE];;
+    const char* path_str = toothpastes_file_path_final;
+
+    size_t needed = strlen(source_str) + strlen(path_str) + 3;
 
     char* line = malloc(needed);
-    if (line == NULL) return NULL;
+    if (line == NULL) return NULL; 
     
-    int res = snprintf(line, needed, "%s %s \n", user_strings[MSG_SOURCE], toothpastes_file_path_final);
-    
-    if (res < 0 || (size_t)res >= needed) {
-        free(line);
-        return NULL;
-    }
+    sprintf(line, "%s %s \n", source_str, path_str);
 		
     return line;
 }
-
 
 static char*
 str_meme(toothpaste_pick_t* pick, toothpaste_pick_options_t* topts)
@@ -1206,8 +1205,7 @@ tpm_pick_toothpaste(list_node_t* head,toothpaste_pick_options_t topts)
 	int toothbrush_flag=0;
 	unsigned int brand_len;
 	char* toothpaste_strings[TOTAL_OUTPUT_STRINGS];
-	char* template_str ="guwntdapoiTfWPlUsmI";
-	char c=template_str[0];
+	char c=topts.tpm_template[0];
 	pick.opts = topts;
 	memset(line,0,MAX_LINE_LENGTH);
 
@@ -1323,7 +1321,7 @@ tpm_pick_toothpaste(list_node_t* head,toothpaste_pick_options_t topts)
 	ti=0;
 	while (c!='\0')
 	{
-		c=template_str[ti++];
+		c=topts.tpm_template[ti++];
 		if (check_visibility(char_to_strnum(c),new_pick_flag,toothbrush_flag,dentist_flag, topts.verbose))
 		if (char_to_strnum(c)!=-1)	
 		strcat(pick.message,toothpaste_strings[char_to_strnum(c)]);
@@ -1398,6 +1396,7 @@ save_default_config(struct cfg_struct* cfg)
 	cfg_set(cfg,"TOOTHPASTES",toothpastes_file_path_final);
 	cfg_set(cfg,"LOAD_CONFIG",config_file_path_final);
 	cfg_set(cfg,"MEME","42");
+	cfg_set(cfg,"TEMPLATE","guwntdapoiTfWPlUsmI");
 	cfg_save(cfg,config_file_path_final);
 	
 	return;
@@ -1478,6 +1477,7 @@ read_config(const char* src)
 	opts.pick_by_index_index=pick_by_index_index;
 	opts.brand_string=brand_string;
 	opts.upper_brands = upper_brands;
+	strncpy(opts.tpm_template,"guwntdapoiTfWPlUsmI",TOTAL_OUTPUT_STRINGS+1);
 	
 	cfg = cfg_init();
 	if (cfg_load(cfg, src) < 0)
@@ -1519,6 +1519,12 @@ read_config(const char* src)
 	if (value!=NULL)
 	{	
 		strncpy(opts.meme_payload,value,MAX_TOOTHPASTE_LINE-1);
+	}
+
+	value = cfg_get_rec(cfg, "TEMPLATE");
+	if (value!=NULL)
+	{	
+		strncpy(opts.tpm_template,value,TOTAL_OUTPUT_STRINGS+1);
 	}
 	
 	value = cfg_get_rec(cfg, "PICK_TYPE");
@@ -1651,7 +1657,7 @@ do_not_test_me(int argc, char* argv[])
 	
 	topts=read_config(config_file_path_final);
 	config_load_failure=!file_exists_fopen(config_file_path_final);
-	while ((opt = getopt_long(argc, argv, "awjCvxqlrUFf:t:o:c:s:p:i:b:z:d:m:",long_options,&option_index)) != -1) 
+	while ((opt = getopt_long(argc, argv, "awjCvxqlrUFf:t:o:c:s:p:i:b:z:d:m:T:",long_options,&option_index)) != -1) 
 	{
         switch (opt) 
 		{
@@ -1724,9 +1730,12 @@ do_not_test_me(int argc, char* argv[])
 			break; 	
 			case 'm':
 				strncpy(topts.meme_payload,optarg,MAX_TOOTHPASTE_LINE);
-			break; 	
+			break;
+			case 'T':
+				strncpy(topts.tpm_template,optarg,TOTAL_OUTPUT_STRINGS+1);
+			break; 				
 			case '?': 
-				fprintf(stderr, "%s %s [-awjCvxqlrUF] [-f dental-formula] [-c config_file] [-o pick output file] [-t stats file] [-s total_picks value] [-p pick_type_value] [-i toothpaste_index] [-b brand_string -z delta_hours -d delta_days -m meme_payload] [toothpastes_file] \n",user_strings[MSG_USAGE], argv[0]);
+				fprintf(stderr, "%s %s [-awjCvxqlrUF] [-f dental-formula] [-c config_file] [-o pick output file] [-t stats file] [-s total_picks value] [-p pick_type_value] [-i toothpaste_index] [-b brand_string [-z delta_hours] [-d delta_days] [-m meme_payload] [-T output_template] [toothpastes_file] \n",user_strings[MSG_USAGE], argv[0]);
 				exit(EXIT_FAILURE);
 			default:
 				break;

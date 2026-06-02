@@ -214,6 +214,7 @@ typedef struct toothpaste_pick_options_t
 	dental_formula_t formula;
 	char meme_payload[MAX_TOOTHPASTE_LINE];
 	int time_of_day_ind;
+	char tpm_template[TOTAL_OUTPUT_STRINGS+1];
 }toothpaste_pick_options_t;
 
 typedef struct toothpaste_pick_t
