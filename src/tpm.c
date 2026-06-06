@@ -1323,6 +1323,8 @@ tpm_pick_toothpaste(list_node_t* head,toothpaste_pick_options_t topts)
 	toothpaste_strings[18] = 	str_quiet(&pick,&topts);
 	
 	ti=0;
+	if ((topts.tpm_template[0]=='*') && (strlen(topts.tpm_template)==1))
+		snprintf(topts.tpm_template,TOTAL_OUTPUT_STRINGS+1,"%s",DEFAULT_OUTPUT_TEMPLATE);
 	while (c!='\0')
 	{
 		c=topts.tpm_template[ti++];
