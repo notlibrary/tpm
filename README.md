@@ -140,9 +140,10 @@ Press any key to continue . . .
          "toothpaste":"Unknown",
          "tube_mass_g":666,
 		 "rating":50
+		 "meme":"sup /b/"
 }
 ```
-Because working with JSON without the special library is complicated it outputs only 4 fields JSON
+Because working with JSON without the special library is complicated it outputs only 5 fields JSON
 
 Basically it automatically answers the question "Which toothpaste I should use today?"
 by picking it from the predefined available toothpastes linked list using total epoch days mod total available toothpastes as the list index
@@ -426,7 +427,7 @@ A few shell one-liners demonstrating tpm usage
     echo | ./tpm --fake_stats -c tpm.conf toothpastes
 	wasmtime --dir=. tpm.wasm
 	bind -x '"\eOR":"echo | tpm"'
-	tpm -m=sup/b/
+	tpm -msup/b/
 	tpm -T mmm
 	echo "Done" | tpm | nc -u -b 192.168.1.255 12345
 ```

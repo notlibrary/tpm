@@ -1338,7 +1338,7 @@ tpm_pick_toothpaste(list_node_t* head,toothpaste_pick_options_t topts)
 	}
 	
 	
-	snprintf(pick.JSON,MAX_LINE_LENGTH,"{\n\t \"who\":\"%s\",\n\t \"toothpaste\":\"%.127s\",\n\t \"tube_mass_g\":%u,\n\t \"rating\":%u \n}",pick.who,pick.what.toothpaste_brand,pick.what.tube_mass_g,pick.what.rating);
+	snprintf(pick.JSON,MAX_LINE_LENGTH,"{\n\t \"who\":\"%s\",\n\t \"toothpaste\":\"%.127s\",\n\t \"tube_mass_g\":%u,\n\t \"rating\":%u\n\t \"meme\":\"%s\" \n}",pick.who,pick.what.toothpaste_brand,pick.what.tube_mass_g,pick.what.rating,topts.meme_payload);
 		
 	snprintf(line,MAX_LINE_LENGTH,"%s,%s,",pick.who,pick_type_strings[topts.ptype] );
 	strncat(pick.CSV,line,MAX_LINE_LENGTH);
@@ -1400,7 +1400,7 @@ save_default_config(struct cfg_struct* cfg)
 	cfg_set(cfg,"TOOTHPASTES",toothpastes_file_path_final);
 	cfg_set(cfg,"LOAD_CONFIG",config_file_path_final);
 	cfg_set(cfg,"MEME","42");
-	cfg_set(cfg,"TEMPLATE","guwntdapoiTfWPlUsmI");
+	cfg_set(cfg,"TEMPLATE",DEFAULT_OUTPUT_TEMPLATE);
 	cfg_save(cfg,config_file_path_final);
 	
 	return;

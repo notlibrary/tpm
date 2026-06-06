@@ -5,15 +5,14 @@
            Compressed="yes" 
            InstallerVersion="200" 
            Manufacturer="Serenity Software" 
-           Version="0.6.4" 
+           Version="0.6.5" 
 		   UpgradeCode="69AF8A56-9550-427C-AE60-AE13108B9105">
     
     <MediaTemplate EmbedCab="yes" />
     <MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." />
     
 	<Icon Id="toothbrush.ico" SourceFile="toothbrush.ico" /> 
-	<Property Id="ARPPRODUCTICON" Value="toothbrush.ico" />
-	
+	<Property Id="ARPPRODUCTICON" Value="toothbrush.ico" />	
     <StandardDirectory Id="ProgramFiles6432Folder">
       <Directory Id="INSTALLFOLDER" Name="tpm"  />
     </StandardDirectory>
