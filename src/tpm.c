@@ -300,6 +300,10 @@ tpm_load_list_from_file(const char* filename)
 		
 		if ( !enhanced_toothpastes){
 			sscanf(current, "%u, %4095[^,],%u,%u\n", &temp_data.index,long_line ,&temp_data.tube_mass_g,&temp_data.rating);
+			strncpy(temp_data.toothbrush_color,toothpastes[0].toothbrush_color,MAX_TOOTHBRUSH_COLOR);
+			strncpy(temp_data.toothbrush_brand,toothpastes[0].toothbrush_brand,MAX_TOOTHPASTE_LINE);
+			temp_data.toothbrush_length_cm=toothpastes[0].toothbrush_length_cm;
+			temp_data.toothbrush_hardness=toothpastes[0].toothbrush_hardness;
 		}
 		else {
 			sscanf(current, "%u, %4095[^,],%u,%u,%32[^,],%128[^,],%u,%u\n", &temp_data.index,long_line ,&temp_data.tube_mass_g,&temp_data.rating,temp_data.toothbrush_color,temp_data.toothbrush_brand,&temp_data.	toothbrush_length_cm,&temp_data.toothbrush_hardness);
@@ -1429,6 +1433,9 @@ tpm_pick_toothpaste(list_node_t* head,toothpaste_pick_options_t topts)
 	strncat(pick.CSV,line,MAX_LINE_LENGTH);
 	
 	snprintf(line,MAX_LINE_LENGTH,"%s,%d,%d,",  pick.what.toothpaste_brand, pick.what.tube_mass_g, pick.what.rating );
+	strncat(pick.CSV,line,MAX_LINE_LENGTH);
+	
+	snprintf(line,MAX_LINE_LENGTH,"%s,%s,%d,%d,",  pick.what.toothbrush_color, pick.what.toothbrush_brand, pick.what.toothbrush_length_cm, pick.what.toothbrush_hardness );
 	strncat(pick.CSV,line,MAX_LINE_LENGTH);
 	
 	snprintf(line,MAX_LINE_LENGTH,"%d,%d,", i,pick.total_toothpastes );
