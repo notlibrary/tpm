@@ -163,6 +163,22 @@ Toothpastes CSV file contents sample:
 .RE
 \f[R]
 
+.PP
+Toothpastes CSV Enhanced file contents sample:
+
+\f[C]
+.RS
+.nf
+#Index,Brand string,Tube mass grams,Rating, Toothbrush Color, Toothbrush Brand, Toothbrush Length_cm, Toothbrush Hardness
+0,RANDOM TOOTHPASTE 1,100,85,Black,Random toothbrush,20,50
+1,RANDOM TOOTHPASTE 2,50,90,White,Random toothbrush,25,25
+2,RANDOM TOOTHPASTE 3,150,100,Pink,Random toothbrush,20,50
+3,RANDOM TOOTHPASTE 4,50,100,Green,Random toothbrush,20,50
+4,Nothing,0,0,Nothing,Nothing,0,0
+.fi
+.RE
+\f[R]
+
 .SH TEMPLATE TOKENS
 .IP "g" 4
 good time of the day
@@ -182,6 +198,8 @@ already picked
 pick type
 .IP "o" 4
 toothpaste
+.IP "b" 4
+toothbrush
 .IP "i" 4
 toothpaste index
 .IP "T" 4

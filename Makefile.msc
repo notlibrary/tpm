@@ -30,6 +30,7 @@ distr:
 	@if not exist tpm-win-bin-amd64\ mkdir tpm-win-bin-amd64
     copy tpm.exe tpm-win-bin-amd64
     copy toothpastes.sample tpm-win-bin-amd64
+	copy toothpastes-enhanced.sample tpm-win-bin-amd64
     copy tpm.conf.sample tpm-win-bin-amd64
     copy README.md tpm-win-bin-amd64
     zip -r tpm-win-bin-amd64.zip tpm-win-bin-amd64

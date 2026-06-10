@@ -10,7 +10,7 @@ extern "C" {
 #define TPM_STRING "tpm"
 #define TPM_VERSION_MAJOR 0
 #define TPM_VERSION_MINOR 6
-#define TPM_VERSION_PATCH 5
+#define TPM_VERSION_PATCH 6
 
 #undef _CRT_NONSTDC_NO_DEPRECATE 
 #define _CRT_NONSTDC_NO_DEPRECATE 
@@ -93,8 +93,11 @@ memcpy(&x,swap_temp,sizeof(x)); \
 #define BRUSHES_PER_LIFETIME 30000
 #define GRAMS_PER_NURDLE 2
 #define MAX_REPORT_TERM 10
-#define TOTAL_OUTPUT_STRINGS 19
-#define DEFAULT_OUTPUT_TEMPLATE "guwntdapoiTfWPlUsmI"
+#define TOTAL_OUTPUT_STRINGS 20
+#define DEFAULT_OUTPUT_TEMPLATE "guwntdapobiTfWPlUsmI"
+#define MAX_TOOTHBRUSH_COLOR 32
+#define ENHANCED_MODE_COMAS 7
+
 
 typedef enum user_msg_t
 {
@@ -103,11 +106,12 @@ typedef enum user_msg_t
 	MSG_PICK_COUNTER_S,
 	MSG_WELCOME,
 	MSG_NEXT_PICK,
-	MSG_TOOTHBRUSH,
+	MSG_SWAP_TOOTHBRUSH,
 	MSG_DENTIST,
 	MSG_ALREADY,
     MSG_PICK_TYPE,
 	MSG_TOOTHPASTE,
+	MSG_TOOTHBRUSH,
 	MSG_TOOTHPASTE_I,
 	MSG_TOOTHPASTE_T,
 	MSG_DENTAL,
@@ -189,6 +193,10 @@ typedef struct toothpaste_data_t
 	char toothpaste_brand[MAX_TOOTHPASTE_LINE];
 	unsigned int tube_mass_g;
 	unsigned int rating;
+	char toothbrush_color[MAX_TOOTHBRUSH_COLOR];
+	char toothbrush_brand[MAX_TOOTHPASTE_LINE];
+	unsigned int toothbrush_length_cm;
+	unsigned int toothbrush_hardness;
 	
 } toothpaste_data_t;
 
@@ -283,6 +291,7 @@ static char* str_visit_dentist(toothpaste_pick_t* pick,toothpaste_pick_options_t
 static char* str_already_picked(toothpaste_pick_t* pick,toothpaste_pick_options_t* topts);
 static char* str_pick_type(toothpaste_pick_t* pick,toothpaste_pick_options_t* topts);
 static char* str_toothpaste(toothpaste_pick_t* pick,toothpaste_pick_options_t* topts);
+static char* str_toothbrush(toothpaste_pick_t* pick,toothpaste_pick_options_t* topts);
 static char* str_toothpaste_index(toothpaste_pick_t* pick,toothpaste_pick_options_t* topts);
 static char* str_toothpaste_type(toothpaste_pick_t* pick,toothpaste_pick_options_t* topts);
 static char* str_dental_formula(toothpaste_pick_t* pick,toothpaste_pick_options_t* topts);
@@ -297,6 +306,7 @@ static int eval_username(toothpaste_pick_t* pick,toothpaste_pick_options_t* topt
 static int eval_total_toothpastes(toothpaste_pick_t* pick,toothpaste_pick_options_t* topts);
 static int char_to_strnum(char input);
 static int check_visibility(int input_id, int new_pick_flag, int toothbrush_flag, int dentist_flag,int verbose);
+static int check_enhanced_toothpastes(const char* filename);
 #ifdef __cplusplus
 }
 #endif /*__cpluplus*/

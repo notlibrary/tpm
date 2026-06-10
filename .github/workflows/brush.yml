@@ -18,10 +18,10 @@ jobs:
     - name: Brush
       run: |
         cd /home/runner/work/tpm/tpm/tpm-linux-bin-amd64
-        echo "0,RANDOM TOOTHPASTE 1,100,85" > toothpastes
-        echo "1,RANDOM TOOTHPASTE 2,50,90" >> toothpastes
-        echo "2,RANDOM TOOTHPASTE 3,150,100" >> toothpastes
-        echo "3,RANDOM TOOTHPASTE 4,50,100" >> toothpastes
+        echo "0,RANDOM TOOTHPASTE 1,100,85,Black,Random toothbrush,20,50" > toothpastes
+        echo "1,RANDOM TOOTHPASTE 2,50,90,Black,Random toothbrush,20,50" >> toothpastes
+        echo "2,RANDOM TOOTHPASTE 3,150,100,Black,Random toothbrush,20,50" >> toothpastes
+        echo "3,RANDOM TOOTHPASTE 4,50,100,Black,Random toothbrush,20,50" >> toothpastes
         echo "4,Nothing,0,0" >> toothpastes
         echo "USERNAME=notlibrary" > tpm.conf
         echo "FAKE_STATS=1" >> tpm.conf

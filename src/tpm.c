@@ -5,11 +5,12 @@
 
 static pick_type_t pick_type =PICK_DEFAULT;
 static list_node_t* toothpastes_list;
+static int enhanced_toothpastes=0;
 
 static const toothpaste_data_t toothpastes[TOTAL_TOOTHPASTES]={
-	{PASTE_BUILTIN,0,"BUILTIN TOOTHPASTE 1",75,90},
-	{PASTE_BUILTIN,1,"BUILTIN TOOTHPASTE 2",150,100},
-	{PASTE_BUILTIN,2,"BUILTIN TOOTHPASTE 3",50,80}
+	{PASTE_BUILTIN,0,"BUILTIN TOOTHPASTE 1",75,90,"White", "Builtin Toothbrush 1",20,50},
+	{PASTE_BUILTIN,1,"BUILTIN TOOTHPASTE 2",150,100,"Black", "Builtin Toothbrush 2",25,75},
+	{PASTE_BUILTIN,2,"BUILTIN TOOTHPASTE 3",50,80,"Pink", "Builtin Toothbrush 3",20,50}
 };
 static const char* pick_type_strings[TOTAL_PICK_TYPE_STRINGS]={
 	"Default",
@@ -65,6 +66,7 @@ static const char* user_strings[TOTAL_USER_MESSAGES]={
 	"Already picked today",
 	"Pick type",
 	"Toothpaste:",
+	"Toothbrush:",
 	"Toothpaste index:",
 	"Toothpaste type:",
 	"Dental Formula:",
@@ -204,12 +206,55 @@ ltrim(char *s)
 	return;
 }
 
+static int
+check_enhanced_toothpastes(const char* filename)
+{
+	FILE* file; 
+	char line[MAX_LINE_LENGTH];
+	char* current = line;
+	int i=0;
+	int total_comas=0;
+	
+	memset(line,0,MAX_LINE_LENGTH);
+	file = fopen(filename, "r");
+	
+	while (fgets(line, sizeof(line), file) != NULL) 
+	{
+        
+        while (isspace((unsigned char)*current)) 
+		{
+            current++;
+        }
+
+        if (*current == '\0' || *current == COMMENT_CHAR) 
+		{
+            continue; 
+        }
+		for (i=0;i<MAX_LINE_LENGTH;i++)
+		{	
+			if (line[i]==',') total_comas++;	
+			if (line[i]=='\0') break;
+		}
+		fclose(file);
+
+	}
+	if (total_comas==ENHANCED_MODE_COMAS) {
+		return 1;
+	}
+		else {
+			return 0;
+			
+		}
+	
+}
+
+
 TPM list_node_t* 
 tpm_load_list_from_file(const char* filename) 
 {
 	unsigned int i;
 	unsigned int cnt=0;
-    FILE* file = fopen(toothpastes_file_path_final, "r");
+    FILE* file; 
 	list_node_t* head = NULL;
     toothpaste_data_t temp_data;
 	char line[MAX_LINE_LENGTH];
@@ -219,6 +264,9 @@ tpm_load_list_from_file(const char* filename)
 	memset(long_line,0,4*MAX_LINE_LENGTH);
 	memset(line,0,MAX_LINE_LENGTH);
 	memset(temp_data.toothpaste_brand,0,MAX_TOOTHPASTE_LINE);
+	
+	enhanced_toothpastes=check_enhanced_toothpastes(filename);
+	file = fopen(filename, "r");
 	
     if (file == NULL) 
 	{
@@ -244,8 +292,14 @@ tpm_load_list_from_file(const char* filename)
 		{
             continue; 
         }
-		if (sscanf(current, "%u, %4095[^,],%u,%u\n", &temp_data.index,long_line ,&temp_data.tube_mass_g,&temp_data.rating) == 4) 
-		{
+		
+		if ( !enhanced_toothpastes){
+			sscanf(current, "%u, %4095[^,],%u,%u\n", &temp_data.index,long_line ,&temp_data.tube_mass_g,&temp_data.rating);
+		}
+		else {
+			sscanf(current, "%u, %4095[^,],%u,%u,%32[^,],%128[^,],%u,%u\n", &temp_data.index,long_line ,&temp_data.tube_mass_g,&temp_data.rating,temp_data.toothbrush_color,temp_data.toothbrush_brand,&temp_data.	toothbrush_length_cm,&temp_data.toothbrush_hardness);
+		}
+		
 			strncpy(temp_data.toothpaste_brand,long_line,MAX_TOOTHPASTE_LINE-1);
 			temp_data.toothpaste_brand[sizeof(temp_data.toothpaste_brand) - 1] = '\0';
 			ltrim(rtrim(temp_data.toothpaste_brand));
@@ -263,7 +317,7 @@ tpm_load_list_from_file(const char* filename)
 			head = add_to_list(head, temp_data);	
 			cnt++;
 			if (cnt>MAX_TOOTHPASTE_LINES){break;}
-		}
+		
 		
 	}
 	if (cnt==1) head->data.type=PASTE_NULL;
@@ -924,7 +978,7 @@ str_new_toothbrush(toothpaste_pick_t* pick,toothpaste_pick_options_t* topts)
 	char* line = malloc(MAX_TOOTHPASTE_LINE);
 	if (topts==NULL || pick == NULL) return NULL;	
 	memset(line,0,MAX_TOOTHPASTE_LINE);	
-	snprintf(line,MAX_TOOTHPASTE_LINE,"%s \n", user_strings[MSG_TOOTHBRUSH]);
+	snprintf(line,MAX_TOOTHPASTE_LINE,"%s \n", user_strings[MSG_SWAP_TOOTHBRUSH]);
 	
 	return line;
 }
@@ -970,6 +1024,23 @@ str_toothpaste(toothpaste_pick_t* pick,toothpaste_pick_options_t* topts)
 	memset(line,0,MAX_LINE_LENGTH);	
 	snprintf(line,MAX_LINE_LENGTH,"%s %s %.127s (%ug) [%u/100] %s \n", user_strings[MSG_TOOTHPASTE], right_armour, pick->what.toothpaste_brand, pick->what.tube_mass_g, pick->what.rating, left_armour);
 		
+	return line;
+}
+
+static char*
+str_toothbrush(toothpaste_pick_t* pick,toothpaste_pick_options_t* topts)
+{
+	char* line = malloc(MAX_LINE_LENGTH);
+	if (topts==NULL || pick == NULL) return NULL;		
+	memset(line,0,MAX_LINE_LENGTH);
+	
+	if (enhanced_toothpastes)
+	{
+		snprintf(line,MAX_LINE_LENGTH,"%s %s %s %u %u\n", user_strings[MSG_TOOTHBRUSH], pick->what.toothbrush_color, pick->what.toothbrush_brand, pick->what.toothbrush_length_cm, pick->what.toothbrush_hardness);
+	}	
+	else {
+		snprintf(line, 1,"%s","\0");
+	}
 	return line;
 }
 
@@ -1102,7 +1173,7 @@ str_quiet(toothpaste_pick_t* pick,toothpaste_pick_options_t* topts)
 static int 
 check_visibility(int input_id, int new_pick_flag, int toothbrush_flag, int dentist_flag,int verbose)
 {
-		if ((input_id ==18)&& verbose) {
+		if ((input_id ==19)&& verbose) {
 			return 0;
 		}
 	
@@ -1158,35 +1229,38 @@ char_to_strnum(char input)
 		case 'o':
 		return 8;
 		break;
-		case 'i':
+		case 'b':
 		return 9;
 		break;
-		case 'T':
+		case 'i':
 		return 10;
-		break;		
-		case 'f':
+		break;
+		case 'T':
 		return 11;
 		break;		
-		case 'W':
+		case 'f':
 		return 12;
 		break;		
-		case 'P':
+		case 'W':
 		return 13;
 		break;		
-		case 'l':
+		case 'P':
 		return 14;
 		break;		
-		case 'U':
+		case 'l':
 		return 15;
 		break;		
-		case 's':
+		case 'U':
 		return 16;
 		break;		
-		case 'm':
+		case 's':
 		return 17;
+		break;		
+		case 'm':
+		return 18;
 		break;
 		case 'I':
-		return 18;
+		return 19;
 		break;			
 		
 		default:
@@ -1311,16 +1385,17 @@ tpm_pick_toothpaste(list_node_t* head,toothpaste_pick_options_t topts)
 	toothpaste_strings[6] = 	str_already_picked(&pick,&topts);
 	toothpaste_strings[7] = 	str_pick_type(&pick,&topts);
 	toothpaste_strings[8] = 	str_toothpaste(&pick,&topts);
-	toothpaste_strings[9] = 	str_toothpaste_index(&pick,&topts);
-	toothpaste_strings[10] = 	str_toothpaste_type(&pick,&topts);
-	toothpaste_strings[11] = 	str_dental_formula(&pick,&topts);
-	toothpaste_strings[12] = 	str_day_of_the_week(&pick,&topts);
-	toothpaste_strings[13] = 	str_total_picks(&pick,&topts);
-	toothpaste_strings[14] = 	str_last_pick_time(&pick,&topts);
-	toothpaste_strings[15] = 	str_tubes_wasted(&pick,&topts);
-	toothpaste_strings[16] = 	str_source(&pick,&topts);
-	toothpaste_strings[17] = 	str_meme(&pick,&topts);
-	toothpaste_strings[18] = 	str_quiet(&pick,&topts);
+	toothpaste_strings[9] =		str_toothbrush(&pick,&topts);
+	toothpaste_strings[10] = 	str_toothpaste_index(&pick,&topts);
+	toothpaste_strings[11] = 	str_toothpaste_type(&pick,&topts);
+	toothpaste_strings[12] = 	str_dental_formula(&pick,&topts);
+	toothpaste_strings[13] = 	str_day_of_the_week(&pick,&topts);
+	toothpaste_strings[14] = 	str_total_picks(&pick,&topts);
+	toothpaste_strings[15] = 	str_last_pick_time(&pick,&topts);
+	toothpaste_strings[16] = 	str_tubes_wasted(&pick,&topts);
+	toothpaste_strings[17] = 	str_source(&pick,&topts);
+	toothpaste_strings[18] = 	str_meme(&pick,&topts);
+	toothpaste_strings[19] = 	str_quiet(&pick,&topts);
 	
 	ti=0;
 	if ((topts.tpm_template[0]=='*') && (strlen(topts.tpm_template)==1))

@@ -33,7 +33,7 @@ WASM:
 Unpack `tpm.wasm` from `tpm-wasm-bin-amd64-x.y.z.tar.gz` and run it with preferred runtime
 
 1. Define the available(what is in the bathroom) toothpastes in the CSV format file with path `~/tpm/toothpastes`
-see `~/tpm/toothpastes.sample` below for format details
+see `~/tpm/toothpastes.sample` or `~/tpm/toothpastes-enhanced.sample` below for format details
 2. Put TPM in the daily crontab or task scheduler task to run it daily(or twice a day)
 
 Windows:
@@ -179,8 +179,8 @@ still better than being stereotypical rotten teeth open source bum
 There is also third output mode `CSV` for those who want to save pick info
 When active it auto appends current pick info to giant CSV with all picks collection `picks.CSV`
 This is purely optional
-The CSV record format for CSV mode follows default mode total 19 attributes:
-`#username, pick_type, new_pick_flag,new_toothbrush_flag,new_dentist_visit, toothpaste_brand, tube_mass_g, toothpaste_rating, toothpaste_index, total_toothpastes, toothpaste_type, dental_formula, day_of_the_week, day_counter,total_picks,last_pick_time,wasted_tubes_report,toothpastes_file_path,meme_payload `
+The CSV record format for CSV mode follows default mode total 23 attributes:
+`#username, pick_type, new_pick_flag,new_toothbrush_flag,new_dentist_visit, toothpaste_brand, tube_mass_g, toothpaste_rating,toothbrush_color, toothbrush_brand, toothbrush_length_cm, toothbrush_hardness, toothpaste_index, total_toothpastes, toothpaste_type, dental_formula, day_of_the_week, day_counter,total_picks,last_pick_time,wasted_tubes_report,toothpastes_file_path,meme_payload `
 
 ## Inner toothpaste types 
 There are 5 supported toothpaste types
@@ -370,10 +370,22 @@ for each tube you got
 
 UPPERCASE the brand string to ensure it's seen first through running down terminal with the toothpaste picking string
 
+## TPM The Toothpastes Picking Manager Toothpastes List CSV enhanced format sample
+```
+#Index,Brand string,Tube mass grams,Rating, Toothbrush Color, Toothbrush Brand, Toothbrush Length_cm, Toothbrush Hardness
+0,RANDOM TOOTHPASTE 1,100,85,Black,Random toothbrush,20,50
+1,RANDOM TOOTHPASTE 2,50,90,White,Random toothbrush,25,25
+2,RANDOM TOOTHPASTE 3,150,100,Pink,Random toothbrush,20,50
+3,RANDOM TOOTHPASTE 4,50,100,Green,Random toothbrush,20,50
+4,Nothing,0,0,Nothing,Nothing,0,0
+
+```
+
+
 ## Templater output table
 Templater is used to control the TPM output
 
-`guwntdapoiTfWPlUsmI` is a standard default TPM output template
+`guwntdapobiTfWPlUsmI` is a standard default TPM output template
 
 `g` good time of the day
 
@@ -392,6 +404,8 @@ Templater is used to control the TPM output
 `p` pick type
 
 `o` toothpaste
+
+`b` toothbrush
 
 `i` toothpaste index
 
