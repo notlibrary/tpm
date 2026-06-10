@@ -34,6 +34,10 @@
         <File Id="ToothpastesFile" Source="toothpastes.sample" KeyPath="yes" />
       </Component>
 
+      <Component Id="ToothpastesEnhanced" Guid="9F216491-00EC-4163-824E-8711910E0232" Bitness="always64">
+        <File Id="ToothpastesEnhancedFile" Source="toothpastes-enhanced.sample" KeyPath="yes" />
+      </Component>
+
       <Component Id="AppLicense" Guid="8431BC14-5A35-44C1-AAC3-AA9D3EF96283" Bitness="always64">
         <File Id="License" Source="LICENSE" KeyPath="yes" />
       </Component>
@@ -44,6 +48,7 @@
       <ComponentRef Id="AppConfig" />
       <ComponentRef Id="HelpDoc" />
       <ComponentRef Id="Toothpastes" />
+      <ComponentRef Id="ToothpastesEnhanced" />
       <ComponentRef Id="AppLicense" />
     </Feature>
     
