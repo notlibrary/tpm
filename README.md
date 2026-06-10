@@ -183,6 +183,8 @@ This is purely optional
 The CSV record format for CSV mode follows default mode total 23 attributes:
 `#username, pick_type, new_pick_flag,new_toothbrush_flag,new_dentist_visit, toothpaste_brand, tube_mass_g, toothpaste_rating,toothbrush_color, toothbrush_brand, toothbrush_length_cm, toothbrush_hardness, toothpaste_index, total_toothpastes, toothpaste_type, dental_formula, day_of_the_week, day_counter,total_picks,last_pick_time,wasted_tubes_report,toothpastes_file_path,meme_payload `
 
+Unfortunately brushing teeth over the Internets is full of bs anyway you need someone who mastered the matter to finally cut it off 
+
 ## Inner toothpaste types 
 There are 5 supported toothpaste types
 They are not pick types
