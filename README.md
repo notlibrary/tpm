@@ -121,6 +121,7 @@ Good Morning Serenity Welcome to the toothpaste picking manager
 Already picked today
 Pick type: Default
 Toothpaste: >>> SENSODYNE (150g) [100/100] <<<
+Toothbrush: White Lacalut 19 50
 Toothpaste index: 1/3
 Toothpaste type: Random
 Dental Formula: 1-10-2-2
