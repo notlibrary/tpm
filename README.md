@@ -332,7 +332,7 @@ UPPER_BRANDS=0
 TIMEZONE=0
 DELTA_DAYS=0
 MEME=42
-TEMPLATE="guwntdapoiTfWPlUsmI"
+TEMPLATE="guwntdapobiTfWPlUsmI"
 ```
 
 ## TPM The Toothpastes Picking Manager Files List
