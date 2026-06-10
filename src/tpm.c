@@ -211,11 +211,9 @@ check_enhanced_toothpastes(const char* filename)
 {
 	FILE* file; 
 	char line[MAX_LINE_LENGTH];
-	char* current = line;
-	int i=0;
-	int total_comas=0;
+	int i = 0;
+	int total_comas = 0;
 	
-	memset(line,0,MAX_LINE_LENGTH);
 	file = fopen(filename, "r");
 	if (file == NULL) 
 	{
@@ -224,25 +222,28 @@ check_enhanced_toothpastes(const char* filename)
 	
 	while (fgets(line, sizeof(line), file) != NULL) 
 	{
-        
-        while (isspace((unsigned char)*current)) 
-		{
-            current++;
-        }
+		char* current = line; 
 
-        if (*current == '\0' || *current == COMMENT_CHAR) 
+		while (isspace((unsigned char)*current)) 
 		{
-            continue; 
-        }
-		for (i=0;i<MAX_LINE_LENGTH;i++)
-		{	
-			if (line[i]==',') total_comas++;	
-			if (line[i]=='\0') break;
+			current++;
 		}
-		fclose(file);
+
+		if (*current == '\0' || *current == COMMENT_CHAR) 
+		{
+			continue; 
+		}
 
 	}
-	if (total_comas==ENHANCED_MODE_COMAS) 
+		for (i = 0; i < MAX_LINE_LENGTH; i++)
+		{	
+			if (line[i] == ',') total_comas++;	
+			if (line[i] == '\0') break;
+		}
+
+	fclose(file); 
+
+	if (total_comas == ENHANCED_MODE_COMAS) 
 	{
 		return 1;
 	}
