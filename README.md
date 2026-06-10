@@ -444,6 +444,7 @@ A few shell one-liners demonstrating tpm usage
 	bind -x '"\eOR":"echo | tpm"'
 	tpm -msup/b/
 	tpm -T mmm
+	tpm -T ob toothpastes-enhanced.sample
 	echo "Done" | tpm | nc -u -b 192.168.1.255 12345
 ```
 
