@@ -58,6 +58,7 @@ static const char* error_strings[TOTAL_ERROR_MESSAGES]={
 static const char* user_strings[TOTAL_USER_MESSAGES]={
 	"Pick counter clear",
 	"# Index | Brand | Tube Mass | Rating",
+	"# Index | Brand | Tube Mass | Rating | Toothbrush Color | Toothbrush Brand | Toothbrush Length | Toothbrush Hardness",
 	"Pick counter set",
 	"Welcome to the toothpaste picking manager",
 	"New next pick stats updated",
@@ -355,7 +356,14 @@ display_list(list_node_t* head, toothpaste_pick_t* pick)
 	memset(line,0,MAX_TOOTHPASTE_LINE);
 	memset(pick->message,0,OUTPUT_BLOCK_SIZE);
 	
-	snprintf(pick->message,MAX_TOOTHPASTE_LINE,"%s \n",user_strings[MSG_COMMENT]);
+		if (!enhanced_toothpastes)
+		{
+			snprintf(pick->message,MAX_TOOTHPASTE_LINE,"%s \n",user_strings[MSG_COMMENT]);
+		}
+		else
+		{
+			snprintf(pick->message,MAX_TOOTHPASTE_LINE,"%s \n",user_strings[MSG_ENHANCED_COMMENT]);
+		}
 	while (current != NULL) 
 	{
         if (pick->opts.upper_brands)
@@ -366,7 +374,15 @@ display_list(list_node_t* head, toothpaste_pick_t* pick)
 				current->data.toothpaste_brand[i]=toupper(current->data.toothpaste_brand[i]);
 			}
 		}
-		snprintf(line,MAX_TOOTHPASTE_LINE,"%d,%.120s,%d,%d\n", current->data.index, current->data.toothpaste_brand, current->data.tube_mass_g, current->data.rating);
+		if (!enhanced_toothpastes)
+		{
+			snprintf(line,MAX_TOOTHPASTE_LINE,"%d,%.120s,%d,%d\n", current->data.index, current->data.toothpaste_brand, current->data.tube_mass_g, current->data.rating);
+		}
+		else
+		{
+			snprintf(line,3*MAX_TOOTHPASTE_LINE,"%d,%.120s,%d,%d,%.30s,%.120s,%u,%u\n", current->data.index, current->data.toothpaste_brand, current->data.tube_mass_g, current->data.rating, current->data.toothbrush_color, current->data.toothbrush_brand, current->data.toothbrush_length_cm, current->data.toothbrush_hardness);
+		}
+		
         strncat(pick->message,line,MAX_LINE_LENGTH);
 		current = current->next;
 		cnt++;
