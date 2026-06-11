@@ -661,11 +661,15 @@ tpm_free_toothpaste_pick(toothpaste_pick_t* pick)
 {
 	if (pick!=NULL)
 	{
+		free(pick->who);
 		free(pick->message);
 		free(pick->JSON);
 		free(pick->CSV);
 		free(pick->waste_report);
 		free_list(pick->where);
+		free(pick->opts.username);
+		free(pick->opts.meme_payload);
+		free(pick->opts.tpm_template);
 		return 0;
 	}
 	else 
@@ -947,8 +951,11 @@ eval_username(toothpaste_pick_t* pick,toothpaste_pick_options_t* topts)
 {
 	char username[UNLEN + 1];
 	if (topts==NULL || pick == NULL) return 1;
+	pick->who=malloc(UNLEN);
 	memset(username,0,UNLEN);
-		
+	memset(pick->who,0,UNLEN);
+	
+	
 	if (get_current_username(username, sizeof(username)) == 0) 
 	{
 		strncpy(pick->who,topts->username,UNLEN);
@@ -1583,6 +1590,7 @@ read_config(const char* src)
 	static int recursion =0;
 	dental_formula_t formula=parse_dental_formula(DEFAULT_DENTAL_FORMULA); 
 	
+	opts.meme_payload=malloc(MAX_TOOTHPASTE_LINE);
 	memset(opts.meme_payload,0,MAX_TOOTHPASTE_LINE-1);
 	opts.formula=formula;
 	opts.ptype=pick_type;
@@ -1595,7 +1603,8 @@ read_config(const char* src)
 	opts.pick_by_index_index=pick_by_index_index;
 	opts.brand_string=brand_string;
 	opts.upper_brands = upper_brands;
-	strncpy(opts.tpm_template,DEFAULT_OUTPUT_TEMPLATE,TOTAL_OUTPUT_STRINGS+1);
+	opts.tpm_template=malloc(TOTAL_OUTPUT_STRINGS);
+	strncpy(opts.tpm_template,DEFAULT_OUTPUT_TEMPLATE,TOTAL_OUTPUT_STRINGS);
 	
 	cfg = cfg_init();
 	if (cfg_load(cfg, src) < 0)
@@ -1610,6 +1619,7 @@ read_config(const char* src)
 		recursion++;
 		opts=read_config(value);
 	}
+	opts.username=malloc(UNLEN);
 	memset(opts.username,0,UNLEN);
 	value = cfg_get_rec(cfg, "USERNAME");
 	if (value!=NULL)

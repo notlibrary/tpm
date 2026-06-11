@@ -93,7 +93,7 @@ memcpy(&x,swap_temp,sizeof(x)); \
 #define BRUSHES_PER_LIFETIME 30000
 #define GRAMS_PER_NURDLE 2
 #define MAX_REPORT_TERM 10
-#define TOTAL_OUTPUT_STRINGS 20
+#define TOTAL_OUTPUT_STRINGS 21
 #define DEFAULT_OUTPUT_TEMPLATE "guwntdapobiTfWPlUsmI"
 #define MAX_TOOTHBRUSH_COLOR 32
 #define ENHANCED_MODE_COMAS 7
@@ -218,18 +218,18 @@ typedef struct toothpaste_pick_options_t
 	int output_to_file;
 	int csv_flag;
 	unsigned int pick_by_index_index;
-	char username[UNLEN];
+	char* username;
 	const char* brand_string;
 	int upper_brands;
 	dental_formula_t formula;
-	char meme_payload[MAX_TOOTHPASTE_LINE];
+	char* meme_payload;
 	int time_of_day_ind;
-	char tpm_template[TOTAL_OUTPUT_STRINGS+1];
+	char* tpm_template;
 }toothpaste_pick_options_t;
 
 typedef struct toothpaste_pick_t
 {
-	char who[UNLEN];
+	char* who;
 	toothpaste_data_t what;
 	list_node_t* where;
 	unsigned int total_toothpastes;	
