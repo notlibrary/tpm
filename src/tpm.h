@@ -191,11 +191,11 @@ typedef struct toothpaste_data_t
 {
     toothpaste_type_t type;
 	unsigned int index;
-	char toothpaste_brand[MAX_TOOTHPASTE_LINE];
+	char* toothpaste_brand;
 	unsigned int tube_mass_g;
 	unsigned int rating;
-	char toothbrush_color[MAX_TOOTHBRUSH_COLOR];
-	char toothbrush_brand[MAX_TOOTHPASTE_LINE];
+	char* toothbrush_color;
+	char* toothbrush_brand;
 	unsigned int toothbrush_length_cm;
 	unsigned int toothbrush_hardness;
 	

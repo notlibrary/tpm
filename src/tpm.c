@@ -269,9 +269,6 @@ tpm_load_list_from_file(const char* filename)
 	
 	memset(long_line,0,4*MAX_LINE_LENGTH);
 	memset(line,0,MAX_LINE_LENGTH);
-	memset(temp_data.toothpaste_brand,0,MAX_TOOTHPASTE_LINE);
-	memset(temp_data.toothbrush_brand,0,MAX_TOOTHPASTE_LINE);
-	memset(temp_data.toothbrush_color,0,MAX_TOOTHBRUSH_COLOR);
 	
 	enhanced_toothpastes=check_enhanced_toothpastes(filename);
 	file = fopen(filename, "r");
@@ -300,6 +297,14 @@ tpm_load_list_from_file(const char* filename)
 		{
             continue; 
         }
+		
+		temp_data.toothpaste_brand=malloc(MAX_TOOTHPASTE_LINE);
+		temp_data.toothbrush_brand=malloc(MAX_TOOTHPASTE_LINE);
+		temp_data.toothbrush_color=malloc(MAX_TOOTHBRUSH_COLOR);
+		
+		memset(temp_data.toothpaste_brand,0,MAX_TOOTHPASTE_LINE);
+		memset(temp_data.toothbrush_brand,0,MAX_TOOTHPASTE_LINE);
+		memset(temp_data.toothbrush_color,0,MAX_TOOTHBRUSH_COLOR);
 		
 		if ( !enhanced_toothpastes){
 			sscanf(current, "%u, %4095[^,],%u,%u\n", &temp_data.index,long_line ,&temp_data.tube_mass_g,&temp_data.rating);
@@ -411,9 +416,8 @@ static toothpaste_data_t
 get_item_by_index(list_node_t* head,unsigned int i) 
 {
  
-    toothpaste_data_t empty ={PASTE_RANNDOM,0,"None",0}; 
+    toothpaste_data_t empty ={PASTE_RANNDOM,0,NULL,0,0,NULL,NULL,0,0}; 
 	list_node_t* current = head;
-	strncpy (empty.toothpaste_brand,user_strings[MSG_BRAND_NONE],MAX_TOOTHPASTE_LINE);
 	
     while (current != NULL) 
 	{
@@ -429,9 +433,8 @@ get_item_by_index(list_node_t* head,unsigned int i)
 static toothpaste_data_t 
 get_item_by_brand_string(list_node_t* head,const char* str) 
 {
-    toothpaste_data_t empty ={PASTE_RANNDOM,0,"None",0}; 
+    toothpaste_data_t empty ={PASTE_RANNDOM,0,NULL,0,0,NULL,NULL,0,0}; ; 
 	list_node_t* current = head;
-	strncpy (empty.toothpaste_brand,user_strings[MSG_BRAND_NONE],MAX_TOOTHPASTE_LINE);
 	
     while (current != NULL) 
 	{
@@ -529,7 +532,11 @@ free_list(list_node_t* head)
 	{
         temp = head;
         head = head->next;
-        free(temp);
+        free(temp->data.toothpaste_brand);
+	    free(temp->data.toothbrush_color);
+		free(temp->data.toothbrush_brand);
+		free(temp);
+		
     }
 	return;
 }
