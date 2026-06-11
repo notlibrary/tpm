@@ -1603,8 +1603,8 @@ read_config(const char* src)
 	opts.pick_by_index_index=pick_by_index_index;
 	opts.brand_string=brand_string;
 	opts.upper_brands = upper_brands;
-	opts.tpm_template=malloc(TOTAL_OUTPUT_STRINGS);
-	strncpy(opts.tpm_template,DEFAULT_OUTPUT_TEMPLATE,TOTAL_OUTPUT_STRINGS);
+	opts.tpm_template=malloc(TOTAL_OUTPUT_STRINGS+1);
+	snprintf(opts.tpm_template,TOTAL_OUTPUT_STRINGS+1,"%s",DEFAULT_OUTPUT_TEMPLATE);
 	
 	cfg = cfg_init();
 	if (cfg_load(cfg, src) < 0)

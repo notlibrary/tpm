@@ -93,7 +93,7 @@ memcpy(&x,swap_temp,sizeof(x)); \
 #define BRUSHES_PER_LIFETIME 30000
 #define GRAMS_PER_NURDLE 2
 #define MAX_REPORT_TERM 10
-#define TOTAL_OUTPUT_STRINGS 21
+#define TOTAL_OUTPUT_STRINGS 20
 #define DEFAULT_OUTPUT_TEMPLATE "guwntdapobiTfWPlUsmI"
 #define MAX_TOOTHBRUSH_COLOR 32
 #define ENHANCED_MODE_COMAS 7
