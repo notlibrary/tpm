@@ -1342,11 +1342,10 @@ char_to_strnum(char input)
 }
 
 
-TPM toothpaste_pick_t*
-tpm_pick_toothpaste(list_node_t* head,toothpaste_pick_options_t topts)
+TPM int
+tpm_pick_toothpaste(list_node_t* head,toothpaste_pick_options_t topts, toothpaste_pick_t* pick )
 {
 	int i=0,k,ti;
-	static toothpaste_pick_t pick;
 	time_t total_seconds = time(NULL)+delta_days*SECONDS_PER_DAY+delta_hours*SECONDS_PER_HOUR;
 	char line[MAX_LINE_LENGTH];
 	int new_pick_flag =0;
@@ -1355,118 +1354,118 @@ tpm_pick_toothpaste(list_node_t* head,toothpaste_pick_options_t topts)
 	unsigned int brand_len;
 	char* toothpaste_strings[TOTAL_OUTPUT_STRINGS];
 	char c=topts.tpm_template[0];
-	pick.opts = topts;
+	pick->opts = topts;
 	memset(line,0,MAX_LINE_LENGTH);
 
-	pick.message=malloc(OUTPUT_BLOCK_SIZE);
-	pick.JSON=malloc(OUTPUT_BLOCK_SIZE);
-	pick.CSV=malloc(OUTPUT_BLOCK_SIZE);
-	pick.waste_report=NULL;
-	pick.head=head;
-	memset(pick.JSON,0,OUTPUT_BLOCK_SIZE);	
-	memset(pick.message,0,OUTPUT_BLOCK_SIZE);
-	memset(pick.CSV,0,OUTPUT_BLOCK_SIZE);	
+	pick->message=malloc(OUTPUT_BLOCK_SIZE);
+	pick->JSON=malloc(OUTPUT_BLOCK_SIZE);
+	pick->CSV=malloc(OUTPUT_BLOCK_SIZE);
+	pick->waste_report=NULL;
+	pick->head=head;
+	memset(pick->JSON,0,OUTPUT_BLOCK_SIZE);	
+	memset(pick->message,0,OUTPUT_BLOCK_SIZE);
+	memset(pick->CSV,0,OUTPUT_BLOCK_SIZE);	
 	
-	eval_username(&pick,&topts);
-	eval_total_toothpastes(&pick,&topts);
-	read_counters(&pick.stats,pick.opts.fake_stats);
-	pick.waste_report=report_wasted_tubes(toothpastes_list,&pick.stats);
-	pick.toothpaste_pick_index=pick.stats.total_picks;
-	pick.when=total_seconds;
+	eval_username(pick,&topts);
+	eval_total_toothpastes(pick,&topts);
+	read_counters(&pick->stats,pick->opts.fake_stats);
+	pick->waste_report=report_wasted_tubes(toothpastes_list,&pick->stats);
+	pick->toothpaste_pick_index=pick->stats.total_picks;
+	pick->when=total_seconds;
 	topts.time_of_day_ind=(total_seconds)/(SECONDS_PER_DAY/TOTAL_TIMES_OF_DAY)%(TOTAL_TIMES_OF_DAY);
 	
-	pick.day = total_seconds/SECONDS_PER_DAY;
+	pick->day = total_seconds/SECONDS_PER_DAY;
 	
-	if (pick.total_toothpastes!=0)  
-		i=pick.day%pick.total_toothpastes;
+	if (pick->total_toothpastes!=0)  
+		i=pick->day%pick->total_toothpastes;
 	
 	if (topts.ptype==PICK_BY_INDEX) 
 	{
-	    if (topts.pick_by_index_index>=pick.total_toothpastes)
-		{i=pick.total_toothpastes-1;}else{i=topts.pick_by_index_index;}
+	    if (topts.pick_by_index_index>=pick->total_toothpastes)
+		{i=pick->total_toothpastes-1;}else{i=topts.pick_by_index_index;}
 	}
 	if (topts.ptype==PICK_RANDOM) 
 	{
 		seed_xrp32(total_seconds);
-		i=rand_range(0,pick.total_toothpastes);
+		i=rand_range(0,pick->total_toothpastes);
 	}
 	if (topts.ptype==PICK_BY_BRAND) 
 	{
-		pick.what = get_item_by_brand_string(toothpastes_list,topts.brand_string);
+		pick->what = get_item_by_brand_string(toothpastes_list,topts.brand_string);
 	}
 	else
 	{
-		pick.what = get_item_by_index(toothpastes_list,i);
+		pick->what = get_item_by_index(toothpastes_list,i);
 	}
-	pick.where=toothpastes_list;
+	pick->where=toothpastes_list;
 	if (topts.ptype==PICK_MAX_RATING)
 	{
-		pick.what=find_item_with_max_rating(pick.where);
+		pick->what=find_item_with_max_rating(pick->where);
 	}
 	if (topts.ptype==PICK_MAX_MASS)
 	{
-		pick.what=find_item_with_max_mass(pick.where);
+		pick->what=find_item_with_max_mass(pick->where);
 	}
 	if (topts.ptype==PICK_MIN_RATING)
 	{
-		pick.what=find_item_with_min_rating(pick.where);
+		pick->what=find_item_with_min_rating(pick->where);
 	}
 	if (topts.ptype==PICK_MIN_MASS)
 	{
-		pick.what=find_item_with_min_mass(pick.where);
+		pick->what=find_item_with_min_mass(pick->where);
 	}
 	
-	brand_len=strlen(pick.what.toothpaste_brand);
+	brand_len=strlen(pick->what.toothpaste_brand);
 	if (topts.upper_brands)
 	{	
 		for (k=0;k<brand_len;k++)
 		{
-			pick.what.toothpaste_brand[k]=toupper(pick.what.toothpaste_brand[k]);
+			pick->what.toothpaste_brand[k]=toupper(pick->what.toothpaste_brand[k]);
 		}
 	}
-	pick.j=(pick.day)%TOTAL_DAYS_OF_WEEK;
+	pick->j=(pick->day)%TOTAL_DAYS_OF_WEEK;
 	
-	if ((total_seconds - pick.stats.last_pick_time) > (SECONDS_PER_DAY-PICK_TIMEOUT_SECONDS)) 
+	if ((total_seconds - pick->stats.last_pick_time) > (SECONDS_PER_DAY-PICK_TIMEOUT_SECONDS)) 
 	{
 		new_pick_flag=1;
-		pick.stats.total_picks++;
-		pick.stats.last_pick_time=total_seconds;
-		write_counters(pick.stats,pick.opts.fake_stats);
+		pick->stats.total_picks++;
+		pick->stats.last_pick_time=total_seconds;
+		write_counters(pick->stats,pick->opts.fake_stats);
 		
-		if (pick.stats.total_picks % (DAYS_PER_YEAR /topts.formula.swap_toothbrush_times_per_year) ==0)
+		if (pick->stats.total_picks % (DAYS_PER_YEAR /topts.formula.swap_toothbrush_times_per_year) ==0)
 		{
 			toothbrush_flag = 1;
 		}
 		
-		if (pick.stats.total_picks % (DAYS_PER_YEAR /topts.formula.visit_dentist_times_per_year) ==0)
+		if (pick->stats.total_picks % (DAYS_PER_YEAR /topts.formula.visit_dentist_times_per_year) ==0)
 		{
 			dentist_flag = 1;
 		}
 	}
-	pick.stats.last_pick_time=pick.stats.last_pick_time-delta_hours*SECONDS_PER_HOUR;
+	pick->stats.last_pick_time=pick->stats.last_pick_time-delta_hours*SECONDS_PER_HOUR;
 		
-	pick.toothpaste_pick_index=i;
+	pick->toothpaste_pick_index=i;
 	
-	toothpaste_strings[0] = 	str_good_day(&pick,&topts);
-	toothpaste_strings[1] = 	str_anon_username(&pick,&topts);
-	toothpaste_strings[2] = 	str_welcome(&pick,&topts);
-	toothpaste_strings[3] = 	str_next_pick(&pick,&topts);
-	toothpaste_strings[4] = 	str_new_toothbrush(&pick,&topts);
-	toothpaste_strings[5] = 	str_visit_dentist(&pick,&topts);
-	toothpaste_strings[6] = 	str_already_picked(&pick,&topts);
-	toothpaste_strings[7] = 	str_pick_type(&pick,&topts);
-	toothpaste_strings[8] = 	str_toothpaste(&pick,&topts);
-	toothpaste_strings[9] =		str_toothbrush(&pick,&topts);
-	toothpaste_strings[10] = 	str_toothpaste_index(&pick,&topts);
-	toothpaste_strings[11] = 	str_toothpaste_type(&pick,&topts);
-	toothpaste_strings[12] = 	str_dental_formula(&pick,&topts);
-	toothpaste_strings[13] = 	str_day_of_the_week(&pick,&topts);
-	toothpaste_strings[14] = 	str_total_picks(&pick,&topts);
-	toothpaste_strings[15] = 	str_last_pick_time(&pick,&topts);
-	toothpaste_strings[16] = 	str_tubes_wasted(&pick,&topts);
-	toothpaste_strings[17] = 	str_source(&pick,&topts);
-	toothpaste_strings[18] = 	str_meme(&pick,&topts);
-	toothpaste_strings[19] = 	str_quiet(&pick,&topts);
+	toothpaste_strings[0] = 	str_good_day(pick,&topts);
+	toothpaste_strings[1] = 	str_anon_username(pick,&topts);
+	toothpaste_strings[2] = 	str_welcome(pick,&topts);
+	toothpaste_strings[3] = 	str_next_pick(pick,&topts);
+	toothpaste_strings[4] = 	str_new_toothbrush(pick,&topts);
+	toothpaste_strings[5] = 	str_visit_dentist(pick,&topts);
+	toothpaste_strings[6] = 	str_already_picked(pick,&topts);
+	toothpaste_strings[7] = 	str_pick_type(pick,&topts);
+	toothpaste_strings[8] = 	str_toothpaste(pick,&topts);
+	toothpaste_strings[9] =		str_toothbrush(pick,&topts);
+	toothpaste_strings[10] = 	str_toothpaste_index(pick,&topts);
+	toothpaste_strings[11] = 	str_toothpaste_type(pick,&topts);
+	toothpaste_strings[12] = 	str_dental_formula(pick,&topts);
+	toothpaste_strings[13] = 	str_day_of_the_week(pick,&topts);
+	toothpaste_strings[14] = 	str_total_picks(pick,&topts);
+	toothpaste_strings[15] = 	str_last_pick_time(pick,&topts);
+	toothpaste_strings[16] = 	str_tubes_wasted(pick,&topts);
+	toothpaste_strings[17] = 	str_source(pick,&topts);
+	toothpaste_strings[18] = 	str_meme(pick,&topts);
+	toothpaste_strings[19] = 	str_quiet(pick,&topts);
 	
 	ti=0;
 	if ((topts.tpm_template[0]=='*') && (strlen(topts.tpm_template)==1))
@@ -1476,7 +1475,7 @@ tpm_pick_toothpaste(list_node_t* head,toothpaste_pick_options_t topts)
 		c=topts.tpm_template[ti++];
 		if (check_visibility(char_to_strnum(c),new_pick_flag,toothbrush_flag,dentist_flag, topts.verbose))
 		if (char_to_strnum(c)!=-1)	
-		strcat(pick.message,toothpaste_strings[char_to_strnum(c)]);
+		strcat(pick->message,toothpaste_strings[char_to_strnum(c)]);
 	}
 
 	for (ti=0;ti<TOTAL_OUTPUT_STRINGS;ti++)
@@ -1486,40 +1485,40 @@ tpm_pick_toothpaste(list_node_t* head,toothpaste_pick_options_t topts)
 	}
 	
 	
-	snprintf(pick.JSON,MAX_LINE_LENGTH,"{\n\t \"who\":\"%s\",\n\t \"toothpaste\":\"%.127s\",\n\t \"tube_mass_g\":%u,\n\t \"rating\":%u\n\t \"meme\":\"%s\" \n}",pick.who,pick.what.toothpaste_brand,pick.what.tube_mass_g,pick.what.rating,topts.meme_payload);
+	snprintf(pick->JSON,MAX_LINE_LENGTH,"{\n\t \"who\":\"%s\",\n\t \"toothpaste\":\"%.127s\",\n\t \"tube_mass_g\":%u,\n\t \"rating\":%u\n\t \"meme\":\"%s\" \n}",pick->who,pick->what.toothpaste_brand,pick->what.tube_mass_g,pick->what.rating,topts.meme_payload);
 		
-	snprintf(line,MAX_LINE_LENGTH,"%s,%s,",pick.who,pick_type_strings[topts.ptype] );
-	strncat(pick.CSV,line,MAX_LINE_LENGTH);
+	snprintf(line,MAX_LINE_LENGTH,"%s,%s,",pick->who,pick_type_strings[topts.ptype] );
+	strncat(pick->CSV,line,MAX_LINE_LENGTH);
 	
 	snprintf(line,MAX_LINE_LENGTH,"%d,%d,%d,",new_pick_flag,toothbrush_flag,dentist_flag );
-	strncat(pick.CSV,line,MAX_LINE_LENGTH);
+	strncat(pick->CSV,line,MAX_LINE_LENGTH);
 	
-	snprintf(line,MAX_LINE_LENGTH,"%s,%d,%d,",  pick.what.toothpaste_brand, pick.what.tube_mass_g, pick.what.rating );
-	strncat(pick.CSV,line,MAX_LINE_LENGTH);
+	snprintf(line,MAX_LINE_LENGTH,"%s,%d,%d,",  pick->what.toothpaste_brand, pick->what.tube_mass_g, pick->what.rating );
+	strncat(pick->CSV,line,MAX_LINE_LENGTH);
 	
-	snprintf(line,MAX_LINE_LENGTH,"%s,%s,%d,%d,",  pick.what.toothbrush_color, pick.what.toothbrush_brand, pick.what.toothbrush_length_cm, pick.what.toothbrush_hardness );
-	strncat(pick.CSV,line,MAX_LINE_LENGTH);
+	snprintf(line,MAX_LINE_LENGTH,"%s,%s,%d,%d,",  pick->what.toothbrush_color, pick->what.toothbrush_brand, pick->what.toothbrush_length_cm, pick->what.toothbrush_hardness );
+	strncat(pick->CSV,line,MAX_LINE_LENGTH);
 	
-	snprintf(line,MAX_LINE_LENGTH,"%d,%d,", i,pick.total_toothpastes );
-	strncat(pick.CSV,line,MAX_LINE_LENGTH);
+	snprintf(line,MAX_LINE_LENGTH,"%d,%d,", i,pick->total_toothpastes );
+	strncat(pick->CSV,line,MAX_LINE_LENGTH);
 	
-	snprintf(line,MAX_LINE_LENGTH,"%s," ,toothpaste_type_strings[pick.what.type]);
-	strncat(pick.CSV,line,MAX_LINE_LENGTH);
+	snprintf(line,MAX_LINE_LENGTH,"%s," ,toothpaste_type_strings[pick->what.type]);
+	strncat(pick->CSV,line,MAX_LINE_LENGTH);
 
 	snprintf(line,MAX_LINE_LENGTH,"%u-%u-%u-%u,", topts.formula.brush_times_per_day ,topts.formula.minutes_per_brush , topts.formula.swap_toothbrush_times_per_year, topts.formula.visit_dentist_times_per_year);
-	strncat(pick.CSV,line,MAX_LINE_LENGTH);
+	strncat(pick->CSV,line,MAX_LINE_LENGTH);
 	
-	snprintf(line,MAX_LINE_LENGTH,"%s,%u,", days_of_week[pick.j],pick.day);
-	strncat(pick.CSV,line,MAX_LINE_LENGTH);
+	snprintf(line,MAX_LINE_LENGTH,"%s,%u,", days_of_week[pick->j],pick->day);
+	strncat(pick->CSV,line,MAX_LINE_LENGTH);
 	
-	snprintf(line,MAX_LINE_LENGTH,LINE_FORMAT_CSV, pick.stats.total_picks,pick.stats.last_pick_time,pick.waste_report,toothpastes_file_path_final,topts.meme_payload);
-	strncat(pick.CSV,line,MAX_LINE_LENGTH);
+	snprintf(line,MAX_LINE_LENGTH,LINE_FORMAT_CSV, pick->stats.total_picks,pick->stats.last_pick_time,pick->waste_report,toothpastes_file_path_final,topts.meme_payload);
+	strncat(pick->CSV,line,MAX_LINE_LENGTH);
 	
 	if (topts.lat_flag) 
 	{
-		list_available_toothpastes(&pick);
+		list_available_toothpastes(pick);
 	}	
-	return &pick;
+	return 0;
 }
 
 static void 
@@ -1787,12 +1786,12 @@ do_not_test_me(int argc, char* argv[])
 
 	int opt;
 	FILE* output_file;
-	toothpaste_pick_t* pick;
 	char* user_home_dir=get_user_home_dir();
 	char user_home_dir_static[MAX_PATH];
 	toothpaste_pick_options_t topts;
 	struct cfg_struct* cfg;
 	int option_index = 0;
+	toothpaste_pick_t pick;
 	
 	strncpy(user_home_dir_static,user_home_dir,MAX_PATH-1);
 	free(user_home_dir);
@@ -1925,18 +1924,18 @@ do_not_test_me(int argc, char* argv[])
 		output_file=stdout;
 	}
 	toothpastes_list=tpm_load_list_from_file(toothpastes_file_path_final);
-	pick=tpm_pick_toothpaste(toothpastes_list,topts);
+	tpm_pick_toothpaste(toothpastes_list,topts,&pick);
 	if (topts.json_flag)
 	{
-		fprintf(output_file,"%s \n",tpm_get_toothpaste_picking_JSON(pick));
+		fprintf(output_file,"%s \n",tpm_get_toothpaste_picking_JSON(&pick));
 	}
 	else if (topts.csv_flag)
 	{
-		 fprintf(output_file,"%s \n",tpm_get_toothpaste_picking_CSV(pick));
+		 fprintf(output_file,"%s \n",tpm_get_toothpaste_picking_CSV(&pick));
 	}
 	else		
 	{
-		fprintf(output_file,"%s \n",tpm_get_toothpaste_picking_message(pick));
+		fprintf(output_file,"%s \n",tpm_get_toothpaste_picking_message(&pick));
 	}
 	if (config_load_failure) 
 	{
@@ -1952,11 +1951,11 @@ do_not_test_me(int argc, char* argv[])
 	
 	if ((topts.json_flag) || (topts.csv_flag)) 
 	{
-		finish(NO_SYSTEM_PAUSE,pick);
+		finish(NO_SYSTEM_PAUSE,&pick);
 	}
 	else
 	{
-		finish(SYSTEM_PAUSE,pick);
+		finish(SYSTEM_PAUSE,&pick);
 	}
 	
 	exit(EXIT_SUCCESS);

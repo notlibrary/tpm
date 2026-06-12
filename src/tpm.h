@@ -247,7 +247,7 @@ typedef struct toothpaste_pick_t
 }toothpaste_pick_t;
 
 TPM list_node_t* tpm_load_list_from_file(const char* filename);
-TPM toothpaste_pick_t* tpm_pick_toothpaste(list_node_t* head,toothpaste_pick_options_t topts);
+TPM int tpm_pick_toothpaste(list_node_t* head,toothpaste_pick_options_t topts,toothpaste_pick_t* pick);
 TPM char* tpm_get_toothpaste_picking_message(toothpaste_pick_t* pick);
 TPM char* tpm_get_toothpaste_picking_JSON(toothpaste_pick_t* pick);
 TPM char* tpm_get_toothpaste_picking_CSV(toothpaste_pick_t* pick);
