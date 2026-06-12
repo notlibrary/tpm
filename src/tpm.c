@@ -1262,7 +1262,7 @@ check_visibility(int input_id, int new_pick_flag, int toothbrush_flag, int denti
 			return 1;
 		}
 	}
-	if ((input_id ==18)&& !verbose) {
+	if ((input_id ==19)&& !verbose) {
 		return 1;
 	}
 	
