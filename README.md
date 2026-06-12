@@ -113,7 +113,7 @@ See `.github/workflows/brush.yml` for workflow details and
 [raw action runner logs](https://github.com/notlibrary/tpm/actions/runs/25910447433/job/76153967460)
 
 Moreover GNU Autotools WASM and code Babylonian nature provided us a giant leap of portability forward theoretically we can push
-even further by running it on OpenWrt router or motherboard UEFI IPMI more than enough this may interest Chinese users
+even further by running it on OpenWrt router or motherboard UEFI IPMI even in the bootloader more than enough this may interest Chinese users
 
 Another one alternative OS dependable schedule strategy is to bind <kbd>F3</kbd> hotkey to run `tpm`
 

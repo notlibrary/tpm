@@ -417,7 +417,7 @@ display_list(list_node_t* head, toothpaste_pick_t* pick)
 		}
 		else
 		{
-			snprintf(line,3*MAX_TOOTHPASTE_LINE,"%d,%.120s,%d,%d,%.30s,%.120s,%u,%u\n", current->data.index, current->data.toothpaste_brand, current->data.tube_mass_g, current->data.rating, current->data.toothbrush_color, current->data.toothbrush_brand, current->data.toothbrush_length_cm, current->data.toothbrush_hardness);
+			snprintf(line,4*MAX_TOOTHPASTE_LINE,"%d,%.120s,%d,%d,%.30s,%.120s,%u,%u\n", current->data.index, current->data.toothpaste_brand, current->data.tube_mass_g, current->data.rating, current->data.toothbrush_color, current->data.toothbrush_brand, current->data.toothbrush_length_cm, current->data.toothbrush_hardness);
 		}
 		
         strncat(pick->message,line,MAX_LINE_LENGTH);

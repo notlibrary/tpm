@@ -10,7 +10,7 @@ extern "C" {
 #define TPM_STRING "tpm"
 #define TPM_VERSION_MAJOR 0
 #define TPM_VERSION_MINOR 6
-#define TPM_VERSION_PATCH 6
+#define TPM_VERSION_PATCH 7
 
 #undef _CRT_NONSTDC_NO_DEPRECATE 
 #define _CRT_NONSTDC_NO_DEPRECATE 
@@ -86,7 +86,7 @@ memcpy(&x,swap_temp,sizeof(x)); \
 #endif
 
 #define TOTAL_TOOTHPASTE_TYPES 5
-#define TOTAL_ERROR_MESSAGES 7
+#define TOTAL_ERROR_MESSAGES 8
 #define TOTAL_USER_MESSAGES 31
 #define TOTAL_USER_ARMOUR 10
 
