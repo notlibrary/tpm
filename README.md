@@ -7,6 +7,8 @@
 ## TPM Toothpaste Picking Manager
 Let me pick the toothpaste for you(or how to brush your teeth admins way)
 
+Do not confuse it with TPM Trusted Platform Module
+
 > Brush your teeth kernel scum
 
 0. Clone the repository to `~/tpm` and make it:
