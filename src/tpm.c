@@ -258,95 +258,125 @@ check_enhanced_toothpastes(const char* filename)
 TPM list_node_t* 
 tpm_load_list_from_file(const char* filename) 
 {
-	unsigned int i;
-	unsigned int cnt=0;
+    unsigned int i;
+    unsigned int cnt = 0;
     FILE* file; 
-	list_node_t* head = NULL;
+    list_node_t* head = NULL;
     toothpaste_data_t temp_data;
-	char line[MAX_LINE_LENGTH];
-	char* current = line;
-	char long_line[4*MAX_LINE_LENGTH];
-	
-	memset(long_line,0,4*MAX_LINE_LENGTH);
-	memset(line,0,MAX_LINE_LENGTH);
-	
-	enhanced_toothpastes=check_enhanced_toothpastes(filename);
-	file = fopen(filename, "r");
-	
+    char line[MAX_LINE_LENGTH];
+    char long_line[4 * MAX_LINE_LENGTH];
+    
+    enhanced_toothpastes = check_enhanced_toothpastes(filename);
+    file = fopen(filename, "r");
+    
     if (file == NULL) 
-	{
+    {
         perror(error_strings[TOOTHPASTES_FAILED]);
-		for (i=0;i<TOTAL_TOOTHPASTES;i++)
-		{
-		  temp_data=toothpastes[i];
-		  head = add_to_list(head, temp_data);	
-		  
-		}
-		return head;
+        for (i = 0; i < TOTAL_TOOTHPASTES; i++)
+        {
+            temp_data = toothpastes[i];
+            head = add_to_list(head, temp_data);    
+        }
+        return head;
     }
-	
+    
     while (fgets(line, sizeof(line), file) != NULL) 
-	{
-        
+    {
+
+        char* current = line;
+
         while (isspace((unsigned char)*current)) 
-		{
+        {
             current++;
         }
 
         if (*current == '\0' || *current == COMMENT_CHAR) 
-		{
+        {
             continue; 
         }
-		
-		temp_data.toothpaste_brand=malloc(MAX_TOOTHPASTE_LINE);
-		temp_data.toothbrush_brand=malloc(MAX_TOOTHPASTE_LINE);
-		temp_data.toothbrush_color=malloc(MAX_TOOTHBRUSH_COLOR);
-		
-		memset(temp_data.toothpaste_brand,0,MAX_TOOTHPASTE_LINE);
-		memset(temp_data.toothbrush_brand,0,MAX_TOOTHPASTE_LINE);
-		memset(temp_data.toothbrush_color,0,MAX_TOOTHBRUSH_COLOR);
-		
-		if ( !enhanced_toothpastes){
-			sscanf(current, "%u, %4095[^,],%u,%u\n", &temp_data.index,long_line ,&temp_data.tube_mass_g,&temp_data.rating);
-			strncpy(temp_data.toothbrush_color,toothpastes[0].toothbrush_color,MAX_TOOTHBRUSH_COLOR);
-			strncpy(temp_data.toothbrush_brand,toothpastes[0].toothbrush_brand,MAX_TOOTHPASTE_LINE);
-			temp_data.toothbrush_length_cm=toothpastes[0].toothbrush_length_cm;
-			temp_data.toothbrush_hardness=toothpastes[0].toothbrush_hardness;
-		}
-		else {
-			sscanf(current, "%u, %4095[^,],%u,%u,%32[^,],%128[^,],%u,%u\n", &temp_data.index,long_line ,&temp_data.tube_mass_g,&temp_data.rating,temp_data.toothbrush_color,temp_data.toothbrush_brand,&temp_data.	toothbrush_length_cm,&temp_data.toothbrush_hardness);
-		}
-		
-			strncpy(temp_data.toothpaste_brand,long_line,MAX_TOOTHPASTE_LINE-1);
-			temp_data.toothpaste_brand[sizeof(temp_data.toothpaste_brand) - 1] = '\0';
-			ltrim(rtrim(temp_data.toothpaste_brand));
-			temp_data.type=PASTE_RANNDOM;
-			if (0==strcmp(toothpaste_type_strings[1],temp_data.toothpaste_brand))
-			{
-				temp_data.type=PASTE_NOTHING;
-			}
-			
-		
-			if (0==strcmp(toothpaste_type_strings[2],temp_data.toothpaste_brand))
-			{
-				temp_data.type=PASTE_UNKNOWN;	
-			}		
-			head = add_to_list(head, temp_data);	
-			cnt++;
-			if (cnt>MAX_TOOTHPASTE_LINES){break;}
-		
-		
-	}
-	if (cnt==1) head->data.type=PASTE_NULL;
-	if (cnt==0)
-	{
-		for (i=0;i<TOTAL_TOOTHPASTES;i++)
-		{
-		  temp_data=toothpastes[i];
-		  head = add_to_list(head, temp_data);	
-		  
-		}
-	}
+        
+        temp_data.toothpaste_brand = malloc(MAX_TOOTHPASTE_LINE);
+        temp_data.toothbrush_brand = malloc(MAX_TOOTHPASTE_LINE);
+        temp_data.toothbrush_color = malloc(MAX_TOOTHBRUSH_COLOR);
+        
+        if (!temp_data.toothpaste_brand || !temp_data.toothbrush_brand || !temp_data.toothbrush_color) {
+            perror(error_strings[MALLOC_FAILED]);
+            free(temp_data.toothpaste_brand);
+            free(temp_data.toothbrush_brand);
+            free(temp_data.toothbrush_color);
+            fclose(file);
+            return head;
+        }
+        
+        memset(temp_data.toothpaste_brand, 0, MAX_TOOTHPASTE_LINE);
+        memset(temp_data.toothbrush_brand, 0, MAX_TOOTHPASTE_LINE);
+        memset(temp_data.toothbrush_color, 0, MAX_TOOTHBRUSH_COLOR);
+        memset(long_line, 0, sizeof(long_line));
+        
+        int parsed_items = 0;
+
+        if (!enhanced_toothpastes) {
+            parsed_items = sscanf(current, "%u, %4095[^,],%u,%u\n", 
+                                  &temp_data.index, long_line, &temp_data.tube_mass_g, &temp_data.rating);
+            if (parsed_items == 4) {
+                strncpy(temp_data.toothbrush_color, toothpastes[0].toothbrush_color, MAX_TOOTHBRUSH_COLOR - 1);
+                strncpy(temp_data.toothbrush_brand, toothpastes[0].toothbrush_brand, MAX_TOOTHPASTE_LINE - 1);
+                temp_data.toothbrush_length_cm = toothpastes[0].toothbrush_length_cm;
+                temp_data.toothbrush_hardness = toothpastes[0].toothbrush_hardness;
+            }
+        }
+        else {
+            parsed_items = sscanf(current, "%u, %4095[^,],%u,%u,%32[^,],%128[^,],%u,%u\n", 
+                                  &temp_data.index, long_line, &temp_data.tube_mass_g, &temp_data.rating,
+                                  temp_data.toothbrush_color, temp_data.toothbrush_brand, 
+                                  &temp_data.toothbrush_length_cm, &temp_data.toothbrush_hardness);
+        }
+        
+        if ((!enhanced_toothpastes && parsed_items == 4) || (enhanced_toothpastes && parsed_items == 8)) 
+        {
+    
+            strncpy(temp_data.toothpaste_brand, long_line, MAX_TOOTHPASTE_LINE - 1);
+            temp_data.toothpaste_brand[MAX_TOOTHPASTE_LINE - 1] = '\0'; 
+            
+            ltrim(rtrim(temp_data.toothpaste_brand));
+            
+            temp_data.type = PASTE_RANNDOM;
+            if (0 == strcmp(toothpaste_type_strings[1], temp_data.toothpaste_brand))
+            {
+                temp_data.type = PASTE_NOTHING;
+            }
+            
+            if (0 == strcmp(toothpaste_type_strings[2], temp_data.toothpaste_brand))
+            {
+                temp_data.type = PASTE_UNKNOWN;    
+            }        
+            
+            head = add_to_list(head, temp_data);    
+            cnt++;
+            if (cnt > MAX_TOOTHPASTE_LINES) { break; }
+        } 
+        else 
+        {
+         
+            free(temp_data.toothpaste_brand);
+            free(temp_data.toothbrush_brand);
+            free(temp_data.toothbrush_color);
+        }
+    }
+    
+    if (cnt == 1 && head != NULL) {
+        head->data.type = PASTE_NULL;
+    }
+    
+    if (cnt == 0)
+    {
+        for (i = 0; i < TOTAL_TOOTHPASTES; i++)
+        {
+            temp_data = toothpastes[i];
+            head = add_to_list(head, temp_data);    
+        }
+    }
+    
     fclose(file);
     return head;
 }
