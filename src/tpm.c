@@ -386,11 +386,11 @@ display_list(list_node_t* head, toothpaste_pick_t* pick)
 {
 	unsigned int cnt=0;
     list_node_t* current = head;
-	char line[MAX_TOOTHPASTE_LINE];
+	char line[4*MAX_TOOTHPASTE_LINE];
 	int i = 0;
 	unsigned int len =0;
 	
-	memset(line,0,MAX_TOOTHPASTE_LINE);
+	memset(line,0,4*MAX_TOOTHPASTE_LINE);
 	memset(pick->message,0,OUTPUT_BLOCK_SIZE);
 	
 		if (!enhanced_toothpastes)
