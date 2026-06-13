@@ -86,7 +86,7 @@ memcpy(&x,swap_temp,sizeof(x)); \
 #endif
 
 #define TOTAL_TOOTHPASTE_TYPES 5
-#define TOTAL_ERROR_MESSAGES 8
+#define TOTAL_ERROR_MESSAGES 9
 #define TOTAL_USER_MESSAGES 31
 #define TOTAL_USER_ARMOUR 10
 
@@ -158,7 +158,8 @@ typedef enum error_msg_t
 	NO_TOOTHPASTES_LOADED,
 	CONFIG_LOAD_FAILED,
 	LAST_PICK_WRITING_FAILED,
-	PICK_NULL
+	PICK_NULL,
+	NO_TOOTHPASTES_AVAILBLE
 	
 }error_msg_t;
 
