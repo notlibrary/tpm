@@ -51,6 +51,7 @@ START_TEST (length_pick_CSV)
 	topts.formula.visit_dentist_times_per_year=2;
 	topts.formula.swap_toothbrush_times_per_year=2;
 	topts.ptype=0;
+	topts.tpm_template="guwntdapobiTfWPlUsmI";
 	int len;
 	
 	toothpastes_list=tpm_load_list_from_file("not/existimg/path");
@@ -68,7 +69,8 @@ START_TEST (length_pick_JSON)
 	toothpaste_pick_t pick;
 	toothpaste_pick_options_t topts;
 	topts.formula.visit_dentist_times_per_year=2;
-	topts.formula.swap_toothbrush_times_per_year=2;;
+	topts.formula.swap_toothbrush_times_per_year=2;
+	topts.tpm_template="guwntdapobiTfWPlUsmI";
 	topts.ptype=0;
 	int len;
 	
@@ -89,8 +91,8 @@ START_TEST (length_pick_msg)
 	topts.formula.visit_dentist_times_per_year=2;
 	topts.formula.swap_toothbrush_times_per_year=2;
 	topts.ptype=0;
-	strcpy(topts.tpm_template,"guwntdapoiTfWPlUsmI");
-	strcpy(topts.meme_payload,"moot");
+	topts.tpm_template="guwntdapobiTfWPlUsmI";
+	topts.meme_payload="moot";
 	int len;
 	
 	toothpastes_list=tpm_load_list_from_file("not/existimg/path");
