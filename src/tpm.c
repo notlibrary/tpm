@@ -215,12 +215,16 @@ check_enhanced_toothpastes(const char* filename)
 	char line[MAX_LINE_LENGTH];
 	int i = 0;
 	int total_comas = 0;
+	int found_valid_line = 0; 
 	
 	file = fopen(filename, "r");
 	if (file == NULL) 
 	{
 		return 0;
 	}
+	
+
+	memset(line, 0, sizeof(line));
 	
 	while (fgets(line, sizeof(line), file) != NULL) 
 	{
@@ -236,14 +240,28 @@ check_enhanced_toothpastes(const char* filename)
 			continue; 
 		}
 
-	}
+
+		found_valid_line = 1;
+		total_comas = 0; 
+
+
 		for (i = 0; i < MAX_LINE_LENGTH; i++)
 		{	
 			if (line[i] == ',') total_comas++;	
 			if (line[i] == '\0') break;
 		}
+		
+	
+		break; 
+	}
 
 	fclose(file); 
+
+
+	if (!found_valid_line)
+	{
+		return 0;
+	}
 
 	if (total_comas == ENHANCED_MODE_COMAS) 
 	{
@@ -267,25 +285,28 @@ tpm_load_list_from_file(const char* filename)
     char line[MAX_LINE_LENGTH];
     char long_line[4 * MAX_LINE_LENGTH];
     
-    enhanced_toothpastes = check_enhanced_toothpastes(filename);
+
     file = fopen(filename, "r");
     
-	if (file == NULL) 
-	{
-		perror(error_strings[TOOTHPASTES_FAILED]);
-		for (i = 0; i < TOTAL_TOOTHPASTES; i++)
-		{
-			temp_data = toothpastes[i];
-			
-			temp_data.toothpaste_brand = toothpastes[i].toothpaste_brand ? strdup(toothpastes[i].toothpaste_brand) : NULL;
-			temp_data.toothbrush_brand = toothpastes[i].toothbrush_brand ? strdup(toothpastes[i].toothbrush_brand) : NULL;
-			temp_data.toothbrush_color = toothpastes[i].toothbrush_color ? strdup(toothpastes[i].toothbrush_color) : NULL;
-			
-			head = add_to_list(head, temp_data);    
-		}
-		return head;
-	}
+    if (file == NULL) 
+    {
+        perror(error_strings[TOOTHPASTES_FAILED]);
+        for (i = 0; i < TOTAL_TOOTHPASTES; i++)
+        {
+            memset(&temp_data, 0, sizeof(toothpaste_data_t));
+            temp_data = toothpastes[i];
+            
+            temp_data.toothpaste_brand = toothpastes[i].toothpaste_brand ? strdup(toothpastes[i].toothpaste_brand) : NULL;
+            temp_data.toothbrush_brand = toothpastes[i].toothbrush_brand ? strdup(toothpastes[i].toothbrush_brand) : NULL;
+            temp_data.toothbrush_color = toothpastes[i].toothbrush_color ? strdup(toothpastes[i].toothbrush_color) : NULL;
+            
+            head = add_to_list(head, temp_data);    
+        }
+        return head;
+    }
     
+	enhanced_toothpastes = check_enhanced_toothpastes(filename);
+	
     while (fgets(line, sizeof(line), file) != NULL) 
     {
 
@@ -1391,7 +1412,7 @@ tpm_pick_toothpaste(list_node_t* head, toothpaste_pick_options_t topts, toothpas
     }
 
     read_counters(&pick->stats, pick->opts.fake_stats);
-    pick->waste_report = report_wasted_tubes(toothpastes_list, &pick->stats);
+    pick->waste_report = report_wasted_tubes(head, &pick->stats);
     pick->toothpaste_pick_index = pick->stats.total_picks;
     pick->when = total_seconds;
 
@@ -1429,7 +1450,7 @@ tpm_pick_toothpaste(list_node_t* head, toothpaste_pick_options_t topts, toothpas
 
     if (topts.ptype == PICK_BY_BRAND) 
     {
-        pick->what = get_item_by_brand_string(toothpastes_list, topts.brand_string);
+       pick->what = get_item_by_brand_string(head, topts.brand_string);
     }
     else if (topts.ptype == PICK_MAX_RATING)
     {
@@ -1449,10 +1470,24 @@ tpm_pick_toothpaste(list_node_t* head, toothpaste_pick_options_t topts, toothpas
     }
     else
     {
-        pick->what = get_item_by_index(toothpastes_list, i);
+                pick->what = get_item_by_index(head, i);
     }
     
-    pick->where = toothpastes_list;
+    pick->where = head;
+    
+    if (pick->what.toothpaste_brand == NULL) {
+
+        pick->what.toothpaste_brand = "Unknown"; 
+    }
+    
+    brand_len = strlen(pick->what.toothpaste_brand);
+    if (topts.upper_brands)
+    {    
+        for (k = 0; k < brand_len; k++)
+        {
+            pick->what.toothpaste_brand[k] = toupper((unsigned char)pick->what.toothpaste_brand[k]);
+        }
+    }
     
     brand_len = strlen(pick->what.toothpaste_brand);
     if (topts.upper_brands)
@@ -1564,7 +1599,20 @@ tpm_pick_toothpaste(list_node_t* head, toothpaste_pick_options_t topts, toothpas
     }
 	
 	
-	 snprintf(pick->JSON, OUTPUT_BLOCK_SIZE, 
+    if (pick->who == NULL) {
+        pick->who = "Anonymous";
+    }
+    if (pick->what.toothpaste_brand == NULL) {
+        pick->what.toothpaste_brand = "Unknown";
+    }
+    if (pick->what.toothbrush_color == NULL) {
+        pick->what.toothbrush_color = "Unknown";
+    }
+    if (pick->what.toothbrush_brand == NULL) {
+        pick->what.toothbrush_brand = "Unknown";
+    }
+
+    snprintf(pick->JSON, OUTPUT_BLOCK_SIZE, 
         "{\n"
         "\t \"who\":\"%s\",\n"
         "\t \"toothpaste\":\"%.127s\",\n"

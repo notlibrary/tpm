@@ -45,63 +45,116 @@ END_TEST
 
 START_TEST (length_pick_CSV)
 {
-	list_node_t* toothpastes_list;
-	toothpaste_pick_t pick;
-	toothpaste_pick_options_t topts;
-	topts.formula.visit_dentist_times_per_year=2;
-	topts.formula.swap_toothbrush_times_per_year=2;
-	topts.ptype=0;
-	topts.tpm_template="guwntdapobiTfWPlUsmI";
+	list_node_t* toothpastes_list = NULL;
+	toothpaste_pick_t pick = {0};           
+	toothpaste_pick_options_t topts = {0};   
+	
+	char template_buffer[] = "guwntdapobiTfWPlUsmI"; 
+	
+	topts.formula.visit_dentist_times_per_year = 2;
+	topts.formula.swap_toothbrush_times_per_year = 2;
+	topts.ptype = 0;
+	topts.tpm_template = template_buffer;
+	topts.username = "TestUser";
+	topts.meme_payload = "moot";
 
 	int len;
 	
-	toothpastes_list=tpm_load_list_from_file("not/existing/path");
-	tpm_pick_toothpaste(toothpastes_list,topts,&pick);
-	char* out=tpm_get_toothpaste_picking_CSV(&pick);
-	len=strlen(out);
+	const char* test_filename = "test_fixtures_csv.txt";
+	FILE* f = fopen(test_filename, "w");
+	ck_assert_ptr_nonnull(f); 
+	fprintf(f, "1, Colgate, 75, 5, Blue, Oral-B, 19, 2\n");
+	fclose(f);
 	
-	ck_assert_int_gt(len,0);
+	toothpastes_list = tpm_load_list_from_file(test_filename);
+	ck_assert_ptr_nonnull(toothpastes_list);
+
+	tpm_pick_toothpaste(toothpastes_list, topts, &pick);
+	
+	char* out = tpm_get_toothpaste_picking_CSV(&pick);
+	ck_assert_ptr_nonnull(out);
+	
+	len = strlen(out);
+	ck_assert_int_gt(len, 0);
+	
+	remove(test_filename);
 }
 END_TEST
 
 START_TEST (length_pick_JSON)
 {
-	list_node_t* toothpastes_list;
-	toothpaste_pick_t pick;
-	toothpaste_pick_options_t topts;
-	topts.formula.visit_dentist_times_per_year=2;
-	topts.formula.swap_toothbrush_times_per_year=2;
-	topts.tpm_template="guwntdapobiTfWPlUsmI";
-	topts.ptype=0;
+	list_node_t* toothpastes_list = NULL;
+	toothpaste_pick_t pick = {0};           
+	toothpaste_pick_options_t topts = {0};   
+	
+	char template_buffer[] = "guwntdapobiTfWPlUsmI";
+	
+	topts.formula.visit_dentist_times_per_year = 2;
+	topts.formula.swap_toothbrush_times_per_year = 2;
+	topts.ptype = 0;
+	topts.tpm_template = template_buffer;
+	topts.username = "TestUser";
+	topts.meme_payload = "moot";
+	
 	int len;
 	
-	toothpastes_list=tpm_load_list_from_file("not/existing/path");
-	tpm_pick_toothpaste(toothpastes_list,topts,&pick);
-	char* out=tpm_get_toothpaste_picking_JSON(&pick);
-	len=strlen(out);
+	const char* test_filename = "test_fixtures_json.txt";
+	FILE* f = fopen(test_filename, "w");
+	ck_assert_ptr_nonnull(f); 
+	fprintf(f, "1, Colgate, 75, 5, Blue, Oral-B, 19, 2\n");
+	fclose(f);
 	
-	ck_assert_int_gt(len,0);
+	toothpastes_list = tpm_load_list_from_file(test_filename);
+	ck_assert_ptr_nonnull(toothpastes_list);
+
+	tpm_pick_toothpaste(toothpastes_list, topts, &pick);
+	
+	char* out = tpm_get_toothpaste_picking_JSON(&pick);
+	ck_assert_ptr_nonnull(out);
+	
+	len = strlen(out);
+	ck_assert_int_gt(len, 0);
+	
+	remove(test_filename);
 }
 END_TEST
 
 START_TEST (length_pick_msg)
 {
-	list_node_t* toothpastes_list;
-	toothpaste_pick_t pick;
-	toothpaste_pick_options_t topts;
-	topts.formula.visit_dentist_times_per_year=2;
-	topts.formula.swap_toothbrush_times_per_year=2;
-	topts.ptype=0;
-	topts.tpm_template="guwntdapobiTfWPlUsmI";
-	topts.meme_payload="moot";
+	list_node_t* toothpastes_list = NULL;
+	toothpaste_pick_t pick = {0};            
+	toothpaste_pick_options_t topts = {0};   
+	
+	
+	char template_buffer[] = "guwntdapobiTfWPlUsmI";
+	
+	topts.formula.visit_dentist_times_per_year = 2;
+	topts.formula.swap_toothbrush_times_per_year = 2;
+	topts.ptype = 0;
+	topts.tpm_template = template_buffer; 
+	topts.meme_payload = "moot";
+	topts.username = "TestUser";
 	
 	int len;
 	
-	toothpastes_list=tpm_load_list_from_file("not/existing/path");
-	tpm_pick_toothpaste(toothpastes_list,topts,&pick);
-	char* out=tpm_get_toothpaste_picking_message(&pick);
-	len=strlen(out);
-	ck_assert_int_gt(len,0);
+	const char* test_filename = "test_fixtures_toothpastes.txt";
+	FILE* f = fopen(test_filename, "w");
+	ck_assert_ptr_nonnull(f); 
+	fprintf(f, "1, Colgate, 75, 5, Blue, Oral-B, 19, 2\n");
+	fclose(f);
+	
+	toothpastes_list = tpm_load_list_from_file(test_filename);
+	ck_assert_ptr_nonnull(toothpastes_list);
+
+	tpm_pick_toothpaste(toothpastes_list, topts, &pick);
+	
+	char* out = tpm_get_toothpaste_picking_message(&pick);
+	ck_assert_ptr_nonnull(out);
+	
+	len = strlen(out);
+	ck_assert_int_gt(len, 0);
+	
+	remove(test_filename);
 }
 END_TEST
 
