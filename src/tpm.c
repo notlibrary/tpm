@@ -1559,7 +1559,7 @@ tpm_pick_toothpaste(list_node_t* head, toothpaste_pick_options_t topts, toothpas
         if (toothpaste_strings[ti] != NULL) 
         {
             free(toothpaste_strings[ti]);
-            toothpaste_strings[ti] = NULL; // Защита от dangling pointer
+            toothpaste_strings[ti] = NULL; 
         }
     }
 	
