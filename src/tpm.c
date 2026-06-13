@@ -270,16 +270,21 @@ tpm_load_list_from_file(const char* filename)
     enhanced_toothpastes = check_enhanced_toothpastes(filename);
     file = fopen(filename, "r");
     
-    if (file == NULL) 
-    {
-        perror(error_strings[TOOTHPASTES_FAILED]);
-        for (i = 0; i < TOTAL_TOOTHPASTES; i++)
-        {
-            temp_data = toothpastes[i];
-            head = add_to_list(head, temp_data);    
-        }
-        return head;
-    }
+	if (file == NULL) 
+	{
+		perror(error_strings[TOOTHPASTES_FAILED]);
+		for (i = 0; i < TOTAL_TOOTHPASTES; i++)
+		{
+			temp_data = toothpastes[i];
+			
+			temp_data.toothpaste_brand = toothpastes[i].toothpaste_brand ? strdup(toothpastes[i].toothpaste_brand) : NULL;
+			temp_data.toothbrush_brand = toothpastes[i].toothbrush_brand ? strdup(toothpastes[i].toothbrush_brand) : NULL;
+			temp_data.toothbrush_color = toothpastes[i].toothbrush_color ? strdup(toothpastes[i].toothbrush_color) : NULL;
+			
+			head = add_to_list(head, temp_data);    
+		}
+		return head;
+	}
     
     while (fgets(line, sizeof(line), file) != NULL) 
     {
