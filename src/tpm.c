@@ -284,7 +284,7 @@ tpm_load_list_from_file(const char* filename)
     toothpaste_data_t temp_data;
     char line[MAX_LINE_LENGTH];
     char long_line[4 * MAX_LINE_LENGTH];
-    
+    size_t copy_len=0;
 
     file = fopen(filename, "r");
     
@@ -362,9 +362,9 @@ tpm_load_list_from_file(const char* filename)
         if ((!enhanced_toothpastes && parsed_items == 4) || (enhanced_toothpastes && parsed_items == 8)) 
         {
     
-            strncpy(temp_data.toothpaste_brand, long_line, MAX_TOOTHPASTE_LINE - 1);
-            temp_data.toothpaste_brand[MAX_TOOTHPASTE_LINE - 1] = '\0'; 
-            
+			copy_len = strlen(long_line);
+			memcpy(temp_data.toothpaste_brand, long_line, copy_len);
+			temp_data.toothpaste_brand[copy_len] = '\0';
             ltrim(rtrim(temp_data.toothpaste_brand));
             
             temp_data.type = PASTE_RANNDOM;
