@@ -142,7 +142,7 @@ Press any key to continue . . .
          "who":"Anonymous",
          "toothpaste":"Unknown",
          "tube_mass_g":666,
-		 "rating":50
+		 "rating":50,
 		 "meme":"sup /b/"
 }
 ```

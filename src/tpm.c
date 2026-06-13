@@ -1353,7 +1353,7 @@ tpm_pick_toothpaste(list_node_t* head,toothpaste_pick_options_t topts, toothpast
 	int toothbrush_flag=0;
 	unsigned int brand_len;
 	char* toothpaste_strings[TOTAL_OUTPUT_STRINGS];
-	char c=topts.tpm_template[0];
+	
 	pick->opts = topts;
 	memset(line,0,MAX_LINE_LENGTH);
 
@@ -1468,51 +1468,115 @@ tpm_pick_toothpaste(list_node_t* head,toothpaste_pick_options_t topts, toothpast
 	toothpaste_strings[19] = 	str_quiet(pick,&topts);
 	
 	ti=0;
-	if ((topts.tpm_template[0]=='*') && (strlen(topts.tpm_template)==1))
-		snprintf(topts.tpm_template,TOTAL_OUTPUT_STRINGS+1,"%s",DEFAULT_OUTPUT_TEMPLATE);
-	while (c!='\0')
-	{
-		c=topts.tpm_template[ti++];
-		if (check_visibility(char_to_strnum(c),new_pick_flag,toothbrush_flag,dentist_flag, topts.verbose))
-		if (char_to_strnum(c)!=-1)	
-		strcat(pick->message,toothpaste_strings[char_to_strnum(c)]);
-	}
+   if (topts.tpm_template[0] == '*' && topts.tpm_template[1] == '\0') 
+    {
+        snprintf(topts.tpm_template, TOTAL_OUTPUT_STRINGS+1, "%s", DEFAULT_OUTPUT_TEMPLATE);
+    }
 
-	for (ti=0;ti<TOTAL_OUTPUT_STRINGS;ti++)
-	{
-		free(toothpaste_strings[ti]);
+    pick->message[0] = '\0'; 
 
-	}
+    ti = 0;
+    while (topts.tpm_template[ti] != '\0') 
+    {
+        char current_char = topts.tpm_template[ti++];
+        int str_num = char_to_strnum(current_char);
+
+       
+        if (str_num >= 0 && str_num < TOTAL_OUTPUT_STRINGS) 
+        {
+ 
+            if (check_visibility(str_num, new_pick_flag, toothbrush_flag, dentist_flag, topts.verbose)) 
+            {
+                if (toothpaste_strings[str_num] != NULL) 
+                {
+                    
+                    size_t current_len = strlen(pick->message);
+                    if (current_len + 1 < OUTPUT_BLOCK_SIZE) 
+                    {
+                        size_t remaining_space = OUTPUT_BLOCK_SIZE - current_len - 1;
+                        
+                       
+                        strncat(pick->message, toothpaste_strings[str_num], remaining_space);
+                    } 
+                    else 
+                    {
+                       
+                        break; 
+                    }
+                }
+            }
+        }
+    }
+
+    for (ti = 0; ti < TOTAL_OUTPUT_STRINGS; ti++) 
+    {
+        if (toothpaste_strings[ti] != NULL) 
+        {
+            free(toothpaste_strings[ti]);
+            toothpaste_strings[ti] = NULL; // Защита от dangling pointer
+        }
+    }
 	
 	
-	snprintf(pick->JSON,MAX_LINE_LENGTH,"{\n\t \"who\":\"%s\",\n\t \"toothpaste\":\"%.127s\",\n\t \"tube_mass_g\":%u,\n\t \"rating\":%u\n\t \"meme\":\"%s\" \n}",pick->who,pick->what.toothpaste_brand,pick->what.tube_mass_g,pick->what.rating,topts.meme_payload);
+	 snprintf(pick->JSON, OUTPUT_BLOCK_SIZE, 
+        "{\n"
+        "\t \"who\":\"%s\",\n"
+        "\t \"toothpaste\":\"%.127s\",\n"
+        "\t \"tube_mass_g\":%u,\n"
+        "\t \"rating\":%u,\n"
+        "\t \"meme\":\"%s\" \n"
+        "}", 
+        pick->who, 
+        pick->what.toothpaste_brand, 
+        pick->what.tube_mass_g, 
+        pick->what.rating, 
+        topts.meme_payload
+    );
 		
-	snprintf(line,MAX_LINE_LENGTH,"%s,%s,",pick->who,pick_type_strings[topts.ptype] );
-	strncat(pick->CSV,line,MAX_LINE_LENGTH);
-	
-	snprintf(line,MAX_LINE_LENGTH,"%d,%d,%d,",new_pick_flag,toothbrush_flag,dentist_flag );
-	strncat(pick->CSV,line,MAX_LINE_LENGTH);
-	
-	snprintf(line,MAX_LINE_LENGTH,"%s,%d,%d,",  pick->what.toothpaste_brand, pick->what.tube_mass_g, pick->what.rating );
-	strncat(pick->CSV,line,MAX_LINE_LENGTH);
-	
-	snprintf(line,MAX_LINE_LENGTH,"%s,%s,%d,%d,",  pick->what.toothbrush_color, pick->what.toothbrush_brand, pick->what.toothbrush_length_cm, pick->what.toothbrush_hardness );
-	strncat(pick->CSV,line,MAX_LINE_LENGTH);
-	
-	snprintf(line,MAX_LINE_LENGTH,"%d,%d,", i,pick->total_toothpastes );
-	strncat(pick->CSV,line,MAX_LINE_LENGTH);
-	
-	snprintf(line,MAX_LINE_LENGTH,"%s," ,toothpaste_type_strings[pick->what.type]);
-	strncat(pick->CSV,line,MAX_LINE_LENGTH);
+    char* csv_ptr = pick->CSV;
+    size_t csv_rem = OUTPUT_BLOCK_SIZE;
+    int written = 0;
 
-	snprintf(line,MAX_LINE_LENGTH,"%u-%u-%u-%u,", topts.formula.brush_times_per_day ,topts.formula.minutes_per_brush , topts.formula.swap_toothbrush_times_per_year, topts.formula.visit_dentist_times_per_year);
-	strncat(pick->CSV,line,MAX_LINE_LENGTH);
-	
-	snprintf(line,MAX_LINE_LENGTH,"%s,%u,", days_of_week[pick->j],pick->day);
-	strncat(pick->CSV,line,MAX_LINE_LENGTH);
-	
-	snprintf(line,MAX_LINE_LENGTH,LINE_FORMAT_CSV, pick->stats.total_picks,pick->stats.last_pick_time,pick->waste_report,toothpastes_file_path_final,topts.meme_payload);
-	strncat(pick->CSV,line,MAX_LINE_LENGTH);
+
+    written = snprintf(csv_ptr, csv_rem, "%s,%s,%d,%d,%d,", 
+                       pick->who, pick_type_strings[topts.ptype], 
+                       new_pick_flag, toothbrush_flag, dentist_flag);
+    if (written > 0 && (size_t)written < csv_rem) { csv_ptr += written; csv_rem -= written; }
+
+
+    written = snprintf(csv_ptr, csv_rem, "%s,%d,%d,", 
+                       pick->what.toothpaste_brand, pick->what.tube_mass_g, pick->what.rating);
+    if (written > 0 && (size_t)written < csv_rem) { csv_ptr += written; csv_rem -= written; }
+
+
+    written = snprintf(csv_ptr, csv_rem, "%s,%s,%d,%d,", 
+                       pick->what.toothbrush_color, pick->what.toothbrush_brand, 
+                       pick->what.toothbrush_length_cm, pick->what.toothbrush_hardness);
+    if (written > 0 && (size_t)written < csv_rem) { csv_ptr += written; csv_rem -= written; }
+
+
+    written = snprintf(csv_ptr, csv_rem, "%d,%d,%s,", 
+                       i, pick->total_toothpastes, toothpaste_type_strings[pick->what.type]);
+    if (written > 0 && (size_t)written < csv_rem) { csv_ptr += written; csv_rem -= written; }
+
+
+    written = snprintf(csv_ptr, csv_rem, "%u-%u-%u-%u,%s,%u,", 
+                       topts.formula.brush_times_per_day, topts.formula.minutes_per_brush, 
+                       topts.formula.swap_toothbrush_times_per_year, topts.formula.visit_dentist_times_per_year,
+                       days_of_week[pick->j], pick->day);
+    if (written > 0 && (size_t)written < csv_rem) { csv_ptr += written; csv_rem -= written; }
+
+   
+    written = snprintf(csv_ptr, csv_rem, LINE_FORMAT_CSV, 
+                       pick->stats.total_picks, pick->stats.last_pick_time, 
+                       pick->waste_report, toothpastes_file_path_final, topts.meme_payload);
+    
+
+    if (written >= (int)csv_rem) 
+	{
+
+    }
+
 	
 	if (topts.lat_flag) 
 	{
