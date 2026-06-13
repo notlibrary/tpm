@@ -52,7 +52,7 @@ static const char* error_strings[TOTAL_ERROR_MESSAGES]={
 	"Error opening pickstats file for reading",
 	"No toothpastes file loaded",
 	"Unable to load config ~tpm/tpm.conf\n",
-	"Error opening last_pick file for writing"
+	"Error opening last_pick file for writing",
 	"Pick is NULL perform pick first",
 	"Error: No toothpastes available."
 };
@@ -1386,7 +1386,7 @@ tpm_pick_toothpaste(list_node_t* head, toothpaste_pick_options_t topts, toothpas
     
 
     if (pick->total_toothpastes <= 0) {
-        snprintf(pick->message, OUTPUT_BLOCK_SIZE, error_strings[NO_TOOTHPASTES_AVAILBLE]);
+        snprintf(pick->message, OUTPUT_BLOCK_SIZE,"%s", error_strings[NO_TOOTHPASTES_AVAILBLE]);
         return -1; 
     }
 
