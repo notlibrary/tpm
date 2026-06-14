@@ -16,3 +16,4 @@ OpenWrt package
 +WASM build
 +Autotools build
 +Valgrind check mem leaks
++Clear global variables
