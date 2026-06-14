@@ -2019,6 +2019,7 @@ do_not_test_me(int argc, char* argv[])
 				topts.output_to_file=1;
 				if (optarg!=NULL)
 					strncpy(output_file_path_final,optarg, MAX_PATH-1);
+			break;
 			case 't':
 				strncpy(stats_file_path_final,optarg, MAX_PATH-1);
 			break;
