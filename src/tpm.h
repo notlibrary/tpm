@@ -267,7 +267,6 @@ TPM char* tpm_get_toothpaste_picking_message(toothpaste_pick_t* pick);
 TPM char* tpm_get_toothpaste_picking_JSON(toothpaste_pick_t* pick);
 TPM char* tpm_get_toothpaste_picking_CSV(toothpaste_pick_t* pick);
 TPM int tpm_free_toothpaste_pick(toothpaste_pick_t* pick);
-TPM void tpm_free_context(toothpaste_pick_options_t* opts);
 
 static list_node_t* create_node(toothpaste_data_t p_data);
 static list_node_t* add_to_list(list_node_t* head, toothpaste_data_t p_data);
@@ -324,6 +323,7 @@ static int eval_total_toothpastes(toothpaste_pick_t* pick,toothpaste_pick_option
 static int char_to_strnum(char input);
 static int check_visibility(int input_id, int new_pick_flag, int toothbrush_flag, int dentist_flag,int verbose);
 static int check_enhanced_toothpastes(const char* filename);
+static void free_context(toothpaste_pick_options_t* opts);
 #ifdef __cplusplus
 }
 #endif /*__cpluplus*/

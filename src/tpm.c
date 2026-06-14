@@ -169,8 +169,8 @@ tpm_init_context(toothpaste_pick_options_t* opts)
     return 0; 
 }
 
-TPM void 
-tpm_free_context(toothpaste_pick_options_t* opts) 
+static void 
+free_context(toothpaste_pick_options_t* opts) 
 {
     if (opts == NULL) return;
     
@@ -763,7 +763,7 @@ tpm_free_toothpaste_pick(toothpaste_pick_t* pick)
 		free(pick->CSV);
 		free(pick->waste_report);
 		free_list(pick->where);
-		tpm_free_context(&pick->opts);
+		free_context(&pick->opts);
 		return 0;
 	}
 	else 
