@@ -48,8 +48,9 @@ START_TEST (length_pick_CSV)
 	list_node_t* toothpastes_list = NULL;
 	toothpaste_pick_t pick = {0};           
 	toothpaste_pick_options_t topts = {0};   
-	
+
 	char template_buffer[] = "guwntdapobiTfWPlUsmI"; 
+	tpm_init_context(&topts);
 	
 	topts.formula.visit_dentist_times_per_year = 2;
 	topts.formula.swap_toothbrush_times_per_year = 2;
@@ -66,7 +67,7 @@ START_TEST (length_pick_CSV)
 	fprintf(f, "1, Colgate, 75, 5, Blue, Oral-B, 19, 2\n");
 	fclose(f);
 	
-	toothpastes_list = tpm_load_list_from_file(test_filename);
+	toothpastes_list = tpm_load_list_from_file(test_filename,&topts);
 	ck_assert_ptr_nonnull(toothpastes_list);
 
 	tpm_pick_toothpaste(toothpastes_list, topts, &pick);
@@ -88,7 +89,7 @@ START_TEST (length_pick_JSON)
 	toothpaste_pick_options_t topts = {0};   
 	
 	char template_buffer[] = "guwntdapobiTfWPlUsmI";
-	
+	tpm_init_context(&topts);
 	topts.formula.visit_dentist_times_per_year = 2;
 	topts.formula.swap_toothbrush_times_per_year = 2;
 	topts.ptype = 0;
@@ -104,7 +105,7 @@ START_TEST (length_pick_JSON)
 	fprintf(f, "1, Colgate, 75, 5, Blue, Oral-B, 19, 2\n");
 	fclose(f);
 	
-	toothpastes_list = tpm_load_list_from_file(test_filename);
+	toothpastes_list = tpm_load_list_from_file(test_filename,&topts);
 	ck_assert_ptr_nonnull(toothpastes_list);
 
 	tpm_pick_toothpaste(toothpastes_list, topts, &pick);
@@ -127,7 +128,7 @@ START_TEST (length_pick_msg)
 	
 	
 	char template_buffer[] = "guwntdapobiTfWPlUsmI";
-	
+	tpm_init_context(&topts);
 	topts.formula.visit_dentist_times_per_year = 2;
 	topts.formula.swap_toothbrush_times_per_year = 2;
 	topts.ptype = 0;
@@ -143,7 +144,7 @@ START_TEST (length_pick_msg)
 	fprintf(f, "1, Colgate, 75, 5, Blue, Oral-B, 19, 2\n");
 	fclose(f);
 	
-	toothpastes_list = tpm_load_list_from_file(test_filename);
+	toothpastes_list = tpm_load_list_from_file(test_filename,&topts);
 	ck_assert_ptr_nonnull(toothpastes_list);
 
 	tpm_pick_toothpaste(toothpastes_list, topts, &pick);
@@ -176,8 +177,9 @@ END_TEST
 START_TEST (bad_toothpastes)
 {
 	list_node_t* toothpastes_list;
-	
-	toothpastes_list=tpm_load_list_from_file("not/exist");
+	toothpaste_pick_options_t topts;
+	tpm_init_context(&topts);
+	toothpastes_list=tpm_load_list_from_file("not/exist",&topts);
 	
 	unsigned int i=0;
 	list_node_t* current = toothpastes_list;
