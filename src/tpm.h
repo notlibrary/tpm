@@ -211,22 +211,34 @@ typedef struct list_node_t
 
 typedef struct toothpaste_pick_options_t
 {
-	pick_type_t ptype;
-	int verbose;
-	int lat_flag;
-	int json_flag;
-	int fake_stats;
-	int output_to_file;
-	int csv_flag;
-	unsigned int pick_by_index_index;
-	char* username;
-	const char* brand_string;
-	int upper_brands;
-	dental_formula_t formula;
-	char* meme_payload;
-	int time_of_day_ind;
-	char* tpm_template;
-}toothpaste_pick_options_t;
+    pick_type_t ptype;
+    int verbose;
+    int lat_flag;
+    int json_flag;
+    int fake_stats;
+    int output_to_file;
+    int csv_flag;
+    unsigned int pick_by_index_index;
+    char* username;
+    const char* brand_string;
+    int upper_brands;
+    dental_formula_t formula;
+    char* meme_payload;
+    int time_of_day_ind;
+    char* tpm_template;
+
+    int enhanced_toothpastes;
+    int delta_days;
+    int delta_hours;
+    int config_load_failure;
+    list_node_t* toothpastes_list;
+
+    char stats_file_path_final[MAX_PATH];
+    char toothpastes_file_path_final[MAX_PATH];
+    char output_file_path_final[MAX_PATH];
+	FILE* output_file;
+    char config_file_path_final[MAX_PATH];
+} toothpaste_pick_options_t;
 
 typedef struct toothpaste_pick_t
 {
@@ -247,12 +259,15 @@ typedef struct toothpaste_pick_t
 	unsigned int day;
 }toothpaste_pick_t;
 
-TPM list_node_t* tpm_load_list_from_file(const char* filename);
+
+TPM int tpm_init_context(toothpaste_pick_options_t* opts);
+TPM list_node_t* tpm_load_list_from_file(const char* filename,toothpaste_pick_options_t* opts);
 TPM int tpm_pick_toothpaste(list_node_t* head,toothpaste_pick_options_t topts,toothpaste_pick_t* pick);
 TPM char* tpm_get_toothpaste_picking_message(toothpaste_pick_t* pick);
 TPM char* tpm_get_toothpaste_picking_JSON(toothpaste_pick_t* pick);
 TPM char* tpm_get_toothpaste_picking_CSV(toothpaste_pick_t* pick);
 TPM int tpm_free_toothpaste_pick(toothpaste_pick_t* pick);
+TPM void tpm_free_context(toothpaste_pick_options_t* opts);
 
 static list_node_t* create_node(toothpaste_data_t p_data);
 static list_node_t* add_to_list(list_node_t* head, toothpaste_data_t p_data);
@@ -267,20 +282,20 @@ static toothpaste_data_t find_item_with_min_mass(list_node_t* where);
 static toothpaste_data_t find_item_with_max_rating(list_node_t* where);
 static toothpaste_data_t find_item_with_min_rating(list_node_t* where);
 static void free_list(list_node_t* head);
-static int reset_counters(void);
-static int set_counters(void* optarg);
-static unsigned int read_counters(toothpaste_pick_stats_t* stats,int fake_stats);
+static int reset_counters(toothpaste_pick_options_t* opts);
+static int set_counters(void* optarg,toothpaste_pick_options_t* opts);
+static unsigned int read_counters(toothpaste_pick_stats_t* stats,int fake_stats,toothpaste_pick_options_t* opts);
 static int list_available_toothpastes(toothpaste_pick_t* pick);
-static int write_counters(toothpaste_pick_stats_t stats,int fake_stats);
+static int write_counters(toothpaste_pick_stats_t stats,int fake_stats,toothpaste_pick_options_t* opts);
 static void stop_system(void);
 static int finish(int flag,toothpaste_pick_t* pick);
 static char* get_user_home_dir(void);
 static int get_current_username(char* buffer, size_t buffer_size);
 static void version(void);
 static const char* cfg_get_rec(const struct cfg_struct* cfg, const char* key);
-static toothpaste_pick_options_t read_config(const char* src);
+static int read_config(const char* src,toothpaste_pick_options_t* opts);
 static dental_formula_t parse_dental_formula(const char* formula_str);
-static void save_default_config(struct cfg_struct* cfg);
+static void save_default_config(struct cfg_struct* cfg,toothpaste_pick_options_t* opts);
 static int file_exists_fopen(const char *filename);
 static uint64_t rand_range(uint64_t min, uint64_t max);
 static char* report_wasted_tubes(list_node_t* head,toothpaste_pick_stats_t* stats);
