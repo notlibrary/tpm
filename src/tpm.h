@@ -236,7 +236,6 @@ typedef struct toothpaste_pick_options_t
     char stats_file_path_final[MAX_PATH];
     char toothpastes_file_path_final[MAX_PATH];
     char output_file_path_final[MAX_PATH];
-	FILE* output_file;
     char config_file_path_final[MAX_PATH];
 } toothpaste_pick_options_t;
 
