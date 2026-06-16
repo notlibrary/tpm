@@ -86,7 +86,7 @@ memcpy(&x,swap_temp,sizeof(x)); \
 #endif
 
 #define TOTAL_TOOTHPASTE_TYPES 5
-#define TOTAL_ERROR_MESSAGES 9
+#define TOTAL_ERROR_MESSAGES 10
 #define TOTAL_USER_MESSAGES 31
 #define TOTAL_USER_ARMOUR 10
 
@@ -151,6 +151,7 @@ typedef enum pick_type_t
 
 typedef enum error_msg_t
 {
+	NO_ERROR,
 	MALLOC_FAILED,
 	TOOTHPASTES_FAILED,
 	PICKSTATS_WRITE_FAILED,

@@ -42,6 +42,8 @@ static const char* times_of_day[TOTAL_TIMES_OF_DAY]={
 	"Evening"
 };
 static const char* error_strings[TOTAL_ERROR_MESSAGES]={
+	"No error",
+	"opts is NULL",
 	"Memory allocation failed",
 	"Error opening toothpastes file falling back to default",
 	"Error opening pickstats file for writing",
@@ -145,7 +147,7 @@ tpm_init_context(toothpaste_pick_options_t* opts)
 		free(opts->output_file_path_final);
 		free(opts->config_file_path_final);
 		
-		return 3; 
+		return 2; 
 	}
 	
 	memset(opts->stats_file_path_final,0,MAX_PATH);
@@ -367,7 +369,7 @@ tpm_load_list_from_file(const char* filename,toothpaste_pick_options_t* opts,lis
             
             *head = add_to_list(*head, temp_data);    
         }
-        return 1;
+        return 3;
     }
     
 	opts->enhanced_toothpastes = check_enhanced_toothpastes(filename);
@@ -795,7 +797,7 @@ tpm_free_toothpaste_pick(toothpaste_pick_t* pick)
 	else 
 	{
 		perror(error_strings[PICK_NULL]);
-		return 1;
+		return 9;
 	}
 }
 
@@ -932,7 +934,7 @@ tpm_get_toothpaste_picking_message(toothpaste_pick_t* pick, char** dest)
 	{
 		perror(error_strings[PICK_NULL]);
 		*dest = NULL;
-		return 1;
+		return 9;
 	}
 	*dest = pick->message;
 	return 0;
@@ -945,7 +947,7 @@ tpm_get_toothpaste_picking_JSON(toothpaste_pick_t* pick, char** dest)
 	{
 		perror(error_strings[PICK_NULL]);
 		*dest = NULL;
-		return 1;
+		return 9;
 	}
 	*dest = pick->JSON;
 	return 0;
@@ -958,7 +960,7 @@ tpm_get_toothpaste_picking_CSV(toothpaste_pick_t* pick, char** dest)
 	{
 		perror(error_strings[PICK_NULL]);
 		*dest=NULL;
-		return 1;
+		return 9;
 	}
 	*dest = pick->CSV;
 	return 0;
@@ -1464,7 +1466,7 @@ tpm_pick_toothpaste(list_node_t* head, toothpaste_pick_options_t* topts, toothpa
     if (!pick->message || !pick->JSON || !pick->CSV) {
 
         free(pick->message); free(pick->JSON); free(pick->CSV);
-        return 1; 
+        return 2; 
     }
     
     memset(pick->JSON, 0, OUTPUT_BLOCK_SIZE);    
@@ -1477,7 +1479,7 @@ tpm_pick_toothpaste(list_node_t* head, toothpaste_pick_options_t* topts, toothpa
 
     if (pick->total_toothpastes <= 0) {
         snprintf(pick->message, OUTPUT_BLOCK_SIZE,"%s", error_strings[NO_TOOTHPASTES_AVAILBLE]);
-        return 2; 
+        return 9; 
     }
 
     read_counters(&pick->stats, pick->opts->fake_stats,pick->opts);
