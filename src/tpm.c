@@ -130,7 +130,7 @@ tpm_init_context(toothpaste_pick_options_t* opts)
     {
         free(opts->meme_payload);
         free(opts->tpm_template);
-        return 1;
+        return 2;
     }
 
     memset(opts->meme_payload, 0, MAX_TOOTHPASTE_LINE);
@@ -145,7 +145,7 @@ tpm_init_context(toothpaste_pick_options_t* opts)
 		free(opts->output_file_path_final);
 		free(opts->config_file_path_final);
 		
-		return 1; 
+		return 3; 
 	}
 	
 	memset(opts->stats_file_path_final,0,MAX_PATH);
@@ -367,7 +367,7 @@ tpm_load_list_from_file(const char* filename,toothpaste_pick_options_t* opts,lis
             
             *head = add_to_list(*head, temp_data);    
         }
-        return 0;
+        return 1;
     }
     
 	opts->enhanced_toothpastes = check_enhanced_toothpastes(filename);
@@ -397,7 +397,7 @@ tpm_load_list_from_file(const char* filename,toothpaste_pick_options_t* opts,lis
             free(temp_data.toothbrush_brand);
             free(temp_data.toothbrush_color);
             fclose(file);
-            return 0;
+            return 2;
         }
         
         memset(temp_data.toothpaste_brand, 0, MAX_TOOTHPASTE_LINE);
@@ -1464,7 +1464,7 @@ tpm_pick_toothpaste(list_node_t* head, toothpaste_pick_options_t* topts, toothpa
     if (!pick->message || !pick->JSON || !pick->CSV) {
 
         free(pick->message); free(pick->JSON); free(pick->CSV);
-        return -1; 
+        return 1; 
     }
     
     memset(pick->JSON, 0, OUTPUT_BLOCK_SIZE);    
@@ -1477,7 +1477,7 @@ tpm_pick_toothpaste(list_node_t* head, toothpaste_pick_options_t* topts, toothpa
 
     if (pick->total_toothpastes <= 0) {
         snprintf(pick->message, OUTPUT_BLOCK_SIZE,"%s", error_strings[NO_TOOTHPASTES_AVAILBLE]);
-        return -1; 
+        return 2; 
     }
 
     read_counters(&pick->stats, pick->opts->fake_stats,pick->opts);
