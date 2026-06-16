@@ -22,7 +22,8 @@ END_TEST
 START_TEST (null_pick_msg)
 {
 	toothpaste_pick_t* pick=NULL;
-	char* out=tpm_get_toothpaste_picking_message(pick);
+	char* out;
+	tpm_get_toothpaste_picking_message(pick,&out);
 	ck_assert_ptr_null(out);
 }
 END_TEST
@@ -30,7 +31,8 @@ END_TEST
 START_TEST (null_pick_JSON)
 {
 	toothpaste_pick_t* pick=NULL;
-	char* out=tpm_get_toothpaste_picking_JSON(pick);
+	char* out;
+	tpm_get_toothpaste_picking_JSON(pick,&out);
 	ck_assert_ptr_null(out);
 }
 END_TEST
@@ -38,7 +40,8 @@ END_TEST
 START_TEST (null_pick_CSV)
 {
 	toothpaste_pick_t* pick=NULL;
-	char* out=tpm_get_toothpaste_picking_CSV(pick);
+	char* out;
+	tpm_get_toothpaste_picking_CSV(pick,&out);
 	ck_assert_ptr_null (out);
 }
 END_TEST
@@ -67,12 +70,13 @@ START_TEST (length_pick_CSV)
 	fprintf(f, "1, Colgate, 75, 5, Blue, Oral-B, 19, 2\n");
 	fclose(f);
 	
-	toothpastes_list = tpm_load_list_from_file(test_filename,&topts);
+	tpm_load_list_from_file(test_filename,&topts,&toothpastes_list);
 	ck_assert_ptr_nonnull(toothpastes_list);
 
 	tpm_pick_toothpaste(toothpastes_list, &topts, &pick);
 	
-	char* out = tpm_get_toothpaste_picking_CSV(&pick);
+	char* out;
+	tpm_get_toothpaste_picking_CSV(&pick,&out);
 	ck_assert_ptr_nonnull(out);
 	
 	len = strlen(out);
@@ -105,12 +109,13 @@ START_TEST (length_pick_JSON)
 	fprintf(f, "1, Colgate, 75, 5, Blue, Oral-B, 19, 2\n");
 	fclose(f);
 	
-	toothpastes_list = tpm_load_list_from_file(test_filename,&topts);
+	tpm_load_list_from_file(test_filename,&topts,&toothpastes_list);
 	ck_assert_ptr_nonnull(toothpastes_list);
 
 	tpm_pick_toothpaste(toothpastes_list, &topts, &pick);
 	
-	char* out = tpm_get_toothpaste_picking_JSON(&pick);
+	char* out;
+    tpm_get_toothpaste_picking_JSON(&pick,&out);
 	ck_assert_ptr_nonnull(out);
 	
 	len = strlen(out);
@@ -144,12 +149,13 @@ START_TEST (length_pick_msg)
 	fprintf(f, "1, Colgate, 75, 5, Blue, Oral-B, 19, 2\n");
 	fclose(f);
 	
-	toothpastes_list = tpm_load_list_from_file(test_filename,&topts);
+	tpm_load_list_from_file(test_filename,&topts,&toothpastes_list );
 	ck_assert_ptr_nonnull(toothpastes_list);
 
 	tpm_pick_toothpaste(toothpastes_list, &topts, &pick);
 	
-	char* out = tpm_get_toothpaste_picking_message(&pick);
+	char* out;
+	tpm_get_toothpaste_picking_message(&pick,&out);
 	ck_assert_ptr_nonnull(out);
 	
 	len = strlen(out);
@@ -176,10 +182,10 @@ END_TEST
 
 START_TEST (bad_toothpastes)
 {
-	list_node_t* toothpastes_list;
+	list_node_t* toothpastes_list = NULL;
 	toothpaste_pick_options_t topts;
 	tpm_init_context(&topts);
-	toothpastes_list=tpm_load_list_from_file("not/exist",&topts);
+	tpm_load_list_from_file("not/exist",&topts,&toothpastes_list);
 	
 	unsigned int i=0;
 	list_node_t* current = toothpastes_list;
