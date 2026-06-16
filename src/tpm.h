@@ -233,10 +233,10 @@ typedef struct toothpaste_pick_options_t
     int config_load_failure;
     list_node_t* toothpastes_list;
 
-    char stats_file_path_final[MAX_PATH];
-    char toothpastes_file_path_final[MAX_PATH];
-    char output_file_path_final[MAX_PATH];
-    char config_file_path_final[MAX_PATH];
+    char* stats_file_path_final;
+    char* toothpastes_file_path_final;
+    char* output_file_path_final;
+    char* config_file_path_final;
 } toothpaste_pick_options_t;
 
 typedef struct toothpaste_pick_t
@@ -261,7 +261,7 @@ typedef struct toothpaste_pick_t
 
 TPM int tpm_init_context(toothpaste_pick_options_t* opts);
 TPM list_node_t* tpm_load_list_from_file(const char* filename,toothpaste_pick_options_t* opts);
-TPM int tpm_pick_toothpaste(list_node_t* head,toothpaste_pick_options_t topts,toothpaste_pick_t* pick);
+TPM int tpm_pick_toothpaste(list_node_t* head,toothpaste_pick_options_t* topts,toothpaste_pick_t* pick);
 TPM char* tpm_get_toothpaste_picking_message(toothpaste_pick_t* pick);
 TPM char* tpm_get_toothpaste_picking_JSON(toothpaste_pick_t* pick);
 TPM char* tpm_get_toothpaste_picking_CSV(toothpaste_pick_t* pick);
