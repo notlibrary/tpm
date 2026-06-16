@@ -340,13 +340,12 @@ check_enhanced_toothpastes(const char* filename)
 }
 
 
-TPM list_node_t* 
-tpm_load_list_from_file(const char* filename,toothpaste_pick_options_t* opts) 
+int 
+tpm_load_list_from_file(const char* filename,toothpaste_pick_options_t* opts,list_node_t** head) 
 {
     unsigned int i;
     unsigned int cnt = 0;
     FILE* file; 
-    list_node_t* head = NULL;
     toothpaste_data_t temp_data;
     char line[MAX_LINE_LENGTH];
     char long_line[4 * MAX_LINE_LENGTH];
@@ -366,9 +365,9 @@ tpm_load_list_from_file(const char* filename,toothpaste_pick_options_t* opts)
             temp_data.toothbrush_brand = toothpastes[i].toothbrush_brand ? strdup(toothpastes[i].toothbrush_brand) : NULL;
             temp_data.toothbrush_color = toothpastes[i].toothbrush_color ? strdup(toothpastes[i].toothbrush_color) : NULL;
             
-            head = add_to_list(head, temp_data);    
+            *head = add_to_list(*head, temp_data);    
         }
-        return head;
+        return 0;
     }
     
 	opts->enhanced_toothpastes = check_enhanced_toothpastes(filename);
@@ -398,7 +397,7 @@ tpm_load_list_from_file(const char* filename,toothpaste_pick_options_t* opts)
             free(temp_data.toothbrush_brand);
             free(temp_data.toothbrush_color);
             fclose(file);
-            return head;
+            return 0;
         }
         
         memset(temp_data.toothpaste_brand, 0, MAX_TOOTHPASTE_LINE);
@@ -444,7 +443,7 @@ tpm_load_list_from_file(const char* filename,toothpaste_pick_options_t* opts)
                 temp_data.type = PASTE_UNKNOWN;    
             }        
             
-            head = add_to_list(head, temp_data);    
+            *head = add_to_list(*head, temp_data);    
             cnt++;
             if (cnt > MAX_TOOTHPASTE_LINES) { break; }
         } 
@@ -457,8 +456,8 @@ tpm_load_list_from_file(const char* filename,toothpaste_pick_options_t* opts)
         }
     }
     
-    if (cnt == 1 && head != NULL) {
-        head->data.type = PASTE_NULL;
+    if (cnt == 1 && *head != NULL) {
+        (*head)->data.type = PASTE_NULL;
     }
     
     if (cnt == 0)
@@ -466,12 +465,12 @@ tpm_load_list_from_file(const char* filename,toothpaste_pick_options_t* opts)
         for (i = 0; i < TOTAL_TOOTHPASTES; i++)
         {
             temp_data = toothpastes[i];
-            head = add_to_list(head, temp_data);    
+			*head = add_to_list(*head, temp_data);    
         }
     }
     
     fclose(file);
-    return head;
+    return 0;
 }
 
 static void 
@@ -926,37 +925,43 @@ version(void)
 	return;
 }
 
-TPM char* 
-tpm_get_toothpaste_picking_message(toothpaste_pick_t* pick)
+TPM int 
+tpm_get_toothpaste_picking_message(toothpaste_pick_t* pick, char** dest)
 {
 	if (pick==NULL) 
 	{
 		perror(error_strings[PICK_NULL]);
-		return NULL;
+		*dest = NULL;
+		return 1;
 	}
-	return pick->message;
+	*dest = pick->message;
+	return 0;
 }
 
-TPM char*
-tpm_get_toothpaste_picking_JSON(toothpaste_pick_t* pick)
+TPM int
+tpm_get_toothpaste_picking_JSON(toothpaste_pick_t* pick, char** dest)
 {
 	if (pick==NULL) 
 	{
 		perror(error_strings[PICK_NULL]);
-		return NULL;
+		*dest = NULL;
+		return 1;
 	}
-	return pick->JSON;
+	*dest = pick->JSON;
+	return 0;
 }
 
-TPM char*
-tpm_get_toothpaste_picking_CSV(toothpaste_pick_t* pick)
+TPM int
+tpm_get_toothpaste_picking_CSV(toothpaste_pick_t* pick, char** dest)
 {
 	if (pick==NULL) 
 	{
 		perror(error_strings[PICK_NULL]);
-		return NULL;
+		*dest=NULL;
+		return 1;
 	}
-	return pick->CSV;	
+	*dest = pick->CSV;
+	return 0;
 }
 /*[min,max)*/
 static uint64_t
@@ -1993,6 +1998,9 @@ do_not_test_me(int argc, char* argv[])
 	struct cfg_struct* cfg;
 	int option_index = 0;
 	toothpaste_pick_t pick;
+	char* out_msg=NULL;
+	char* out_JSON=NULL;
+	char* out_CSV=NULL;
 	
 		struct option long_options[] = {
     {"rating",     no_argument, 0, 'a'},
@@ -2136,19 +2144,23 @@ do_not_test_me(int argc, char* argv[])
 	{
 		output_file=stdout;
 	}
-	topts.toothpastes_list=tpm_load_list_from_file(topts.toothpastes_file_path_final,&topts);
+	tpm_load_list_from_file(topts.toothpastes_file_path_final,&topts,&topts.toothpastes_list);
 	tpm_pick_toothpaste(topts.toothpastes_list,&topts,&pick);
+	
 	if (topts.json_flag)
 	{
-		fprintf(output_file,"%s \n",tpm_get_toothpaste_picking_JSON(&pick));
+		tpm_get_toothpaste_picking_JSON(&pick,&out_JSON);
+		fprintf(output_file,"%s \n",out_JSON);
 	}
 	else if (topts.csv_flag)
 	{
-		 fprintf(output_file,"%s \n",tpm_get_toothpaste_picking_CSV(&pick));
+		tpm_get_toothpaste_picking_CSV(&pick,&out_CSV);
+		fprintf(output_file,"%s \n",out_CSV);
 	}
 	else		
 	{
-		fprintf(output_file,"%s \n",tpm_get_toothpaste_picking_message(&pick));
+		tpm_get_toothpaste_picking_message(&pick,&out_msg);
+		fprintf(output_file,"%s \n",out_msg);
 	}
 	if (topts.config_load_failure) 
 	{
