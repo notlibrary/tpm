@@ -70,7 +70,7 @@ START_TEST (length_pick_CSV)
 	toothpastes_list = tpm_load_list_from_file(test_filename,&topts);
 	ck_assert_ptr_nonnull(toothpastes_list);
 
-	tpm_pick_toothpaste(toothpastes_list, topts, &pick);
+	tpm_pick_toothpaste(toothpastes_list, &topts, &pick);
 	
 	char* out = tpm_get_toothpaste_picking_CSV(&pick);
 	ck_assert_ptr_nonnull(out);
@@ -108,7 +108,7 @@ START_TEST (length_pick_JSON)
 	toothpastes_list = tpm_load_list_from_file(test_filename,&topts);
 	ck_assert_ptr_nonnull(toothpastes_list);
 
-	tpm_pick_toothpaste(toothpastes_list, topts, &pick);
+	tpm_pick_toothpaste(toothpastes_list, &topts, &pick);
 	
 	char* out = tpm_get_toothpaste_picking_JSON(&pick);
 	ck_assert_ptr_nonnull(out);
@@ -147,7 +147,7 @@ START_TEST (length_pick_msg)
 	toothpastes_list = tpm_load_list_from_file(test_filename,&topts);
 	ck_assert_ptr_nonnull(toothpastes_list);
 
-	tpm_pick_toothpaste(toothpastes_list, topts, &pick);
+	tpm_pick_toothpaste(toothpastes_list, &topts, &pick);
 	
 	char* out = tpm_get_toothpaste_picking_message(&pick);
 	ck_assert_ptr_nonnull(out);
