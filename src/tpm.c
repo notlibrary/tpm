@@ -486,7 +486,7 @@ display_list(list_node_t* head, toothpaste_pick_t* pick)
 	memset(line,0,4*MAX_TOOTHPASTE_LINE);
 	memset(pick->message,0,OUTPUT_BLOCK_SIZE);
 	
-		if (!pick->opts.enhanced_toothpastes)
+		if (!pick->opts->enhanced_toothpastes)
 		{
 			snprintf(pick->message,MAX_TOOTHPASTE_LINE,"%s \n",user_strings[MSG_COMMENT]);
 		}
@@ -496,7 +496,7 @@ display_list(list_node_t* head, toothpaste_pick_t* pick)
 		}
 	while (current != NULL) 
 	{
-        if (pick->opts.upper_brands)
+        if (pick->opts->upper_brands)
 		{
 			len = strlen(current->data.toothpaste_brand);
 			for (i =0; i<len; i++)
@@ -504,7 +504,7 @@ display_list(list_node_t* head, toothpaste_pick_t* pick)
 				current->data.toothpaste_brand[i]=toupper(current->data.toothpaste_brand[i]);
 			}
 		}
-		if (!pick->opts.enhanced_toothpastes)
+		if (!pick->opts->enhanced_toothpastes)
 		{
 			snprintf(line,MAX_TOOTHPASTE_LINE,"%d,%.120s,%d,%d\n", current->data.index, current->data.toothpaste_brand, current->data.tube_mass_g, current->data.rating);
 		}
@@ -790,7 +790,7 @@ tpm_free_toothpaste_pick(toothpaste_pick_t* pick)
 		free(pick->CSV);
 		free(pick->waste_report);
 		free_list(pick->where);
-		free_context(&pick->opts);
+		free_context(pick->opts);
 		return 0;
 	}
 	else 
@@ -1446,7 +1446,7 @@ tpm_pick_toothpaste(list_node_t* head, toothpaste_pick_options_t* topts, toothpa
     char* toothpaste_strings[TOTAL_OUTPUT_STRINGS];
 	
     
-    pick->opts = *topts;
+    pick->opts = topts;
     memset(line, 0, MAX_LINE_LENGTH);
 
 
@@ -1475,7 +1475,7 @@ tpm_pick_toothpaste(list_node_t* head, toothpaste_pick_options_t* topts, toothpa
         return -1; 
     }
 
-    read_counters(&pick->stats, pick->opts.fake_stats,&pick->opts);
+    read_counters(&pick->stats, pick->opts->fake_stats,pick->opts);
     pick->waste_report = report_wasted_tubes(head, &pick->stats);
     pick->toothpaste_pick_index = pick->stats.total_picks;
     pick->when = total_seconds;
@@ -1569,7 +1569,7 @@ tpm_pick_toothpaste(list_node_t* head, toothpaste_pick_options_t* topts, toothpa
         new_pick_flag = 1;
         pick->stats.total_picks++;
         pick->stats.last_pick_time = total_seconds;
-        write_counters(pick->stats, pick->opts.fake_stats,&pick->opts);
+        write_counters(pick->stats, pick->opts->fake_stats,pick->opts);
         
       
         if (topts->formula.swap_toothbrush_times_per_year > 0) {

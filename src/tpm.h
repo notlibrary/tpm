@@ -252,7 +252,7 @@ typedef struct toothpaste_pick_t
 	char* JSON;
 	char* CSV;
 	char* waste_report;
-	toothpaste_pick_options_t opts;
+	toothpaste_pick_options_t* opts;
 	struct list_node_t* head;
 	int j;
 	unsigned int day;
