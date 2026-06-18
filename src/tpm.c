@@ -3,6 +3,18 @@
 */
 #include "tpm.h"
 
+#define	TPM_NO_ERROR 0
+#define	MALLOC_FAILED 1
+#define	TOOTHPASTES_FAILED 2
+#define	PICKSTATS_WRITE_FAILED 3
+#define	PICKSTATS_READ_FAILED 4
+#define	NO_TOOTHPASTES_LOADED 5
+#define	CONFIG_LOAD_FAILED 6
+#define	LAST_PICK_WRITING_FAILED 7
+#define PICK_NULL 8
+#define	NO_TOOTHPASTES_AVAILBLE 9
+
+
 static const toothpaste_data_t toothpastes[TOTAL_TOOTHPASTES]={
 	{PASTE_BUILTIN,0,"BUILTIN TOOTHPASTE 1",75,90,"White", "Builtin Toothbrush 1",20,50},
 	{PASTE_BUILTIN,1,"BUILTIN TOOTHPASTE 2",150,100,"Black", "Builtin Toothbrush 2",25,75},
