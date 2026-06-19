@@ -10,7 +10,7 @@ extern "C" {
 #define TPM_STRING "tpm"
 #define TPM_VERSION_MAJOR 0
 #define TPM_VERSION_MINOR 6
-#define TPM_VERSION_PATCH 7
+#define TPM_VERSION_PATCH 8
 
 #undef _CRT_NONSTDC_NO_DEPRECATE 
 #define _CRT_NONSTDC_NO_DEPRECATE 
@@ -86,7 +86,7 @@ memcpy(&x,swap_temp,sizeof(x)); \
 #endif
 
 #define TOTAL_TOOTHPASTE_TYPES 5
-#define TOTAL_ERROR_MESSAGES 11
+#define TOTAL_ERROR_MESSAGES 12
 #define TOTAL_USER_MESSAGES 31
 #define TOTAL_USER_ARMOUR 10
 
@@ -160,7 +160,8 @@ typedef enum error_msg_t
 	CONFIG_LOAD_FAILED,
 	LAST_PICK_WRITING_FAILED,
 	PICK_NULL,
-	NO_TOOTHPASTES_AVAILBLE
+	NO_TOOTHPASTES_AVAILBLE,
+	NULL_CONTEXT
 	
 }error_msg_t;
 

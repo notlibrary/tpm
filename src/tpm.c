@@ -13,6 +13,8 @@
 #define	LAST_PICK_WRITING_FAILED 7
 #define PICK_NULL 8
 #define	NO_TOOTHPASTES_AVAILBLE 9
+#define	NULL_CONTEXT 10
+
 
 
 static const toothpaste_data_t toothpastes[TOTAL_TOOTHPASTES]={
@@ -113,7 +115,7 @@ static const char config_file_name[MAX_PATH] ="tpm.conf";
 TPM int 
 tpm_init_context(toothpaste_pick_options_t* opts) 
 {
-    if (opts == NULL) return 1;
+    if (opts == NULL) return NULL_CONTEXT;
 
     memset(opts, 0, sizeof(toothpaste_pick_options_t));
 
@@ -144,7 +146,7 @@ tpm_init_context(toothpaste_pick_options_t* opts)
     {
         free(opts->meme_payload);
         free(opts->tpm_template);
-        return 2;
+        return MALLOC_FAILED;
     }
 
     memset(opts->meme_payload, 0, MAX_TOOTHPASTE_LINE);
@@ -159,7 +161,7 @@ tpm_init_context(toothpaste_pick_options_t* opts)
 		free(opts->output_file_path_final);
 		free(opts->config_file_path_final);
 		
-		return 2; 
+		return MALLOC_FAILED; 
 	}
 	
 	memset(opts->stats_file_path_final,0,MAX_PATH);
@@ -204,7 +206,7 @@ tpm_init_context(toothpaste_pick_options_t* opts)
     strncpy(opts->config_file_path_final, user_home_dir_static, MAX_PATH - 1);
     strncat(opts->config_file_path_final, config_file_name, MAX_PATH / 2);
 
-    return 0; 
+    return TPM_NO_ERROR; 
 }
 
 static void 
@@ -381,7 +383,7 @@ tpm_load_list_from_file(const char* filename,toothpaste_pick_options_t* opts,lis
             
             *head = add_to_list(*head, temp_data);    
         }
-        return 3;
+        return TOOTHPASTES_FAILED;
     }
     
 	opts->enhanced_toothpastes = check_enhanced_toothpastes(filename);
@@ -411,7 +413,7 @@ tpm_load_list_from_file(const char* filename,toothpaste_pick_options_t* opts,lis
             free(temp_data.toothbrush_brand);
             free(temp_data.toothbrush_color);
             fclose(file);
-            return 2;
+            return MALLOC_FAILED;
         }
         
         memset(temp_data.toothpaste_brand, 0, MAX_TOOTHPASTE_LINE);
@@ -484,7 +486,7 @@ tpm_load_list_from_file(const char* filename,toothpaste_pick_options_t* opts,lis
     }
     
     fclose(file);
-    return 0;
+    return TPM_NO_ERROR;
 }
 
 static void 
@@ -689,7 +691,7 @@ reset_counters(toothpaste_pick_options_t* opts)
 	if (file_ptr == NULL) 
 	{
 		perror(error_strings[PICKSTATS_WRITE_FAILED]);
-		return 1;
+		return 3;
 	}	
 
 	fwrite(&zero, sizeof(unsigned int), 1, file_ptr);
@@ -711,7 +713,7 @@ set_counters(void* optarg,toothpaste_pick_options_t* opts)
 	if (file_ptr == NULL) 
 	{
 		perror(error_strings[PICKSTATS_WRITE_FAILED]);
-		return 1;
+		return 3;
 	}	
 
 
@@ -737,7 +739,7 @@ read_counters(toothpaste_pick_stats_t* stats,int fake_stats,toothpaste_pick_opti
 		if (file_ptr == NULL) 
 		{
 			perror(error_strings[PICKSTATS_READ_FAILED]);
-			return 1;
+			return 4;
 		}
 
 		nbytes=fread(&(stats->total_picks), sizeof(unsigned int), 1, file_ptr);
@@ -771,7 +773,7 @@ write_counters(toothpaste_pick_stats_t stats,int fake_stats,toothpaste_pick_opti
 		if (file_ptr == NULL) 
 		{
 			perror(error_strings[PICKSTATS_WRITE_FAILED]);
-			return 1;
+			return 3;
 		}
 		fwrite(&stats.total_picks, sizeof(unsigned int), 1, file_ptr);
 		fwrite(&stats.last_pick_time, sizeof(time_t), 1, file_ptr);
@@ -804,12 +806,12 @@ tpm_free_toothpaste_pick(toothpaste_pick_t* pick)
 		free(pick->waste_report);
 		free_list(pick->where);
 		free_context(pick->opts);
-		return 0;
+		return TPM_NO_ERROR;
 	}
 	else 
 	{
 		perror(error_strings[PICK_NULL]);
-		return 9;
+		return PICK_NULL;
 	}
 }
 
@@ -946,10 +948,10 @@ tpm_get_toothpaste_picking_message(toothpaste_pick_t* pick, char** dest)
 	{
 		perror(error_strings[PICK_NULL]);
 		*dest = NULL;
-		return 9;
+		return PICK_NULL;
 	}
 	*dest = pick->message;
-	return 0;
+	return TPM_NO_ERROR;
 }
 
 TPM int
@@ -959,10 +961,10 @@ tpm_get_toothpaste_picking_JSON(toothpaste_pick_t* pick, char** dest)
 	{
 		perror(error_strings[PICK_NULL]);
 		*dest = NULL;
-		return 9;
+		return PICK_NULL;
 	}
 	*dest = pick->JSON;
-	return 0;
+	return TPM_NO_ERROR;
 }
 
 TPM int
@@ -972,10 +974,10 @@ tpm_get_toothpaste_picking_CSV(toothpaste_pick_t* pick, char** dest)
 	{
 		perror(error_strings[PICK_NULL]);
 		*dest=NULL;
-		return 9;
+		return PICK_NULL;
 	}
 	*dest = pick->CSV;
-	return 0;
+	return TPM_NO_ERROR;
 }
 /*[min,max)*/
 static uint64_t
@@ -1478,7 +1480,7 @@ tpm_pick_toothpaste(list_node_t* head, toothpaste_pick_options_t* topts, toothpa
     if (!pick->message || !pick->JSON || !pick->CSV) {
 
         free(pick->message); free(pick->JSON); free(pick->CSV);
-        return 2; 
+        return MALLOC_FAILED; 
     }
     
     memset(pick->JSON, 0, OUTPUT_BLOCK_SIZE);    
@@ -1491,7 +1493,7 @@ tpm_pick_toothpaste(list_node_t* head, toothpaste_pick_options_t* topts, toothpa
 
     if (pick->total_toothpastes <= 0) {
         snprintf(pick->message, OUTPUT_BLOCK_SIZE,"%s", error_strings[NO_TOOTHPASTES_AVAILBLE]);
-        return 9; 
+        return NO_TOOTHPASTES_AVAILBLE; 
     }
 
     read_counters(&pick->stats, pick->opts->fake_stats,pick->opts);
@@ -1759,7 +1761,7 @@ tpm_pick_toothpaste(list_node_t* head, toothpaste_pick_options_t* topts, toothpa
 	{
 		list_available_toothpastes(pick);
 	}	
-	return 0;
+	return TPM_NO_ERROR;
 }
 
 static void 
