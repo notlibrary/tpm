@@ -1465,8 +1465,12 @@ tpm_pick_toothpaste(list_node_t* head, toothpaste_pick_options_t* topts, toothpa
     int toothbrush_flag = 0;
     unsigned int brand_len;
     char* toothpaste_strings[TOTAL_OUTPUT_STRINGS];
+	char current_char;
+	int str_num = 0;
+	int interval;
+    size_t current_len;
+	size_t remaining_space;
 	
-    
     pick->opts = topts;
     memset(line, 0, MAX_LINE_LENGTH);
 
@@ -1594,7 +1598,7 @@ tpm_pick_toothpaste(list_node_t* head, toothpaste_pick_options_t* topts, toothpa
         
       
         if (topts->formula.swap_toothbrush_times_per_year > 0) {
-            int interval = DAYS_PER_YEAR / topts->formula.swap_toothbrush_times_per_year;
+            interval = DAYS_PER_YEAR / topts->formula.swap_toothbrush_times_per_year;
             if (interval > 0 && pick->stats.total_picks % interval == 0) {
                 toothbrush_flag = 1;
             }
@@ -1602,7 +1606,7 @@ tpm_pick_toothpaste(list_node_t* head, toothpaste_pick_options_t* topts, toothpa
         
         
         if (topts->formula.visit_dentist_times_per_year > 0) {
-            int interval = DAYS_PER_YEAR / topts->formula.visit_dentist_times_per_year;
+            interval = DAYS_PER_YEAR / topts->formula.visit_dentist_times_per_year;
             if (interval > 0 && pick->stats.total_picks % interval == 0) {
                 dentist_flag = 1;
             }
@@ -1644,8 +1648,8 @@ tpm_pick_toothpaste(list_node_t* head, toothpaste_pick_options_t* topts, toothpa
     ti = 0;
     while (topts->tpm_template[ti] != '\0') 
     {
-        char current_char = topts->tpm_template[ti++];
-        int str_num = char_to_strnum(current_char);
+        current_char = topts->tpm_template[ti++];
+        str_num = char_to_strnum(current_char);
 
        
         if (str_num >= 0 && str_num < TOTAL_OUTPUT_STRINGS) 
@@ -1656,10 +1660,10 @@ tpm_pick_toothpaste(list_node_t* head, toothpaste_pick_options_t* topts, toothpa
                 if (toothpaste_strings[str_num] != NULL) 
                 {
                     
-                    size_t current_len = strlen(pick->message);
+                    current_len = strlen(pick->message);
                     if (current_len + 1 < OUTPUT_BLOCK_SIZE) 
                     {
-                        size_t remaining_space = OUTPUT_BLOCK_SIZE - current_len - 1;
+                        remaining_space = OUTPUT_BLOCK_SIZE - current_len - 1;
                         
                        
                         strncat(pick->message, toothpaste_strings[str_num], remaining_space);
