@@ -510,6 +510,9 @@ $``TPS = 478 027 613 / 365 / 86400 = 15 ``$
 
 Did your country produce enough? See the toothpaste business is walking devil in detail idiom
 
+I am totally fine with the idea of brushing 265 billions teeth with single computer program
+although it may be annoying or uncontrollably quirky sometimes 
+
 ## Per component reverse engineering and pick by AI
 This is the advanced topic the key point is that make a new toothpaste is cheaper
 than reverse engineer the old one so AI simply has not enough data to base on 
