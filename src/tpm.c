@@ -128,6 +128,7 @@ tpm_init_context(toothpaste_pick_options_t* opts)
     opts->fake_stats = 0;
     opts->output_to_file = 0;
     opts->upper_brands = 0;
+	opts->formula = (dental_formula_t) {2,2,2,2};
     opts->delta_days = 0;
     opts->delta_hours = 0;
     opts->config_load_failure = 0;
