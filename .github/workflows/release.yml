@@ -45,13 +45,18 @@ jobs:
       - name: Install WiX
         if: runner.os == 'Windows'
         run: dotnet tool install --global wix --version 7.0.0
-        
+      - name: Install gettext via vcpkg
+        if: runner.os == 'Windows'
+        run: | 
+            vcpkg install gettext:x64-windows
+    
       - name: Build on Windows
         if: runner.os == 'Windows'
         id: build        
         shell: powershell
         run: |
-          nmake.exe /f .\Makefile.msc tpm.exe
+          & "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvars64.bat" x64
+          nmake.exe /f .\Makefile.msc VCPKG_ROOT="%VCPKG_INSTALLATION_ROOT%\installed\x64-windows" tpm.exe
           wix build -acceptEula wix7 tpm.wxs -arch x64 -out tpm-win-bin-amd64-${{ github.ref_name }}.msi
           Remove-Item -LiteralPath "tpm.exe" -Force -Recurse -Confirm:$false
           Remove-Item -LiteralPath "*.obj" -Force -Recurse -Confirm:$false

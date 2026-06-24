@@ -1,46 +1,58 @@
-#TPM Windows manual build 
+# TPM Windows manual build 
 CC = cl.exe
 LINKER = link.exe
-MKDIR = mkdir
-CFLAGS = /DHAVE_MAIN /c /EHsc /Fo
-LFLAGS = /OUT:
-TARGET_DIR ="C:\Program Files\tpm"
-SRC=src
-SOURCES = \
-	$(SRC)\tpm.c\
-	$(SRC)\prng64_xrp32.c\
-	$(SRC)\cfg_parse.c\
-	$(SRC)\win\getopt.c
+RC = rc.exe
+
+!IFNDEF VCPKG_ROOT
+VCPKG_ROOT = C:\vcpkg\installed\x64-windows
+!ENDIF
+
+CFLAGS = /nologo /TC /O2 /DHAVE_MAIN /FS /c /I"$(VCPKG_ROOT)\include" /I"src" /I"src\win"
+LFLAGS = /NOLOGO /OUT:
+TARGET_DIR = "C:\Program Files\tpm"
+SRC = src
+
+LIBS = "$(VCPKG_ROOT)\lib\libintl.lib" user32.lib kernel32.lib Advapi32.lib
+
 OBJECTS = \
-	tpm.obj\
-	prng64_xrp32.obj\
-	cfg_parse.obj\
+	tpm.obj \
+	prng64_xrp32.obj \
+	cfg_parse.obj \
 	getopt.obj
 	
 all: tpm.exe install clean
 
-tpm.exe: $(OBJECTS)
-	$(LINKER) $(LFLAGS)$@ $(OBJECTS) tpm.res
+tpm.obj: $(SRC)\tpm.c
+	$(CC) $(CFLAGS) /Fotpm.obj $(SRC)\tpm.c
 
-$(OBJECTS):$(SOURCES)
-	$(CC) $(CFLAGS) $(SOURCES)
-	rc /nologo tpm.rc
+prng64_xrp32.obj: $(SRC)\prng64_xrp32.c
+	$(CC) $(CFLAGS) /Foprng64_xrp32.obj $(SRC)\prng64_xrp32.c
+
+cfg_parse.obj: $(SRC)\cfg_parse.c
+	$(CC) $(CFLAGS) /Focfg_parse.obj $(SRC)\cfg_parse.c
+
+getopt.obj: $(SRC)\win\getopt.c
+	$(CC) $(CFLAGS) /Fogetopt.obj $(SRC)\win\getopt.c
+
+tpm.res: tpm.rc
+	$(RC) /nologo tpm.rc
+
+tpm.exe: $(OBJECTS) tpm.res
+	$(LINKER) $(LFLAGS)$@ $(OBJECTS) tpm.res $(LIBS)
 
 distr:
 	@if not exist tpm-win-bin-amd64\ mkdir tpm-win-bin-amd64
-    copy tpm.exe tpm-win-bin-amd64
-    copy toothpastes.sample tpm-win-bin-amd64
+	copy tpm.exe tpm-win-bin-amd64
+	copy toothpastes.sample tpm-win-bin-amd64
 	copy toothpastes-enhanced.sample tpm-win-bin-amd64
-    copy tpm.conf.sample tpm-win-bin-amd64
-    copy README.md tpm-win-bin-amd64
-    zip -r tpm-win-bin-amd64.zip tpm-win-bin-amd64
+	copy tpm.conf.sample tpm-win-bin-amd64
+	copy README.md tpm-win-bin-amd64
+	zip -r tpm-win-bin-amd64.zip tpm-win-bin-amd64
 	
 install:
 	@if not exist $(TARGET_DIR)\ mkdir $(TARGET_DIR)
-	copy "tpm.exe" "C:\Program Files\tpm\tpm.exe"
+	copy "tpm.exe" "$(TARGET_DIR)\tpm.exe"
 
 clean:
-	del tpm.exe $(OBJECTS) tpm.exp tpm.lib tpm.res
-	@if exist tpm-win-bin-amd64\
-	rmdir /S /Q tpm-win-bin-amd64
-
+	del /Q tpm.exe $(OBJECTS) tpm.exp tpm.lib tpm.res 2>nul
+	@if exist tpm-win-bin-amd64\ rmdir /S /Q tpm-win-bin-amd64
