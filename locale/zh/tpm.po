@@ -14,304 +14,305 @@ msgstr ""
 "Language-Team: Chinese\n"
 "Language: zh\n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=ASCII\n"
+"Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
 #: src/tpm.c:22 src/tpm.c:102
 msgid "BUILTIN TOOTHPASTE 1"
-msgstr ""
+msgstr "内置牙膏 1"
 
 #: src/tpm.c:22
 msgid "White"
-msgstr ""
+msgstr "白色"
 
 #: src/tpm.c:22
 msgid "Builtin Toothbrush 1"
-msgstr ""
+msgstr "内置牙刷 1"
 
 #: src/tpm.c:23 src/tpm.c:103
 msgid "BUILTIN TOOTHPASTE 2"
-msgstr ""
+msgstr "内置牙膏 2"
 
 #: src/tpm.c:23
 msgid "Black"
-msgstr ""
+msgstr "黑色"
 
 #: src/tpm.c:23
 msgid "Builtin Toothbrush 2"
-msgstr ""
+msgstr "内置牙刷 2"
 
 #: src/tpm.c:24 src/tpm.c:104
 msgid "BUILTIN TOOTHPASTE 3"
-msgstr ""
+msgstr "内置牙膏 3"
 
 #: src/tpm.c:24
 msgid "Pink"
-msgstr ""
+msgstr "粉红色"
 
 #: src/tpm.c:24
 msgid "Builtin Toothbrush 3"
-msgstr ""
+msgstr "内置牙刷 3"
 
 #: src/tpm.c:27
 msgid "Default"
-msgstr ""
+msgstr "默认"
 
 #: src/tpm.c:28 src/tpm.c:37
 msgid "Random"
-msgstr ""
+msgstr "随机"
 
 #: src/tpm.c:29
 msgid "By index"
-msgstr ""
+msgstr "按索引"
 
 #: src/tpm.c:30
 msgid "By brand"
-msgstr ""
+msgstr "按品牌"
 
 #: src/tpm.c:31
 msgid "Max rating"
-msgstr ""
+msgstr "最高评分"
 
 #: src/tpm.c:32
 msgid "Max tube mass"
-msgstr ""
+msgstr "最大管重"
 
 #: src/tpm.c:33
 msgid "Min rating"
-msgstr ""
+msgstr "最低评分"
 
 #: src/tpm.c:34
 msgid "Min tube mass"
-msgstr ""
+msgstr "最小管重"
 
 #: src/tpm.c:38
 msgid "Nothing"
-msgstr ""
+msgstr "无"
 
 #: src/tpm.c:39 src/tpm.c:1572 src/tpm.c:1698 src/tpm.c:1701 src/tpm.c:1704
 msgid "Unknown"
-msgstr ""
+msgstr "未知"
 
 #: src/tpm.c:40
 msgid "0-paste"
-msgstr ""
+msgstr "0号牙膏"
 
 #: src/tpm.c:41
 msgid "Builtin"
-msgstr ""
+msgstr "内置"
 
 #: src/tpm.c:45
 msgid "Thursday"
-msgstr ""
+msgstr "星期四"
 
 #. 1 jan 1970 epoch start is Thursday
 #: src/tpm.c:46
 msgid "Friday"
-msgstr ""
+msgstr "星期五"
 
 #: src/tpm.c:47
 msgid "Saturday"
-msgstr ""
+msgstr "星期六"
 
 #: src/tpm.c:48
 msgid "Sunday"
-msgstr ""
+msgstr "星期日"
 
 #: src/tpm.c:49
 msgid "Monday"
-msgstr ""
+msgstr "星期一"
 
 #: src/tpm.c:50
 msgid "Tuesday"
-msgstr ""
+msgstr "星期二"
 
 #: src/tpm.c:51
 msgid "Wednesday"
-msgstr ""
+msgstr "星期三"
 
 #: src/tpm.c:54
 msgid "Night"
-msgstr ""
+msgstr "夜晚"
 
 #: src/tpm.c:55
 msgid "Morning"
-msgstr ""
+msgstr "早晨"
 
 #: src/tpm.c:56
 msgid "Day"
-msgstr ""
+msgstr "白天"
 
 #: src/tpm.c:57
 msgid "Evening"
-msgstr ""
+msgstr "傍晚"
 
 #: src/tpm.c:60
 msgid "Error 0: No error."
-msgstr ""
+msgstr "错误 0：无错误。"
 
 #: src/tpm.c:61
 msgid "Error 101: opts is NULL"
-msgstr ""
+msgstr "错误 101：opts 为 NULL"
 
 #: src/tpm.c:62
 msgid "Error 102: Memory allocation failed."
-msgstr ""
+msgstr "错误 102：内存分配失败。"
 
 #: src/tpm.c:63
 msgid "Error 103: Opening toothpastes file falling back to default."
-msgstr ""
+msgstr "错误 103：无法打开牙膏文件，正在回退到默认设置。"
 
 #: src/tpm.c:64
 msgid "Error 104: Opening pickstats file for writing"
-msgstr ""
+msgstr "错误 104：无法打开 pickstats 文件以进行写入操作"
 
 #: src/tpm.c:65
 msgid "Error 105: Opening pickstats file for reading"
-msgstr ""
+msgstr "错误 105：无法打开 pickstats 文件以进行读取操作"
 
 #: src/tpm.c:66
 msgid "Error 106: No toothpastes file loaded"
-msgstr ""
+msgstr "错误 106：未加载任何牙膏文件"
 
 #: src/tpm.c:67
 msgid "Error 107: Unable to load config ~tpm/tpm.conf\n"
-msgstr ""
+msgstr "错误 107：无法加载配置文件 ~tpm/tpm.conf\n"
 
 #: src/tpm.c:68
 msgid "Error 108: Opening last_pick file for writing"
-msgstr ""
+msgstr "错误 108：无法打开 last_pick 文件以进行写入操作"
 
 #: src/tpm.c:69
 msgid "Error 109: Pick is NULL perform pick first"
-msgstr ""
+msgstr "错误 109：选择为 NULL，请先执行选择操作"
 
 #: src/tpm.c:70
 msgid "Error 110: No toothpastes available."
-msgstr ""
+msgstr "错误 110：没有可用的牙膏。"
 
 #: src/tpm.c:71
 msgid "Error 111: NULL context"
-msgstr ""
+msgstr "错误 111：上下文为 NULL"
 
 #: src/tpm.c:74
 msgid "Pick counter clear"
-msgstr ""
+msgstr "清除选择计数器"
 
 #: src/tpm.c:75
 msgid "# Index | Brand | Tube Mass | Rating"
-msgstr ""
+msgstr "# 索引 | 品牌 | 管重 | 评分"
 
 #: src/tpm.c:76
 msgid ""
 "# Index | Brand | Tube Mass | Rating | Toothbrush Color | Toothbrush Brand | "
 "Toothbrush Length | Toothbrush Hardness"
 msgstr ""
+"# 索引 | 品牌 | 管重 | 评分 | 牙刷颜色 | 牙刷品牌 | 牙刷长度 | 牙刷硬度"
 
 #: src/tpm.c:77
 msgid "Pick counter set"
-msgstr ""
+msgstr "设置选择计数器"
 
 #: src/tpm.c:78
 msgid "Welcome to the toothpaste picking manager"
-msgstr ""
+msgstr "欢迎使用牙膏选择管理器"
 
 #: src/tpm.c:79
 msgid "New next pick stats updated"
-msgstr ""
+msgstr "下次选择的新统计数据已更新"
 
 #: src/tpm.c:80
 msgid "Toothbrush time span over swap the toothbrush(or order new one)"
-msgstr ""
+msgstr "牙刷使用寿命已到，请更换牙刷（或订购新牙刷）"
 
 #: src/tpm.c:81
 msgid "Time span over please visit dentist"
-msgstr ""
+msgstr "时间已过，请去看牙医"
 
 #: src/tpm.c:82
 msgid "Already picked today"
-msgstr ""
+msgstr "今天已经选择过了"
 
 #: src/tpm.c:83
 msgid "Pick type"
-msgstr ""
+msgstr "选择类型"
 
 #: src/tpm.c:84
 msgid "Toothpaste:"
-msgstr ""
+msgstr "牙膏："
 
 #: src/tpm.c:85
 msgid "Toothbrush:"
-msgstr ""
+msgstr "牙刷："
 
 #: src/tpm.c:86
 msgid "Toothpaste index:"
-msgstr ""
+msgstr "牙膏索引："
 
 #: src/tpm.c:87
 msgid "Toothpaste type:"
-msgstr ""
+msgstr "牙膏类型："
 
 #: src/tpm.c:88
 msgid "Dental Formula:"
-msgstr ""
+msgstr "牙式 / 牙科公式："
 
 #: src/tpm.c:89
 msgid "Day:"
-msgstr ""
+msgstr "天："
 
 #: src/tpm.c:90
 msgid "Total picks:"
-msgstr ""
+msgstr "总选择次数："
 
 #: src/tpm.c:91
 msgid "Tubes wasted:"
-msgstr ""
+msgstr "浪费的牙膏管数："
 
 #: src/tpm.c:92
 msgid "Source:"
-msgstr ""
+msgstr "来源："
 
 #: src/tpm.c:93
 msgid "Meme:"
-msgstr ""
+msgstr "梗 / 迷因："
 
 #: src/tpm.c:94
 msgid "Last pick time:"
-msgstr ""
+msgstr "上次选择时间："
 
 #: src/tpm.c:95
 msgid "Good"
-msgstr ""
+msgstr "好"
 
 #: src/tpm.c:96
 msgid "Press Enter to continue..."
-msgstr ""
+msgstr "按回车键继续..."
 
 #: src/tpm.c:97
 msgid "Compiler:"
-msgstr ""
+msgstr "编译器："
 
 #: src/tpm.c:98
 msgid "Compiled on:"
-msgstr ""
+msgstr "编译于："
 
 #: src/tpm.c:99 src/tpm.c:1695
 msgid "Anonymous"
-msgstr ""
+msgstr "匿名"
 
 #: src/tpm.c:100
 msgid "Output pick to file "
-msgstr ""
+msgstr "输出选择到文件 "
 
 #: src/tpm.c:101
 msgid "Usage:"
-msgstr ""
+msgstr "用法："
 
 #: src/tpm.c:107
 msgid "<<<"
-msgstr ""
+msgstr "<<<"
 
 #: src/tpm.c:108
 msgid ">>>"
-msgstr ""
+msgstr ">>>"
