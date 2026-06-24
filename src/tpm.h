@@ -27,6 +27,9 @@ extern "C" {
 #include <string.h>
 #include <ctype.h>
 
+#include <libintl.h>
+#define _(String) gettext(String)
+
 #include "prng64_xrp32.h"
 #include "cfg_parse.h"
 
@@ -152,6 +155,7 @@ typedef enum pick_type_t
 typedef enum error_msg_t
 {
 	TPM_NO_ERROR=0,
+	OPTS_IS_NULL,
 	MALLOC_FAILED,
 	TOOTHPASTES_FAILED,
 	PICKSTATS_WRITE_FAILED,
