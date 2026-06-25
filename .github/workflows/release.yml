@@ -7,6 +7,7 @@ on:
 
 env:
   APP_NAME: tpm-win-bin-amd64  
+
 jobs:
   create-release:
     runs-on: ubuntu-latest
@@ -22,6 +23,7 @@ jobs:
           prerelease: false
           body: Toothpaste picking manager
           token: ${{ secrets.PAT3 }}
+
   build:
     runs-on: ${{ matrix.os }}
     strategy:
@@ -32,19 +34,11 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
       
-      - name: Setup VS PS
+      - name: Install gettext via vcpkg
         if: runner.os == 'Windows'
-        uses: ilammy/msvc-dev-cmd@v1 
-        with:
-            arch: x64
-      - name: Setup .NET
-        if: runner.os == 'Windows'
-        uses: actions/setup-dotnet@v4
-        with:
-            dotnet-version: '8.0.x'
-      - name: Install WiX
-        if: runner.os == 'Windows'
-        run: dotnet tool install --global wix --version 7.0.0
+        run: | 
+          vcpkg install gettext:x64-windows
+
 
       - name: Set up MSVC Developer Command Prompt
         if: runner.os == 'Windows'
@@ -52,25 +46,28 @@ jobs:
         with:
           arch: x64 
 
-      - name: Install gettext via vcpkg
+      - name: Setup .NET
         if: runner.os == 'Windows'
-        run: | 
-            choco install gettext -y
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Install WiX
+        if: runner.os == 'Windows'
+        run: dotnet tool install --global wix --version 7.0.0
         
-            
       - name: Build on Windows
         if: runner.os == 'Windows'
         id: build        
         shell: powershell
         run: |
-          $vcpkgPath = "${env:VCPKG_INSTALLATION_ROOT}\installed\x64-windows"  
-          nmake /f Makefile.msc VCPKG_ROOT="$vcpkgPath" tpm.exe
+          $env:VCPKG_ROOT = "${env:VCPKG_INSTALLATION_ROOT}\installed\x64-windows"
+          nmake /f Makefile.msc tpm.exe
           wix build -acceptEula wix7 tpm.wxs -arch x64 -out tpm-win-bin-amd64-${{ github.ref_name }}.msi
-          Remove-Item -LiteralPath "tpm.exe" -Force -Recurse -Confirm:$false
-          Remove-Item -LiteralPath "*.obj" -Force -Recurse -Confirm:$false
-          Remove-Item -LiteralPath "tpm.exp" -Force -Recurse -Confirm:$false
-          Remove-Item -LiteralPath "tpm.lib" -Force -Recurse -Confirm:$false
-          Remove-Item -LiteralPath "tpm.res" -Force -Recurse -Confirm:$false
+          
+          Remove-Item -Path "tpm.exe", "tpm.exp", "tpm.lib", "tpm.res" -Force -ErrorAction SilentlyContinue
+          Remove-Item -Path "*.obj" -Force -ErrorAction SilentlyContinue
+      
       - name: Upload to Release Win
         if: runner.os == 'Windows'       
         uses: softprops/action-gh-release@v2
@@ -82,10 +79,9 @@ jobs:
         if: runner.os != 'Windows'
         shell: bash
         run: |
-            make -f tpm-ubuntu.mk tpm docs dist
-            mv tpm-linux-bin-amd64.tar.gz tpm-linux-bin-amd64-${{ github.ref_name }}.tar.gz
-            make -f tpm-ubuntu.mk clean            
-            
+          make -f tpm-ubuntu.mk tpm docs dist
+          mv tpm-linux-bin-amd64.tar.gz tpm-linux-bin-amd64-${{ github.ref_name }}.tar.gz
+          make -f tpm-ubuntu.mk clean            
             
       - name: Upload to Release Linux
         if: runner.os != 'Windows'       
@@ -101,9 +97,9 @@ jobs:
         if: runner.os != 'Windows'
         shell: bash
         run: |
-            make -f tpm-wasm.mk tpm.wasm dist
-            mv tpm-wasm-bin-amd64.tar.gz tpm-wasm-bin-amd64-${{ github.ref_name }}.tar.gz
-            make -f tpm-wasm.mk clean
+          make -f tpm-wasm.mk tpm.wasm dist
+          mv tpm-wasm-bin-amd64.tar.gz tpm-wasm-bin-amd64-${{ github.ref_name }}.tar.gz
+          make -f tpm-wasm.mk clean
             
       - name: Upload to Release WASM
         if: runner.os != 'Windows'       
@@ -112,28 +108,27 @@ jobs:
           token: ${{ secrets.PAT3 }}
           files: tpm-wasm-bin-amd64-${{ github.ref_name }}.tar.gz  
           
-      
       - name: Install autotools
         if: runner.os != 'Windows'
         shell: bash
         run: |
-            sudo apt-get update
-            sudo apt-get install -y autoconf automake libtool  
+          sudo apt-get update
+          sudo apt-get install -y autoconf automake libtool  
             
       - name: Reconfigure build env 
         if: runner.os != 'Windows'
         shell: bash
         run: |
-            autoreconf -ivf
-            ./configure
-            make dist
-            mv tpm-${{ github.ref_name }}.tar.gz tpm-unix-tarball-amd64-${{ github.ref_name }}.tar.gz  
+          autoreconf -ivf
+          ./configure
+          make dist
+          mv tpm-${{ github.ref_name }}.tar.gz tpm-unix-tarball-amd64-${{ github.ref_name }}.tar.gz  
       
       - name: Upload Unix tarball to Release
         if: runner.os != 'Windows'
         uses: softprops/action-gh-release@v2
         with:
           token: ${{ secrets.PAT3 }}
-          files: tpm-unix-tarball-amd64-${{ github.ref_name }}.tar.gz 
+          files: tpm-unix-tarball-amd64-${{ github.ref_name }}.tar.gz
 
      
