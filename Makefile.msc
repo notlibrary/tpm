@@ -3,12 +3,10 @@ CC = cl.exe
 LINKER = link.exe
 RC = rc.exe
 
-# Никаких абсолютных путей к vcpkg — всё подхватит компилятор автоматически
-CFLAGS = /nologo /TC /O2 /DHAVE_MAIN /FS /c /I"src" /I"src\win"
-LFLAGS = /NOLOGO /OUT:
+CFLAGS = /nologo /TC /O2 /DHAVE_MAIN /FS /c /I"$(VCPKG_ROOT)\include" /I"src" /I"src\win"
+LFLAGS = /NOLOGO /LIBPATH:"$(VCPKG_ROOT)\lib" /OUT:
 SRC = src
 
-# libintl.lib теперь просто в списке библиотек
 LIBS = libintl.lib user32.lib kernel32.lib Advapi32.lib
 
 OBJECTS = \
