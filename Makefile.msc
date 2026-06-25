@@ -3,7 +3,10 @@ CC = cl.exe
 LINKER = link.exe
 RC = rc.exe
 
-!IFNDEF VCPKG_ROOT
+
+!IFDEF VCPKG_INSTALLATION_ROOT
+VCPKG_ROOT = $(VCPKG_INSTALLATION_ROOT)\installed\x64-windows
+!ELSE
 VCPKG_ROOT = C:\vcpkg\installed\x64-windows
 !ENDIF
 
