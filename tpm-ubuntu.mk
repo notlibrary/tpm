@@ -1,11 +1,10 @@
 #TPM Linux makefile
 #Used to manually build on Ubuntu 
 #Alternative to other unixes is autotools tarball build
-
 CC=gcc
 CP=cp -f
 MKDIR=mkdir -p
-RM=rm
+RM=rm -f
 CFLAGS=-Wall -Os -DHAVE_MAIN
 CURRENT_DIR=$(CURDIR)
 SRC=src
@@ -17,23 +16,38 @@ OBJECTS=    tpm.o \
 			prng64_xrp32.o \
 			cfg_parse.o
 
-.PHONY: all install clean
+.PHONY: all install clean dist
 
-all: tpm docs install clean
+all: tpm docs
+
 tpm: $(OBJECTS)
 	$(CC) $(CFLAGS) $(OBJECTS) -o tpm
-$(OBJECTS): $(SOURCES)
-	$(CC) $(CFLAGS) -c $(SOURCES)
+
+%.o: $(SRC)/%.c
+	$(CC) $(CFLAGS) -c $< -o $@
+
 docs:
-	gzip -k tpm.1
-install:
+	gzip -k -f tpm.1
+
+install: all
 	cp $(CURRENT_DIR)/tpm /usr/local/bin/
 	cp tpm.1.gz /usr/share/man/man1/tpm.1.gz
+
 clean:	
-	rm $(CURRENT_DIR)/tpm $(OBJECTS)
-	rm -rf tpm-linux-bin-amd64
-	rm tpm.1.gz
-dist:
-	mkdir -p tpm-linux-bin-amd64
+	$(RM) tpm $(OBJECTS)
+	$(RM) -r tpm-linux-bin-amd64 dist
+	$(RM) tpm.1.gz tpm-linux-bin-amd64.tar.gz
+
+dist: all
+	$(MKDIR) tpm-linux-bin-amd64
 	cp tpm.conf.sample toothpastes.sample toothpastes-enhanced.sample tpm README.md tpm.1.gz LICENSE tpm-linux-bin-amd64
+	
+	@if [ -d locale ]; then \
+		find locale -name "*.mo" | while read -r mo_file; do \
+			lang_dir=$$(dirname "$$mo_file"); \
+			$(MKDIR) "tpm-linux-bin-amd64/$$lang_dir"; \
+			cp "$$mo_file" "tpm-linux-bin-amd64/$$lang_dir/"; \
+		done; \
+	fi
+	
 	tar -czf tpm-linux-bin-amd64.tar.gz tpm-linux-bin-amd64

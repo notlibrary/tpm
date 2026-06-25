@@ -6,15 +6,44 @@
            InstallerVersion="200" 
            Manufacturer="Serenity Software" 
            Version="0.6.8" 
-		   UpgradeCode="69AF8A56-9550-427C-AE60-AE13108B9105">
+           UpgradeCode="69AF8A56-9550-427C-AE60-AE13108B9105">
     
     <MediaTemplate EmbedCab="yes" />
     <MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." />
     
-	<Icon Id="toothbrush.ico" SourceFile="toothbrush.ico" /> 
-	<Property Id="ARPPRODUCTICON" Value="toothbrush.ico" />	
+    <Icon Id="toothbrush.ico" SourceFile="toothbrush.ico" /> 
+    <Property Id="ARPPRODUCTICON" Value="toothbrush.ico" />	
+    
     <StandardDirectory Id="ProgramFiles6432Folder">
-      <Directory Id="INSTALLFOLDER" Name="tpm"  />
+      <Directory Id="INSTALLFOLDER" Name="tpm">
+        <Directory Id="LocaleFolder" Name="locale">
+          
+          <Directory Id="LangZH" Name="zh">
+            <Directory Id="MsgZH" Name="LC_MESSAGES" />
+          </Directory>
+
+          <Directory Id="LangFR" Name="fr">
+            <Directory Id="MsgFR" Name="LC_MESSAGES" />
+          </Directory>
+
+          <Directory Id="LangES" Name="es">
+            <Directory Id="MsgES" Name="LC_MESSAGES" />
+          </Directory>
+
+          <Directory Id="LangDE" Name="de">
+            <Directory Id="MsgDE" Name="LC_MESSAGES" />
+          </Directory>
+
+          <Directory Id="LangRU" Name="ru">
+            <Directory Id="MsgRU" Name="LC_MESSAGES" />
+          </Directory>
+
+          <Directory Id="LangIT" Name="it">
+            <Directory Id="MsgIT" Name="LC_MESSAGES" />
+          </Directory>
+          
+        </Directory>
+      </Directory>
     </StandardDirectory>
     
     <DirectoryRef Id="INSTALLFOLDER">
@@ -43,6 +72,42 @@
       </Component>
     </DirectoryRef>
     
+    <DirectoryRef Id="MsgZH">
+      <Component Id="MoZH" Guid="1A8E3F2B-0D9C-4A7B-8E6F-5C3D2B1A0E9F" Bitness="always64">
+        <File Id="MoFileZH" Source="locale\zh\LC_MESSAGES\tpm.mo" KeyPath="yes" />
+      </Component>
+    </DirectoryRef>
+
+    <DirectoryRef Id="MsgFR">
+      <Component Id="MoFR" Guid="C3D4E5F6-7A8B-9C0D-1E2F-3A4B5C6D7E8F" Bitness="always64">
+        <File Id="MoFileFR" Source="locale\fr\LC_MESSAGES\tpm.mo" KeyPath="yes" />
+      </Component>
+    </DirectoryRef>
+
+    <DirectoryRef Id="MsgES">
+      <Component Id="MoES" Guid="2B9F8E7D-6C5B-4A3B-2A1A-0F9E8D7C6B5A" Bitness="always64">
+        <File Id="MoFileES" Source="locale\es\LC_MESSAGES\tpm.mo" KeyPath="yes" />
+      </Component>
+    </DirectoryRef>
+
+    <DirectoryRef Id="MsgDE">
+      <Component Id="MoDE" Guid="3C0A1B2C-3D4E-5F6A-7B8C-9D0E1F2A3B4C" Bitness="always64">
+        <File Id="MoFileDE" Source="locale\de\LC_MESSAGES\tpm.mo" KeyPath="yes" />
+      </Component>
+    </DirectoryRef>
+
+    <DirectoryRef Id="MsgRU">
+      <Component Id="MoRU" Guid="A1B2C3D4-E5F6-7A8B-9C0D-1E2F3A4B5C6D" Bitness="always64">
+        <File Id="MoFileRU" Source="locale\ru\LC_MESSAGES\tpm.mo" KeyPath="yes" />
+      </Component>
+    </DirectoryRef>
+
+    <DirectoryRef Id="MsgIT">
+      <Component Id="MoIT" Guid="4D1E2F3A-4B5C-6D7E-8F9A-0B1C2D3E4F5A" Bitness="always64">
+        <File Id="MoFileIT" Source="locale\it\LC_MESSAGES\tpm.mo" KeyPath="yes" />
+      </Component>
+    </DirectoryRef>
+    
     <Feature Id="MainFeature" Title="Main Application" Level="1">
       <ComponentRef Id="MainExecutable" />
       <ComponentRef Id="AppConfig" />
@@ -50,6 +115,13 @@
       <ComponentRef Id="Toothpastes" />
       <ComponentRef Id="ToothpastesEnhanced" />
       <ComponentRef Id="AppLicense" />
+      
+      <ComponentRef Id="MoZH" />
+      <ComponentRef Id="MoFR" />
+      <ComponentRef Id="MoES" />
+      <ComponentRef Id="MoDE" />
+      <ComponentRef Id="MoRU" />
+      <ComponentRef Id="MoIT" />
     </Feature>
     
   </Package>

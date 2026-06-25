@@ -3,7 +3,7 @@
 CC=emcc
 CP=cp -f
 MKDIR=mkdir -p
-RM=rm
+RM=rm -f
 CFLAGS=-Wall -Os -sSTANDALONE_WASM=1 -DHAVE_MAIN --minify=0 -sMODULARIZE=0 
 CURRENT_DIR=$(CURDIR)
 SRC=src
@@ -15,17 +15,31 @@ OBJECTS=    tpm.o \
 			prng64_xrp32.o \
 			cfg_parse.o
 
-.PHONY: all clean
+.PHONY: all clean dist
 
-all: tpm.wasm clean
+all: tpm.wasm
+
 tpm.wasm: $(OBJECTS)
 	$(CC) $(CFLAGS) $(OBJECTS) -o tpm.wasm
-$(OBJECTS): $(SOURCES)
-	$(CC) $(CFLAGS) -c $(SOURCES)
+
+%.o: $(SRC)/%.c
+	$(CC) $(CFLAGS) -c $< -o $@
+
 clean:	
-	rm $(CURRENT_DIR)/tpm.wasm $(OBJECTS)
-	rm -rf tpm-wasm-bin-amd64
-dist:
-	mkdir -p tpm-wasm-bin-amd64
+	$(RM) tpm.wasm $(OBJECTS)
+	$(RM) -r tpm-wasm-bin-amd64
+	$(RM) tpm-wasm-bin-amd64.tar.gz
+
+dist: all
+	$(MKDIR) tpm-wasm-bin-amd64
 	cp tpm.conf.sample toothpastes.sample toothpastes-enhanced.sample tpm.wasm README.md LICENSE tpm-wasm-bin-amd64
+	
+	@if [ -d locale ]; then \
+		find locale -name "*.mo" | while read -r mo_file; do \
+			lang_dir=$$(dirname "$$mo_file"); \
+			$(MKDIR) "tpm-wasm-bin-amd64/$$lang_dir"; \
+			cp "$$mo_file" "tpm-wasm-bin-amd64/$$lang_dir/"; \
+		done; \
+	fi
+	
 	tar -czf tpm-wasm-bin-amd64.tar.gz tpm-wasm-bin-amd64
