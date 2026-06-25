@@ -63,10 +63,8 @@ jobs:
         run: |
           $env:VCPKG_ROOT = "${env:VCPKG_INSTALLATION_ROOT}\installed\x64-windows"      "
           nmake -e /f Makefile.msc tpm.exe
-          wix build -acceptEula wix7 tpm.wxs -arch x64 -out tpm-win-bin-amd64-${{ github.ref_name }}.msi
-          
-          Remove-Item -Path "tpm.exe", "tpm.exp", "tpm.lib", "tpm.res" -Force -ErrorAction SilentlyContinue
-          Remove-Item -Path "*.obj" -Force -ErrorAction SilentlyContinue
+          wix build -acceptEula wix7 tpm.wxs -arch x64 -out tpm-win-bin-amd64-${{ github.ref_name }}.msi 
+          cmd /c "del /Q tpm.exe tpm.exp tpm.lib tpm.res *.obj 2>nul"
       
       - name: Upload to Release Win
         if: runner.os == 'Windows'       
