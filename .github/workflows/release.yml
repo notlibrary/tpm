@@ -55,7 +55,7 @@ jobs:
       - name: Install gettext via vcpkg
         if: runner.os == 'Windows'
         run: | 
-            vcpkg install gettext:x64-windows
+            choco install gettext -y
         
             
       - name: Build on Windows
