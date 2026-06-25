@@ -27,6 +27,7 @@ extern "C" {
 #include <string.h>
 #include <ctype.h>
 
+#include <locale.h>
 #include <libintl.h>
 #define _(String) gettext(String)
 

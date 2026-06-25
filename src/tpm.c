@@ -209,7 +209,15 @@ tpm_init_context(toothpaste_pick_options_t* opts)
     strncpy(opts->config_file_path_final, user_home_dir_static, MAX_PATH - 1);
     strncat(opts->config_file_path_final, config_file_name, MAX_PATH / 2);
 
-    return TPM_NO_ERROR; 
+	setlocale(LC_ALL, "");
+#ifdef _WIN32	
+	bindtextdomain ("tpm", "C:\Program Files\tpm\locale");
+#else
+	bindtextdomain ("tpm", "/usr/share/locale/");	
+#endif
+	textdomain ("tpm");
+    
+	return TPM_NO_ERROR; 
 }
 
 static void 
@@ -2050,7 +2058,7 @@ do_not_test_me(int argc, char* argv[])
 	{"meme", required_argument,0, 'm'},	
 	{"template", required_argument,0, 'T'},		
     {0, 0, 0, 0} 
-};	
+};		
 	tpm_init_context(&topts); 
 	
 	result=read_config(topts.config_file_path_final,&topts);
