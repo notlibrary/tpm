@@ -61,7 +61,7 @@ jobs:
         id: build        
         shell: powershell
         run: |
-          nmake.exe /f .\Makefile.msc VCPKG_ROOT="%VCPKG_INSTALLATION_ROOT%\installed\x64-windows" tpm.exe
+          nmake /f Makefile.msc VCPKG_ROOT="%VCPKG_INSTALLATION_ROOT%\installed\x64-windows" tpm.exe
           wix build -acceptEula wix7 tpm.wxs -arch x64 -out tpm-win-bin-amd64-${{ github.ref_name }}.msi
           Remove-Item -LiteralPath "tpm.exe" -Force -Recurse -Confirm:$false
           Remove-Item -LiteralPath "*.obj" -Force -Recurse -Confirm:$false
