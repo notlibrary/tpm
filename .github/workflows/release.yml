@@ -61,7 +61,7 @@ jobs:
         id: build        
         shell: powershell
         run: |
-          $env:VCPKG_ROOT = "${env:VCPKG_INSTALLATION_ROOT}\installed\x64-windows"      "
+          $env:VCPKG_ROOT = "${env:VCPKG_INSTALLATION_ROOT}\installed\x64-windows"
           nmake -e /f Makefile.msc tpm.exe
           wix build -acceptEula wix7 tpm.wxs -arch x64 -out tpm-win-bin-amd64-${{ github.ref_name }}.msi 
           Remove-Item tpm.exe -ErrorAction SilentlyContinue
