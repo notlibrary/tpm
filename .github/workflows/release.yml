@@ -74,8 +74,10 @@ jobs:
         if: runner.os != 'Windows'
         shell: bash
         run: |
-            make -f tpm-ubuntu.mk tpm docs dist clean
+            make -f tpm-ubuntu.mk tpm docs dist
             mv tpm-linux-bin-amd64.tar.gz tpm-linux-bin-amd64-${{ github.ref_name }}.tar.gz
+            make -f tpm-ubuntu.mk clean            
+            
             
       - name: Upload to Release Linux
         if: runner.os != 'Windows'       
@@ -91,8 +93,9 @@ jobs:
         if: runner.os != 'Windows'
         shell: bash
         run: |
-            make -f tpm-wasm.mk tpm.wasm dist clean
+            make -f tpm-wasm.mk tpm.wasm dist
             mv tpm-wasm-bin-amd64.tar.gz tpm-wasm-bin-amd64-${{ github.ref_name }}.tar.gz
+            make -f tpm-wasm.mk clean
             
       - name: Upload to Release WASM
         if: runner.os != 'Windows'       
