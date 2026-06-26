@@ -7,7 +7,7 @@ CFLAGS = /nologo /TC /O2 /DHAVE_MAIN /FS /c /I"$(VCPKG_ROOT)\include" /I"src" /I
 LFLAGS = /NOLOGO /LIBPATH:"$(VCPKG_ROOT)\lib" /OUT:
 SRC = src
 
-LIBS = libintl.lib user32.lib kernel32.lib Advapi32.lib
+LIBS = intl.lib user32.lib kernel32.lib Advapi32.lib
 
 OBJECTS = \
 	tpm.obj \
