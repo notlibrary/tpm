@@ -37,8 +37,7 @@ jobs:
       - name: Install gettext via vcpkg
         if: runner.os == 'Windows'
         run: | 
-          vcpkg install gettext:x64-windows
-          vcpkg install gettext:x64-windows-static
+          vcpkg install gettext-runtime:x64-windows
 
 
       - name: Set up MSVC Developer Command Prompt
@@ -62,10 +61,8 @@ jobs:
         id: build        
         shell: powershell
         run: |
-          $vcpkgSharedLib = "${env:VCPKG_INSTALLATION_ROOT}\installed\x64-windows\lib"
-          $vcpkgStaticLib = "${env:VCPKG_INSTALLATION_ROOT}\installed\x64-windows-static\lib"
-          $env:LIB = "${vcpkgSharedLib};${vcpkgStaticLib};${env:LIB}"
           $env:VCPKG_ROOT = "${env:VCPKG_INSTALLATION_ROOT}\installed\x64-windows"
+          $env:LIB = "${env:VCPKG_ROOT}\lib;${env:LIB}"
           nmake -e /f Makefile.msc tpm.exe
           wix build -acceptEula wix7 tpm.wxs -arch x64 -out tpm-win-bin-amd64-${{ github.ref_name }}.msi 
           Remove-Item tpm.exe -ErrorAction SilentlyContinue
