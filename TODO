@@ -5,7 +5,6 @@ iOS port
 Open/Free/NetBSD ports
 macOS port
 OpenWrt package
-Chinese Russian localization
 
 +Toothbrush support
 +Output templates
@@ -18,3 +17,4 @@ Chinese Russian localization
 +Autotools build
 +Valgrind check mem leaks
 +Clear global variables
++Chinese Russian localization
