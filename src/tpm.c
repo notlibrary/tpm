@@ -113,6 +113,33 @@ static const char toothpastes_file_name[MAX_PATH] ="toothpastes";
 static const char output_file_name[MAX_PATH] ="last_pick";
 static const char config_file_name[MAX_PATH] ="tpm.conf";
 
+int 
+init_tpm_locale(char* locale_id, toothpaste_pick_options_t* opts)
+{
+    setlocale(LC_ALL, opts->tpm_locale);
+
+#if defined(_WIN32) || defined(_WIN64)
+    char exe_path[MAX_PATH];
+    char locale_path[MAX_PATH];
+    
+    GetModuleFileNameA(NULL, exe_path, MAX_PATH);
+    
+    char *last_slash = strrchr(exe_path, '\\');
+    if (last_slash) *last_slash = '\0';
+    
+    snprintf(locale_path, sizeof(locale_path), "%s\\locale", exe_path);
+    
+    bindtextdomain("tpm", locale_path);
+#else	
+#ifdef LOCALEDIR
+    bindtextdomain("tpm", LOCALEDIR);
+#else
+    bindtextdomain("tpm", "/usr/local/share/locale");
+#endif
+#endif
+    textdomain("tpm");
+	return 0;
+}
 
 TPM int 
 tpm_init_context(toothpaste_pick_options_t* opts) 
@@ -208,31 +235,9 @@ tpm_init_context(toothpaste_pick_options_t* opts)
 
     strncpy(opts->config_file_path_final, user_home_dir_static, MAX_PATH - 1);
     strncat(opts->config_file_path_final, config_file_name, MAX_PATH / 2);
-
-    memset(opts->tpm_locale, 0, MAX_LOCALE_CODE + 1);
-    setlocale(LC_ALL, opts->tpm_locale);
-
-#if defined(_WIN32) || defined(_WIN64)
-    char exe_path[MAX_PATH];
-    char locale_path[MAX_PATH];
-    
-    GetModuleFileNameA(NULL, exe_path, MAX_PATH);
-    
-    char *last_slash = strrchr(exe_path, '\\');
-    if (last_slash) *last_slash = '\0';
-    
-    snprintf(locale_path, sizeof(locale_path), "%s\\locale", exe_path);
-    
-    bindtextdomain("tpm", locale_path);
-#else	
-#ifdef LOCALEDIR
-    bindtextdomain("tpm", LOCALEDIR);
-#else
-    bindtextdomain("tpm", "/usr/local/share/locale");
-#endif
-#endif
-    textdomain("tpm");
-    
+	
+	memset(opts->tpm_locale, 0, MAX_LOCALE_CODE + 1);
+    init_tpm_locale(opts->tpm_locale,opts); 
 	return TPM_NO_ERROR; 
 }
 
@@ -1947,7 +1952,7 @@ read_config(const char* src,toothpaste_pick_options_t* opts)
 	if (value!=NULL)
 	{	
 		strncpy(opts->tpm_locale,value,MAX_LOCALE_CODE);
-		setlocale(LC_ALL, opts->tpm_locale);
+		init_tpm_locale(opts->tpm_locale,opts); 
 	}
 	
 	value = cfg_get_rec(cfg, "PICK_TYPE");
@@ -2169,7 +2174,7 @@ do_not_test_me(int argc, char* argv[])
             break;
 			case 'L':
 				snprintf(topts.tpm_locale, MAX_LOCALE_CODE + 1, "%s", optarg);
-				setlocale(LC_ALL,topts.tpm_locale);
+				init_tpm_locale(topts.tpm_locale,&topts); 
 			break;
 			case '?': 
 				fprintf(stderr, "%s %s [-awjCvxqlrUF] [-f dental-formula] [-c config_file] [-o pick output file] [-t stats file] [-s total_picks value] [-p pick_type_value] [-i toothpaste_index] [-b brand_string [-z delta_hours] [-d delta_days] [-m meme_payload] [-T output_template] -L locale_code [toothpastes_file] \n",user_strings[MSG_USAGE], argv[0]);
