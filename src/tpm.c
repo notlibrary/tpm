@@ -209,14 +209,29 @@ tpm_init_context(toothpaste_pick_options_t* opts)
     strncpy(opts->config_file_path_final, user_home_dir_static, MAX_PATH - 1);
     strncat(opts->config_file_path_final, config_file_name, MAX_PATH / 2);
 
-	memset(opts->tpm_locale,0,MAX_LOCALE_CODE+1);
-	setlocale(LC_ALL, opts->tpm_locale);
-#ifdef _WIN32	
-	bindtextdomain ("tpm", "C:\Program Files\tpm\locale");
+    memset(opts->tpm_locale, 0, MAX_LOCALE_CODE + 1);
+    setlocale(LC_ALL, opts->tpm_locale);
+
+#if defined(_WIN32) || defined(_WIN64)
+    char exe_path[MAX_PATH];
+    char locale_path[MAX_PATH];
+    
+    GetModuleFileNameA(NULL, exe_path, MAX_PATH);
+    
+    char *last_slash = strrchr(exe_path, '\\');
+    if (last_slash) *last_slash = '\0';
+    
+    snprintf(locale_path, sizeof(locale_path), "%s\\locale", exe_path);
+    
+    bindtextdomain("tpm", locale_path);
+#else	
+#ifdef LOCALEDIR
+    bindtextdomain("tpm", LOCALEDIR);
 #else
-	bindtextdomain ("tpm", "/usr/share/locale/");	
+    bindtextdomain("tpm", "/usr/local/share/locale");
 #endif
-	textdomain ("tpm");
+#endif
+    textdomain("tpm");
     
 	return TPM_NO_ERROR; 
 }
