@@ -556,6 +556,8 @@ device managers etc
 
 I'm not joking if you know how to do it better make the pull request thread and show me the code
 
+Another approach is to use it instead of the SQL if you need the computer especially to do the single task brush your teeth with zero costs
+
 ## DeepSeek review
 TPM is a **fully functional, lightweight, and portable utility** wrapped in a layer of humor. It takes a simple concept (choosing a toothpaste) and implements it with the rigor of an enterprise software project, complete with multiple build systems, output formats, and scheduling instructions. It's a playful tool for command-line enthusiasts who appreciate automation and a good joke.
 
