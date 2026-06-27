@@ -258,6 +258,8 @@ Also sometimes is possible to add 5th term toothpaste grams per nurdle but this 
 
 `-T --template [template]` set output template
 
+`-L --locale` set output locale
+
 `toothpastes_path` path to the toothpastes CSV file
 
 ## Configuration file options
@@ -308,6 +310,8 @@ It's options:
 
 `TEMPLATE` set output template 	
 
+`LOCALE` set output locale
+
 ## TPM Toothpastes Picking Manager Configuration Sample
 ```
 [CONSTANTS]
@@ -337,6 +341,7 @@ TIMEZONE=0
 DELTA_DAYS=0
 MEME=42
 TEMPLATE="guwntdapobiTfWPlUsmI"
+LOCALE="en"
 ```
 
 ## TPM The Toothpastes Picking Manager Files List

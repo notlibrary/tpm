@@ -10,7 +10,7 @@ extern "C" {
 #define TPM_STRING "tpm"
 #define TPM_VERSION_MAJOR 0
 #define TPM_VERSION_MINOR 6
-#define TPM_VERSION_PATCH 8
+#define TPM_VERSION_PATCH 9
 
 #undef _CRT_NONSTDC_NO_DEPRECATE 
 #define _CRT_NONSTDC_NO_DEPRECATE 
@@ -101,6 +101,7 @@ memcpy(&x,swap_temp,sizeof(x)); \
 #define DEFAULT_OUTPUT_TEMPLATE "guwntdapobiTfWPlUsmI"
 #define MAX_TOOTHBRUSH_COLOR 32
 #define ENHANCED_MODE_COMAS 7
+#define MAX_LOCALE_CODE 8
 
 
 typedef enum user_msg_t
@@ -244,6 +245,8 @@ typedef struct toothpaste_pick_options_t
     char* toothpastes_file_path_final;
     char* output_file_path_final;
     char* config_file_path_final;
+	
+	char tpm_locale[MAX_LOCALE_CODE];
 } toothpaste_pick_options_t;
 
 typedef struct toothpaste_pick_t

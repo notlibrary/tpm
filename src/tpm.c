@@ -209,7 +209,8 @@ tpm_init_context(toothpaste_pick_options_t* opts)
     strncpy(opts->config_file_path_final, user_home_dir_static, MAX_PATH - 1);
     strncat(opts->config_file_path_final, config_file_name, MAX_PATH / 2);
 
-	setlocale(LC_ALL, "");
+	memset(opts->tpm_locale,0,MAX_LOCALE_CODE+1);
+	setlocale(LC_ALL, opts->tpm_locale);
 #ifdef _WIN32	
 	bindtextdomain ("tpm", "C:\Program Files\tpm\locale");
 #else
@@ -1809,6 +1810,7 @@ save_default_config(struct cfg_struct* cfg,toothpaste_pick_options_t* opts)
 	cfg_set(cfg,"LOAD_CONFIG",opts->config_file_path_final);
 	cfg_set(cfg,"MEME","42");
 	cfg_set(cfg,"TEMPLATE",DEFAULT_OUTPUT_TEMPLATE);
+	cfg_set(cfg,"LOCALE","en");
 	cfg_save(cfg,opts->config_file_path_final);
 	
 	return;
@@ -1924,6 +1926,13 @@ read_config(const char* src,toothpaste_pick_options_t* opts)
 	if (value!=NULL)
 	{	
 		strncpy(opts->tpm_template,value,TOTAL_OUTPUT_STRINGS+1);
+	}
+	
+	value = cfg_get_rec(cfg, "LOCALE");
+	if (value!=NULL)
+	{	
+		strncpy(opts->tpm_locale,value,MAX_LOCALE_CODE);
+		setlocale(LC_ALL, opts->tpm_locale);
 	}
 	
 	value = cfg_get_rec(cfg, "PICK_TYPE");
@@ -2056,7 +2065,8 @@ do_not_test_me(int argc, char* argv[])
 	{"delta", required_argument,0, 'd'},
 	{"timezone", required_argument,0, 'z'},
 	{"meme", required_argument,0, 'm'},	
-	{"template", required_argument,0, 'T'},		
+	{"template", required_argument,0, 'T'},	
+	{"locale", required_argument,0, 'L'},	
     {0, 0, 0, 0} 
 };		
 	tpm_init_context(&topts); 
@@ -2064,7 +2074,7 @@ do_not_test_me(int argc, char* argv[])
 	result=read_config(topts.config_file_path_final,&topts);
 	if (result<0);
 	topts.config_load_failure=!file_exists_fopen(topts.config_file_path_final);
-	while ((opt = getopt_long(argc, argv, "awjCvxqlrUFf:t:o:c:s:p:i:b:z:d:m:T:",long_options,&option_index)) != -1) 
+	while ((opt = getopt_long(argc, argv, "awjCvxqlrUFf:t:o:c:s:p:i:b:z:d:m:T:L:",long_options,&option_index)) != -1) 
 	{
         switch (opt) 
 		{
@@ -2141,9 +2151,13 @@ do_not_test_me(int argc, char* argv[])
                 break;
             case 'T':
                 snprintf(topts.tpm_template, TOTAL_OUTPUT_STRINGS + 1, "%s", optarg);
-            break;		
+            break;
+			case 'L':
+				snprintf(topts.tpm_locale, MAX_LOCALE_CODE + 1, "%s", optarg);
+				setlocale(LC_ALL,topts.tpm_locale);
+			break;
 			case '?': 
-				fprintf(stderr, "%s %s [-awjCvxqlrUF] [-f dental-formula] [-c config_file] [-o pick output file] [-t stats file] [-s total_picks value] [-p pick_type_value] [-i toothpaste_index] [-b brand_string [-z delta_hours] [-d delta_days] [-m meme_payload] [-T output_template] [toothpastes_file] \n",user_strings[MSG_USAGE], argv[0]);
+				fprintf(stderr, "%s %s [-awjCvxqlrUF] [-f dental-formula] [-c config_file] [-o pick output file] [-t stats file] [-s total_picks value] [-p pick_type_value] [-i toothpaste_index] [-b brand_string [-z delta_hours] [-d delta_days] [-m meme_payload] [-T output_template] -L locale_code [toothpastes_file] \n",user_strings[MSG_USAGE], argv[0]);
 				exit(EXIT_FAILURE);
 			default:
 				break;
