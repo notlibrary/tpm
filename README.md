@@ -4,7 +4,7 @@
    <img src="https://img.shields.io/github/actions/workflow/status/notlibrary/tpm/release.yml" alt="Build">
 </p>
 
-## TPM Toothpaste Picking Manager
+## TPM The Toothpaste Picking Manager
 Let me pick the toothpaste for you(or how to brush your teeth admins way)
 
 Do not confuse it with TPM Trusted Platform Module
@@ -312,7 +312,7 @@ It's options:
 
 `LOCALE` set output locale
 
-## TPM Toothpastes Picking Manager Configuration Sample
+## TPM The Toothpastes Picking Manager Configuration Sample
 ```
 [CONSTANTS]
 LOAD_CONFIG="C:\Users\Anonymous\tpm\tpm.conf"
