@@ -91,7 +91,7 @@ memcpy(&x,swap_temp,sizeof(x)); \
 
 #define TOTAL_TOOTHPASTE_TYPES 5
 #define TOTAL_ERROR_MESSAGES 12
-#define TOTAL_USER_MESSAGES 31
+#define TOTAL_USER_MESSAGES 33
 #define TOTAL_USER_ARMOUR 10
 
 #define BRUSHES_PER_LIFETIME 30000
