@@ -101,7 +101,7 @@ memcpy(&x,swap_temp,sizeof(x)); \
 #define DEFAULT_OUTPUT_TEMPLATE "guwntdapobiTfWPlUsmI"
 #define MAX_TOOTHBRUSH_COLOR 32
 #define ENHANCED_MODE_COMAS 7
-#define MAX_LOCALE_CODE 8
+#define MAX_LOCALE_CODE 16
 
 
 typedef enum user_msg_t
