@@ -98,7 +98,8 @@ static const char* user_strings[TOTAL_USER_MESSAGES]={
 	"Compiled on:",
 	"Anonymous",
 	"Output pick to file ",
-	"Compiler unknown"
+	"Brand None",
+	"Compiler unknown",
 	"Usage:",
 	"BUILTIN TOOTHPASTE 1",
 	"BUILTIN TOOTHPASTE 2",
