@@ -115,7 +115,7 @@ static const char toothpastes_file_name[MAX_PATH] ="toothpastes";
 static const char output_file_name[MAX_PATH] ="last_pick";
 static const char config_file_name[MAX_PATH] ="tpm.conf";
 
-int 
+static int 
 init_tpm_locale(char* locale_id, toothpaste_pick_options_t* opts)
 {
     setlocale(LC_ALL, opts->tpm_locale);

@@ -333,7 +333,7 @@ static int char_to_strnum(char input);
 static int check_visibility(int input_id, int new_pick_flag, int toothbrush_flag, int dentist_flag,int verbose);
 static int check_enhanced_toothpastes(const char* filename);
 static void free_context(toothpaste_pick_options_t* opts);
-int init_tpm_locale(char* locale_id, toothpaste_pick_options_t* opts);
+static int init_tpm_locale(char* locale_id, toothpaste_pick_options_t* opts);
 #ifdef __cplusplus
 }
 #endif /*__cpluplus*/
