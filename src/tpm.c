@@ -2175,7 +2175,7 @@ do_not_test_me(int argc, char* argv[])
                 snprintf(topts.tpm_template, TOTAL_OUTPUT_STRINGS + 1, "%s", optarg);
             break;
 			case 'L':
-				snprintf(topts.tpm_locale, MAX_LOCALE_CODE + 1, "%s", optarg);
+				snprintf(topts.tpm_locale, MAX_LOCALE_CODE, "%s", optarg);
 				init_tpm_locale(topts.tpm_locale,&topts); 
 			break;
 			case '?': 
