@@ -64,13 +64,16 @@ jobs:
           $env:VCPKG_ROOT = "${env:VCPKG_INSTALLATION_ROOT}\installed\x64-windows"
           $env:LIB = "${env:VCPKG_ROOT}\lib;${env:LIB}"
           nmake -e /f Makefile.msc tpm.exe
-          Copy-Item -Path "${env:VCPKG_ROOT}\bin\*.dll" -Destination "." -Force -ErrorAction SilentlyContinue
+          Get-ChildItem -Path $env:VCPKG_INSTALLATION_ROOT -Filter "libintl-8.dll" -Recurse | Select-Object -First 1 | Copy-Item -Destination "." -Force
+          Get-ChildItem -Path $env:VCPKG_INSTALLATION_ROOT -Filter "libiconv-2.dll" -Recurse | Select-Object -First 1 | Copy-Item -Destination "." -Force
           wix build -acceptEula wix7 tpm.wxs -arch x64 -out tpm-win-bin-amd64-${{ github.ref_name }}.msi 
           Remove-Item tpm.exe -ErrorAction SilentlyContinue
           Remove-Item tpm.exp -ErrorAction SilentlyContinue
           Remove-Item tpm.lib -ErrorAction SilentlyContinue
           Remove-Item tpm.res -ErrorAction SilentlyContinue
           Remove-Item *.obj -ErrorAction SilentlyContinue
+          
+
       
       - name: Upload to Release Win
         if: runner.os == 'Windows'       
