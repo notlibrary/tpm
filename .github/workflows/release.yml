@@ -64,14 +64,8 @@ jobs:
           $env:VCPKG_ROOT = "${env:VCPKG_INSTALLATION_ROOT}\installed\x64-windows"
           $env:LIB = "${env:VCPKG_ROOT}\lib;${env:LIB}"
           nmake -e /f Makefile.msc tpm.exe
-          Get-ChildItem -Path $env:VCPKG_INSTALLATION_ROOT -Include "*.dll","*.lib" -Recurse | ForEach-Object { Write-Host $_.FullName }
-          if (Test-Path "${env:VCPKG_ROOT}\bin") {
-              Copy-Item -Path "${env:VCPKG_ROOT}\bin\*.dll" -Destination "." -Force -ErrorAction SilentlyContinue
-          }
-          if (Test-Path "${env:VCPKG_ROOT}\debug\bin") {
-              Copy-Item -Path "${env:VCPKG_ROOT}\debug\bin\*.dll" -Destination "." -Force -ErrorAction SilentlyContinue
-          }
-          Get-ChildItem -Path "." -Include "*.dll","*.exe" -Recurse | ForEach-Object { Write-Host $_.Name }
+          Copy-Item -Path "C:\vcpkg\buildtrees\gettext-libintl\x64-windows-rel\.libs\intl-8.dll" -Destination ".\intl-8.dll" -Force
+          Copy-Item -Path "C:\vcpkg\buildtrees\libiconv\x64-windows-rel\lib\.libs\iconv-2.dll" -Destination ".\iconv-2.dll" -Force
           wix build -acceptEula wix7 tpm.wxs -arch x64 -out tpm-win-bin-amd64-${{ github.ref_name }}.msi 
           Remove-Item tpm.exe -ErrorAction SilentlyContinue
           Remove-Item tpm.exp -ErrorAction SilentlyContinue
