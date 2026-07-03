@@ -68,7 +68,7 @@ static const char* error_strings[TOTAL_ERROR_MESSAGES]={
 	"Error 108: Opening last_pick file for writing",
 	"Error 109: Pick is NULL perform pick first",
 	"Error 110: No toothpastes available.",
-	"Error 111: NULL context",
+	"Error 111: NULL context"
 };
 static const char* user_strings[TOTAL_USER_MESSAGES]={
 	"Pick counter clear",
@@ -220,7 +220,7 @@ tpm_init_context(toothpaste_pick_options_t* opts)
         strncpy(user_home_dir_static, ".", MAX_PATH - 1);
     }
 
-#ifdef _WIN32
+#if defined(_WIN32) || defined(_WIN64)
     strncat(user_home_dir_static, "\\tpm\\", MAX_PATH / 2);
 #else
     strncat(user_home_dir_static, "/tpm/", MAX_PATH / 2);
@@ -855,8 +855,14 @@ finish(int flag,toothpaste_pick_t* pick)
 	tpm_free_toothpaste_pick(pick);
 	if (flag) 
 	{
-#ifdef _WIN32
-	system("pause");
+#if defined(_WIN32) || defined(_WIN64)
+    DWORD process_list[2];
+    DWORD count = GetConsoleProcessList(process_list, 2);
+    if (count == 1) 
+	{
+        printf("%s",_(user_strings[MSG_PAUSE]));
+        getchar(); 
+    }
 #else
 	stop_system();
 #endif
@@ -869,7 +875,7 @@ get_user_home_dir(void)
 {
     char* home_dir = NULL;
 
-#ifdef _WIN32
+#if defined(_WIN32) || defined(_WIN64)
     const char* user_profile_env = getenv("USERPROFILE");
 	const char* home_drive;
     const char* home_path;
@@ -916,7 +922,7 @@ get_user_home_dir(void)
 static int 
 get_current_username(char* buffer, size_t buffer_size) 
 {
-#ifdef _WIN32
+#if defined(_WIN32) || defined(_WIN64)
     DWORD len = (DWORD)buffer_size;
 	
     if (GetUserName(buffer, &len)) 

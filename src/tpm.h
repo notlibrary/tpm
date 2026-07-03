@@ -34,7 +34,7 @@ extern "C" {
 #include "prng64_xrp32.h"
 #include "cfg_parse.h"
 
-#ifdef _WIN32
+#if defined(_WIN32) || defined(_WIN64)
 #include <windows.h>
 #include <winbase.h>
 #include <shlobj.h>
@@ -83,7 +83,7 @@ memcpy(swap_temp,&y,sizeof(x)); \
 memcpy(&y,&x,       sizeof(x)); \
 memcpy(&x,swap_temp,sizeof(x)); \
 } while(0)
-#if defined(_WIN32) || defined(__clang__) || defined(__EMSCRIPTEN__)
+#if defined(_WIN32) || defined (_WIN64) || defined(__clang__) || defined(__EMSCRIPTEN__)
 #define LINE_FORMAT_CSV "%u,%llu,%s,%s,%s"
 #else
 #define LINE_FORMAT_CSV "%u,%lu,%s,%s,%s"
