@@ -49,8 +49,8 @@
     <DirectoryRef Id="INSTALLFOLDER">
       <Component Id="MainExecutable" Guid="1C2B3E4F-5A6B-7C8D-9E0F-1A2B3C4D5E6F" Bitness="always64">
         <File Id="AppEXE" Source="tpm.exe" KeyPath="yes" />
-        <File Id="LibIntlDll" Source="libintl-8.dll" FailIfMissing="no" /> 
-        <File Id="IconvDll" Source="libiconv-2.dll" FailIfMissing="no" />
+        <File Id="LibIntlDll" Source="libintl-8.dll" /> 
+        <File Id="IconvDll" Source="libiconv-2.dll" />
       </Component>
 
       <Component Id="AppConfig" Guid="2A3B4C5D-6E7F-8A9B-0C1D-2E3F4A5B6C7D" Bitness="always64">
