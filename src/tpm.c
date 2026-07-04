@@ -858,9 +858,9 @@ finish(int flag,toothpaste_pick_t* pick)
 #if defined(_WIN32) || defined(_WIN64)
     DWORD process_list[2];
     DWORD count = GetConsoleProcessList(process_list, 2);
-    if (count == 1) 
+    printf("%s",_(user_strings[MSG_PAUSE]));
+	if (count == 1) 
 	{
-        printf("%s",_(user_strings[MSG_PAUSE]));
         getchar(); 
     }
 #else
