@@ -140,7 +140,9 @@ init_tpm_locale(char* locale_id, toothpaste_pick_options_t* opts)
     bindtextdomain("tpm", "/usr/local/share/locale");
 #endif
 #endif
-    textdomain("tpm");
+    const char *unused_tpm_domain = textdomain("tpm");
+    (void)unused_tpm_domain;
+	
 	return 0;
 }
 
