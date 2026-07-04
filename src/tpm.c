@@ -103,7 +103,8 @@ static const char* user_strings[TOTAL_USER_MESSAGES]={
 	"Usage:",
 	"BUILTIN TOOTHPASTE 1",
 	"BUILTIN TOOTHPASTE 2",
-	"BUILTIN TOOTHPASTE 3"
+	"BUILTIN TOOTHPASTE 3",
+	"Press any key to continue . . ."
 };
 
 static const char left_armour[TOTAL_USER_ARMOUR]={"<<<"};
@@ -858,7 +859,7 @@ finish(int flag,toothpaste_pick_t* pick)
 #if defined(_WIN32) || defined(_WIN64)
     DWORD process_list[2];
     DWORD count = GetConsoleProcessList(process_list, 2);
-    printf("%s",_(user_strings[MSG_PAUSE]));
+    printf("%s",_(user_strings[MSG_ANY_KEY]));
 	if (count == 1) 
 	{
         getchar(); 
