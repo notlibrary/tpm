@@ -57,54 +57,54 @@ static const char* times_of_day[TOTAL_TIMES_OF_DAY]={
 	gettext_noop("Evening")
 };
 static const char* error_strings[TOTAL_ERROR_MESSAGES]={
-	"Error 0: No error.",
-	"Error 101: opts is NULL",
-	"Error 102: Memory allocation failed.",
-	"Error 103: Opening toothpastes file falling back to default.",
-	"Error 104: Opening pickstats file for writing",
-	"Error 105: Opening pickstats file for reading",
-	"Error 106: No toothpastes file loaded",
-	"Error 107: Unable to load config ~tpm/tpm.conf\n",
-	"Error 108: Opening last_pick file for writing",
-	"Error 109: Pick is NULL perform pick first",
-	"Error 110: No toothpastes available.",
-	"Error 111: NULL context"
+	gettext_noop("Error 0: No error."),
+	gettext_noop("Error 101: opts is NULL"),
+	gettext_noop("Error 102: Memory allocation failed."),
+	gettext_noop("Error 103: Opening toothpastes file falling back to default."),
+	gettext_noop("Error 104: Opening pickstats file for writing"),
+	gettext_noop("Error 105: Opening pickstats file for reading"),
+	gettext_noop("Error 106: No toothpastes file loaded"),
+	gettext_noop("Error 107: Unable to load config ~tpm/tpm.conf\n"),
+	gettext_noop("Error 108: Opening last_pick file for writing"),
+	gettext_noop("Error 109: Pick is NULL perform pick first"),
+	gettext_noop("Error 110: No toothpastes available."),
+	gettext_noop("Error 111: NULL context")
 };
 static const char* user_strings[TOTAL_USER_MESSAGES]={
-	"Pick counter clear",
-	"# Index | Brand | Tube Mass | Rating",
-	"# Index | Brand | Tube Mass | Rating | Toothbrush Color | Toothbrush Brand | Toothbrush Length | Toothbrush Hardness",
-	"Pick counter set",
-	"Welcome to the toothpaste picking manager",
-	"New next pick stats updated",
-	"Toothbrush time span over swap the toothbrush(or order new one)",
-	"Time span over please visit dentist",
-	"Already picked today",
-	"Pick type",
-	"Toothpaste:",
-	"Toothbrush:",
-	"Toothpaste index:",
-	"Toothpaste type:",
-	"Dental Formula:",
-	"Day:",
-	"Total picks:",
-	"Tubes wasted:",
-	"Source:",
-	"Meme:",
-	"Last pick time:",
-	"Good",
-	"Press Enter to continue...",
-	"Compiler:",
-	"Compiled on:",
-	"Anonymous",
-	"Output pick to file ",
-	"Brand None",
-	"Compiler unknown",
-	"Usage:",
-	"BUILTIN TOOTHPASTE 1",
-	"BUILTIN TOOTHPASTE 2",
-	"BUILTIN TOOTHPASTE 3",
-	"Press any key to continue . . ."
+	gettext_noop("Pick counter clear"),
+	gettext_noop("# Index | Brand | Tube Mass | Rating"),
+	gettext_noop("# Index | Brand | Tube Mass | Rating | Toothbrush Color | Toothbrush Brand | Toothbrush Length | Toothbrush Hardness"),
+	gettext_noop("Pick counter set"),
+	gettext_noop("Welcome to the toothpaste picking manager"),
+	gettext_noop("New next pick stats updated"),
+	gettext_noop("Toothbrush time span over swap the toothbrush(or order new one)"),
+	gettext_noop("Time span over please visit dentist"),
+	gettext_noop("Already picked today"),
+	gettext_noop("Pick type"),
+	gettext_noop("Toothpaste:"),
+	gettext_noop("Toothbrush:"),
+	gettext_noop("Toothpaste index:"),
+	gettext_noop("Toothpaste type:"),
+	gettext_noop("Dental Formula:"),
+	gettext_noop("Day:"),
+	gettext_noop("Total picks:"),
+	gettext_noop("Tubes wasted:"),
+	gettext_noop("Source:"),
+	gettext_noop("Meme:"),
+	gettext_noop("Last pick time:"),
+	gettext_noop("Good"),
+	gettext_noop("Press Enter to continue..."),
+	gettext_noop("Compiler:"),
+	gettext_noop("Compiled on:"),
+	gettext_noop("Anonymous"),
+	gettext_noop("Output pick to file "),
+	gettext_noop("Brand None"),
+	gettext_noop("Compiler unknown"),
+	gettext_noop("Usage:"),
+	gettext_noop("BUILTIN TOOTHPASTE 1"),
+	gettext_noop("BUILTIN TOOTHPASTE 2"),
+	gettext_noop("BUILTIN TOOTHPASTE 3"),
+	gettext_noop("Press any key to continue . . .")
 };
 
 static const char left_armour[TOTAL_USER_ARMOUR]={"<<<"};
@@ -116,10 +116,17 @@ static const char toothpastes_file_name[MAX_PATH] ="toothpastes";
 static const char output_file_name[MAX_PATH] ="last_pick";
 static const char config_file_name[MAX_PATH] ="tpm.conf";
 
+#include <sys/stat.h>
+
 static int 
 init_tpm_locale(char* locale_id, toothpaste_pick_options_t* opts)
 {
-    setlocale(LC_ALL, opts->tpm_locale);
+
+    char *current_locale = setlocale(LC_ALL, opts->tpm_locale);
+    
+    if (current_locale == NULL) {
+        setlocale(LC_ALL, "");
+    }
 
 #if defined(_WIN32) || defined(_WIN64)
     char exe_path[MAX_PATH];
@@ -132,18 +139,27 @@ init_tpm_locale(char* locale_id, toothpaste_pick_options_t* opts)
     
     snprintf(locale_path, sizeof(locale_path), "%s\\locale", exe_path);
     
+    for (int i = 0; locale_path[i] != '\0'; i++) {
+        if (locale_path[i] == '\\') {
+            locale_path[i] = '/';
+        }
+    }
+    
     bindtextdomain("tpm", locale_path);
 #else	
 #ifdef LOCALEDIR
     bindtextdomain("tpm", LOCALEDIR);
 #else
+    
     bindtextdomain("tpm", "/usr/local/share/locale");
 #endif
 #endif
+
+    bind_textdomain_codeset("tpm", "UTF-8");
     const char *unused_tpm_domain = textdomain("tpm");
     (void)unused_tpm_domain;
 	
-	return 0;
+    return 0;
 }
 
 TPM int 
