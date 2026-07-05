@@ -259,6 +259,37 @@ tpm_init_context(toothpaste_pick_options_t* opts)
 	
 	memset(opts->tpm_locale, 0, MAX_LOCALE_CODE + 1);
     init_tpm_locale(opts->tpm_locale,opts); 
+	printf("\n=== ГЛОБАЛЬНАЯ ДИАГНОСТИКА GETTEXT ===\n");
+
+
+printf("1. ENV LANG: %s\n", ThrowsGetEnv("LANG") ? getenv("LANG") : "NOT SET");
+printf("2. ENV LANGUAGE: %s\n", ThrowsGetEnv("LANGUAGE") ? getenv("LANGUAGE") : "NOT SET");
+
+
+char *real_locale = setlocale(LC_ALL, NULL);
+printf("3. Действующая локаль в программе: %s\n", real_locale);
+
+
+#if defined(_WIN32) || defined(_WIN64)
+   
+    FILE *f = fopen("locale/fr/LC_MESSAGES/tpm.mo", "rb");
+#else
+    
+    FILE *f = fopen("./locale/fr/LC_MESSAGES/tpm.mo", "rb");
+    if (!f) f = fopen("/usr/local/share/locale/fr/LC_MESSAGES/tpm.mo", "rb");
+#endif
+
+if (f) {
+    printf("4. Файл tpm.mo: НАЙДЕН и успешно открывается процессом.\n");
+    fclose(f);
+} else {
+    printf("4. Файл tpm.mo: КРИТИЧЕСКАЯ ОШИБКА! Файл не найден по путям проверки.\n");
+}
+
+
+printf("5. Тест gettext(\"Default\"): [%s]\n", gettext("Default"));
+printf("6. Тест gettext(\"Pick type\"): [%s]\n", gettext("Pick type"));
+printf("========================================\n\n");
 	return TPM_NO_ERROR; 
 }
 
