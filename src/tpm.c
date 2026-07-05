@@ -1259,11 +1259,11 @@ str_pick_type(toothpaste_pick_t* pick, toothpaste_pick_options_t* topts)
     memset(line, 0, MAX_TOOTHPASTE_LINE);	
 
     
-    const char* label = gettext(user_strings[MSG_PICK_TYPE]);
+    const char* label = (user_strings[MSG_PICK_TYPE]);
 
     
     const char* raw_pick_str = pick_type_strings[topts->ptype];
-    const char* translated_pick = (raw_pick_str != NULL) ? gettext(raw_pick_str) : "";
+    const char* translated_pick = (raw_pick_str != NULL) ? (raw_pick_str) : "";
 
     snprintf(line, MAX_TOOTHPASTE_LINE, "%s: %s\n", label, translated_pick);
 		
@@ -1333,12 +1333,12 @@ str_toothpaste_type(toothpaste_pick_t* pick, toothpaste_pick_options_t* topts)
     
     memset(line, 0, MAX_TOOTHPASTE_LINE);		
 
-    const char* label = gettext(user_strings[MSG_TOOTHPASTE_T]);
+    const char* label = (user_strings[MSG_TOOTHPASTE_T]);
 
     
     const char* raw_type_str = toothpaste_type_strings[pick->what.type];
     
-    const char* translated_type = (raw_type_str != NULL) ? gettext(raw_type_str) : "";
+    const char* translated_type = (raw_type_str != NULL) ? (raw_type_str) : "";
 
     snprintf(line, MAX_TOOTHPASTE_LINE, "%s %s \n", label, translated_type);
 		
@@ -1365,8 +1365,8 @@ str_day_of_the_week(toothpaste_pick_t* pick, toothpaste_pick_options_t* topts)
     
     memset(line, 0, MAX_LINE_LENGTH);	
 
-    const char* translated_msg_day = gettext(user_strings[MSG_DAY]);
-    const char* translated_day_name = gettext(days_of_week[pick->j]);
+    const char* translated_msg_day = (user_strings[MSG_DAY]);
+    const char* translated_day_name = (days_of_week[pick->j]);
 
     snprintf(line, MAX_LINE_LENGTH, "%s %s %u \n", 
              translated_msg_day, 
