@@ -258,7 +258,22 @@ tpm_init_context(toothpaste_pick_options_t* opts)
     strncat(opts->config_file_path_final, config_file_name, MAX_PATH / 2);
 	
 	memset(opts->tpm_locale, 0, MAX_LOCALE_CODE + 1);
-    init_tpm_locale(opts->tpm_locale,opts); 
+    init_tpm_locale(opts->tpm_locale,opts);
+
+	printf("\n--- TPM GETTEXT DIAGNOSTIC ---\n");
+    
+    // 1. Check if the OS actually accepted your locale string
+    char *res_locale = setlocale(LC_ALL, NULL);
+    printf("1. Active System Locale: %s\n", res_locale ? res_locale : "NULL");
+
+    // 2. Test gettext directly with a raw literal string
+    printf("2. Direct translation test (\"Day:\"): [%s]\n", gettext("Day:"));
+    
+    // 3. Test gettext with your array pointer
+    printf("3. Array element test (MSG_DAY): [%s]\n", gettext(user_strings[MSG_DAY]));
+    
+    printf("------------------------------\n\n");
+	
 	return TPM_NO_ERROR; 
 }
 
@@ -1281,20 +1296,34 @@ str_toothpaste(toothpaste_pick_t* pick,toothpaste_pick_options_t* topts)
 }
 
 static char*
-str_toothbrush(toothpaste_pick_t* pick,toothpaste_pick_options_t* topts)
+str_toothbrush(toothpaste_pick_t* pick, toothpaste_pick_options_t* topts)
 {
-	char* line = malloc(MAX_LINE_LENGTH);
-	if (topts==NULL || pick == NULL) return NULL;		
-	memset(line,0,MAX_LINE_LENGTH);
+    if (topts == NULL || pick == NULL) return NULL;		
+
+    char* line = malloc(MAX_LINE_LENGTH);
+    if (line == NULL) return NULL; 
+    
+    memset(line, 0, MAX_LINE_LENGTH);
 	
-	if (topts->enhanced_toothpastes)
-	{
-		snprintf(line,MAX_LINE_LENGTH,"%s %s %s %u %u\n", _(user_strings[MSG_TOOTHBRUSH]), pick->what.toothbrush_color, pick->what.toothbrush_brand, pick->what.toothbrush_length_cm, pick->what.toothbrush_hardness);
-	}	
-	else {
-		snprintf(line, 1,"%s","\0");
-	}
-	return line;
+    if (topts->enhanced_toothpastes)
+    {
+       
+        const char* label_toothbrush = gettext(user_strings[MSG_TOOTHBRUSH]);
+
+        snprintf(line, MAX_LINE_LENGTH, "%s %s %s %u %u\n", 
+                 label_toothbrush, 
+                 pick->what.toothbrush_color, 
+                 pick->what.toothbrush_brand, 
+                 pick->what.toothbrush_length_cm, 
+                 pick->what.toothbrush_hardness);
+    }	
+    else 
+    {
+        
+        line[0] = '\0';
+    }
+
+    return line;
 }
 
 static char*
