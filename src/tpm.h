@@ -29,6 +29,7 @@ extern "C" {
 
 #include <locale.h>
 #include "gettext.h"
+#define gettext_noop(String) String
 #define _(String) gettext(String)
 
 #include "prng64_xrp32.h"

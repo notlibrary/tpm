@@ -24,37 +24,37 @@ static const toothpaste_data_t toothpastes[TOTAL_TOOTHPASTES]={
 	{PASTE_BUILTIN,2,"BUILTIN TOOTHPASTE 3",50,80,"Pink", "Builtin Toothbrush 3",20,50}
 };
 static const char* pick_type_strings[TOTAL_PICK_TYPE_STRINGS]={
-	"Default",
-	"Random",
-	"By index",
-	"By brand",
-	"Max rating",
-	"Max tube mass",
-	"Min rating",
-	"Min tube mass"
+	gettext_noop("Default"),
+	gettext_noop("Random"),
+	gettext_noop("By index"),
+	gettext_noop("By brand"),
+	gettext_noop("Max rating"),
+	gettext_noop("Max tube mass"),
+	gettext_noop("Min rating"),
+	gettext_noop("Min tube mass")
 };
 static const char* toothpaste_type_strings[TOTAL_TOOTHPASTE_TYPES]={
-	"Random", 
-	"Nothing",
-	"Unknown",
-	"0-paste",
-	"Builtin"
+	gettext_noop("Random"), 
+	gettext_noop("Nothing"),
+	gettext_noop("Unknown"),
+	gettext_noop("0-paste"),
+	gettext_noop("Builtin")
 	
 };	
 static const char* days_of_week[TOTAL_DAYS_OF_WEEK]={
-	"Thursday", /*1 jan 1970 epoch start is Thursday*/
-	"Friday",
-	"Saturday",
-	"Sunday",	
-	"Monday",
-	"Tuesday",
-	"Wednesday"
+	gettext_noop("Thursday"), /*1 jan 1970 epoch start is Thursday*/
+	gettext_noop("Friday"),
+	gettext_noop("Saturday"),
+	gettext_noop("Sunday"),	
+	gettext_noop("Monday"),
+	gettext_noop("Tuesday"),
+	gettext_noop("Wednesday")
 };
 static const char* times_of_day[TOTAL_TIMES_OF_DAY]={
-	"Night",
-	"Morning",
-	"Day",
-	"Evening"
+	gettext_noop("Night"),
+	gettext_noop("Morning"),
+	gettext_noop("Day"),
+	gettext_noop("Evening")
 };
 static const char* error_strings[TOTAL_ERROR_MESSAGES]={
 	"Error 0: No error.",
