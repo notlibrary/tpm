@@ -341,7 +341,7 @@ TIMEZONE=0
 DELTA_DAYS=0
 MEME=42
 TEMPLATE="guwntdapobiTfWPlUsmI"
-LOCALE="en"
+LOCALE="en_US.UTF-8"
 ```
 
 ## TPM The Toothpastes Picking Manager Files List
@@ -454,6 +454,7 @@ A few shell one-liners demonstrating tpm usage
 	tpm -msup/b/
 	tpm -T mmm
 	tpm -T ob toothpastes-enhanced.sample
+	export LANG=fr_FR.UTF-8 && tpm
 	echo "Done" | tpm | nc -u -b 192.168.1.255 12345
 ```
 
