@@ -136,6 +136,27 @@ Meme: https://www.youtube.com/watch?v=dQw4w9WgXcQ
 
 Press any key to continue . . .
 ```
+
+## AI translated to French gettext i18n sample:
+```
+Bon Matin Anonymous Bienvenue dans le gestionnaire de choix de dentifrice
+Déjà choisi aujourd'hui
+Type de choix: Default
+Dentifrice : >>> Nothing (0g) [0/100] <<<
+Index du dentifrice : 4/5
+Type de dentifrice : Nothing
+Formule dentaire : 2-2-2-2
+Jour : Sunday 20639
+Total des choix : 38
+Heure du dernier choix : Sun Jul  5 05:12:41 2026
+Tubes gaspillés : 0+0+0+0+0=0
+Source: /home/anon/tpm/toothpastes
+Mème: SAGE
+
+Appuyez sur Entrée pour continuer...
+```
+
+
 ## Sample JSON output:
 ```
 {
