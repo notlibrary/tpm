@@ -259,27 +259,6 @@ tpm_init_context(toothpaste_pick_options_t* opts)
 	
 	memset(opts->tpm_locale, 0, MAX_LOCALE_CODE + 1);
     init_tpm_locale(opts->tpm_locale,opts);
-
-	printf("\n--- TPM GETTEXT DIAGNOSTIC ---\n");
-    
-    // 1. Check if the OS actually accepted your locale string
-    char *res_locale = setlocale(LC_ALL, NULL);
-    printf("1. Active System Locale: %s\n", res_locale ? res_locale : "NULL");
-
-    // 2. Test gettext directly with a raw literal string
-    printf("2. Direct translation test (\"Day:\"): [%s]\n", gettext("Day:"));
-    
-    // 3. Test gettext with your array pointer
-    printf("3. Array element test (MSG_DAY): [%s]\n", gettext(user_strings[MSG_DAY]));
-    
-    printf("------------------------------\n\n");
-	
-	printf("\n--- TPM EXACT KEY TEST ---\n");
-    printf("Test 1 ('Default'): [%s]\n", gettext("Default"));
-    printf("Test 2 ('Random'):  [%s]\n", gettext("Random"));
-    printf("Test 3 ('Usage:'):  [%s]\n", gettext("Usage:"));
-    printf("--------------------------\n\n");
-	
 	
 	return TPM_NO_ERROR; 
 }
