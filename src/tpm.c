@@ -1237,7 +1237,7 @@ str_pick_type(toothpaste_pick_t* pick,toothpaste_pick_options_t* topts)
 	char* line = malloc(MAX_TOOTHPASTE_LINE);
 	if (topts==NULL || pick == NULL) return NULL;		
 	memset(line,0,MAX_TOOTHPASTE_LINE);	
-	snprintf(line,MAX_TOOTHPASTE_LINE,"%s: %s\n", _(user_strings[MSG_PICK_TYPE]), pick_type_strings[topts->ptype]);
+	snprintf(line,MAX_TOOTHPASTE_LINE,"%s: %s\n", _(user_strings[MSG_PICK_TYPE]), _(pick_type_strings[topts->ptype]));
 		
 	return line;
 }
@@ -1287,7 +1287,7 @@ str_toothpaste_type(toothpaste_pick_t* pick,toothpaste_pick_options_t* topts)
 	char* line = malloc(MAX_TOOTHPASTE_LINE);
 	if (topts==NULL || pick == NULL) return NULL;		
 	memset(line,0,MAX_TOOTHPASTE_LINE);		
-	snprintf(line,MAX_TOOTHPASTE_LINE,"%s %s \n", _(user_strings[MSG_TOOTHPASTE_T]),toothpaste_type_strings[pick->what.type]);
+	snprintf(line,MAX_TOOTHPASTE_LINE,"%s %s \n", _(user_strings[MSG_TOOTHPASTE_T]),_(toothpaste_type_strings[pick->what.type]));
 		
 	return line;
 }
@@ -1309,7 +1309,7 @@ str_day_of_the_week(toothpaste_pick_t* pick,toothpaste_pick_options_t* topts)
 	char* line = malloc(MAX_LINE_LENGTH);
 	if (topts==NULL || pick == NULL) return NULL;		
 	memset(line,0,MAX_LINE_LENGTH);	
-	snprintf(line,MAX_LINE_LENGTH,"%s %s %u \n", _(user_strings[MSG_DAY]) ,days_of_week[pick->j],pick->day);
+	snprintf(line,MAX_LINE_LENGTH,"%s %s %u \n", _(user_strings[MSG_DAY]) ,_(days_of_week[pick->j]),pick->day);
 		
 	return line;
 }
