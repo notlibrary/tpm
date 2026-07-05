@@ -274,6 +274,13 @@ tpm_init_context(toothpaste_pick_options_t* opts)
     
     printf("------------------------------\n\n");
 	
+	printf("\n--- TPM EXACT KEY TEST ---\n");
+    printf("Test 1 ('Default'): [%s]\n", gettext("Default"));
+    printf("Test 2 ('Random'):  [%s]\n", gettext("Random"));
+    printf("Test 3 ('Usage:'):  [%s]\n", gettext("Usage:"));
+    printf("--------------------------\n\n");
+	
+	
 	return TPM_NO_ERROR; 
 }
 
