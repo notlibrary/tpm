@@ -1248,14 +1248,25 @@ str_already_picked(toothpaste_pick_t* pick,toothpaste_pick_options_t* topts)
 }
 
 static char*
-str_pick_type(toothpaste_pick_t* pick,toothpaste_pick_options_t* topts)
+str_pick_type(toothpaste_pick_t* pick, toothpaste_pick_options_t* topts)
 {
-	char* line = malloc(MAX_TOOTHPASTE_LINE);
-	if (topts==NULL || pick == NULL) return NULL;		
-	memset(line,0,MAX_TOOTHPASTE_LINE);	
-	snprintf(line,MAX_TOOTHPASTE_LINE,"%s: %s\n", _(user_strings[MSG_PICK_TYPE]), _(pick_type_strings[topts->ptype]));
+    if (topts == NULL || pick == NULL) return NULL;		
+
+    char* line = malloc(MAX_TOOTHPASTE_LINE);
+    if (line == NULL) return NULL;
+    
+    memset(line, 0, MAX_TOOTHPASTE_LINE);	
+
+    
+    const char* label = gettext(user_strings[MSG_PICK_TYPE]);
+
+    
+    const char* raw_pick_str = pick_type_strings[topts->ptype];
+    const char* translated_pick = (raw_pick_str != NULL) ? gettext(raw_pick_str) : "";
+
+    snprintf(line, MAX_TOOTHPASTE_LINE, "%s: %s\n", label, translated_pick);
 		
-	return line;
+    return line;
 }
 
 static char*
@@ -1298,14 +1309,25 @@ str_toothpaste_index(toothpaste_pick_t* pick,toothpaste_pick_options_t* topts)
 }
 
 static char*
-str_toothpaste_type(toothpaste_pick_t* pick,toothpaste_pick_options_t* topts)
+str_toothpaste_type(toothpaste_pick_t* pick, toothpaste_pick_options_t* topts)
 {
-	char* line = malloc(MAX_TOOTHPASTE_LINE);
-	if (topts==NULL || pick == NULL) return NULL;		
-	memset(line,0,MAX_TOOTHPASTE_LINE);		
-	snprintf(line,MAX_TOOTHPASTE_LINE,"%s %s \n", _(user_strings[MSG_TOOTHPASTE_T]),_(toothpaste_type_strings[pick->what.type]));
+    if (topts == NULL || pick == NULL) return NULL;		
+
+    char* line = malloc(MAX_TOOTHPASTE_LINE);
+    if (line == NULL) return NULL; 
+    
+    memset(line, 0, MAX_TOOTHPASTE_LINE);		
+
+    const char* label = gettext(user_strings[MSG_TOOTHPASTE_T]);
+
+    
+    const char* raw_type_str = toothpaste_type_strings[pick->what.type];
+    
+    const char* translated_type = (raw_type_str != NULL) ? gettext(raw_type_str) : "";
+
+    snprintf(line, MAX_TOOTHPASTE_LINE, "%s %s \n", label, translated_type);
 		
-	return line;
+    return line;
 }
 
 static char*
@@ -1318,16 +1340,25 @@ str_dental_formula(toothpaste_pick_t* pick,toothpaste_pick_options_t* topts)
 		
 	return line;
 }
-
 static char*
-str_day_of_the_week(toothpaste_pick_t* pick,toothpaste_pick_options_t* topts)
+str_day_of_the_week(toothpaste_pick_t* pick, toothpaste_pick_options_t* topts)
 {
-	char* line = malloc(MAX_LINE_LENGTH);
-	if (topts==NULL || pick == NULL) return NULL;		
-	memset(line,0,MAX_LINE_LENGTH);	
-	snprintf(line,MAX_LINE_LENGTH,"%s %s %u \n", _(user_strings[MSG_DAY]) ,_(days_of_week[pick->j]),pick->day);
+    if (topts == NULL || pick == NULL) return NULL;	
+
+    char* line = malloc(MAX_LINE_LENGTH);
+    if (line == NULL) return NULL; 
+    
+    memset(line, 0, MAX_LINE_LENGTH);	
+
+    const char* translated_msg_day = gettext(user_strings[MSG_DAY]);
+    const char* translated_day_name = gettext(days_of_week[pick->j]);
+
+    snprintf(line, MAX_LINE_LENGTH, "%s %s %u \n", 
+             translated_msg_day, 
+             translated_day_name, 
+             pick->day);
 		
-	return line;
+    return line;
 }
 
 static char*
