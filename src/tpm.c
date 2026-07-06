@@ -3,7 +3,7 @@
 */
 #include "tpm.h"
 #ifndef ENABLE_NLS
-# define ENABLE_NLS 1
+#define ENABLE_NLS 1
 #endif
 
 #define	TPM_NO_ERROR 0
