@@ -146,12 +146,11 @@ init_tpm_locale(char* locale_id, toothpaste_pick_options_t* opts)
     
     bindtextdomain("tpm", locale_path);
 #else	
-#ifdef LOCALEDIR
-    bindtextdomain("tpm", LOCALEDIR);
-#else
+
+     bindtextdomain("tpm", "/usr/local/share/locale");
+
     
-    bindtextdomain("tpm", "/usr/local/share/locale");
-#endif
+   
 #endif
 
     bind_textdomain_codeset("tpm", "UTF-8");
