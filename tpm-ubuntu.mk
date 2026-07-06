@@ -1,11 +1,15 @@
-#TPM Linux makefile
-#Used to manually build on Ubuntu 
-#Alternative to other unixes is autotools tarball build
 CC=gcc
 CP=cp -f
 MKDIR=mkdir -p
 RM=rm -f
-CFLAGS=-Wall -Os -DHAVE_MAIN
+
+PREFIX    = /usr/local
+BINDIR    = $(PREFIX)/bin
+SHAREDIR  = $(PREFIX)/share
+MANDIR    = $(SHAREDIR)/man/man1
+LOCALEDIR = $(SHAREDIR)/locale
+
+CFLAGS=-Wall -Os -DHAVE_MAIN -DENABLE_NLS=1 -DLOCALEDIR=\"$(LOCALEDIR)\"
 CURRENT_DIR=$(CURDIR)
 SRC=src
 SOURCES=    $(SRC)/tpm.c \
@@ -16,15 +20,9 @@ OBJECTS=    tpm.o \
 			prng64_xrp32.o \
 			cfg_parse.o
 
-PREFIX    = /usr/local
-BINDIR    = $(PREFIX)/bin
-SHAREDIR  = $(PREFIX)/share
-MANDIR    = $(SHAREDIR)/man/man1
-LOCALEDIR = $(SHAREDIR)/locale
+.PHONY: all install uninstall clean dist update-po
 
-.PHONY: all install uninstall clean dist
-
-all: tpm docs
+all: tpm docs update-po
 
 tpm: $(OBJECTS)
 	$(CC) $(CFLAGS) $(OBJECTS) -o tpm
@@ -34,6 +32,12 @@ tpm: $(OBJECTS)
 
 docs:
 	gzip -k -f tpm.1
+
+update-po:
+	@if [ -f fr.po ]; then \
+		$(MKDIR) locale/fr/LC_MESSAGES; \
+		msgfmt fr.po -o locale/fr/LC_MESSAGES/tpm.mo; \
+	fi
 
 install: all
 	$(MKDIR) $(DESTDIR)$(BINDIR)
@@ -53,11 +57,11 @@ install: all
 uninstall:
 	$(RM) $(DESTDIR)$(BINDIR)/tpm
 	$(RM) $(DESTDIR)$(MANDIR)/tpm.1.gz
-	$(RM) $(DESTDIR)$(LOCALEDIR)/*/LC_MESSAGES/tpm.mo
+	$(RM) -r $(DESTDIR)$(LOCALEDIR)/fr/LC_MESSAGES/tpm.mo
 
 clean:	
 	$(RM) tpm $(OBJECTS)
-	$(RM) -r tpm-linux-bin-amd64 dist
+	$(RM) -r tpm-linux-bin-amd64 dist locale
 	$(RM) tpm.1.gz tpm-linux-bin-amd64.tar.gz
 
 dist: all
