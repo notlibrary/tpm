@@ -120,11 +120,15 @@ static const char config_file_name[MAX_PATH] ="tpm.conf";
 static int 
 init_tpm_locale(char* locale_id, toothpaste_pick_options_t* opts)
 {
+    char *current_locale = NULL;
 
-    char *current_locale = setlocale(LC_ALL, opts->tpm_locale);
-    
-    if (current_locale == NULL) {
-        setlocale(LC_ALL, "");
+    if (opts == NULL || opts->tpm_locale == NULL || opts->tpm_locale[0] == '\0') {
+        current_locale = setlocale(LC_ALL, "");
+    } else {
+        current_locale = setlocale(LC_ALL, opts->tpm_locale);
+        if (current_locale == NULL) {
+            current_locale = setlocale(LC_ALL, "");
+        }
     }
 
 #if defined(_WIN32) || defined(_WIN64)
@@ -1176,10 +1180,10 @@ str_good_day(toothpaste_pick_t* pick, toothpaste_pick_options_t* topts)
     
     memset(line, 0, MAX_TOOTHPASTE_LINE);
 
-    const char* translated_good = gettext(user_strings[MSG_GOOD]);
+    const char* translated_good = _(user_strings[MSG_GOOD]);
     
     const char* raw_time_str = times_of_day[topts->time_of_day_ind];
-    const char* translated_time = (raw_time_str != NULL) ? gettext(raw_time_str) : "";
+    const char* translated_time = (raw_time_str != NULL) ? _(raw_time_str) : "";
 
     snprintf(line, MAX_TOOTHPASTE_LINE, "%s %s ", translated_good, translated_time);
 
@@ -1265,11 +1269,11 @@ str_pick_type(toothpaste_pick_t* pick, toothpaste_pick_options_t* topts)
     memset(line, 0, MAX_TOOTHPASTE_LINE);	
 
     
-    const char* label = gettext(user_strings[MSG_PICK_TYPE]);
+    const char* label = _(user_strings[MSG_PICK_TYPE]);
 
     
     const char* raw_pick_str = pick_type_strings[topts->ptype];
-    const char* translated_pick = (raw_pick_str != NULL) ? gettext(raw_pick_str) : "";
+    const char* translated_pick = (raw_pick_str != NULL) ? _(raw_pick_str) : "";
 
     snprintf(line, MAX_TOOTHPASTE_LINE, "%s: %s\n", label, translated_pick);
 		
@@ -1300,7 +1304,7 @@ str_toothbrush(toothpaste_pick_t* pick, toothpaste_pick_options_t* topts)
     if (topts->enhanced_toothpastes)
     {
        
-        const char* label_toothbrush = gettext(user_strings[MSG_TOOTHBRUSH]);
+        const char* label_toothbrush = _(user_strings[MSG_TOOTHBRUSH]);
 
         snprintf(line, MAX_LINE_LENGTH, "%s %s %s %u %u\n", 
                  label_toothbrush, 
@@ -1339,12 +1343,12 @@ str_toothpaste_type(toothpaste_pick_t* pick, toothpaste_pick_options_t* topts)
     
     memset(line, 0, MAX_TOOTHPASTE_LINE);		
 
-    const char* label = gettext(user_strings[MSG_TOOTHPASTE_T]);
+    const char* label = _(user_strings[MSG_TOOTHPASTE_T]);
 
     
     const char* raw_type_str = toothpaste_type_strings[pick->what.type];
     
-    const char* translated_type = (raw_type_str != NULL) ? gettext(raw_type_str) : "";
+    const char* translated_type = (raw_type_str != NULL) ? _(raw_type_str) : "";
 
     snprintf(line, MAX_TOOTHPASTE_LINE, "%s %s \n", label, translated_type);
 		
@@ -1371,8 +1375,8 @@ str_day_of_the_week(toothpaste_pick_t* pick, toothpaste_pick_options_t* topts)
     
     memset(line, 0, MAX_LINE_LENGTH);	
 
-    const char* translated_msg_day = gettext(user_strings[MSG_DAY]);
-    const char* translated_day_name = gettext(days_of_week[pick->j]);
+    const char* translated_msg_day = _(user_strings[MSG_DAY]);
+    const char* translated_day_name = _(days_of_week[pick->j]);
 
     snprintf(line, MAX_LINE_LENGTH, "%s %s %u \n", 
              translated_msg_day, 
@@ -1423,7 +1427,7 @@ str_source(toothpaste_pick_t* pick, toothpaste_pick_options_t* topts)
 {
     if (topts == NULL || pick == NULL) return NULL;		
     
-    const char* translated_source = gettext(user_strings[MSG_SOURCE]);
+    const char* translated_source = _(user_strings[MSG_SOURCE]);
     
     const char* path_str = (topts->toothpastes_file_path_final != NULL) ? 
                             topts->toothpastes_file_path_final : "";
@@ -1443,7 +1447,7 @@ str_meme(toothpaste_pick_t* pick, toothpaste_pick_options_t* topts)
 {
     if (topts == NULL || pick == NULL) return NULL;	
 
-    const char* translated_meme_label = gettext(user_strings[MSG_MEME]);
+    const char* translated_meme_label = _(user_strings[MSG_MEME]);
 
     const char* payload = (topts->meme_payload != NULL) ? topts->meme_payload : "";
 
