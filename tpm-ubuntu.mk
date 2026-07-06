@@ -34,11 +34,13 @@ docs:
 	gzip -k -f tpm.1
 
 update-po:
-	@for po_file in $$(ls *.po 2>/dev/null); do \
-		lang=$${po_file%.po}; \
-		$(MKDIR) "locale/$$lang/LC_MESSAGES"; \
-		msgfmt "$$po_file" -o "locale/$$lang/LC_MESSAGES/tpm.mo"; \
-		echo "Compiled $$po_file -> locale/$$lang/LC_MESSAGES/tpm.mo"; \
+	@find . -maxdepth 2 -name "tpm.po" 2>/dev/null | while read -r po_file; do \
+		lang=$$(basename $$(dirname "$$po_file")); \
+		if [ "$$lang" != "." ] && [ "$$lang" != "src" ]; then \
+			$(MKDIR) "locale/$$lang/LC_MESSAGES"; \
+			msgfmt "$$po_file" -o "locale/$$lang/LC_MESSAGES/tpm.mo"; \
+			echo "Compiled $$po_file -> locale/$$lang/LC_MESSAGES/tpm.mo"; \
+		fi; \
 	done
 	
 install: all
