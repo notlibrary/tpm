@@ -139,18 +139,18 @@ Press any key to continue . . .
 
 ## AI translated to French gettext i18n sample:
 ```
-Bon Matin Anonymous Bienvenue dans le gestionnaire de choix de dentifrice
+Bon Jour Anonymous Bienvenue dans le gestionnaire de choix de dentifrice
 Déjà choisi aujourd'hui
-Type de choix: Default
-Dentifrice : >>> Nothing (0g) [0/100] <<<
-Index du dentifrice : 4/5
-Type de dentifrice : Nothing
+Type de choix: Par défaut
+Dentifrice : >>> Random Toothpaste 1 (100g) [85/100] <<<
+Index du dentifrice : 0/5
+Type de dentifrice : Aléatoire
 Formule dentaire : 2-2-2-2
-Jour : Sunday 20639
-Total des choix : 38
-Heure du dernier choix : Sun Jul  5 05:12:41 2026
+Jour : Lundi 20640
+Total des choix : 39
+Heure du dernier choix : Mon Jul  6 06:00:01 2026
 Tubes gaspillés : 0+0+0+0+0=0
-Source: /home/anon/tpm/toothpastes
+Source : /home/tno/tpm/toothpastes
 Mème: SAGE
 
 Appuyez sur Entrée pour continuer...
