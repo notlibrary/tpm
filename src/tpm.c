@@ -1324,20 +1324,17 @@ str_toothpaste(toothpaste_pick_t* pick, toothpaste_pick_options_t* topts)
     
     memset(line, 0, MAX_LINE_LENGTH);	
 
-    const char* translated_toothpaste_label = _(user_strings[MSG_TOOTHPASTE]);
+    const char* translated_toothpaste_label = gettext(user_strings[MSG_TOOTHPASTE]);
 
-    
-    const char* r_armour = (right_armour != NULL) ? right_armour : "";
-    const char* l_armour = (left_armour != NULL) ? left_armour : "";
     const char* brand = (pick->what.toothpaste_brand != NULL) ? pick->what.toothpaste_brand : "";
 
     snprintf(line, MAX_LINE_LENGTH, "%s %s %.127s (%ug) [%u/100] %s\n", 
              translated_toothpaste_label, 
-             r_armour, 
+             right_armour, 
              brand, 
              pick->what.tube_mass_g, 
              pick->what.rating, 
-             l_armour);
+             left_armour);
 		
     return line;
 }
