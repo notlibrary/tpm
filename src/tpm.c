@@ -2,6 +2,9 @@
 	TPM Toothpaste Picking Manager source code 0BSD license
 */
 #include "tpm.h"
+#ifndef ENABLE_NLS
+# define ENABLE_NLS 1
+#endif
 
 #define	TPM_NO_ERROR 0
 #define	OPTS_IS_NULL 1
