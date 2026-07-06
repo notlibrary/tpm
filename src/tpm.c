@@ -1205,58 +1205,91 @@ str_anon_username(toothpaste_pick_t* pick, toothpaste_pick_options_t* topts)
 }
 
 static char*
-str_welcome(toothpaste_pick_t* pick,toothpaste_pick_options_t* topts)
+str_welcome(toothpaste_pick_t* pick, toothpaste_pick_options_t* topts)
 {
-	char* line = malloc(MAX_TOOTHPASTE_LINE);
-	if (topts==NULL || pick == NULL) return NULL;	
-	memset(line,0,MAX_TOOTHPASTE_LINE);
-	snprintf(line,MAX_TOOTHPASTE_LINE,"%s \n" ,_(user_strings[MSG_WELCOME]));
+    if (topts == NULL || pick == NULL) return NULL;	
+
+    char* line = malloc(MAX_TOOTHPASTE_LINE);
+    if (line == NULL) return NULL;
+    
+    memset(line, 0, MAX_TOOTHPASTE_LINE);
+
+    const char* translated_welcome = _(user_strings[MSG_WELCOME]);
+
+    snprintf(line, MAX_TOOTHPASTE_LINE, "%s\n", translated_welcome);
 	
-	return line;
+    return line;
 }
 
 static char*
-str_next_pick(toothpaste_pick_t* pick,toothpaste_pick_options_t* topts)
+str_next_pick(toothpaste_pick_t* pick, toothpaste_pick_options_t* topts)
 {
-	char* line = malloc(MAX_TOOTHPASTE_LINE);
-	if (topts==NULL || pick == NULL) return NULL;	
-	memset(line,0,MAX_TOOTHPASTE_LINE);
-	snprintf(line,MAX_TOOTHPASTE_LINE,"%s \n", _(user_strings[MSG_NEXT_PICK]));
+    if (topts == NULL || pick == NULL) return NULL;	
+
+    char* line = malloc(MAX_TOOTHPASTE_LINE);
+    if (line == NULL) return NULL; 
+    
+    memset(line, 0, MAX_TOOTHPASTE_LINE);
 	
-	return line;
+    const char* translated_next_pick = _(user_strings[MSG_NEXT_PICK]);
+
+    snprintf(line, MAX_TOOTHPASTE_LINE, "%s\n", translated_next_pick);
+	
+    return line;
 }
 
 static char*
-str_new_toothbrush(toothpaste_pick_t* pick,toothpaste_pick_options_t* topts)
+str_new_toothbrush(toothpaste_pick_t* pick, toothpaste_pick_options_t* topts)
 {
-	char* line = malloc(MAX_TOOTHPASTE_LINE);
-	if (topts==NULL || pick == NULL) return NULL;	
-	memset(line,0,MAX_TOOTHPASTE_LINE);	
-	snprintf(line,MAX_TOOTHPASTE_LINE,"%s \n", _(user_strings[MSG_SWAP_TOOTHBRUSH]));
+    if (topts == NULL || pick == NULL) return NULL;	
+
+    char* line = malloc(MAX_TOOTHPASTE_LINE);
+    if (line == NULL) return NULL; 
+    
+    memset(line, 0, MAX_TOOTHPASTE_LINE);	
 	
-	return line;
+    const char* translated_swap_msg = _(user_strings[MSG_SWAP_TOOTHBRUSH]);
+
+    snprintf(line, MAX_TOOTHPASTE_LINE, "%s\n", translated_swap_msg);
+	
+    return line;
 }
 
 static char*
-str_visit_dentist(toothpaste_pick_t* pick,toothpaste_pick_options_t* topts)
+str_visit_dentist(toothpaste_pick_t* pick, toothpaste_pick_options_t* topts)
 {
-	char* line = malloc(MAX_TOOTHPASTE_LINE);
-	if (topts==NULL || pick == NULL) return NULL;		
-	memset(line,0,MAX_TOOTHPASTE_LINE);	
-	snprintf(line,MAX_TOOTHPASTE_LINE,"%s \n", _(user_strings[MSG_DENTIST]));
+    if (topts == NULL || pick == NULL) return NULL;		
+
+    char* line = malloc(MAX_TOOTHPASTE_LINE);
+    if (line == NULL) return NULL; 
+    
+    memset(line, 0, MAX_TOOTHPASTE_LINE);	
+
+    
+    const char* translated_dentist_msg = _(user_strings[MSG_DENTIST]);
+
+    
+    snprintf(line, MAX_TOOTHPASTE_LINE, "%s\n", translated_dentist_msg);
 		
-	return line;
+    return line;
 }
 
 static char*
-str_already_picked(toothpaste_pick_t* pick,toothpaste_pick_options_t* topts)
+str_already_picked(toothpaste_pick_t* pick, toothpaste_pick_options_t* topts)
 {
-	char* line = malloc(MAX_TOOTHPASTE_LINE);
-	if (topts==NULL || pick == NULL) return NULL;		
-	memset(line,0,MAX_TOOTHPASTE_LINE);	
-	snprintf(line,MAX_TOOTHPASTE_LINE,"%s \n", _(user_strings[MSG_ALREADY]));
+    if (topts == NULL || pick == NULL) return NULL;		
+
+    char* line = malloc(MAX_TOOTHPASTE_LINE);
+    if (line == NULL) return NULL; 
+    
+    memset(line, 0, MAX_TOOTHPASTE_LINE);	
+
+ 
+    const char* translated_already_msg = _(user_strings[MSG_ALREADY]);
+
+    snprintf(line, MAX_TOOTHPASTE_LINE, "%s\n", translated_already_msg);
 		
-	return line;
+    return line;
 }
 
 static char*
@@ -1282,14 +1315,31 @@ str_pick_type(toothpaste_pick_t* pick, toothpaste_pick_options_t* topts)
 }
 
 static char*
-str_toothpaste(toothpaste_pick_t* pick,toothpaste_pick_options_t* topts)
+str_toothpaste(toothpaste_pick_t* pick, toothpaste_pick_options_t* topts)
 {
-	char* line = malloc(MAX_LINE_LENGTH);
-	if (topts==NULL || pick == NULL) return NULL;		
-	memset(line,0,MAX_LINE_LENGTH);	
-	snprintf(line,MAX_LINE_LENGTH,"%s %s %.127s (%ug) [%u/100] %s \n", _(user_strings[MSG_TOOTHPASTE]), right_armour, pick->what.toothpaste_brand, pick->what.tube_mass_g, pick->what.rating, left_armour);
+    if (topts == NULL || pick == NULL) return NULL;		
+
+    char* line = malloc(MAX_LINE_LENGTH);
+    if (line == NULL) return NULL; 
+    
+    memset(line, 0, MAX_LINE_LENGTH);	
+
+    const char* translated_toothpaste_label = _(user_strings[MSG_TOOTHPASTE]);
+
+    
+    const char* r_armour = (right_armour != NULL) ? right_armour : "";
+    const char* l_armour = (left_armour != NULL) ? left_armour : "";
+    const char* brand = (pick->what.toothpaste_brand != NULL) ? pick->what.toothpaste_brand : "";
+
+    snprintf(line, MAX_LINE_LENGTH, "%s %s %.127s (%ug) [%u/100] %s\n", 
+             translated_toothpaste_label, 
+             r_armour, 
+             brand, 
+             pick->what.tube_mass_g, 
+             pick->what.rating, 
+             l_armour);
 		
-	return line;
+    return line;
 }
 
 static char*
@@ -1324,14 +1374,25 @@ str_toothbrush(toothpaste_pick_t* pick, toothpaste_pick_options_t* topts)
 }
 
 static char*
-str_toothpaste_index(toothpaste_pick_t* pick,toothpaste_pick_options_t* topts)
+str_toothpaste_index(toothpaste_pick_t* pick, toothpaste_pick_options_t* topts)
 {
-	char* line = malloc(MAX_TOOTHPASTE_LINE);
-	if (topts==NULL || pick == NULL) return NULL;		
-	memset(line,0,MAX_TOOTHPASTE_LINE);	
-	snprintf(line,MAX_TOOTHPASTE_LINE,"%s %u/%u \n", _(user_strings[MSG_TOOTHPASTE_I]),pick->toothpaste_pick_index,pick->total_toothpastes);
+    if (topts == NULL || pick == NULL) return NULL;		
+
+    char* line = malloc(MAX_TOOTHPASTE_LINE);
+    if (line == NULL) return NULL;
+    
+    memset(line, 0, MAX_TOOTHPASTE_LINE);	
+
+    
+    const char* translated_index_label = _(user_strings[MSG_TOOTHPASTE_I]);
+
+   
+    snprintf(line, MAX_TOOTHPASTE_LINE, "%s %u/%u\n", 
+             translated_index_label, 
+             pick->toothpaste_pick_index, 
+             pick->total_toothpastes);
 		
-	return line;
+    return line;
 }
 
 static char*
@@ -1357,15 +1418,27 @@ str_toothpaste_type(toothpaste_pick_t* pick, toothpaste_pick_options_t* topts)
 }
 
 static char*
-str_dental_formula(toothpaste_pick_t* pick,toothpaste_pick_options_t* topts)
+str_dental_formula(toothpaste_pick_t* pick, toothpaste_pick_options_t* topts)
 {
-	char* line = malloc(MAX_TOOTHPASTE_LINE);
-	if (topts==NULL || pick == NULL) return NULL;		
-	memset(line,0,MAX_TOOTHPASTE_LINE);		
-	snprintf(line,MAX_TOOTHPASTE_LINE,"%s %u-%u-%u-%u \n", _(user_strings[MSG_DENTAL]) , topts->formula.brush_times_per_day ,topts->formula.minutes_per_brush , topts->formula.swap_toothbrush_times_per_year , topts->formula.visit_dentist_times_per_year);
+    if (topts == NULL || pick == NULL) return NULL;		
+
+    char* line = malloc(MAX_TOOTHPASTE_LINE);
+    if (line == NULL) return NULL; 
+    
+    memset(line, 0, MAX_TOOTHPASTE_LINE);		
+
+    const char* translated_dental_label = _(user_strings[MSG_DENTAL]);
+
+    snprintf(line, MAX_TOOTHPASTE_LINE, "%s %u-%u-%u-%u\n", 
+             translated_dental_label, 
+             topts->formula.brush_times_per_day, 
+             topts->formula.minutes_per_brush, 
+             topts->formula.swap_toothbrush_times_per_year, 
+             topts->formula.visit_dentist_times_per_year);
 		
-	return line;
+    return line;
 }
+
 static char*
 str_day_of_the_week(toothpaste_pick_t* pick, toothpaste_pick_options_t* topts)
 {
@@ -1388,39 +1461,72 @@ str_day_of_the_week(toothpaste_pick_t* pick, toothpaste_pick_options_t* topts)
 }
 
 static char*
-str_total_picks(toothpaste_pick_t* pick,toothpaste_pick_options_t* topts)
+str_total_picks(toothpaste_pick_t* pick, toothpaste_pick_options_t* topts)
 {
-	char* line = malloc(MAX_TOOTHPASTE_LINE);
-	if (topts==NULL || pick == NULL) return NULL;	
-		memset(line,0,MAX_TOOTHPASTE_LINE);		
-		if (topts->fake_stats)
-			snprintf(line,MAX_TOOTHPASTE_LINE,"%s ~%u \n", _(user_strings[MSG_TOTAL_PICKS]), pick->stats.total_picks);
-		else
-			snprintf(line,MAX_TOOTHPASTE_LINE,"%s %u \n", _(user_strings[MSG_TOTAL_PICKS]), pick->stats.total_picks);
+    if (topts == NULL || pick == NULL) return NULL;	
+
+    char* line = malloc(MAX_TOOTHPASTE_LINE);
+    if (line == NULL) return NULL; 
+    
+    memset(line, 0, MAX_TOOTHPASTE_LINE);		
+    
+    const char* translated_total_picks = _(user_strings[MSG_TOTAL_PICKS]);
+
+    if (topts->fake_stats) {
+        snprintf(line, MAX_TOOTHPASTE_LINE, "%s ~%u\n", translated_total_picks, pick->stats.total_picks);
+    } else {
+        snprintf(line, MAX_TOOTHPASTE_LINE, "%s %u\n", translated_total_picks, pick->stats.total_picks);
+    }
 		
-	return line;
+    return line;
 }
 
 static char*
-str_last_pick_time(toothpaste_pick_t* pick,toothpaste_pick_options_t* topts)
+str_last_pick_time(toothpaste_pick_t* pick, toothpaste_pick_options_t* topts)
 {
-	char* line = malloc(MAX_TOOTHPASTE_LINE);
-	if (topts==NULL || pick == NULL) return NULL;		
-	memset(line,0,MAX_TOOTHPASTE_LINE);			
-	snprintf(line,MAX_TOOTHPASTE_LINE-2,"%s %s", _(user_strings[MSG_LAST_PICK_TIME]) ,ctime(&pick->stats.last_pick_time));
+    if (topts == NULL || pick == NULL) return NULL;		
+
+    char* line = malloc(MAX_TOOTHPASTE_LINE);
+    if (line == NULL) return NULL; 
+    
+    memset(line, 0, MAX_TOOTHPASTE_LINE);			
+ 
+    const char* translated_label = _(user_strings[MSG_LAST_PICK_TIME]);
+
+    char *raw_time = ctime(&pick->stats.last_pick_time);
+    char clean_time[26] = {0}; 
+    
+    if (raw_time != NULL) {
+        snprintf(clean_time, sizeof(clean_time), "%s", raw_time);
+       
+        size_t len = strlen(clean_time);
+        if (len > 0 && clean_time[len - 1] == '\n') {
+            clean_time[len - 1] = '\0';
+        }
+    }
+
+    snprintf(line, MAX_TOOTHPASTE_LINE, "%s %s\n", translated_label, clean_time);
 		
-	return line;
+    return line;
 }
 
 static char*
-str_tubes_wasted(toothpaste_pick_t* pick,toothpaste_pick_options_t* topts)
+str_tubes_wasted(toothpaste_pick_t* pick, toothpaste_pick_options_t* topts)
 {
-	char* line = malloc(MAX_TOOTHPASTE_LINE);
-	if (topts==NULL || pick == NULL) return NULL;		
-	memset(line,0,MAX_TOOTHPASTE_LINE);			
-	snprintf(line,MAX_TOOTHPASTE_LINE-2,"%s %s \n", _(user_strings[MSG_TUBES_WASTED]), pick->waste_report);
+    if (topts == NULL || pick == NULL) return NULL;		
+
+    char* line = malloc(MAX_TOOTHPASTE_LINE);
+    if (line == NULL) return NULL; 
+    
+    memset(line, 0, MAX_TOOTHPASTE_LINE);			
+
+    const char* translated_tubes_wasted = _(user_strings[MSG_TUBES_WASTED]);
+
+    const char* report = (pick->waste_report != NULL) ? pick->waste_report : "";
+
+    snprintf(line, MAX_TOOTHPASTE_LINE, "%s %s\n", translated_tubes_wasted, report);
 		
-	return line;
+    return line;
 }
 
 static char*
@@ -1463,14 +1569,23 @@ str_meme(toothpaste_pick_t* pick, toothpaste_pick_options_t* topts)
 }
 
 static char*
-str_quiet(toothpaste_pick_t* pick,toothpaste_pick_options_t* topts)
+str_quiet(toothpaste_pick_t* pick, toothpaste_pick_options_t* topts)
 {
-	char* line = malloc(MAX_TOOTHPASTE_LINE);
-	
-	if (topts==NULL || pick == NULL) return NULL;	
-	memset(line,0,MAX_TOOTHPASTE_LINE);			
-	snprintf(line,MAX_TOOTHPASTE_LINE,"%.94s (%ug) [%u/100] \n", pick->what.toothpaste_brand,pick->what.tube_mass_g, pick->what.rating);
-	return line;
+    if (topts == NULL || pick == NULL) return NULL;	
+
+    char* line = malloc(MAX_TOOTHPASTE_LINE);
+    if (line == NULL) return NULL; 
+    
+    memset(line, 0, MAX_TOOTHPASTE_LINE);			
+
+    const char* brand = (pick->what.toothpaste_brand != NULL) ? pick->what.toothpaste_brand : "";
+
+    snprintf(line, MAX_TOOTHPASTE_LINE, "%.94s (%ug) [%u/100]\n", 
+             brand, 
+             pick->what.tube_mass_g, 
+             pick->what.rating);
+
+    return line;
 }
 
 static int 
