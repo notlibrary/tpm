@@ -27,10 +27,11 @@ extern "C" {
 #include <string.h>
 #include <ctype.h>
 
+#include <gettext.h>
 #include <locale.h>
-#include "gettext.h"
-#define gettext_noop(String) String
+#undef _
 #define _(String) gettext(String)
+#define gettext_noop(String) String
 
 #include "prng64_xrp32.h"
 #include "cfg_parse.h"
