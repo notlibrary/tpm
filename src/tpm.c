@@ -116,7 +116,6 @@ static const char toothpastes_file_name[MAX_PATH] ="toothpastes";
 static const char output_file_name[MAX_PATH] ="last_pick";
 static const char config_file_name[MAX_PATH] ="tpm.conf";
 
-#include <sys/stat.h>
 
 static int 
 init_tpm_locale(char* locale_id, toothpaste_pick_options_t* opts)
@@ -1170,14 +1169,23 @@ eval_username(toothpaste_pick_t* pick,toothpaste_pick_options_t* topts)
 }
 
 static char*
-str_good_day(toothpaste_pick_t* pick,toothpaste_pick_options_t* topts)
+str_good_day(toothpaste_pick_t* pick, toothpaste_pick_options_t* topts)
 {
-	char* line = malloc(MAX_TOOTHPASTE_LINE);
-	if (topts==NULL || pick == NULL) return NULL;	
-	memset(line,0,MAX_TOOTHPASTE_LINE);
-	snprintf(line,MAX_TOOTHPASTE_LINE,"%s %s ", _(user_strings[MSG_GOOD]), _(times_of_day[topts->time_of_day_ind]));
+    if (topts == NULL || pick == NULL) return NULL;	
 
-	return line;
+    char* line = malloc(MAX_TOOTHPASTE_LINE);
+    if (line == NULL) return NULL; // Protection against malloc failure
+    
+    memset(line, 0, MAX_TOOTHPASTE_LINE);
+
+    const char* translated_good = gettext(user_strings[MSG_GOOD]);
+    
+    const char* raw_time_str = times_of_day[topts->time_of_day_ind];
+    const char* translated_time = (raw_time_str != NULL) ? gettext(raw_time_str) : "";
+
+    snprintf(line, MAX_TOOTHPASTE_LINE, "%s %s ", translated_good, translated_time);
+
+    return line;
 }
 
 static char*
@@ -1417,15 +1425,17 @@ str_source(toothpaste_pick_t* pick, toothpaste_pick_options_t* topts)
 {
     if (topts == NULL || pick == NULL) return NULL;		
     
-    const char* source_str = user_strings[MSG_SOURCE];
-    const char* path_str = topts->toothpastes_file_path_final;
+    const char* translated_source = gettext(user_strings[MSG_SOURCE]);
+    
+    const char* path_str = (topts->toothpastes_file_path_final != NULL) ? 
+                            topts->toothpastes_file_path_final : "";
 
-    size_t needed = strlen(source_str) + strlen(path_str) + 4;
+    size_t needed = strlen(translated_source) + strlen(path_str) + 4;
 
     char* line = malloc(needed);
     if (line == NULL) return NULL; 
     
-    sprintf(line, "%s %s \n", source_str, path_str);
+    snprintf(line, needed, "%s %s \n", translated_source, path_str);
 		
     return line;
 }
@@ -1435,14 +1445,16 @@ str_meme(toothpaste_pick_t* pick, toothpaste_pick_options_t* topts)
 {
     if (topts == NULL || pick == NULL) return NULL;	
 
+    const char* translated_meme_label = gettext(user_strings[MSG_MEME]);
 
-    size_t needed = strlen(user_strings[MSG_MEME]) + strlen(topts->meme_payload) + 3;
+    const char* payload = (topts->meme_payload != NULL) ? topts->meme_payload : "";
+
+    size_t needed = strlen(translated_meme_label) + strlen(payload) + 3;
 
     char* line = malloc(needed);
     if (line == NULL) return NULL;
     
-
-    snprintf(line, needed, "%s %s\n", _(user_strings[MSG_MEME]), topts->meme_payload);
+    snprintf(line, needed, "%s %s\n", translated_meme_label, payload);
     
     return line;
 }
