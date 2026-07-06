@@ -27,6 +27,9 @@ extern "C" {
 #include <string.h>
 #include <ctype.h>
 
+#ifndef ENABLE_NLS
+#define ENABLE_NLS 1
+#endif
 #include "gettext.h"
 #include <locale.h>
 #undef _
