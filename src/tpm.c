@@ -122,7 +122,8 @@ init_tpm_locale(char* locale_id, toothpaste_pick_options_t* opts)
 {
     char *current_locale = NULL;
 
-    if (opts == NULL || opts->tpm_locale == NULL || opts->tpm_locale[0] == '\0') {
+
+    if (opts == NULL || opts->tpm_locale[0] == '\0') {
         current_locale = setlocale(LC_ALL, "");
     } else {
         current_locale = setlocale(LC_ALL, opts->tpm_locale);
