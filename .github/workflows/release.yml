@@ -118,6 +118,7 @@ jobs:
         if: runner.os != 'Windows'
         shell: bash
         run: |
+          rm -f *.o
           make -f tpm-wasm.mk tpm.wasm update-po dist
           mv tpm-wasm-bin-amd64.tar.gz tpm-wasm-bin-amd64-${{ github.ref_name }}.tar.gz
             
