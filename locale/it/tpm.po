@@ -1,320 +1,297 @@
-# Toothpaste picking manager
-# Copyright (C) 2026 THE tpm'S COPYRIGHT HOLDER
+# Toothpaste Picking Manager.
+# Copyright (C) 2026 notlibrary
 # This file is distributed under the same license as the tpm package.
-# FIRST AUTHOR <yendorium@gmail.com>, 2026.
+# notlibrary yendoriun@gmail.com, 2026.
 #
-#: src/tpm.c:1228
 msgid ""
 msgstr ""
-"Project-Id-Version: tpm 0.6.7\n"
+"Project-Id-Version: tpm 0.6.9\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-06-24 08:27+0300\n"
-"PO-Revision-Date: 2026-06-24 10:40+0300\n"
-"Last-Translator:  <yendorium@gmail.com>\n"
-"Language-Team: Italian <tp@lists.linux.it>\n"
+"POT-Creation-Date: 2026-07-05 12:21+0300\n"
+"PO-Revision-Date: 2026-07-07 10:10+0300\n"
+"Last-Translator: Automatically generated\n"
+"Language-Team: none\n"
 "Language: it\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: src/tpm.c:22 src/tpm.c:102
-msgid "BUILTIN TOOTHPASTE 1"
-msgstr "DENTIFRICIO INTEGRATO 1"
-
-#: src/tpm.c:22
-msgid "White"
-msgstr "Bianco"
-
-#: src/tpm.c:22
-msgid "Builtin Toothbrush 1"
-msgstr "Spazzolino integrato 1"
-
-#: src/tpm.c:23 src/tpm.c:103
-msgid "BUILTIN TOOTHPASTE 2"
-msgstr "DENTIFRICIO INTEGRATO 2"
-
-#: src/tpm.c:23
-msgid "Black"
-msgstr "Nero"
-
-#: src/tpm.c:23
-msgid "Builtin Toothbrush 2"
-msgstr "Spazzolino integrato 2"
-
-#: src/tpm.c:24 src/tpm.c:104
-msgid "BUILTIN TOOTHPASTE 3"
-msgstr "DENTIFRICIO INTEGRATO 3"
-
-#: src/tpm.c:24
-msgid "Pink"
-msgstr "Rosa"
-
-#: src/tpm.c:24
-msgid "Builtin Toothbrush 3"
-msgstr "Spazzolino integrato 3"
-
-#: src/tpm.c:27
+#: tpm.c:27
 msgid "Default"
 msgstr "Predefinito"
 
-#: src/tpm.c:28 src/tpm.c:37
+#: tpm.c:28 tpm.c:37
 msgid "Random"
 msgstr "Casuale"
 
-#: src/tpm.c:29
+#: tpm.c:29
 msgid "By index"
 msgstr "Per indice"
 
-#: src/tpm.c:30
+#: tpm.c:30
 msgid "By brand"
 msgstr "Per marca"
 
-#: src/tpm.c:31
+#: tpm.c:31
 msgid "Max rating"
 msgstr "Valutazione massima"
 
-#: src/tpm.c:32
+#: tpm.c:32
 msgid "Max tube mass"
-msgstr "Massa massima tubo"
+msgstr "Massa massima del tubo"
 
-#: src/tpm.c:33
+#: tpm.c:33
 msgid "Min rating"
 msgstr "Valutazione minima"
 
-#: src/tpm.c:34
+#: tpm.c:34
 msgid "Min tube mass"
-msgstr "Massa minima tubo"
+msgstr "Massa minima del tubo"
 
-#: src/tpm.c:38
+#: tpm.c:38
 msgid "Nothing"
 msgstr "Niente"
 
-#: src/tpm.c:39 src/tpm.c:1572 src/tpm.c:1698 src/tpm.c:1701 src/tpm.c:1704
+#: tpm.c:39
 msgid "Unknown"
 msgstr "Sconosciuto"
 
-#: src/tpm.c:40
+#: tpm.c:40
 msgid "0-paste"
-msgstr "Pasta-0"
+msgstr "Dentifricio-0"
 
-#: src/tpm.c:41
+#: tpm.c:41
 msgid "Builtin"
 msgstr "Integrato"
 
-#: src/tpm.c:45
+#: tpm.c:45
 msgid "Thursday"
 msgstr "Giovedì"
 
-#. 1 jan 1970 epoch start is Thursday
-#: src/tpm.c:46
+#: tpm.c:46
 msgid "Friday"
 msgstr "Venerdì"
 
-#: src/tpm.c:47
+#: tpm.c:47
 msgid "Saturday"
 msgstr "Sabato"
 
-#: src/tpm.c:48
+#: tpm.c:48
 msgid "Sunday"
 msgstr "Domenica"
 
-#: src/tpm.c:49
+#: tpm.c:49
 msgid "Monday"
 msgstr "Lunedì"
 
-#: src/tpm.c:50
+#: tpm.c:50
 msgid "Tuesday"
 msgstr "Martedì"
 
-#: src/tpm.c:51
+#: tpm.c:51
 msgid "Wednesday"
 msgstr "Mercoledì"
 
-#: src/tpm.c:54
+#: tpm.c:54
 msgid "Night"
 msgstr "Notte"
 
-#: src/tpm.c:55
+#: tpm.c:55
 msgid "Morning"
 msgstr "Mattina"
 
-#: src/tpm.c:56
+#: tpm.c:56
 msgid "Day"
 msgstr "Giorno"
 
-#: src/tpm.c:57
+#: tpm.c:57
 msgid "Evening"
 msgstr "Sera"
 
-#: src/tpm.c:60
+#: tpm.c:60
 msgid "Error 0: No error."
 msgstr "Errore 0: Nessun errore."
 
-#: src/tpm.c:61
+#: tpm.c:61
 msgid "Error 101: opts is NULL"
 msgstr "Errore 101: opts è NULL"
 
-#: src/tpm.c:62
+#: tpm.c:62
 msgid "Error 102: Memory allocation failed."
 msgstr "Errore 102: Allocazione di memoria fallita."
 
-#: src/tpm.c:63
+#: tpm.c:63
 msgid "Error 103: Opening toothpastes file falling back to default."
-msgstr "Errore 103: Apertura del file dei dentifrici fallita, ripiego sul predefinito."
+msgstr "Errore 103: Impossibile aprire il file dei dentifrici, ripristino dei valori predefiniti."
 
-#: src/tpm.c:64
+#: tpm.c:64
 msgid "Error 104: Opening pickstats file for writing"
-msgstr "Errore 104: Errore durante l'apertura del file pickstats in scrittura"
+msgstr "Errore 104: Impossibile aprire il file pickstats in scrittura"
 
-#: src/tpm.c:65
+#: tpm.c:65
 msgid "Error 105: Opening pickstats file for reading"
-msgstr "Errore 105: Errore durante l'apertura del file pickstats in lettura"
+msgstr "Errore 105: Impossibile aprire il file pickstats in lettura"
 
-#: src/tpm.c:66
+#: tpm.c:66
 msgid "Error 106: No toothpastes file loaded"
-msgstr "Errore 106: Nessun file dei dentifrici caricato"
+msgstr "Errore 106: Nessun file di dentifrici caricato"
 
-#: src/tpm.c:67
+#: tpm.c:67
 msgid "Error 107: Unable to load config ~tpm/tpm.conf\n"
 msgstr "Errore 107: Impossibile caricare la configurazione ~tpm/tpm.conf\n"
 
-#: src/tpm.c:68
+#: tpm.c:68
 msgid "Error 108: Opening last_pick file for writing"
-msgstr "Errore 108: Errore durante l'apertura del file last_pick in scrittura"
+msgstr "Errore 108: Impossibile aprire il file last_pick in scrittura"
 
-#: src/tpm.c:69
+#: tpm.c:69
 msgid "Error 109: Pick is NULL perform pick first"
-msgstr "Errore 109: Pick è NULL, effettuare prima una scelta"
+msgstr "Errore 109: Il valore di scelta è NULL, effettuare prima una selezione"
 
-#: src/tpm.c:70
+#: tpm.c:70
 msgid "Error 110: No toothpastes available."
 msgstr "Errore 110: Nessun dentifricio disponibile."
 
-#: src/tpm.c:71
+#: tpm.c:71
 msgid "Error 111: NULL context"
 msgstr "Errore 111: Contesto NULL"
 
-#: src/tpm.c:74
+#: tpm.c:74
 msgid "Pick counter clear"
-msgstr "Contatore scelte azzerato"
+msgstr "Contatore delle selezioni azzerato"
 
-#: src/tpm.c:75
+#: tpm.c:75
 msgid "# Index | Brand | Tube Mass | Rating"
-msgstr "# Indice | Marca | Massa tubo | Valutazione"
+msgstr "# Indice | Marca | Massa Tubo | Valutazione"
 
-#: src/tpm.c:76
+#: tpm.c:76
 msgid ""
 "# Index | Brand | Tube Mass | Rating | Toothbrush Color | Toothbrush Brand | "
 "Toothbrush Length | Toothbrush Hardness"
 msgstr ""
-"# Indice | Marca | Massa tubo | Valutazione | Colore spazzolino | Marca spazzolino | "
-"Lunghezza spazzolino | Durezza spazzolino"
+"# Indice | Marca | Massa Tubo | Valutazione | Colore Spazzolino | Marca Spazzolino | Lunghezza Spazzolino | Durezza Spazzolino"
 
-#: src/tpm.c:77
+#: tpm.c:77
 msgid "Pick counter set"
-msgstr "Contatore scelte impostato"
+msgstr "Contatore delle selezioni configurato"
 
-#: src/tpm.c:78
+#: tpm.c:78
 msgid "Welcome to the toothpaste picking manager"
-msgstr "Benvenuto nel gestore della scelta del dentifricio"
+msgstr "Benvenuto nel gestore della selezione del dentifricio"
 
-#: src/tpm.c:79
+#: tpm.c:79
 msgid "New next pick stats updated"
-msgstr "Statistiche della prossima scelta aggiornate"
+msgstr "Statistiche per la prossima selezione aggiornate"
 
-#: src/tpm.c:80
+#: tpm.c:80
 msgid "Toothbrush time span over swap the toothbrush(or order new one)"
-msgstr "Durata dello spazzolino esaurita, sostituire lo spazzolino (o ordinarne uno nuovo)"
+msgstr "Durata dello spazzolino superata, si prega di sostituirlo (o di ordinarne uno nuovo)"
 
-#: src/tpm.c:81
+#: tpm.c:81
 msgid "Time span over please visit dentist"
-msgstr "Tempo limite superato, si prega di visitare un dentista"
+msgstr "Tempo limite superato, si prega di consultare un dentista"
 
-#: src/tpm.c:82
+#: tpm.c:82
 msgid "Already picked today"
-msgstr "Già scelto oggi"
+msgstr "Già selezionato oggi"
 
-#: src/tpm.c:83
+#: tpm.c:83
 msgid "Pick type"
-msgstr "Tipo di scelta"
+msgstr "Tipo di selezione"
 
-#: src/tpm.c:84
+#: tpm.c:84
 msgid "Toothpaste:"
 msgstr "Dentifricio:"
 
-#: src/tpm.c:85
+#: tpm.c:85
 msgid "Toothbrush:"
 msgstr "Spazzolino:"
 
-#: src/tpm.c:86
+#: tpm.c:86
 msgid "Toothpaste index:"
-msgstr "Indice dentifricio:"
+msgstr "Indice del dentifricio:"
 
-#: src/tpm.c:87
+#: tpm.c:87
 msgid "Toothpaste type:"
 msgstr "Tipo di dentifricio:"
 
-#: src/tpm.c:88
+#: tpm.c:88
 msgid "Dental Formula:"
 msgstr "Formula dentaria:"
 
-#: src/tpm.c:89
+#: tpm.c:89
 msgid "Day:"
 msgstr "Giorno:"
 
-#: src/tpm.c:90
+#: tpm.c:90
 msgid "Total picks:"
-msgstr "Scelte totali:"
+msgstr "Selezioni totali:"
 
-#: src/tpm.c:91
+#: tpm.c:91
 msgid "Tubes wasted:"
 msgstr "Tubi sprecati:"
 
-#: src/tpm.c:92
+#: tpm.c:92
 msgid "Source:"
-msgstr "Fonte:"
+msgstr "Origine:"
 
-#: src/tpm.c:93
+#: tpm.c:93
 msgid "Meme:"
 msgstr "Meme:"
 
-#: src/tpm.c:94
+#: tpm.c:94
 msgid "Last pick time:"
-msgstr "Ora dell'ultima scelta:"
+msgstr "Ora dell'ultima selezione:"
 
-#: src/tpm.c:95
+#: tpm.c:95
 msgid "Good"
 msgstr "Buono"
 
-#: src/tpm.c:96
+#: tpm.c:96
 msgid "Press Enter to continue..."
-msgstr "Premi Invio per continuare..."
+msgstr "Premere Invio per continuare..."
 
-#: src/tpm.c:97
+#: tpm.c:97
 msgid "Compiler:"
 msgstr "Compilatore:"
 
-#: src/tpm.c:98
+#: tpm.c:98
 msgid "Compiled on:"
 msgstr "Compilato il:"
 
-#: src/tpm.c:99 src/tpm.c:1695
+#: tpm.c:99
 msgid "Anonymous"
 msgstr "Anonimo"
 
-#: src/tpm.c:100
+#: tpm.c:100
 msgid "Output pick to file "
-msgstr "Salvataggio della scelta nel file "
+msgstr "Salvataggio della selezione nel file "
 
-#: src/tpm.c:101
+#: tpm.c:101
+msgid "Brand None"
+msgstr "Nessuna marca"
+
+#: tpm.c:102
+msgid "Compiler unknown"
+msgstr "Compilatore sconosciuto"
+
+#: tpm.c:103
 msgid "Usage:"
 msgstr "Utilizzo:"
 
-#: src/tpm.c:107
-msgid "<<<"
-msgstr "<<<"
+#: tpm.c:104
+msgid "BUILTIN TOOTHPASTE 1"
+msgstr "DENTIFRICIO INTEGRATO 1"
 
-#: src/tpm.c:108
-msgid ">>>"
-msgstr ">>>"
+#: tpm.c:105
+msgid "BUILTIN TOOTHPASTE 2"
+msgstr "DENTIFRICIO INTEGRATO 2"
+
+#: tpm.c:106
+msgid "BUILTIN TOOTHPASTE 3"
+msgstr "DENTIFRICIO INTEGRATO 3"
+
+#: tpm.c:107
+msgid "Press any key to continue . . ."
+msgstr "Premere un tasto per continuare . . ."

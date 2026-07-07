@@ -1324,7 +1324,7 @@ str_toothpaste(toothpaste_pick_t* pick, toothpaste_pick_options_t* topts)
     
     memset(line, 0, MAX_LINE_LENGTH);	
 
-    const char* translated_toothpaste_label = gettext(user_strings[MSG_TOOTHPASTE]);
+    const char* translated_toothpaste_label = _(user_strings[MSG_TOOTHPASTE]);
 
     const char* brand = (pick->what.toothpaste_brand != NULL) ? pick->what.toothpaste_brand : "";
 
