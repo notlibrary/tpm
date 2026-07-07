@@ -1,10 +1,11 @@
-#TPM WASM makefile
-
 CC=emcc
 CP=cp -f
 MKDIR=mkdir -p
 RM=rm -f
-CFLAGS=-Wall -Os -sSTANDALONE_WASM=1 -DHAVE_MAIN --minify=0 -sMODULARIZE=0 
+
+# Added -DENABLE_NLS=1 and forced the LOCALEDIR virtual root to /locale inside the WASM filesystem
+# Added --embed-file to bundle the virtual locale directory directly inside the binary
+CFLAGS=-Wall -Os -sSTANDALONE_WASM=1 -DHAVE_MAIN --minify=0 -sMODULARIZE=0 -DENABLE_NLS=1 -DLOCALEDIR=\"/locale\"
 CURRENT_DIR=$(CURDIR)
 SRC=src
 SOURCES=    $(SRC)/tpm.c \
@@ -15,19 +16,29 @@ OBJECTS=    tpm.o \
 			prng64_xrp32.o \
 			cfg_parse.o
 
-.PHONY: all clean dist
+.PHONY: all clean dist update-po
 
-all: tpm.wasm
+# Ensure update-po runs BEFORE tpm.wasm is linked so the files exist to be embedded
+all: update-po tpm.wasm
 
 tpm.wasm: $(OBJECTS)
-	$(CC) $(CFLAGS) $(OBJECTS) -o tpm.wasm
+	$(CC) $(CFLAGS) --embed-file locale@/locale $(OBJECTS) -o tpm.wasm
 
 %.o: $(SRC)/%.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
+update-po:
+	@find . -maxdepth 2 -name "tpm.po" 2>/dev/null | while read -r po_file; do \
+		lang=$$(basename $$(dirname "$$po_file")); \
+		if [ "$$lang" != "." ] && [ "$$lang" != "src" ] && [ "$$lang" != "locale" ]; then \
+			$(MKDIR) "locale/$$lang/LC_MESSAGES"; \
+			msgfmt "$$po_file" -o "locale/$$lang/LC_MESSAGES/tpm.mo"; \
+		fi; \
+	done
+
 clean:	
 	$(RM) tpm.wasm $(OBJECTS)
-	$(RM) -r tpm-wasm-bin-amd64
+	$(RM) -r tpm-wasm-bin-amd64 locale
 	$(RM) tpm-wasm-bin-amd64.tar.gz
 
 dist: all
@@ -43,3 +54,4 @@ dist: all
 	fi
 	
 	tar -czf tpm-wasm-bin-amd64.tar.gz tpm-wasm-bin-amd64
+	

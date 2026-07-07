@@ -55,6 +55,12 @@ jobs:
       - name: Install WiX
         if: runner.os == 'Windows'
         run: dotnet tool install --global wix --version 7.0.0
+       
+      - name: Install Gettext via Chocolatey
+        if: runner.os == 'Windows'
+        run: |
+          choco install gettext --no-progress -y
+          echo "C:\Program Files\gettext-iconv" >> $GITHUB_PATH
         
       - name: Build on Windows
         if: runner.os == 'Windows'
@@ -63,7 +69,7 @@ jobs:
         run: |
           $env:VCPKG_ROOT = "${env:VCPKG_INSTALLATION_ROOT}\installed\x64-windows"
           $env:LIB = "${env:VCPKG_ROOT}\lib;${env:LIB}"
-          nmake -e /f Makefile.msc tpm.exe
+          nmake -e /f Makefile.msc tpm.exe update-po
           Copy-Item -Path "C:\vcpkg\buildtrees\gettext-libintl\x64-windows-rel\.libs\intl-8.dll" -Destination ".\intl-8.dll" -Force
           Copy-Item -Path "C:\vcpkg\buildtrees\libiconv\x64-windows-rel\lib\.libs\iconv-2.dll" -Destination ".\iconv-2.dll" -Force
           wix build -acceptEula wix7 tpm.wxs -arch x64 -out tpm-win-bin-amd64-${{ github.ref_name }}.msi 
@@ -81,12 +87,18 @@ jobs:
         with:
           token: ${{ secrets.PAT3 }}
           files: tpm-win-bin-amd64-${{ github.ref_name }}.msi
-          
+      
+      - name: Install Gettext
+        if: runner.os != 'Windows'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y gettext      
+      
       - name: Build on Linux
         if: runner.os != 'Windows'
         shell: bash
         run: |
-          make -f tpm-ubuntu.mk tpm docs dist
+          make -f tpm-ubuntu.mk tpm docs update-po dist
           mv tpm-linux-bin-amd64.tar.gz tpm-linux-bin-amd64-${{ github.ref_name }}.tar.gz
           make -f tpm-ubuntu.mk clean            
             
@@ -104,7 +116,7 @@ jobs:
         if: runner.os != 'Windows'
         shell: bash
         run: |
-          make -f tpm-wasm.mk tpm.wasm dist
+          make -f tpm-wasm.mk tpm.wasm update-po dist
           mv tpm-wasm-bin-amd64.tar.gz tpm-wasm-bin-amd64-${{ github.ref_name }}.tar.gz
           make -f tpm-wasm.mk clean
             
