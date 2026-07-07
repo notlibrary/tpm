@@ -27,4 +27,4 @@ dist-hook:
 	fi
 
 clean-local:
-	rm -rf locale
+	find . -type f -name "*.mo" -delete

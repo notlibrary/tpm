@@ -45,4 +45,4 @@ update-po:
 
 clean:
 	-del /q tpm.exe tpm.res $(OBJECTS) 2>nul
-	-rmdir /s /q locale 2>nul
+	-del /s /q *.mo 2>nul

@@ -35,11 +35,12 @@ update-po:
 			msgfmt "$$po_file" -o "locale/$$lang/LC_MESSAGES/tpm.mo"; \
 		fi; \
 	done
-
+	
 clean:	
 	$(RM) tpm.wasm $(OBJECTS)
-	$(RM) -r tpm-wasm-bin-amd64 locale
+	$(RM) -r tpm-wasm-bin-amd64
 	$(RM) tpm-wasm-bin-amd64.tar.gz
+	find . -type f -name "*.mo" -delete
 
 dist: all
 	$(MKDIR) tpm-wasm-bin-amd64

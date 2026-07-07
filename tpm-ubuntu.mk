@@ -65,8 +65,9 @@ uninstall:
 
 clean:	
 	$(RM) tpm $(OBJECTS)
-	$(RM) -r tpm-linux-bin-amd64 dist locale
+	$(RM) -r tpm-linux-bin-amd64 dist
 	$(RM) tpm.1.gz tpm-linux-bin-amd64.tar.gz
+	find . -type f -name "*.mo" -delete
 
 dist: all
 	$(MKDIR) tpm-linux-bin-amd64
