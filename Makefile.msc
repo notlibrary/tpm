@@ -36,12 +36,13 @@ tpm.exe: $(OBJECTS) tpm.res
 	$(LINKER) $(LFLAGS)$@ $(OBJECTS) tpm.res $(LIBS)
 
 update-po:
-	@if exist zh_CN\tpm.po ( if not exist locale\zh\LC_MESSAGES mkdir locale\zh\LC_MESSAGES && "C:\Program Files\gettext-iconv\bin\msgfmt.exe" zh_CN\tpm.po -o locale\zh\LC_MESSAGES\tpm.mo )
-	@if exist fr\tpm.po ( if not exist locale\fr\LC_MESSAGES mkdir locale\fr\LC_MESSAGES && "C:\Program Files\gettext-iconv\bin\msgfmt.exe" fr\tpm.po -o locale\fr\LC_MESSAGES\tpm.mo )
-	@if exist es\tpm.po ( if not exist locale\es\LC_MESSAGES mkdir locale\es\LC_MESSAGES && "C:\Program Files\gettext-iconv\bin\msgfmt.exe" es\tpm.po -o locale\es\LC_MESSAGES\tpm.mo )
-	@if exist de\tpm.po ( if not exist locale\de\LC_MESSAGES mkdir locale\de\LC_MESSAGES && "C:\Program Files\gettext-iconv\bin\msgfmt.exe" de\tpm.po -o locale\de\LC_MESSAGES\tpm.mo )
-	@if exist ru\tpm.po ( if not exist locale\ru\LC_MESSAGES mkdir locale\ru\LC_MESSAGES && "C:\Program Files\gettext-iconv\bin\msgfmt.exe" ru\tpm.po -o locale\ru\LC_MESSAGES\tpm.mo )
-	@if exist it\tpm.po ( if not exist locale\it\LC_MESSAGES mkdir locale\it\LC_MESSAGES && "C:\Program Files\gettext-iconv\bin\msgfmt.exe" it\tpm.po -o locale\it\LC_MESSAGES\tpm.mo )
+	@if exist locale\zh\tpm.po ( if not exist locale\zh\LC_MESSAGES mkdir locale\zh\LC_MESSAGES && "C:\Program Files\gettext-iconv\bin\msgfmt.exe" locale\zh\tpm.po -o locale\zh\LC_MESSAGES\tpm.mo )
+	@if exist locale\fr\tpm.po ( if not exist locale\fr\LC_MESSAGES mkdir locale\fr\LC_MESSAGES && "C:\Program Files\gettext-iconv\bin\msgfmt.exe" locale\fr\tpm.po -o locale\fr\LC_MESSAGES\tpm.mo )
+	@if exist locale\es\tpm.po ( if not exist locale\es\LC_MESSAGES mkdir locale\es\LC_MESSAGES && "C:\Program Files\gettext-iconv\bin\msgfmt.exe" locale\es\tpm.po -o locale\es\LC_MESSAGES\tpm.mo )
+	@if exist locale\de\tpm.po ( if not exist locale\de\LC_MESSAGES mkdir locale\de\LC_MESSAGES && "C:\Program Files\gettext-iconv\bin\msgfmt.exe" locale\de\tpm.po -o locale\de\LC_MESSAGES\tpm.mo )
+	@if exist locale\ru\tpm.po ( if not exist locale\ru\LC_MESSAGES mkdir locale\ru\LC_MESSAGES && "C:\Program Files\gettext-iconv\bin\msgfmt.exe" locale\ru\tpm.po -o locale\ru\LC_MESSAGES\tpm.mo )
+	@if exist locale\it\tpm.po ( if not exist locale\it\LC_MESSAGES mkdir locale\it\LC_MESSAGES && "C:\Program Files\gettext-iconv\bin\msgfmt.exe" locale\it\tpm.po -o locale\it\LC_MESSAGES\tpm.mo )
+
 
 
 

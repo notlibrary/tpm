@@ -61,7 +61,13 @@ jobs:
         run: |
           choco install gettext --no-progress -y
           echo "C:\Program Files\gettext-iconv" >> $GITHUB_PATH
-        
+      - name: Compile Gettext Translations (Windows)
+        if: runner.os == 'Windows'
+        shell: powershell
+        run: |
+          & "C:\Program Files\gettext-iconv\bin\msgfmt.exe" --version
+          nmake /f Makefile.msc update-po        
+          
       - name: Build on Windows
         if: runner.os == 'Windows'
         id: build        
@@ -69,11 +75,7 @@ jobs:
         run: |
           $env:VCPKG_ROOT = "${env:VCPKG_INSTALLATION_ROOT}\installed\x64-windows"
           $env:LIB = "${env:VCPKG_ROOT}\lib;${env:LIB}"
-          
           $env:PATH = "C:\Program Files\gettext-iconv;C:\Program Files\gettext-iconv\bin;$env:PATH"
-          msgfmt --version
-          
-          nmake /f Makefile.msc update-po
           nmake -e /f Makefile.msc tpm.exe
           Get-ChildItem -Path .\locale -Recurse -Filter *.mo -ErrorAction SilentlyContinue
           Copy-Item -Path "C:\vcpkg\buildtrees\gettext-libintl\x64-windows-rel\.libs\intl-8.dll" -Destination ".\intl-8.dll" -Force
