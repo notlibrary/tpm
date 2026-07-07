@@ -36,12 +36,13 @@ tpm.exe: $(OBJECTS) tpm.res
 	$(LINKER) $(LFLAGS)$@ $(OBJECTS) tpm.res $(LIBS)
 
 update-po:
-	@for /d %%D in (*) do @if exist "%%D\tpm.po" ( \
-		if not "%%D"=="src" if not "%%D"=="locale" ( \
-			if not exist "locale\%%D\LC_MESSAGES" mkdir "locale\%%D\LC_MESSAGES" && \
-			msgfmt "%%D\tpm.po" -o "locale\%%D\LC_MESSAGES\tpm.mo" \
-		) \
-	)
+	@if exist zh_CN\tpm.po ( if not exist locale\zh\LC_MESSAGES mkdir locale\zh\LC_MESSAGES && msgfmt zh_CN\tpm.po -o locale\zh\LC_MESSAGES\tpm.mo )
+	@if exist zh\tpm.po ( if not exist locale\zh\LC_MESSAGES mkdir locale\zh\LC_MESSAGES && msgfmt zh\tpm.po -o locale\zh\LC_MESSAGES\tpm.mo )
+	@if exist fr\tpm.po ( if not exist locale\fr\LC_MESSAGES mkdir locale\fr\LC_MESSAGES && msgfmt fr\tpm.po -o locale\fr\LC_MESSAGES\tpm.mo )
+	@if exist es\tpm.po ( if not exist locale\es\LC_MESSAGES mkdir locale\es\LC_MESSAGES && msgfmt es\tpm.po -o locale\es\LC_MESSAGES\tpm.mo )
+	@if exist de\tpm.po ( if not exist locale\de\LC_MESSAGES mkdir locale\de\LC_MESSAGES && msgfmt de\tpm.po -o locale\de\LC_MESSAGES\tpm.mo )
+	@if exist ru\tpm.po ( if not exist locale\ru\LC_MESSAGES mkdir locale\ru\LC_MESSAGES && msgfmt ru\tpm.po -o locale\ru\LC_MESSAGES\tpm.mo )
+	@if exist it\tpm.po ( if not exist locale\it\LC_MESSAGES mkdir locale\it\LC_MESSAGES && msgfmt it\tpm.po -o locale\it\LC_MESSAGES\tpm.mo )
 
 clean:
 	-del /q tpm.exe tpm.res $(OBJECTS) 2>nul
