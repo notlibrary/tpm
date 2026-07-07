@@ -36,7 +36,7 @@ tpm.exe: $(OBJECTS) tpm.res
 	$(LINKER) $(LFLAGS)$@ $(OBJECTS) tpm.res $(LIBS)
 
 update-po:
-	@if exist locale\zh\tpm.po ( if not exist locale\zh\LC_MESSAGES mkdir locale\zh\LC_MESSAGES && "C:\Program Files\gettext-iconv\bin\msgfmt.exe" locale\zh\tpm.po -o locale\zh\LC_MESSAGES\tpm.mo )
+	@if exist locale\zh_CN\tpm.po ( if not exist locale\zh_CN\LC_MESSAGES mkdir locale\zh_CN\LC_MESSAGES && "C:\Program Files\gettext-iconv\bin\msgfmt.exe" locale\zh_CN\tpm.po -o locale\zh_CN\LC_MESSAGES\tpm.mo )
 	@if exist locale\fr\tpm.po ( if not exist locale\fr\LC_MESSAGES mkdir locale\fr\LC_MESSAGES && "C:\Program Files\gettext-iconv\bin\msgfmt.exe" locale\fr\tpm.po -o locale\fr\LC_MESSAGES\tpm.mo )
 	@if exist locale\es\tpm.po ( if not exist locale\es\LC_MESSAGES mkdir locale\es\LC_MESSAGES && "C:\Program Files\gettext-iconv\bin\msgfmt.exe" locale\es\tpm.po -o locale\es\LC_MESSAGES\tpm.mo )
 	@if exist locale\de\tpm.po ( if not exist locale\de\LC_MESSAGES mkdir locale\de\LC_MESSAGES && "C:\Program Files\gettext-iconv\bin\msgfmt.exe" locale\de\tpm.po -o locale\de\LC_MESSAGES\tpm.mo )

@@ -18,7 +18,7 @@
       <Directory Id="INSTALLFOLDER" Name="tpm">
         <Directory Id="LocaleFolder" Name="locale">
           
-          <Directory Id="LangZH" Name="zh">
+          <Directory Id="LangZH" Name="zh_CN">
             <Directory Id="MsgZH" Name="LC_MESSAGES" />
           </Directory>
 
@@ -76,7 +76,7 @@
     
     <DirectoryRef Id="MsgZH">
       <Component Id="MoZH" Guid="1A8E3F2B-0D9C-4A7B-8E6F-5C3D2B1A0E9F" Bitness="always64">
-        <File Id="MoFileZH" Source="locale\zh\LC_MESSAGES\tpm.mo" KeyPath="yes" />
+        <File Id="MoFileZH" Source="locale\zh_CN\LC_MESSAGES\tpm.mo" KeyPath="yes" />
       </Component>
     </DirectoryRef>
 

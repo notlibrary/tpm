@@ -872,24 +872,28 @@ tpm_free_toothpaste_pick(toothpaste_pick_t* pick)
 }
 
 static int 
-finish(int flag,toothpaste_pick_t* pick)
+finish(int flag, toothpaste_pick_t* pick)
 {
-	tpm_free_toothpaste_pick(pick);
-	if (flag) 
-	{
+    tpm_free_toothpaste_pick(pick);
+    if (flag) 
+    {
 #if defined(_WIN32) || defined(_WIN64)
-    DWORD process_list[2];
-    DWORD count = GetConsoleProcessList(process_list, 2);
-    printf("%s",_(user_strings[MSG_ANY_KEY]));
-	if (count == 1) 
-	{
-        getchar(); 
-    }
+        DWORD process_list[2];
+        DWORD count = GetConsoleProcessList(process_list, 2);
+        
+        printf("%s", _(user_strings[MSG_ANY_KEY]));
+        fflush(stdout); 
+
+        if (count == 1) 
+        {
+            fflush(stdin);
+            getchar(); 
+        }
 #else
-	stop_system();
+        stop_system();
 #endif
-	}
-	return 0;
+    }
+    return 0;
 }
 
 static char* 
@@ -1177,7 +1181,7 @@ str_good_day(toothpaste_pick_t* pick, toothpaste_pick_options_t* topts)
     if (topts == NULL || pick == NULL) return NULL;	
 
     char* line = malloc(MAX_TOOTHPASTE_LINE);
-    if (line == NULL) return NULL; // Protection against malloc failure
+    if (line == NULL) return NULL; 
     
     memset(line, 0, MAX_TOOTHPASTE_LINE);
 
@@ -1191,13 +1195,17 @@ str_good_day(toothpaste_pick_t* pick, toothpaste_pick_options_t* topts)
     return line;
 }
 
+
 static char*
 str_anon_username(toothpaste_pick_t* pick, toothpaste_pick_options_t* topts)
 {
-    
-    size_t buffer_size = UNLEN + 2; 
+    if (topts == NULL || pick == NULL || pick->who == NULL) return NULL;
+
+    size_t buffer_size = UNLEN + 3; 
     char* line = malloc(buffer_size);
     if (line == NULL) return NULL;
+
+    memset(line, 0, buffer_size);
 
     snprintf(line, buffer_size, "%s ", pick->who);
 	
@@ -2289,6 +2297,9 @@ do_not_test_me(int argc, char* argv[])
 	{"locale", required_argument,0, 'L'},	
     {0, 0, 0, 0} 
 };		
+#if defined(_WIN32) || defined(_WIN64)
+    setvbuf(stdout, NULL, _IONBF, 0);
+#endif
 	tpm_init_context(&topts); 
 	
 	result=read_config(topts.config_file_path_final,&topts);
