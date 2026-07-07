@@ -140,7 +140,7 @@ jobs:
         run: |
           autoreconf -ivf
           ./configure
-          make dist
+          make all-local dist
           mv tpm-${{ github.ref_name }}.tar.gz tpm-unix-tarball-amd64-${{ github.ref_name }}.tar.gz  
       
       - name: Upload Unix tarball to Release
