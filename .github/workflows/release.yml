@@ -70,7 +70,7 @@ jobs:
           $env:VCPKG_ROOT = "${env:VCPKG_INSTALLATION_ROOT}\installed\x64-windows"
           $env:LIB = "${env:VCPKG_ROOT}\lib;${env:LIB}"
           nmake /f Makefile.msc update-po
-          nmake /f Makefile.msc tpm.exe
+          nmake -e /f Makefile.msc tpm.exe
           Get-ChildItem -Path .\locale -Recurse -Filter *.mo -ErrorAction SilentlyContinue
           Copy-Item -Path "C:\vcpkg\buildtrees\gettext-libintl\x64-windows-rel\.libs\intl-8.dll" -Destination ".\intl-8.dll" -Force
           Copy-Item -Path "C:\vcpkg\buildtrees\libiconv\x64-windows-rel\lib\.libs\iconv-2.dll" -Destination ".\iconv-2.dll" -Force
@@ -101,8 +101,7 @@ jobs:
         shell: bash
         run: |
           make -f tpm-ubuntu.mk tpm docs update-po dist
-          mv tpm-linux-bin-amd64.tar.gz tpm-linux-bin-amd64-${{ github.ref_name }}.tar.gz
-          make -f tpm-ubuntu.mk clean            
+          mv tpm-linux-bin-amd64.tar.gz tpm-linux-bin-amd64-${{ github.ref_name }}.tar.gz           
             
       - name: Upload to Release Linux
         if: runner.os != 'Windows'       
@@ -112,6 +111,7 @@ jobs:
           files: tpm-linux-bin-amd64-${{ github.ref_name }}.tar.gz   
           
       - name: Setup emcc
+        if: runner.os != 'Windows'
         uses: emscripten-core/setup-emsdk@v15
       
       - name: Build on WASM
@@ -120,7 +120,6 @@ jobs:
         run: |
           make -f tpm-wasm.mk tpm.wasm update-po dist
           mv tpm-wasm-bin-amd64.tar.gz tpm-wasm-bin-amd64-${{ github.ref_name }}.tar.gz
-          make -f tpm-wasm.mk clean
             
       - name: Upload to Release WASM
         if: runner.os != 'Windows'       
@@ -142,7 +141,8 @@ jobs:
         run: |
           autoreconf -ivf
           ./configure
-          make all-local dist
+          make all-local
+          make dist
           mv tpm-${{ github.ref_name }}.tar.gz tpm-unix-tarball-amd64-${{ github.ref_name }}.tar.gz  
       
       - name: Upload Unix tarball to Release
