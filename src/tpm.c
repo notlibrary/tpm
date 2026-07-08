@@ -260,7 +260,7 @@ tpm_init_context(toothpaste_pick_options_t* opts)
     strncat(opts->config_file_path_final, config_file_name, MAX_PATH / 2);
 	
 	memset(opts->tpm_locale, 0, MAX_LOCALE_CODE + 1);
-    init_tpm_locale(opts->tpm_locale,opts);
+    
 	
 	return TPM_NO_ERROR; 
 }
@@ -2159,8 +2159,7 @@ read_config(const char* src,toothpaste_pick_options_t* opts)
 	value = cfg_get_rec(cfg, "LOCALE");
 	if (value!=NULL)
 	{	
-		strncpy(opts->tpm_locale,value,MAX_LOCALE_CODE);
-		init_tpm_locale(opts->tpm_locale,opts); 
+		strncpy(opts->tpm_locale,value,MAX_LOCALE_CODE); 
 	}
 	
 	value = cfg_get_rec(cfg, "PICK_TYPE");
@@ -2384,8 +2383,7 @@ do_not_test_me(int argc, char* argv[])
                 snprintf(topts.tpm_template, TOTAL_OUTPUT_STRINGS + 1, "%s", optarg);
             break;
 			case 'L':
-				snprintf(topts.tpm_locale, MAX_LOCALE_CODE, "%s", optarg);
-				init_tpm_locale(topts.tpm_locale,&topts); 
+				snprintf(topts.tpm_locale, MAX_LOCALE_CODE, "%s", optarg); 
 			break;
 			case '?': 
 				fprintf(stderr, "%s %s [-awjCvxqlrUF] [-f dental-formula] [-c config_file] [-o pick output file] [-t stats file] [-s total_picks value] [-p pick_type_value] [-i toothpaste_index] [-b brand_string [-z delta_hours] [-d delta_days] [-m meme_payload] [-T output_template] -L locale_code [toothpastes_file] \n",user_strings[MSG_USAGE], argv[0]);
@@ -2419,6 +2417,7 @@ do_not_test_me(int argc, char* argv[])
 	{
 		output_file=stdout;
 	}
+	init_tpm_locale(topts.tpm_locale,&topts);
 	tpm_load_list_from_file(topts.toothpastes_file_path_final,&topts,&topts.toothpastes_list);
 	tpm_pick_toothpaste(topts.toothpastes_list,&topts,&pick);
 	
