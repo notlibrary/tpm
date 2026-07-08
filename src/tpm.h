@@ -27,14 +27,33 @@ extern "C" {
 #include <string.h>
 #include <ctype.h>
 
-#ifndef ENABLE_NLS
-#define ENABLE_NLS 1
+/* Compiling gettext to WASM is walking hell example better off */
+
+#if defined(__EMSCRIPTEN__)
+# undef ENABLE_NLS
+# define ENABLE_NLS 0
+#else
+# ifndef ENABLE_NLS
+#  define ENABLE_NLS 1
+# endif
 #endif
-#include "gettext.h"
-#include <locale.h>
-#undef _
-#define _(String) gettext(String)
-#define gettext_noop(String) String
+
+#if defined(ENABLE_NLS) && (ENABLE_NLS == 1)
+# include "gettext.h"
+# include <locale.h>
+# undef _
+# define _(String) gettext(String)
+# define gettext_noop(String) String
+#else
+	
+# undef _
+# define _(String) (String)
+# define gettext_noop(String) String
+# define gettext(String) (String)
+# define textdomain(Domain) ((const char*)(Domain))
+# define bindtextdomain(Domain, Directory) ((const char*)(Directory))
+# define bind_textdomain_codeset(Domain, Codeset) ((const char*)(Codeset))
+#endif
 
 #include "prng64_xrp32.h"
 #include "cfg_parse.h"
