@@ -42,6 +42,7 @@ update-po:
 	@if exist locale\de\tpm.po ( if not exist locale\de\LC_MESSAGES mkdir locale\de\LC_MESSAGES && "C:\Program Files\gettext-iconv\bin\msgfmt.exe" locale\de\tpm.po -o locale\de\LC_MESSAGES\tpm.mo )
 	@if exist locale\ru\tpm.po ( if not exist locale\ru\LC_MESSAGES mkdir locale\ru\LC_MESSAGES && "C:\Program Files\gettext-iconv\bin\msgfmt.exe" locale\ru\tpm.po -o locale\ru\LC_MESSAGES\tpm.mo )
 	@if exist locale\it\tpm.po ( if not exist locale\it\LC_MESSAGES mkdir locale\it\LC_MESSAGES && "C:\Program Files\gettext-iconv\bin\msgfmt.exe" locale\it\tpm.po -o locale\it\LC_MESSAGES\tpm.mo )
+	@if exist locale\ja\tpm.po ( if not exist locale\ja\LC_MESSAGES mkdir locale\ja\LC_MESSAGES && "C:\Program Files\gettext-iconv\bin\msgfmt.exe" locale\ja\tpm.po -o locale\ja\LC_MESSAGES\tpm.mo )
 
 
 

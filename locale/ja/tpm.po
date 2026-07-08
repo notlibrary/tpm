@@ -1,0 +1,297 @@
+# Toothpaste Picking Manager.
+# Copyright (C) 2026 notlibrary
+# This file is distributed under the same license as the tpm package.
+# notlibrary yendoriun@gmail.com, 2026.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: tpm 0.6.9\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-07-05 12:21+0300\n"
+"PO-Revision-Date: 2026-07-08 09:51+0300\n"
+"Last-Translator: Automatically generated\n"
+"Language-Team: none\n"
+"Language: ja\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#: tpm.c:27
+msgid "Default"
+msgstr "デフォルト"
+
+#: tpm.c:28 tpm.c:37
+msgid "Random"
+msgstr "ランダム"
+
+#: tpm.c:29
+msgid "By index"
+msgstr "インデックス順"
+
+#: tpm.c:30
+msgid "By brand"
+msgstr "ブランド順"
+
+#: tpm.c:31
+msgid "Max rating"
+msgstr "最高評価"
+
+#: tpm.c:32
+msgid "Max tube mass"
+msgstr "最大容量"
+
+#: tpm.c:33
+msgid "Min rating"
+msgstr "最低評価"
+
+#: tpm.c:34
+msgid "Min tube mass"
+msgstr "最小容量"
+
+#: tpm.c:38
+msgid "Nothing"
+msgstr "なし"
+
+#: tpm.c:39
+msgid "Unknown"
+msgstr "不明"
+
+#: tpm.c:40
+msgid "0-paste"
+msgstr "0型ペースト"
+
+#: tpm.c:41
+msgid "Builtin"
+msgstr "内蔵"
+
+#: tpm.c:45
+msgid "Thursday"
+msgstr "木曜日"
+
+#: tpm.c:46
+msgid "Friday"
+msgstr "金曜日"
+
+#: tpm.c:47
+msgid "Saturday"
+msgstr "土曜日"
+
+#: tpm.c:48
+msgid "Sunday"
+msgstr "日曜日"
+
+#: tpm.c:49
+msgid "Monday"
+msgstr "月曜日"
+
+#: tpm.c:50
+msgid "Tuesday"
+msgstr "火曜日"
+
+#: tpm.c:51
+msgid "Wednesday"
+msgstr "水曜日"
+
+#: tpm.c:54
+msgid "Night"
+msgstr "夜"
+
+#: tpm.c:55
+msgid "Morning"
+msgstr "朝"
+
+#: tpm.c:56
+msgid "Day"
+msgstr "昼"
+
+#: tpm.c:57
+msgid "Evening"
+msgstr "夕方"
+
+#: tpm.c:60
+msgid "Error 0: No error."
+msgstr "エラー 0: エラーはありません。"
+
+#: tpm.c:61
+msgid "Error 101: opts is NULL"
+msgstr "エラー 101: optsがNULLです"
+
+#: tpm.c:62
+msgid "Error 102: Memory allocation failed."
+msgstr "エラー 102: メモリ割り当てに失敗しました。"
+
+#: tpm.c:63
+msgid "Error 103: Opening toothpastes file falling back to default."
+msgstr "エラー 103: 歯磨き粉ファイルを開けません。デフォルトに戻します。"
+
+#: tpm.c:64
+msgid "Error 104: Opening pickstats file for writing"
+msgstr "エラー 104: 書き込み用のpickstatsファイルを開けません"
+
+#: tpm.c:65
+msgid "Error 105: Opening pickstats file for reading"
+msgstr "エラー 105: 読み込み用のpickstatsファイルを開けません"
+
+#: tpm.c:66
+msgid "Error 106: No toothpastes file loaded"
+msgstr "エラー 106: 歯磨き粉ファイルが読み込まれていません"
+
+#: tpm.c:67
+msgid "Error 107: Unable to load config ~tpm/tpm.conf\n"
+msgstr "エラー 107: 設定 ~tpm/tpm.conf を読み込めません\n"
+
+#: tpm.c:68
+msgid "Error 108: Opening last_pick file for writing"
+msgstr "エラー 108: 書き込み用のlast_pickファイルを開けません"
+
+#: tpm.c:69
+msgid "Error 109: Pick is NULL perform pick first"
+msgstr "エラー 109: PickがNULLです。先に選択を実行してください"
+
+#: tpm.c:70
+msgid "Error 110: No toothpastes available."
+msgstr "エラー 110: 利用可能な歯磨き粉がありません。"
+
+#: tpm.c:71
+msgid "Error 111: NULL context"
+msgstr "エラー 111: コンテキストがNULLです"
+
+#: tpm.c:74
+msgid "Pick counter clear"
+msgstr "選択カウンターをクリアしました"
+
+#: tpm.c:75
+msgid "# Index | Brand | Tube Mass | Rating"
+msgstr "# インデックス | ブランド | 容量 | 評価"
+
+#: tpm.c:76
+msgid ""
+"# Index | Brand | Tube Mass | Rating | Toothbrush Color | Toothbrush Brand | "
+"Toothbrush Length | Toothbrush Hardness"
+msgstr ""
+"# インデックス | ブランド | 容量 | 評価 | 歯ブラシの色 | 歯ブラシのブランド | 歯ブラシの長さ | 歯ブラシの硬さ"
+
+#: tpm.c:77
+msgid "Pick counter set"
+msgstr "選択カウンターを設定しました"
+
+#: tpm.c:78
+msgid "Welcome to the toothpaste picking manager"
+msgstr "歯磨き粉選択マネージャーへようこそ"
+
+#: tpm.c:79
+msgid "New next pick stats updated"
+msgstr "次回の選択統計が更新されました"
+
+#: tpm.c:80
+msgid "Toothbrush time span over swap the toothbrush(or order new one)"
+msgstr "歯ブラシの交換時期を過ぎています。歯ブラシを交換するか、新しいものを注文してください"
+
+#: tpm.c:81
+msgid "Time span over please visit dentist"
+msgstr "期間を過ぎています。歯医者を受診してください"
+
+#: tpm.c:82
+msgid "Already picked today"
+msgstr "本日はすでに選択済みです"
+
+#: tpm.c:83
+msgid "Pick type"
+msgstr "選択タイプ"
+
+#: tpm.c:84
+msgid "Toothpaste:"
+msgstr "歯磨き粉:"
+
+#: tpm.c:85
+msgid "Toothbrush:"
+msgstr "歯ブラシ:"
+
+#: tpm.c:86
+msgid "Toothpaste index:"
+msgstr "歯磨き粉インデックス:"
+
+#: tpm.c:87
+msgid "Toothpaste type:"
+msgstr "歯磨き粉タイプ:"
+
+#: tpm.c:88
+msgid "Dental Formula:"
+msgstr "デンタルフォーミュラ:"
+
+#: tpm.c:89
+msgid "Day:"
+msgstr "日付:"
+
+#: tpm.c:90
+msgid "Total picks:"
+msgstr "総選択回数:"
+
+#: tpm.c:91
+msgid "Tubes wasted:"
+msgstr "廃棄されたチューブ数:"
+
+#: tpm.c:92
+msgid "Source:"
+msgstr "ソース:"
+
+#: tpm.c:93
+msgid "Meme:"
+msgstr "ミーム:"
+
+#: tpm.c:94
+msgid "Last pick time:"
+msgstr "最終選択日時:"
+
+#: tpm.c:95
+msgid "Good"
+msgstr "良好"
+
+#: tpm.c:96
+msgid "Press Enter to continue..."
+msgstr "Enterキーを押して続行..."
+
+#: tpm.c:97
+msgid "Compiler:"
+msgstr "コンパイラ:"
+
+#: tpm.c:98
+msgid "Compiled on:"
+msgstr "コンパイル日時:"
+
+#: tpm.c:99
+msgid "Anonymous"
+msgstr "匿名"
+
+#: tpm.c:100
+msgid "Output pick to file "
+msgstr "選択結果をファイルに出力 "
+
+#: tpm.c:101
+msgid "Brand None"
+msgstr "ブランドなし"
+
+#: tpm.c:102
+msgid "Compiler unknown"
+msgstr "不明なコンパイラ"
+
+#: tpm.c:103
+msgid "Usage:"
+msgstr "使用法:"
+
+#: tpm.c:104
+msgid "BUILTIN TOOTHPASTE 1"
+msgstr "内蔵歯磨き粉 1"
+
+#: tpm.c:105
+msgid "BUILTIN TOOTHPASTE 2"
+msgstr "内蔵歯磨き粉 2"
+
+#: tpm.c:106
+msgid "BUILTIN TOOTHPASTE 3"
+msgstr "内蔵歯磨き粉 3"
+
+#: tpm.c:107
+msgid "Press any key to continue . . ."
+msgstr "続行するには何かキーを押してください . . ."

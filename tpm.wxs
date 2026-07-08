@@ -41,6 +41,11 @@
           <Directory Id="LangIT" Name="it">
             <Directory Id="MsgIT" Name="LC_MESSAGES" />
           </Directory>
+
+          <Directory Id="LangJA" Name="ja">
+            <Directory Id="MsgJA" Name="LC_MESSAGES" />
+          </Directory>
+
           
         </Directory>
       </Directory>
@@ -109,6 +114,12 @@
         <File Id="MoFileIT" Source="locale\it\LC_MESSAGES\tpm.mo" KeyPath="yes" />
       </Component>
     </DirectoryRef>
+	
+    <DirectoryRef Id="MsgJA">
+      <Component Id="MoJA" Guid="C5E2D2A4-F8B6-4A73-9D22-C84B53DFA9E1" Bitness="always64">
+        <File Id="MoFileJA" Source="locale\ja\LC_MESSAGES\tpm.mo" KeyPath="yes" />
+      </Component>
+    </DirectoryRef>
     
     <Feature Id="MainFeature" Title="Main Application" Level="1">
       <ComponentRef Id="MainExecutable" />
@@ -124,6 +135,7 @@
       <ComponentRef Id="MoDE" />
       <ComponentRef Id="MoRU" />
       <ComponentRef Id="MoIT" />
+      <ComponentRef Id="MoJA" />
     </Feature>
     
   </Package>
