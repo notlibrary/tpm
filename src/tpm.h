@@ -27,7 +27,11 @@ extern "C" {
 #include <string.h>
 #include <ctype.h>
 
-/* Compiling gettext to WASM is walking hell example better off */
+/* Compiling gettext to WASM is walking hell example better off 
+If you can contribute it to this project then you are really and I mean really good email me to 
+yendorium@gmail.com before trying the whole pull request thing out*/
+
+# include <locale.h>
 
 #if defined(__EMSCRIPTEN__)
 # undef ENABLE_NLS
@@ -40,7 +44,6 @@ extern "C" {
 
 #if defined(ENABLE_NLS) && (ENABLE_NLS == 1)
 # include "gettext.h"
-# include <locale.h>
 # undef _
 # define _(String) gettext(String)
 # define gettext_noop(String) String
