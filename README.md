@@ -150,8 +150,8 @@ Jour : Lundi 20640
 Total des choix : 39
 Heure du dernier choix : Mon Jul  6 06:00:01 2026
 Tubes gaspillés : 0+0+0+0+0=0
-Source : /home/tno/tpm/toothpastes
-Mème: SAGE
+Source : /home/anon/tpm/toothpastes
+Mème : SAGE
 
 Appuyez sur Entrée pour continuer...
 ```

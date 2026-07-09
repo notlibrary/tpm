@@ -239,7 +239,7 @@ msgstr "Source :"
 
 #: tpm.c:93
 msgid "Meme:"
-msgstr "Mème:"
+msgstr "Mème :"
 
 #: tpm.c:94
 msgid "Last pick time:"
