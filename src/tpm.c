@@ -988,7 +988,7 @@ version(void)
 {
 	printf("%s %u.%u.%u \n",TPM_STRING,TPM_VERSION_MAJOR,TPM_VERSION_MINOR,TPM_VERSION_PATCH);
 	printf("%s %s at %s\n",_(user_strings[MSG_COMPILED]) , __DATE__, __TIME__);
-#if defined(__clang__)
+#if defined(__clang__) && !defined(__EMSCRIPTEN__)
     printf("%s Clang/LLVM %d.%d \n",_(user_strings[MSG_COMPILER]),__clang_major__,__clang_minor__);
 #elif defined(__GNUC__) || defined(__GNUG__)
     printf("%s GCC %d.%d \n", _(user_strings[MSG_COMPILER]), __GNUC__,__GNUC_MINOR__);
