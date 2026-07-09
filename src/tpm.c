@@ -1704,7 +1704,7 @@ tpm_pick_toothpaste(list_node_t* head, toothpaste_pick_options_t* topts, toothpa
     int dentist_flag = 0;
     int toothbrush_flag = 0;
     unsigned int brand_len;
-    char* toothpaste_strings[TOTAL_OUTPUT_STRINGS];
+    char* toothpaste_picking_message[TOTAL_OUTPUT_STRINGS];
 	char current_char;
 	int str_num = 0;
 	int interval;
@@ -1856,26 +1856,26 @@ tpm_pick_toothpaste(list_node_t* head, toothpaste_pick_options_t* topts, toothpa
 
     pick->toothpaste_pick_index = i;
 	
-	toothpaste_strings[0] = 	str_good_day(pick,topts);
-	toothpaste_strings[1] = 	str_anon_username(pick,topts);
-	toothpaste_strings[2] = 	str_welcome(pick,topts);
-	toothpaste_strings[3] = 	str_next_pick(pick,topts);
-	toothpaste_strings[4] = 	str_new_toothbrush(pick,topts);
-	toothpaste_strings[5] = 	str_visit_dentist(pick,topts);
-	toothpaste_strings[6] = 	str_already_picked(pick,topts);
-	toothpaste_strings[7] = 	str_pick_type(pick,topts);
-	toothpaste_strings[8] = 	str_toothpaste(pick,topts);
-	toothpaste_strings[9] =		str_toothbrush(pick,topts);
-	toothpaste_strings[10] = 	str_toothpaste_index(pick,topts);
-	toothpaste_strings[11] = 	str_toothpaste_type(pick,topts);
-	toothpaste_strings[12] = 	str_dental_formula(pick,topts);
-	toothpaste_strings[13] = 	str_day_of_the_week(pick,topts);
-	toothpaste_strings[14] = 	str_total_picks(pick,topts);
-	toothpaste_strings[15] = 	str_last_pick_time(pick,topts);
-	toothpaste_strings[16] = 	str_tubes_wasted(pick,topts);
-	toothpaste_strings[17] = 	str_source(pick,topts);
-	toothpaste_strings[18] = 	str_meme(pick,topts);
-	toothpaste_strings[19] = 	str_quiet(pick,topts);
+	toothpaste_picking_message[0] = 	str_good_day(pick,topts);
+	toothpaste_picking_message[1] = 	str_anon_username(pick,topts);
+	toothpaste_picking_message[2] = 	str_welcome(pick,topts);
+	toothpaste_picking_message[3] = 	str_next_pick(pick,topts);
+	toothpaste_picking_message[4] = 	str_new_toothbrush(pick,topts);
+	toothpaste_picking_message[5] = 	str_visit_dentist(pick,topts);
+	toothpaste_picking_message[6] = 	str_already_picked(pick,topts);
+	toothpaste_picking_message[7] = 	str_pick_type(pick,topts);
+	toothpaste_picking_message[8] = 	str_toothpaste(pick,topts);
+	toothpaste_picking_message[9] =		str_toothbrush(pick,topts);
+	toothpaste_picking_message[10] = 	str_toothpaste_index(pick,topts);
+	toothpaste_picking_message[11] = 	str_toothpaste_type(pick,topts);
+	toothpaste_picking_message[12] = 	str_dental_formula(pick,topts);
+	toothpaste_picking_message[13] = 	str_day_of_the_week(pick,topts);
+	toothpaste_picking_message[14] = 	str_total_picks(pick,topts);
+	toothpaste_picking_message[15] = 	str_last_pick_time(pick,topts);
+	toothpaste_picking_message[16] = 	str_tubes_wasted(pick,topts);
+	toothpaste_picking_message[17] = 	str_source(pick,topts);
+	toothpaste_picking_message[18] = 	str_meme(pick,topts);
+	toothpaste_picking_message[19] = 	str_quiet(pick,topts);
 	
 	ti=0;
    if (topts->tpm_template[0] == '*' && topts->tpm_template[1] == '\0') 
@@ -1897,7 +1897,7 @@ tpm_pick_toothpaste(list_node_t* head, toothpaste_pick_options_t* topts, toothpa
  
             if (check_visibility(str_num, new_pick_flag, toothbrush_flag, dentist_flag, topts->verbose)) 
             {
-                if (toothpaste_strings[str_num] != NULL) 
+                if (toothpaste_picking_message[str_num] != NULL) 
                 {
                     
                     current_len = strlen(pick->message);
@@ -1906,7 +1906,7 @@ tpm_pick_toothpaste(list_node_t* head, toothpaste_pick_options_t* topts, toothpa
                         remaining_space = OUTPUT_BLOCK_SIZE - current_len - 1;
                         
                        
-                        strncat(pick->message, toothpaste_strings[str_num], remaining_space);
+                        strncat(pick->message, toothpaste_picking_message[str_num], remaining_space);
                     } 
                     else 
                     {
@@ -1920,10 +1920,10 @@ tpm_pick_toothpaste(list_node_t* head, toothpaste_pick_options_t* topts, toothpa
 
     for (ti = 0; ti < TOTAL_OUTPUT_STRINGS; ti++) 
     {
-        if (toothpaste_strings[ti] != NULL) 
+        if (toothpaste_picking_message[ti] != NULL) 
         {
-            free(toothpaste_strings[ti]);
-            toothpaste_strings[ti] = NULL; 
+            free(toothpaste_picking_message[ti]);
+            toothpaste_picking_message[ti] = NULL; 
         }
     }
 	

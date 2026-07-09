@@ -237,9 +237,9 @@ Also sometimes is possible to add 5th term toothpaste grams per nurdle but this 
 
 `-w --weight` pick the toothpaste with highest tube weight
 
-`-j --json` output the JSON with last pick info instead toothpaste picking string
+`-j --json` output the JSON with last pick info instead toothpaste picking message
 
-`-C --csv` output and appends the CSV with last pick info instead toothpaste picking string
+`-C --csv` output and appends the CSV with last pick info instead toothpaste picking message
 
 `-v --version` show the toothpaste picking manager version
 
@@ -257,7 +257,7 @@ Also sometimes is possible to add 5th term toothpaste grams per nurdle but this 
 
 `-f --formula` set the dental formula `dental_formula`
 
-`-o --output pick_output_file` output toothpaste picking string or JSON or CSV to the text file `pick_output_file`
+`-o --output pick_output_file` output toothpaste picking message or JSON or CSV to the text file `pick_output_file`
 
 `-c --config config_file` load the custom configuration file `config file`
 
@@ -399,7 +399,7 @@ it's called `0-paste`
 If you have few single brand tubes you may have different brand strings
 for each tube you got
 
-UPPERCASE the brand string to ensure it's seen first through running down terminal with the toothpaste picking string
+UPPERCASE the brand string to ensure it's seen first through running down terminal with the toothpaste picking message
 
 ## TPM The Toothpastes Picking Manager Toothpastes List CSV enhanced format sample
 ```
