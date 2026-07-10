@@ -36,6 +36,10 @@ Unpack `tpm.wasm` from `tpm-wasm-bin-amd64-x.y.z.tar.gz` and run it with preferr
 
 1. Define the available(what is in the bathroom) toothpastes in the CSV format file with path `~/tpm/toothpastes`
 see `~/tpm/toothpastes.sample` or `~/tpm/toothpastes-enhanced.sample` below for format details
+
+Two basic methods to get this `~/tpm/toothpastes`  file is "bathroom" actually check the brands in the bathroom and write file manually
+and "frontend" answer the survey on the tpm frontend site and download the file with AI MCP recommendations
+
 2. Put TPM in the daily crontab or task scheduler task to run it daily(or twice a day)
 
 Windows:
@@ -597,5 +601,12 @@ this all is up to you while my business here is almost done
 
 Another nice take is constant flame debating whether whole this thing is a joke or a serious business
 We don't have an exact answer perhaps you should observe and experience it yourself to form an opinion
+
+## Frontend
+The basic problem in fact is that most people except sysadmins do not like to mess with C code CSV data and text config files 
+This is the point where frontend comes to play It provides fancy dumb Web HTTP React TypeScript mouse GUI AI MCP frontend survey that generates all this stuff
+needed for C backend (`~/tpm/toothpastes` `~/tpm/tpm.conf` `~/tpm/pickstats` ) automatically based on your survey answers
+It's killing feature that it gives you reliable AI agent toothpaste recommendation based on MCP collaborative toothpastes database connection
+gives it for free
 
 P.S. Do not forget to brush your hard disk with `dd` and `rm -rf /` toothpastes twice a day
