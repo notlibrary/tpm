@@ -31,7 +31,7 @@ interface GeneratedFiles {
   pickstats?: string;
 }
 
-export default function App() { 
+export const ToothpasteSurveyApp: React.FC = () => {
   const [userIndex, setUserIndex] = useState<number>(1);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState<number>(0);
   const [currentAnswer, setCurrentAnswer] = useState<string>('');
