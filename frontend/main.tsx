@@ -31,7 +31,7 @@ interface GeneratedFiles {
   pickstats?: string;
 }
 
-export const ToothpasteSurveyApp: React.FC = () => {
+export default function App() { 
   const [userIndex, setUserIndex] = useState<number>(1);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState<number>(0);
   const [currentAnswer, setCurrentAnswer] = useState<string>('');
@@ -138,6 +138,14 @@ export const ToothpasteSurveyApp: React.FC = () => {
     <div style={{ maxWidth: '600px', margin: '40px auto', padding: '24px', fontFamily: 'sans-serif', border: '1px solid #ccc', borderRadius: '12px' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid #eee', paddingBottom: '12px', marginBottom: '20px' }}>
         <h2 style={{ margin: 0 }}>🪥 TPM Dashboard</h2>
+          <a 
+            href="https://github.com/notlibrary/tpm/releases" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            style={{ fontSize: '12px', color: '#002fcc', textDecoration: 'none', display: 'inline-block', marginTop: '4px' }}
+          >
+            notlibrary/tpm Releases ↗
+          </a>
         <span style={{ background: '#e2e8f0', padding: '4px 12px', borderRadius: '9999px', fontSize: '12px', fontWeight: 'bold' }}>
           User Manager ID: #{userIndex}
         </span>
