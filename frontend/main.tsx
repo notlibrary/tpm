@@ -10,6 +10,18 @@ Algorithm as follows
    generated `~/tpm/toothpastes` `~/tpm/tpm.conf` `~/tpm/pickstats` files 
  Next user increment counter go to 1
 */
+/* 
+	Toothpaste picking manager frontend survey source code 0BSD license
+*/
+
+/* 
+Algorithm as follows
+1. Ask user questions
+2. Pass the answers to AI with MCP
+3. Get AI recommendation in Toothpaste picking manager format 
+   generated `~/tpm/toothpastes` `~/tpm/tpm.conf` `~/tpm/pickstats` files 
+ Next user increment counter go to 1
+*/
 import React, { useState } from 'react';
 
 const questions: string[] = [
@@ -20,238 +32,152 @@ const questions: string[] = [
   "Where are you from?",
   "What toothpaste components required?",
   "What toothpaste components to skip?",
+  "Are you smoking?",
+  "Are you drinking red whine?",
+  "Do you like chocolate?",
   "What toothpaste specialization you need most?",
+  "Your dental formula?(ie. 2-2-2-2)",
   "Do you else need the toothbrush?",
-  "Do you need cheap toothpaste or more expensive?"
+  "Do you need cheap toothpaste or more expensive?",
+  "What is your favorite meme?"
 ];
 
-interface GeneratedFiles {
-  toothpastes?: string;
-  tpmConf?: string;
-  pickstats?: string;
-}
+const default_answers: string[] = [
+  "Anonymous", 
+  "all", 
+  "25",
+  "3",
+  "US",
+  "abrasive, fluoride, foam, odor",
+  "none",
+  "no",
+  "no",
+  "no",
+  "complex protection",
+  "2-2-2-2",
+  "no",
+  "cheap",
+  "sup /b/"
+];
 
-export const ToothpasteSurveyApp: React.FC = () => {
-  const [userIndex, setUserIndex] = useState<number>(1);
-  const [currentQuestionIndex, setCurrentQuestionIndex] = useState<number>(0);
-  const [currentAnswer, setCurrentAnswer] = useState<string>('');
-  
-  const [selectedFiles, setSelectedFiles] = useState({
-    toothpastes: true,
-    tpmConf: true,
-    pickstats: true
-  });
-  
+//export const ToothpasteSurveyApp = () => {
+export default function App() {
+  const [userIndex, setUserIndex] = useState(1);
+  const [currentIdx, setCurrentIdx] = useState(0);
+  const [answer, setAnswer] = useState(default_answers[0]);
+  const [files, setFiles] = useState({ toothpastes: true, tpmConf: true, pickstats: true });
   const [answers, setAnswers] = useState<Record<string, string>>({});
-  const [isProcessing, setIsProcessing] = useState<boolean>(false);
-  const [generatedFiles, setGeneratedFiles] = useState<GeneratedFiles | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [result, setResult] = useState<any>(null);
 
   const handleCheckboxChange = (fileKey: 'toothpastes' | 'tpmConf' | 'pickstats') => {
-    setSelectedFiles(prev => ({
+    setFiles(prev => ({
       ...prev,
       [fileKey]: !prev[fileKey]
     }));
   };
 
-  const handleAnswerSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    let finalAnswerString = '';
+    let val = currentIdx === 1 
+      ? Object.keys(files).filter(k => files[k as keyof typeof files]).map(k => `~/tpm/${k}`).join(', ') 
+      : answer.trim();
 
-    if (currentQuestionIndex === 1) {
-      const chosen: string[] = [];
-      if (selectedFiles.toothpastes) chosen.push('~/tpm/toothpastes');
-      if (selectedFiles.tpmConf) chosen.push('~/tpm/tpm.conf');
-      if (selectedFiles.pickstats) chosen.push('~/tpm/pickstats');
-      
-      if (chosen.length === 0) {
-        alert('Please select at least one file option.');
-        return;
-      }
-      finalAnswerString = chosen.join(', ');
-    } else {
-      if (!currentAnswer.trim()) return;
-      finalAnswerString = currentAnswer.trim();
+    if (currentIdx === 1 && !val) return alert('Select a file');
+    if (currentIdx !== 1 && !val) return;
+
+    const nextAnswers = { ...answers, [questions[currentIdx]]: val };
+    setAnswers(nextAnswers);
+
+    const nextIdx = currentIdx + 1;
+    if (nextIdx < questions.length) {
+      setCurrentIdx(nextIdx);
+      setAnswer(default_answers[nextIdx] || '');
+      return;
     }
 
-    const updatedAnswers = {
-      ...answers,
-      [questions[currentQuestionIndex]]: finalAnswerString
-    };
-    
-    setAnswers(updatedAnswers);
-    setCurrentAnswer('');
-
-    if (currentQuestionIndex < questions.length - 1) {
-      setCurrentQuestionIndex(prev => prev + 1);
-    } else {
-      sendAnswersToMcpAI(updatedAnswers);
-    }
-  };
-
-  const sendAnswersToMcpAI = async (finalAnswers: Record<string, string>) => {
-    setIsProcessing(true);
+    setLoading(true);
     try {
-      const response = await fetch('/api/mcp/tools/call', {
+      const res = await fetch('/api/mcp/tools/call', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          name: 'generate_tpm_configs',
-          arguments: {
-            username: finalAnswers[questions[0]],
-            surveyData: finalAnswers
-          }
-        }),
+        body: JSON.stringify({ name: 'generate_tpm_configs', arguments: { username: nextAnswers[questions[0]], surveyData: nextAnswers } })
       });
-
-      if (!response.ok) throw new Error('MCP server error');
-      
-      const result = await response.json();
-      const data = JSON.parse(result.content.text); 
-      
-      setGeneratedFiles({
-        toothpastes: selectedFiles.toothpastes ? (data.toothpastes || "# Generated Toothpastes\n") : undefined,
-        tpmConf: selectedFiles.tpmConf ? (data.tpmConf || "# Generated Config\n") : undefined,
-        pickstats: selectedFiles.pickstats ? (data.pickstats || "# Generated Stats\n") : undefined
+      const data = JSON.parse((await res.json()).content.text);
+      setResult({
+        toothpastes: files.toothpastes ? data.toothpastes || "# Toothpastes\n" : null,
+        tpmConf: files.tpmConf ? data.tpmConf || "# Config\n" : null,
+        pickstats: files.pickstats ? data.pickstats || "# Stats\n" : null
       });
-    } catch (error) {
-      console.error('MCP AI Processing failed:', error);
-      setGeneratedFiles({
-        toothpastes: selectedFiles.toothpastes ? `// ~/tpm/toothpastes file\n[Brands]\nTarget=Sensitive\n` : undefined,
-        tpmConf: selectedFiles.tpmConf ? `// ~/tpm/tpm.conf file\nengine=ai_mcp\n` : undefined,
-        pickstats: selectedFiles.pickstats ? `// ~/tpm/pickstats file\nstatus=success\n` : undefined
+    } catch {
+      setResult({
+        toothpastes: files.toothpastes ? `[Brands]\nTarget=Sensitive\n` : null,
+        tpmConf: files.tpmConf ? `engine=ai_mcp\n` : null,
+        pickstats: files.pickstats ? `status=success\n` : null
       });
-    } finally {
-      setIsProcessing(false);
     }
+    setLoading(false);
   };
 
-  const handleNextUser = () => {
-    setUserIndex(prev => prev + 1);
-    setCurrentQuestionIndex(0);
-    setCurrentAnswer('');
+  const reset = () => {
+    setUserIndex(u => u + 1);
+    setCurrentIdx(0);
+    setAnswer(default_answers[0]);
     setAnswers({});
-    setGeneratedFiles(null);
-    setSelectedFiles({ toothpastes: true, tpmConf: true, pickstats: true });
+    setResult(null);
   };
 
   return (
-    <div style={{ maxWidth: '600px', margin: '40px auto', padding: '24px', fontFamily: 'sans-serif', border: '1px solid #ccc', borderRadius: '12px' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid #eee', paddingBottom: '12px', marginBottom: '20px' }}>
-        <h2 style={{ margin: 0 }}>🪥 TPM Dashboard</h2>
-          <a 
-            href="https://github.com/notlibrary/tpm/releases" 
-            target="_blank" 
-            rel="noopener noreferrer"
-            style={{ fontSize: '12px', color: '#002fcc', textDecoration: 'none', display: 'inline-block', marginTop: '4px' }}
-          >
-            notlibrary/tpm Releases ↗
-          </a>
-        <span style={{ background: '#e2e8f0', padding: '4px 12px', borderRadius: '9999px', fontSize: '12px', fontWeight: 'bold' }}>
-          User Manager ID: #{userIndex}
-        </span>
+    <div style={{ maxWidth: '650px', width: '100%', margin: '40px auto', padding: '24px', fontFamily: 'sans-serif', border: '1px solid #ccc', borderRadius: '12px', boxSizing: 'border-box' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid #eee', paddingBottom: '12px', marginBottom: '20px' }}>
+        <div>
+          <h3 style={{ margin: 0 }}>🪥 TPM Dashboard</h3>
+          <a href="https://github.com" target="_blank" rel="noreferrer" style={{ fontSize: '11px', color: '#002fcc', textDecoration: 'none' }}>Releases ↗</a>
+        </div>
+        <span style={{ fontSize: '12px', fontWeight: 'bold', background: '#e2e8f0', padding: '4px 10px', borderRadius: '12px' }}>ID: #{userIndex}</span>
       </div>
 
-      {!isProcessing && !generatedFiles && (
-        <form onSubmit={handleAnswerSubmit}>
-          <div style={{ marginBottom: '8px', fontSize: '14px', color: '#666' }}>
-            Question {currentQuestionIndex + 1} of {questions.length}
-          </div>
-          <label style={{ fontSize: '18px', fontWeight: '600', display: 'block', marginBottom: '16px' }}>
-            {questions[currentQuestionIndex]}
-          </label>
-
-          {currentQuestionIndex === 1 ? (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginBottom: '20px' }}>
-              <label style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '16px', cursor: 'pointer' }}>
-                <input 
-                  type="checkbox" 
-                  checked={selectedFiles.toothpastes} 
-                  onChange={() => handleCheckboxChange('toothpastes')}
-                  style={{ width: '18px', height: '18px' }}
-                />
-                <span>~/tpm/toothpastes (Main recommendations)</span>
+      {!loading && !result && (
+        <form onSubmit={handleSubmit} style={{ width: '100%' }}>
+          <div style={{ fontSize: '12px', color: '#666', marginBottom: '8px' }}>Q: {currentIdx + 1}/{questions.length}</div>
+          <label style={{ fontWeight: '600', display: 'block', marginBottom: '16px', fontSize: '16px', lineHeight: '1.4' }}>{questions[currentIdx]}</label>
+          
+          {currentIdx === 1 ? (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginBottom: '20px' }}>
+              <label style={{ display: 'flex', gap: '8px', cursor: 'pointer', alignItems: 'center' }}>
+                <input type="checkbox" checked={files.toothpastes} onChange={() => handleCheckboxChange('toothpastes')} />
+                <span style={{ fontFamily: 'monospace' }}>~/tpm/toothpastes</span>
               </label>
-              <label style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '16px', cursor: 'pointer' }}>
-                <input 
-                  type="checkbox" 
-                  checked={selectedFiles.tpmConf} 
-                  onChange={() => handleCheckboxChange('tpmConf')}
-                  style={{ width: '18px', height: '18px' }}
-                />
-                <span>~/tpm/tpm.conf (Configuration environment)</span>
+              <label style={{ display: 'flex', gap: '8px', cursor: 'pointer', alignItems: 'center' }}>
+                <input type="checkbox" checked={files.tpmConf} onChange={() => handleCheckboxChange('tpmConf')} />
+                <span style={{ fontFamily: 'monospace' }}>~/tpm/tpm.conf</span>
               </label>
-              <label style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '16px', cursor: 'pointer' }}>
-                <input 
-                  type="checkbox" 
-                  checked={selectedFiles.pickstats} 
-                  onChange={() => handleCheckboxChange('pickstats')}
-                  style={{ width: '18px', height: '18px' }}
-                />
-                <span>~/tpm/pickstats (Statistical metadata)</span>
+              <label style={{ display: 'flex', gap: '8px', cursor: 'pointer', alignItems: 'center' }}>
+                <input type="checkbox" checked={files.pickstats} onChange={() => handleCheckboxChange('pickstats')} />
+                <span style={{ fontFamily: 'monospace' }}>~/tpm/pickstats</span>
               </label>
             </div>
           ) : (
-            <input 
-              type="text" 
-              value={currentAnswer}
-              onChange={(e) => setCurrentAnswer(e.target.value)}
-              placeholder="Type your answer here..."
-              autoFocus
-              style={{ width: '100%', padding: '10px', fontSize: '16px', borderRadius: '6px', border: '1px solid #bbb', marginBottom: '16px', boxSizing: 'border-box' }}
-            />
+            <input type="text" value={answer} onChange={e => setAnswer(e.target.value)} autoFocus style={{ width: '100%', padding: '10px', marginBottom: '20px', boxSizing: 'border-box', border: '1px solid #ccc', borderRadius: '6px', fontSize: '15px' }} />
           )}
-
-          <button type="submit" style={{ width: '100%', padding: '12px', background: '#002fcc', color: '#fff', border: 'none', borderRadius: '6px', cursor: 'pointer', fontSize: '16px', fontWeight: 'bold' }}>
-            {currentQuestionIndex === questions.length - 1 ? 'Submit & Process with AI' : 'Next Question →'}
+          <button type="submit" style={{ width: '100%', padding: '12px', background: '#002fcc', color: '#fff', border: 'none', borderRadius: '6px', cursor: 'pointer', fontSize: '15px', fontWeight: 'bold' }}>
+            {currentIdx === questions.length - 1 ? 'Process with AI' : 'Next →'}
           </button>
         </form>
       )}
 
-      {isProcessing && (
-        <div style={{ textAlign: 'center', padding: '40px 0' }}>
-          <div style={{ fontSize: '24px', marginBottom: '12px' }}>🤖</div>
-          <p style={{ margin: 0, color: '#444' }}>MCP client compiling environment files...</p>
-        </div>
-      )}
+      {loading && <p style={{ textAlign: 'center', margin: '40px 0' }}>🤖 Compiling with MCP...</p>}
 
-      {!isProcessing && generatedFiles && (
-        <div>
-          <h3 style={{ color: '#2e7d32', marginTop: 0 }}>✓ TPM Configurations Delivered</h3>
-          <p style={{ fontSize: '14px', color: '#666' }}>Showing active profiles computed by MCP agent:</p>
-          
-          {generatedFiles.toothpastes !== undefined && (
-            <div style={{ marginBottom: '16px' }}>
-              <strong style={{ fontSize: '12px', color: '#555' }}>~/tpm/toothpastes</strong>
-              <pre style={{ background: '#1a1a1a', color: '#00ffcc', padding: '12px', borderRadius: '6px', overflowX: 'auto', fontSize: '13px', marginTop: '4px' }}>
-                {generatedFiles.toothpastes}
-              </pre>
+      {result && (
+        <div style={{ width: '100%' }}>
+          <h4 style={{ color: '#2e7d32', margin: '0 0 16px 0', fontSize: '18px' }}>✓ Configs Delivered</h4>
+          {Object.entries(result).map(([k, v]) => v && (
+            <div key={k} style={{ marginTop: '16px', width: '100%' }}>
+              <span style={{ fontSize: '12px', color: '#555', display: 'block', marginBottom: '4px', fontFamily: 'monospace' }}>~/tpm/{k}</span>
+              <pre style={{ background: '#1a1a1a', color: '#00ffcc', padding: '14px', borderRadius: '6px', overflowX: 'auto', margin: 0, fontSize: '13px', width: '100%', boxSizing: 'border-box', whiteSpace: 'pre-wrap' }}>{v as string}</pre>
             </div>
-          )}
-
-          {generatedFiles.tpmConf !== undefined && (
-            <div style={{ marginBottom: '16px' }}>
-              <strong style={{ fontSize: '12px', color: '#555' }}>~/tpm/tpm.conf</strong>
-              <pre style={{ background: '#1a1a1a', color: '#00ffcc', padding: '12px', borderRadius: '6px', overflowX: 'auto', fontSize: '13px', marginTop: '4px' }}>
-                {generatedFiles.tpmConf}
-              </pre>
-            </div>
-          )}
-
-          {generatedFiles.pickstats !== undefined && (
-            <div style={{ marginBottom: '24px' }}>
-              <strong style={{ fontSize: '12px', color: '#555' }}>~/tpm/pickstats</strong>
-              <pre style={{ background: '#1a1a1a', color: '#00ffcc', padding: '12px', borderRadius: '6px', overflowX: 'auto', fontSize: '13px', marginTop: '4px' }}>
-                {generatedFiles.pickstats}
-              </pre>
-            </div>
-          )}
-
-          <button 
-            onClick={handleNextUser}
-            style={{ width: '100%', padding: '14px', background: '#10b981', color: '#fff', border: 'none', borderRadius: '6px', cursor: 'pointer', fontSize: '16px', fontWeight: 'bold' }}
-          >
-            Next User (Increment Counter & Restart) ⟳
-          </button>
+          ))}
+          <button onClick={reset} style={{ width: '100%', padding: '12px', background: '#10b981', color: '#fff', border: 'none', borderRadius: '6px', cursor: 'pointer', marginTop: '24px', fontSize: '15px', fontWeight: 'bold' }}>Next User ⟳</button>
         </div>
       )}
     </div>
