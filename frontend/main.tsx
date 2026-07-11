@@ -39,7 +39,23 @@ const questions: string[] = [
   "Your dental formula?(ie. 2-2-2-2)",
   "Do you else need the toothbrush?",
   "Do you need cheap toothpaste or more expensive?",
-  "What is your favorite meme?"
+  "What is your favorite meme?",
+  "What is your pick type style?",
+  "Enable verbose logging mode?",
+  "List toothpastes on startup?",
+  "Output results in JSON format?",
+  "Output results in CSV format?",
+  "Generate fake statistical logs?",
+  "Write outputs directly to a file?",
+  "What initial pick index to use?",
+  "Reset internal pick counter?",
+  "Set explicit counter starting point?",
+  "What bathroom brand do you prefer?",
+  "Force brand names to UPPERCASE?",
+  "What is your current timezone offset?(hours)",
+  "Delta days parameter adjustment?",
+  "What config layout template code?",
+  "What interface localization language?"
 ];
 
 const default_answers: string[] = [
@@ -57,7 +73,23 @@ const default_answers: string[] = [
   "2-2-2-2",
   "no",
   "cheap",
-  "sup /b/"
+  "sup /b/",
+  "0",
+  "1",
+  "0",
+  "0",
+  "0",
+  "0",
+  "0",
+  "0",
+  "0",
+  "0",
+  "SENSODYNE",
+  "0",
+  "3",
+  "0",
+  "guwntdapobiTfWPlUsmI",
+  "en_US"
 ];
 
 //export const ToothpasteSurveyApp = () => {
