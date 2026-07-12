@@ -24,6 +24,11 @@ Algorithm as follows
 */
 import React, { useState } from 'react';
 
+const welcome_msg: string = `Welcome to the Toothpaste picking manager frontend survey
+Everything is completely anonymous 
+We do not save your personal data and using it only to produce high quality AI recommendation
+Then clean and remove everything`;
+
 const questions: string[] = [
   "What is your username?", 
   "What TPM files do you need?", 
@@ -92,8 +97,8 @@ const default_answers: string[] = [
   "en_US"
 ];
 
-//export const ToothpasteSurveyApp = () => {
-export default function App() {
+export const ToothpasteSurveyApp = () => {
+//export default function App() {
   const [userIndex, setUserIndex] = useState(1);
   const [currentIdx, setCurrentIdx] = useState(0);
   const [answer, setAnswer] = useState(default_answers[0]);
