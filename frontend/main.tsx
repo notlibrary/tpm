@@ -10,18 +10,6 @@ Algorithm as follows
    generated `~/tpm/toothpastes` `~/tpm/tpm.conf` `~/tpm/pickstats` files 
  Next user increment counter go to 1
 */
-/* 
-	Toothpaste picking manager frontend survey source code 0BSD license
-*/
-
-/* 
-Algorithm as follows
-1. Ask user questions
-2. Pass the answers to AI with MCP
-3. Get AI recommendation in Toothpaste picking manager format 
-   generated `~/tpm/toothpastes` `~/tpm/tpm.conf` `~/tpm/pickstats` files 
- Next user increment counter go to 1
-*/
 import React, { useState } from 'react';
 
 const welcome_msg: string = `Welcome to the Toothpaste picking manager frontend survey
@@ -97,14 +85,13 @@ const default_answers: string[] = [
   "0",
   "SENSODYNE",
   "0",
-  "3",
+  "0",
   "0",
   "guwntdapobiTfWPlUsmI",
   "en_US"
 ];
-
-export const ToothpasteSurveyApp = () => {
-//export default function App() {
+ //export default function App() {
+  export const ToothpasteSurveyApp = () => {
   const [userIndex, setUserIndex] = useState(1);
   const [currentIdx, setCurrentIdx] = useState(0);
   const [answer, setAnswer] = useState(default_answers[0]);
@@ -114,10 +101,7 @@ export const ToothpasteSurveyApp = () => {
   const [result, setResult] = useState<any>(null);
 
   const handleCheckboxChange = (fileKey: 'toothpastes' | 'tpmConf' | 'pickstats') => {
-    setFiles(prev => ({
-      ...prev,
-      [fileKey]: !prev[fileKey]
-    }));
+    setFiles(prev => ({ ...prev, [fileKey]: !prev[fileKey] }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -148,15 +132,15 @@ export const ToothpasteSurveyApp = () => {
       });
       const data = JSON.parse((await res.json()).content.text);
       setResult({
-        toothpastes: files.toothpastes ? data.toothpastes || "# Toothpastes\n" : null,
+        toothpastes: files.toothpastes ? data.toothpastes || "# Toothpastes CSV\n" : null,
         tpmConf: files.tpmConf ? data.tpmConf || "# Config\n" : null,
         pickstats: files.pickstats ? data.pickstats || "# Stats\n" : null
       });
     } catch {
       setResult({
-        toothpastes: files.toothpastes ? `[Brands]\nTarget=Sensitive\n` : null,
-        tpmConf: files.tpmConf ? `engine=ai_mcp\n` : null,
-        pickstats: files.pickstats ? `status=success\n` : null
+        toothpastes: files.toothpastes ? `// ~/tpm/toothpastes file\n[Brands]\nTarget=${nextAnswers[questions[10]] || 'General'}\nRequired=${nextAnswers[questions[5]]}\n` : null,
+        tpmConf: files.tpmConf ? `// ~/tpm/tpm.conf file\nengine=ai_mcp\nuser=${nextAnswers[questions[0]]}\n` : null,
+        pickstats: files.pickstats ? `// ~/tpm/pickstats file\nstatus=success\ntotal_questions_processed=${questions.length}\n` : null
       });
     }
     setLoading(false);
@@ -175,13 +159,19 @@ export const ToothpasteSurveyApp = () => {
       <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid #eee', paddingBottom: '12px', marginBottom: '20px' }}>
         <div>
           <h3 style={{ margin: 0 }}>🪥 TPM Dashboard</h3>
-          <a href="https://github.com" target="_blank" rel="noreferrer" style={{ fontSize: '11px', color: '#002fcc', textDecoration: 'none' }}>Releases ↗</a>
+          <a href="https://github.com/notlibrary/tpm/releases" target="_blank" rel="noreferrer" style={{ fontSize: '11px', color: '#002fcc', textDecoration: 'none' }}>TPM Releases </a>
         </div>
         <span style={{ fontSize: '12px', fontWeight: 'bold', background: '#e2e8f0', padding: '4px 10px', borderRadius: '12px' }}>ID: #{userIndex}</span>
       </div>
 
       {!loading && !result && (
         <form onSubmit={handleSubmit} style={{ width: '100%' }}>
+          {currentIdx === 0 && (
+            <div style={{ background: '#f8fafc', borderLeft: '4px solid #002fcc', padding: '12px 16px', borderRadius: '0 8px 8px 0', marginBottom: '20px', fontSize: '13px', color: '#475569', lineHeight: '1.5', whiteSpace: 'pre-line' }}>
+              {welcome_msg}
+            </div>
+          )}
+
           <div style={{ fontSize: '12px', color: '#666', marginBottom: '8px' }}>Q: {currentIdx + 1}/{questions.length}</div>
           <label style={{ fontWeight: '600', display: 'block', marginBottom: '16px', fontSize: '16px', lineHeight: '1.4' }}>{questions[currentIdx]}</label>
           
@@ -189,15 +179,15 @@ export const ToothpasteSurveyApp = () => {
             <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginBottom: '20px' }}>
               <label style={{ display: 'flex', gap: '8px', cursor: 'pointer', alignItems: 'center' }}>
                 <input type="checkbox" checked={files.toothpastes} onChange={() => handleCheckboxChange('toothpastes')} />
-                <span style={{ fontFamily: 'monospace' }}>~/tpm/toothpastes</span>
+                <span style={{ fontFamily: 'monospace' }}>~/tpm/toothpastes (Toothpaste recommendations) </span>
               </label>
               <label style={{ display: 'flex', gap: '8px', cursor: 'pointer', alignItems: 'center' }}>
                 <input type="checkbox" checked={files.tpmConf} onChange={() => handleCheckboxChange('tpmConf')} />
-                <span style={{ fontFamily: 'monospace' }}>~/tpm/tpm.conf</span>
+                <span style={{ fontFamily: 'monospace' }}>~/tpm/tpm.conf (Environmental configuration) </span>
               </label>
               <label style={{ display: 'flex', gap: '8px', cursor: 'pointer', alignItems: 'center' }}>
                 <input type="checkbox" checked={files.pickstats} onChange={() => handleCheckboxChange('pickstats')} />
-                <span style={{ fontFamily: 'monospace' }}>~/tpm/pickstats</span>
+                <span style={{ fontFamily: 'monospace' }}>~/tpm/pickstats (Statistical initializer) </span>
               </label>
             </div>
           ) : (

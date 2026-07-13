@@ -1,3 +1,4 @@
+#TPM manual Ubuntu Makefile
 CC=gcc
 CP=cp -f
 MKDIR=mkdir -p
@@ -34,9 +35,9 @@ docs:
 	gzip -k -f tpm.1
 
 update-po:
-	@find . -maxdepth 2 -name "tpm.po" 2>/dev/null | while read -r po_file; do \
-		lang=$$(basename $$(dirname "$$po_file")); \
-		if [ "$$lang" != "." ] && [ "$$lang" != "src" ]; then \
+	@find . -maxdepth 3 -name "*.po" 2>/dev/null | while read -r po_file; do \
+		lang=$${po_file%/tpm.po}; lang=$${lang##*/}; \
+		if [ -n "$$lang" ] && [ "$$lang" != "." ] && [ "$$lang" != "src" ]; then \
 			$(MKDIR) "locale/$$lang/LC_MESSAGES"; \
 			msgfmt "$$po_file" -o "locale/$$lang/LC_MESSAGES/tpm.mo"; \
 			echo "Compiled $$po_file -> locale/$$lang/LC_MESSAGES/tpm.mo"; \
@@ -45,16 +46,16 @@ update-po:
 	
 install: all
 	$(MKDIR) $(DESTDIR)$(BINDIR)
-	cp $(CURRENT_DIR)/tpm $(DESTDIR)$(BINDIR)/
+	$(CP) $(CURRENT_DIR)/tpm $(DESTDIR)$(BINDIR)/
 	
 	$(MKDIR) $(DESTDIR)$(MANDIR)
-	cp tpm.1.gz $(DESTDIR)$(MANDIR)/tpm.1.gz
+	$(CP) tpm.1.gz $(DESTDIR)$(MANDIR)/tpm.1.gz
 	
 	@if [ -d locale ]; then \
 		find locale -name "*.mo" | while read -r mo_file; do \
 			lang_dir=$$(dirname "$$mo_file"); \
 			$(MKDIR) "$(DESTDIR)$(SHAREDIR)/$$lang_dir"; \
-			cp "$$mo_file" "$(DESTDIR)$(SHAREDIR)/$$lang_dir/"; \
+			$(CP) "$$mo_file" "$(DESTDIR)$(SHAREDIR)/$$lang_dir/"; \
 		done; \
 	fi
 
@@ -70,14 +71,15 @@ clean:
 	find . -type f -name "*.mo" -delete
 
 dist: all
+	$(RM) -r tpm-linux-bin-amd64
 	$(MKDIR) tpm-linux-bin-amd64
-	cp tpm.conf.sample toothpastes.sample toothpastes-enhanced.sample tpm README.md tpm.1.gz LICENSE tpm-linux-bin-amd64
+	$(CP) tpm.conf.sample toothpastes.sample toothpastes-enhanced.sample tpm README.md tpm.1.gz LICENSE tpm-linux-bin-amd64/ 2>/dev/null || true
 	
 	@if [ -d locale ]; then \
 		find locale -name "*.mo" | while read -r mo_file; do \
 			lang_dir=$$(dirname "$$mo_file"); \
 			$(MKDIR) "tpm-linux-bin-amd64/$$lang_dir"; \
-			cp "$$mo_file" "tpm-linux-bin-amd64/$$lang_dir/"; \
+			$(CP) "$$mo_file" "tpm-linux-bin-amd64/$$lang_dir/"; \
 		done; \
 	fi
 	

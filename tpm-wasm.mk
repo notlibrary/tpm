@@ -1,3 +1,4 @@
+#TPM WASM build Makefile
 CC=emcc
 CP=cp -f
 MKDIR=mkdir -p
