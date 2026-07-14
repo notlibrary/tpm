@@ -125,7 +125,7 @@ Another one alternative OS dependable schedule strategy is to bind <kbd>F3</kbd>
 ```
 Good Morning Serenity Welcome to the toothpaste picking manager
 Already picked today
-Pick type: Default
+Pick type: Default(Circular)
 Toothpaste: >>> SENSODYNE (150g) [100/100] <<<
 Toothbrush: White Lacalut 19 50
 Toothpaste index: 1/3
@@ -145,7 +145,7 @@ Press any key to continue . . .
 ```
 Bon Jour Anonymous Bienvenue dans le gestionnaire de choix de dentifrice
 Déjà choisi aujourd'hui
-Type de choix: Par défaut
+Type de choix : Par défaut (Circulaire)
 Dentifrice : >>> Random Toothpaste 1 (100g) [85/100] <<<
 Index du dentifrice : 0/5
 Type de dentifrice : Aléatoire
@@ -295,7 +295,7 @@ It's options:
 
 `USERNAME` override the username
 
-`PICK_TYPE` set the toothpaste pick type [0,7] number for `Default, Random, By index, By brand, Max rating, Max tube mass, Min rating, Min tube mas`
+`PICK_TYPE` set the toothpaste pick type [0,7] number for `Default(Circular), Random, By index, By brand, Max rating, Max tube mass, Min rating, Min tube mas`
 
 `DENTAL_FORMULA` set the dental formula eg. "2-2-2-2"
 

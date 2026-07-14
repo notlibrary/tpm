@@ -18,8 +18,8 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
 #: tpm.c:27
-msgid "Default"
-msgstr "Par défaut"
+msgid "Default(Circular)"
+msgstr "Par défaut (Circulaire)"
 
 #: tpm.c:28 tpm.c:37
 msgid "Random"

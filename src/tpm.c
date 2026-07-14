@@ -24,7 +24,7 @@ static const toothpaste_data_t toothpastes[TOTAL_TOOTHPASTES]={
 	{PASTE_BUILTIN,2,"BUILTIN TOOTHPASTE 3",50,80,"Pink", "Builtin Toothbrush 3",20,50}
 };
 static const char* pick_type_strings[TOTAL_PICK_TYPE_STRINGS]={
-	gettext_noop("Default"),
+	gettext_noop("Default(Circular)"),
 	gettext_noop("Random"),
 	gettext_noop("By index"),
 	gettext_noop("By brand"),
@@ -116,14 +116,27 @@ static const char toothpastes_file_name[MAX_PATH] ="toothpastes";
 static const char output_file_name[MAX_PATH] ="last_pick";
 static const char config_file_name[MAX_PATH] ="tpm.conf";
 
-
 static int 
 init_tpm_locale(char* locale_id, toothpaste_pick_options_t* opts)
 {
     char *current_locale = NULL;
+    (void)locale_id; 
+	
+#if defined(_WIN32) || defined(_WIN64)
 
+    SetConsoleOutputCP(CP_UTF8);
+    SetConsoleCP(CP_UTF8);
 
-    if (opts == NULL || opts->tpm_locale[0] == '\0') {
+    if (opts == NULL || opts->tpm_locale == NULL || opts->tpm_locale[0] == '\0') {
+        current_locale = setlocale(LC_ALL, ".UTF-8");
+    } else {
+        current_locale = setlocale(LC_ALL, opts->tpm_locale);
+        if (current_locale == NULL) {
+            current_locale = setlocale(LC_ALL, ".UTF-8");
+        }
+    }
+#else
+    if (opts == NULL || opts->tpm_locale == NULL || opts->tpm_locale[0] == '\0') {
         current_locale = setlocale(LC_ALL, "");
     } else {
         current_locale = setlocale(LC_ALL, opts->tpm_locale);
@@ -131,23 +144,26 @@ init_tpm_locale(char* locale_id, toothpaste_pick_options_t* opts)
             current_locale = setlocale(LC_ALL, "");
         }
     }
+#endif
+
+    (void)current_locale;
 
 #if defined(_WIN32) || defined(_WIN64)
     char exe_path[MAX_PATH];
     char locale_path[MAX_PATH];
     
-    GetModuleFileNameA(NULL, exe_path, MAX_PATH);
-    
-    char *last_slash = strrchr(exe_path, '\\');
-    if (last_slash) *last_slash = '\0';
-    
-    snprintf(locale_path, sizeof(locale_path), "%s\\locale", exe_path);
-    
-    for (int i = 0; locale_path[i] != '\0'; i++) {
-        if (locale_path[i] == '\\') {
-            locale_path[i] = '/';
+   
+    if (GetModuleFileNameA(NULL, exe_path, MAX_PATH) > 0) {
+        char *last_slash = strrchr(exe_path, '\\');
+        if (last_slash) {
+            *last_slash = '\0';
         }
+        snprintf(locale_path, sizeof(locale_path), "%s\\locale", exe_path);
+    } else {
+        snprintf(locale_path, sizeof(locale_path), ".\\locale");
     }
+    
+    
     
     bindtextdomain("tpm", locale_path);
 #else	
@@ -157,9 +173,10 @@ init_tpm_locale(char* locale_id, toothpaste_pick_options_t* opts)
     bindtextdomain("tpm", "/usr/local/share/locale");
 #endif
 #endif
+
     bind_textdomain_codeset("tpm", "UTF-8");
-    const char *unused_tpm_domain = textdomain("tpm");
-    (void)unused_tpm_domain;
+    
+    textdomain("tpm");
 	
     return 0;
 }

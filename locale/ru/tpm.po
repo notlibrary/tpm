@@ -19,8 +19,8 @@ msgstr ""
 "%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 
 #: tpm.c:27
-msgid "Default"
-msgstr "По умолчанию"
+msgid "Default(Circular)"
+msgstr "По умолчанию(Циркуляр)"
 
 #: tpm.c:28 tpm.c:37
 msgid "Random"

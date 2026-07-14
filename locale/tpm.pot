@@ -18,7 +18,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 
 #: tpm.c:27
-msgid "Default"
+msgid "Default(Circular)"
 msgstr ""
 
 #: tpm.c:28 tpm.c:37

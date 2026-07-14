@@ -10,6 +10,18 @@ Algorithm as follows
    generated `~/tpm/toothpastes` `~/tpm/tpm.conf` `~/tpm/pickstats` files 
  Next user increment counter go to 1
 */
+/* 
+	Toothpaste picking manager frontend survey source code 0BSD license
+*/
+
+/* 
+Algorithm as follows
+1. Ask user questions
+2. Pass the answers to AI with MCP
+3. Get AI recommendation in Toothpaste picking manager format 
+   generated `~/tpm/toothpastes` `~/tpm/tpm.conf` `~/tpm/pickstats` files 
+ Next user increment counter go to 1
+*/
 import React, { useState } from 'react';
 
 const welcome_msg: string = `Welcome to the Toothpaste picking manager frontend survey
@@ -90,18 +102,30 @@ const default_answers: string[] = [
   "guwntdapobiTfWPlUsmI",
   "en_US"
 ];
- //export default function App() {
-  export const ToothpasteSurveyApp = () => {
+
+export default function App() {
+//export const ToothpasteSurveyApp = () => {
   const [userIndex, setUserIndex] = useState(1);
   const [currentIdx, setCurrentIdx] = useState(0);
-  const [answer, setAnswer] = useState(default_answers[0]);
+  const [answer, setAnswer] = useState<string>(default_answers[0]); 
   const [files, setFiles] = useState({ toothpastes: true, tpmConf: true, pickstats: true });
   const [answers, setAnswers] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<any>(null);
+  const [copied, setCopied] = useState(false);
 
   const handleCheckboxChange = (fileKey: 'toothpastes' | 'tpmConf' | 'pickstats') => {
     setFiles(prev => ({ ...prev, [fileKey]: !prev[fileKey] }));
+  };
+
+  const handleCopyToClipboard = async () => {
+    try {
+      await navigator.clipboard.writeText(JSON.stringify(answers, null, 2));
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch (err) {
+      console.error('Failed to copy text: ', err);
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -149,9 +173,10 @@ const default_answers: string[] = [
   const reset = () => {
     setUserIndex(u => u + 1);
     setCurrentIdx(0);
-    setAnswer(default_answers[0]);
+    setAnswer(default_answers[0])
     setAnswers({});
     setResult(null);
+    setCopied(false);
   };
 
   return (
@@ -159,7 +184,7 @@ const default_answers: string[] = [
       <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid #eee', paddingBottom: '12px', marginBottom: '20px' }}>
         <div>
           <h3 style={{ margin: 0 }}>🪥 TPM Dashboard</h3>
-          <a href="https://github.com/notlibrary/tpm/releases" target="_blank" rel="noreferrer" style={{ fontSize: '11px', color: '#002fcc', textDecoration: 'none' }}>TPM Releases </a>
+          <a href="https://github.com" target="_blank" rel="noreferrer" style={{ fontSize: '11px', color: '#002fcc', textDecoration: 'none' }}>TPM Releases ↗</a>
         </div>
         <span style={{ fontSize: '12px', fontWeight: 'bold', background: '#e2e8f0', padding: '4px 10px', borderRadius: '12px' }}>ID: #{userIndex}</span>
       </div>
@@ -179,15 +204,15 @@ const default_answers: string[] = [
             <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginBottom: '20px' }}>
               <label style={{ display: 'flex', gap: '8px', cursor: 'pointer', alignItems: 'center' }}>
                 <input type="checkbox" checked={files.toothpastes} onChange={() => handleCheckboxChange('toothpastes')} />
-                <span style={{ fontFamily: 'monospace' }}>~/tpm/toothpastes (Toothpaste recommendations) </span>
+                <span style={{ fontFamily: 'monospace' }}>~/tpm/toothpastes (Toothpaste recommendations)</span>
               </label>
               <label style={{ display: 'flex', gap: '8px', cursor: 'pointer', alignItems: 'center' }}>
                 <input type="checkbox" checked={files.tpmConf} onChange={() => handleCheckboxChange('tpmConf')} />
-                <span style={{ fontFamily: 'monospace' }}>~/tpm/tpm.conf (Environmental configuration) </span>
+                <span style={{ fontFamily: 'monospace' }}>~/tpm/tpm.conf (Environmental configuration)</span>
               </label>
               <label style={{ display: 'flex', gap: '8px', cursor: 'pointer', alignItems: 'center' }}>
                 <input type="checkbox" checked={files.pickstats} onChange={() => handleCheckboxChange('pickstats')} />
-                <span style={{ fontFamily: 'monospace' }}>~/tpm/pickstats (Statistical initializer) </span>
+                <span style={{ fontFamily: 'monospace' }}>~/tpm/pickstats (Statistical initializer)</span>
               </label>
             </div>
           ) : (
@@ -203,14 +228,31 @@ const default_answers: string[] = [
 
       {result && (
         <div style={{ width: '100%' }}>
-          <h4 style={{ color: '#2e7d32', margin: '0 0 16px 0', fontSize: '18px' }}>✓ Configs Delivered</h4>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+            <h4 style={{ color: '#2e7d32', margin: 0, fontSize: '18px' }}>✓ Configs Delivered</h4>
+            <button 
+              type="button"
+              onClick={handleCopyToClipboard}
+              style={{ padding: '6px 12px', background: copied ? '#059669' : '#475569', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer', fontSize: '12px', fontWeight: 'bold', transition: 'background-color 0.2s' }}
+            >
+              {copied ? '✓ Copied!' : 'Copy Survey Data as JSON'}
+            </button>
+          </div>
+          
           {Object.entries(result).map(([k, v]) => v && (
-            <div key={k} style={{ marginTop: '16px', width: '100%' }}>
-              <span style={{ fontSize: '12px', color: '#555', display: 'block', marginBottom: '4px', fontFamily: 'monospace' }}>~/tpm/{k}</span>
-              <pre style={{ background: '#1a1a1a', color: '#00ffcc', padding: '14px', borderRadius: '6px', overflowX: 'auto', margin: 0, fontSize: '13px', width: '100%', boxSizing: 'border-box', whiteSpace: 'pre-wrap' }}>{v as string}</pre>
+            <div key={k} style={{ marginTop: '8px' }}>
+              <span style={{ fontSize: '11px', fontFamily: 'monospace' }}>~/tpm/{k}</span>
+              <pre style={{ background: '#1a1a1a', color: '#00ffcc', padding: '8px', borderRadius: '4px', overflowX: 'auto', margin: 0, fontSize: '11px', whiteSpace: 'pre-wrap' }}>{v as string}</pre>
             </div>
           ))}
-          <button onClick={reset} style={{ width: '100%', padding: '12px', background: '#10b981', color: '#fff', border: 'none', borderRadius: '6px', cursor: 'pointer', marginTop: '24px', fontSize: '15px', fontWeight: 'bold' }}>Next User ⟳</button>
+          
+          <button 
+            type="button" 
+            onClick={reset} 
+            style={{ width: '100%', padding: '12px', background: '#10b981', color: '#fff', border: 'none', borderRadius: '6px', cursor: 'pointer', marginTop: '24px', fontSize: '15px', fontWeight: 'bold' }}
+          >
+            Next User ⟳
+          </button>
         </div>
       )}
     </div>

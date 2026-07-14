@@ -18,8 +18,8 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 
 #: tpm.c:27
-msgid "Default"
-msgstr "デフォルト"
+msgid "Default(Circular)"
+msgstr "デフォルト (円形)"
 
 #: tpm.c:28 tpm.c:37
 msgid "Random"
