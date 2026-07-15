@@ -120,31 +120,25 @@ static int
 init_tpm_locale(char* locale_id, toothpaste_pick_options_t* opts)
 {
     char *current_locale = NULL;
+    const char *fallback_locale;
     (void)locale_id; 
-	
-#if defined(_WIN32) || defined(_WIN64)
 
+#if defined(_WIN32) || defined(_WIN64)
     SetConsoleOutputCP(CP_UTF8);
     SetConsoleCP(CP_UTF8);
-
-    if (opts == NULL || opts->tpm_locale == NULL || opts->tpm_locale[0] == '\0') {
-        current_locale = setlocale(LC_ALL, ".UTF-8");
-    } else {
-        current_locale = setlocale(LC_ALL, opts->tpm_locale);
-        if (current_locale == NULL) {
-            current_locale = setlocale(LC_ALL, ".UTF-8");
-        }
-    }
+    fallback_locale = ".UTF-8";
 #else
-    if (opts == NULL || opts->tpm_locale == NULL || opts->tpm_locale[0] == '\0') {
-        current_locale = setlocale(LC_ALL, "");
+    fallback_locale = "";
+#endif
+
+    if (opts == NULL || opts->tpm_locale[0] == '\0') {
+        current_locale = setlocale(LC_ALL, fallback_locale);
     } else {
         current_locale = setlocale(LC_ALL, opts->tpm_locale);
         if (current_locale == NULL) {
-            current_locale = setlocale(LC_ALL, "");
+            current_locale = setlocale(LC_ALL, fallback_locale);
         }
     }
-#endif
 
     (void)current_locale;
 
@@ -152,7 +146,6 @@ init_tpm_locale(char* locale_id, toothpaste_pick_options_t* opts)
     char exe_path[MAX_PATH];
     char locale_path[MAX_PATH];
     
-   
     if (GetModuleFileNameA(NULL, exe_path, MAX_PATH) > 0) {
         char *last_slash = strrchr(exe_path, '\\');
         if (last_slash) {
@@ -162,8 +155,6 @@ init_tpm_locale(char* locale_id, toothpaste_pick_options_t* opts)
     } else {
         snprintf(locale_path, sizeof(locale_path), ".\\locale");
     }
-    
-    
     
     bindtextdomain("tpm", locale_path);
 #else	
@@ -175,7 +166,6 @@ init_tpm_locale(char* locale_id, toothpaste_pick_options_t* opts)
 #endif
 
     bind_textdomain_codeset("tpm", "UTF-8");
-    
     textdomain("tpm");
 	
     return 0;
