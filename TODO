@@ -1,7 +1,5 @@
 Toothpaste Picking Manager TODO list:
 
-Frontend
-
 Android port
 iOS port
 Open/Free/NetBSD ports
@@ -20,3 +18,4 @@ OpenWrt package
 +Valgrind check mem leaks
 +Clear global variables
 +Chinese Russian localization
++Frontend
