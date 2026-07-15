@@ -38,7 +38,7 @@ Unpack `tpm.wasm` from `tpm-wasm-bin-amd64-x.y.z.tar.gz` and run it with preferr
 see `~/tpm/toothpastes.sample` or `~/tpm/toothpastes-enhanced.sample` below for format details
 
 Two basic methods to get this `~/tpm/toothpastes`  file is "bathroom" actually check the brands in the bathroom and write file manually
-and "frontend" answer the survey on the tpm frontend site and download the file with AI MCP recommendations
+and "frontend" [answer the survey on the TPM frontend site](https://tpmme.me) and download the file with AI MCP recommendations
 
 2. Put TPM in the daily crontab or task scheduler task to run it daily(or twice a day)
 
@@ -611,5 +611,7 @@ gives it for free
 
 [Here's an example 3 toothpastes recommendation from Deepseek based on JSON TPM frontend survey results](https://chat.deepseek.com/share/tvdmk9ylo7wy1vxlbk)
 No MCP just random agent
+
+[TPM frontend is running here](https://tpmme.me)
 
 P.S. Do not forget to brush your hard disk with `dd` and `rm -rf /` toothpastes twice a day
