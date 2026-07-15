@@ -609,4 +609,7 @@ needed for C backend (`~/tpm/toothpastes` `~/tpm/tpm.conf` `~/tpm/pickstats` ) a
 It's killing feature that it gives you reliable AI agent toothpaste recommendation based on MCP collaborative toothpastes database connection
 gives it for free
 
+[Here's an example 3 toothpastes recommendation from Deepseek based on JSON TPM frontend survey results](https://chat.deepseek.com/share/tvdmk9ylo7wy1vxlbk)
+No MCP just random agent
+
 P.S. Do not forget to brush your hard disk with `dd` and `rm -rf /` toothpastes twice a day
