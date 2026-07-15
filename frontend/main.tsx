@@ -70,6 +70,13 @@ interface ResultType {
   pickstats: string | null;
 }
 
+interface Toothbrush {
+  color: string;
+  brand: string;
+  length_cm: number;
+  hardness: number;
+}
+
 const welcome_msg: string = `Welcome to the Toothpaste picking manager frontend survey
 Everything is completely anonymous 
 We do not save your personal data and using it only to produce high quality AI recommendation
@@ -130,7 +137,7 @@ const default_answers: string[] = [
   "no",
   "no",
   "no",
-  "sup /b/",
+  "sup/b/",
   "DEFAULT",
   "TRUE",
   "FALSE",
@@ -151,22 +158,17 @@ const default_answers: string[] = [
 
 // Generate binary pickstats file
 function generateBinaryPickStats(stats: ToothpastePickStats): Uint8Array {
-  // Create ArrayBuffer for the struct
-  // time_t is 8 bytes, unsigned int is 4 bytes = 12 bytes total
   const buffer = new ArrayBuffer(12);
   const view = new DataView(buffer);
   
-  // Write last_pick_time (64-bit integer)
-  view.setBigUint64(0, BigInt(stats.last_pick_time), true); // little-endian
-  
-  // Write total_picks (32-bit unsigned integer)
-  view.setUint32(8, stats.total_picks, true); // little-endian
+  view.setBigUint64(0, BigInt(stats.last_pick_time), true);
+  view.setUint32(8, stats.total_picks, true);
   
   return new Uint8Array(buffer);
 }
 
-// Generate toothpaste file
-function generateToothpastes(answers: Record<string, string>): string {
+// Generate enhanced toothpaste file with toothbrush info
+function generateToothpastesEnhanced(answers: Record<string, string>): string {
   const brands = parseInt(answers[questions[3]]) || 3;
   const specialization = answers[questions[10]] || "complex protection";
   const smoking = answers[questions[7]]?.toLowerCase() === "yes";
@@ -176,6 +178,7 @@ function generateToothpastes(answers: Record<string, string>): string {
   const braces = answers[questions[15]]?.toLowerCase() === "yes";
   const organic = answers[questions[16]]?.toLowerCase() === "yes";
   const cheap = answers[questions[13]]?.toLowerCase() === "cheap";
+  const needsBrush = answers[questions[12]]?.toLowerCase() === "yes";
 
   // Brand database with realistic values
   const brandDatabase = [
@@ -191,6 +194,18 @@ function generateToothpastes(answers: Record<string, string>): string {
     { name: 'CLOSYS', price: 145, rating: 84, color: 'Red', brand: 'CloSYS', fluoride: 11, abrasiveness: 42 },
   ];
 
+  // Toothbrush database
+  const toothbrushDatabase: Toothbrush[] = [
+    { color: 'Black', brand: 'Random toothbrush', length_cm: 20, hardness: 50 },
+    { color: 'White', brand: 'Random toothbrush', length_cm: 25, hardness: 25 },
+    { color: 'Pink', brand: 'Random toothbrush', length_cm: 20, hardness: 50 },
+    { color: 'Green', brand: 'Random toothbrush', length_cm: 20, hardness: 50 },
+    { color: 'Blue', brand: 'Random toothbrush', length_cm: 22, hardness: 40 },
+    { color: 'Red', brand: 'Random toothbrush', length_cm: 18, hardness: 60 },
+    { color: 'Purple', brand: 'Random toothbrush', length_cm: 21, hardness: 35 },
+    { color: 'Orange', brand: 'Random toothbrush', length_cm: 19, hardness: 45 },
+  ];
+
   // Filter brands based on preferences
   let selectedBrands = brandDatabase;
   
@@ -199,7 +214,6 @@ function generateToothpastes(answers: Record<string, string>): string {
   }
   
   if (pain) {
-    // Sensitive teeth - prioritize SENSODYNE
     selectedBrands = selectedBrands.sort((a, b) => {
       if (a.name === 'SENSODYNE') return -1;
       if (b.name === 'SENSODYNE') return 1;
@@ -212,7 +226,6 @@ function generateToothpastes(answers: Record<string, string>): string {
   }
   
   if (smoking || whine || chocolate) {
-    // Higher rating for whitening brands
     selectedBrands = selectedBrands.sort((a, b) => b.rating - a.rating);
   }
 
@@ -232,11 +245,91 @@ function generateToothpastes(answers: Record<string, string>): string {
     });
   }
 
-  // Generate CSV content
-  let content = "# Toothpaste Picking Manager - Toothpastes CSV\n";
-  content += "# Generated from survey responses\n";
+  // Generate enhanced CSV content with toothbrush info
+  let content = "#TPM Toothpaste Picking Manager ~/tpm/toothpastes enhanced file\n";
+  content += "#Index,Brand string,Tube mass grams,Rating,Toothbrush Color,Toothbrush Brand,Toothbrush Length_cm,Toothbrush Hardness\n";
   content += `# Specialization: ${specialization}\n`;
-  content += `# Format: ID,NAME,PRICE,RATING,COLOR,BRAND,FLUORIDE,ABRASIVENESS\n`;
+  
+  if (smoking) content += "# Note: Smoker - extra whitening recommended\n";
+  if (whine) content += "# Note: Red wine drinker - stain protection recommended\n";
+  if (chocolate) content += "# Note: Chocolate lover - cavity protection recommended\n";
+  if (pain) content += "# Note: Sensitive teeth - desensitizing recommended\n";
+  if (braces) content += "# Note: Braces/implants - gentle formula recommended\n";
+  if (organic) content += "# Note: Organic/fluoride-free preference\n";
+  if (cheap) content += "# Note: Budget-friendly options\n";
+  if (needsBrush) content += "# Note: Toothbrush included with recommendation\n";
+  
+  finalBrands.forEach((brand, index) => {
+    const brush = needsBrush ? toothbrushDatabase[index % toothbrushDatabase.length] : 
+      { color: 'Nothing', brand: 'Nothing', length_cm: 0, hardness: 0 };
+    content += `${index},${brand.name},${brand.price},${brand.rating},${brush.color},${brush.brand},${brush.length_cm},${brush.hardness}\n`;
+  });
+  
+  return content;
+}
+
+// Generate normal toothpaste file (without toothbrush info)
+function generateToothpastesNormal(answers: Record<string, string>): string {
+  const brands = parseInt(answers[questions[3]]) || 3;
+  const specialization = answers[questions[10]] || "complex protection";
+  const smoking = answers[questions[7]]?.toLowerCase() === "yes";
+  const whine = answers[questions[8]]?.toLowerCase() === "yes";
+  const chocolate = answers[questions[9]]?.toLowerCase() === "yes";
+  const pain = answers[questions[14]]?.toLowerCase() === "yes";
+  const braces = answers[questions[15]]?.toLowerCase() === "yes";
+  const organic = answers[questions[16]]?.toLowerCase() === "yes";
+  const cheap = answers[questions[13]]?.toLowerCase() === "cheap";
+
+  // Brand database with realistic values
+  const brandDatabase = [
+    { name: 'LACALUT', price: 100, rating: 90 },
+    { name: 'CREST', price: 161, rating: 90 },
+    { name: 'SENSODYNE', price: 150, rating: 100 },
+    { name: 'COLGATE', price: 120, rating: 85 },
+    { name: 'AQUAFRESH', price: 110, rating: 88 },
+    { name: 'ARM & HAMMER', price: 95, rating: 82 },
+    { name: 'TOMS', price: 130, rating: 78 },
+    { name: 'HELLO', price: 125, rating: 80 },
+    { name: 'BURT\'S BEES', price: 140, rating: 76 },
+    { name: 'CLOSYS', price: 145, rating: 84 },
+  ];
+
+  // Filter brands based on preferences
+  let selectedBrands = brandDatabase;
+  
+  if (organic) {
+    // Organic brands are those with lower price (simplified)
+    selectedBrands = selectedBrands.filter(b => b.price < 120);
+  }
+  
+  if (pain) {
+    selectedBrands = selectedBrands.sort((a, b) => {
+      if (a.name === 'SENSODYNE') return -1;
+      if (b.name === 'SENSODYNE') return 1;
+      return 0;
+    });
+  }
+  
+  if (cheap) {
+    selectedBrands = selectedBrands.sort((a, b) => a.price - b.price);
+  }
+  
+  if (smoking || whine || chocolate) {
+    selectedBrands = selectedBrands.sort((a, b) => b.rating - a.rating);
+  }
+
+  // Take only the requested number of brands
+  const finalBrands = selectedBrands.slice(0, brands);
+  
+  // Add "Nothing" placeholder if needed
+  while (finalBrands.length < brands) {
+    finalBrands.push({ name: 'Nothing', price: 0, rating: 0 });
+  }
+
+  // Generate normal CSV content
+  let content = "#TPM Toothpaste Picking Manager ~/tpm/toothpastes file\n";
+  content += "#id,brand string,tube mass g,rating\n";
+  content += `# Specialization: ${specialization}\n`;
   
   if (smoking) content += "# Note: Smoker - extra whitening recommended\n";
   if (whine) content += "# Note: Red wine drinker - stain protection recommended\n";
@@ -247,7 +340,7 @@ function generateToothpastes(answers: Record<string, string>): string {
   if (cheap) content += "# Note: Budget-friendly options\n";
   
   finalBrands.forEach((brand, index) => {
-    content += `${index},${brand.name},${brand.price},${brand.rating},${brand.color},${brand.brand},${brand.fluoride},${brand.abrasiveness}\n`;
+    content += `${index},${brand.name},${brand.price},${brand.rating}\n`;
   });
   
   return content;
@@ -345,7 +438,6 @@ function formatConfig(config: TPMConfig): string {
 function downloadFile(content: string | Uint8Array, filename: string, mimeType: string = 'text/plain') {
   let blobContent: BlobPart;
   if (content instanceof Uint8Array) {
-    // Create a new ArrayBuffer from the Uint8Array
     const buffer = new ArrayBuffer(content.length);
     const view = new Uint8Array(buffer);
     view.set(content);
@@ -393,19 +485,15 @@ export default function App() {
   const downloadAll = () => {
     if (!result) return;
     
-    // Download tpm.conf
     if (result.tpmConf) {
       downloadFile(result.tpmConf, 'tpm.conf');
     }
     
-    // Download toothpastes
     if (result.toothpastes) {
       downloadFile(result.toothpastes, 'toothpastes');
     }
     
-    // Download binary pickstats
     if (result.pickstats) {
-      // Convert hex string back to binary
       const hexStr = result.pickstats.replace(/\s/g, '');
       const matches = hexStr.match(/.{1,2}/g);
       const bytes = new Uint8Array(matches?.map((byte: string) => parseInt(byte, 16)) || []);
@@ -433,25 +521,26 @@ export default function App() {
     }
 
     setLoading(true);
-    // Simulate API call with MCP
     setTimeout(() => {
       try {
         const username = nextAnswers[questions[0]] || "Anonymous";
         
-        // Generate tpm.conf
         const tpmConfig = generateTPMConfig(nextAnswers, username);
         const configStr = formatConfig(tpmConfig);
         
-        // Generate toothpastes
-        const toothpastesStr = generateToothpastes(nextAnswers);
+        // Check if user needs a toothbrush (question 12)
+        const needsBrush = nextAnswers[questions[12]]?.toLowerCase() === "yes";
         
-        // Generate binary pickstats
+        // Generate toothpastes based on toothbrush need
+        const toothpastesStr = needsBrush 
+          ? generateToothpastesEnhanced(nextAnswers)
+          : generateToothpastesNormal(nextAnswers);
+        
         const pickStats: ToothpastePickStats = {
-          last_pick_time: Math.floor(Date.now() / 1000), // Current time in seconds
+          last_pick_time: Math.floor(Date.now() / 1000),
           total_picks: 0
         };
         const binaryData = generateBinaryPickStats(pickStats);
-        // Convert to hex string for display
         const hexString = Array.from(binaryData)
           .map(b => b.toString(16).padStart(2, '0'))
           .join(' ');
@@ -606,7 +695,7 @@ export default function App() {
                   style={{ width: '18px', height: '18px', cursor: 'pointer' }}
                 />
                 <span style={{ fontFamily: 'monospace', fontSize: '14px' }}>~/tpm/toothpastes</span>
-                <span style={{ fontSize: '12px', color: '#64748b', marginLeft: 'auto' }}>CSV Format</span>
+                <span style={{ fontSize: '12px', color: '#64748b', marginLeft: 'auto' }}>Recommendations in CSV Format</span>
               </label>
               <label style={{ 
                 display: 'flex', 
@@ -625,7 +714,7 @@ export default function App() {
                   style={{ width: '18px', height: '18px', cursor: 'pointer' }}
                 />
                 <span style={{ fontFamily: 'monospace', fontSize: '14px' }}>~/tpm/tpm.conf</span>
-                <span style={{ fontSize: '12px', color: '#64748b', marginLeft: 'auto' }}>Configuration</span>
+                <span style={{ fontSize: '12px', color: '#64748b', marginLeft: 'auto' }}>Environmental Configuration</span>
               </label>
               <label style={{ 
                 display: 'flex', 
@@ -644,7 +733,7 @@ export default function App() {
                   style={{ width: '18px', height: '18px', cursor: 'pointer' }}
                 />
                 <span style={{ fontFamily: 'monospace', fontSize: '14px' }}>~/tpm/pickstats</span>
-                <span style={{ fontSize: '12px', color: '#64748b', marginLeft: 'auto' }}>Binary (C struct)</span>
+                <span style={{ fontSize: '12px', color: '#64748b', marginLeft: 'auto' }}>Statistical initializer</span>
               </label>
             </div>
           ) : (
