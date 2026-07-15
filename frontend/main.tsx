@@ -22,9 +22,7 @@ Algorithm as follows
    generated `~/tpm/toothpastes` `~/tpm/tpm.conf` `~/tpm/pickstats` files 
  Next user increment counter go to 1
 */
-
 import React, { useState } from 'react';
-import JSZip from 'jszip';
 
 // Type definitions
 interface TPMConfig {
@@ -66,6 +64,12 @@ interface ToothpastePickStats {
   total_picks: number;     // unsigned int
 }
 
+interface ResultType {
+  toothpastes: string | null;
+  tpmConf: string | null;
+  pickstats: string | null;
+}
+
 const welcome_msg: string = `Welcome to the Toothpaste picking manager frontend survey
 Everything is completely anonymous 
 We do not save your personal data and using it only to produce high quality AI recommendation
@@ -84,7 +88,7 @@ const questions: string[] = [
   "Do you like chocolate?",
   "What toothpaste specialization you need most?",
   "Your dental formula?(ie. 2-2-2-2)",
-  "Do you else need the random toothbrush?",
+  "Do you else need the toothbrush?",
   "Do you need cheap toothpaste or more expensive?",
   "Do you experience pain from cold or acidic food?",
   "Do you have braces, implants, or crowns?",
@@ -172,7 +176,6 @@ function generateToothpastes(answers: Record<string, string>): string {
   const braces = answers[questions[15]]?.toLowerCase() === "yes";
   const organic = answers[questions[16]]?.toLowerCase() === "yes";
   const cheap = answers[questions[13]]?.toLowerCase() === "cheap";
-  const brandPref = answers[questions[28]] || "LACALUT";
 
   // Brand database with realistic values
   const brandDatabase = [
@@ -338,6 +341,30 @@ function formatConfig(config: TPMConfig): string {
   return str;
 }
 
+// Helper function to download a file
+function downloadFile(content: string | Uint8Array, filename: string, mimeType: string = 'text/plain') {
+  let blobContent: BlobPart;
+  if (content instanceof Uint8Array) {
+    // Create a new ArrayBuffer from the Uint8Array
+    const buffer = new ArrayBuffer(content.length);
+    const view = new Uint8Array(buffer);
+    view.set(content);
+    blobContent = buffer;
+  } else {
+    blobContent = content;
+  }
+  
+  const blob = new Blob([blobContent], { type: mimeType });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
 export default function App() {
   const [userIndex, setUserIndex] = useState(1);
   const [currentIdx, setCurrentIdx] = useState(0);
@@ -345,7 +372,7 @@ export default function App() {
   const [files, setFiles] = useState({ toothpastes: true, tpmConf: true, pickstats: true });
   const [answers, setAnswers] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(false);
-  const [result, setResult] = useState<any>(null);
+  const [result, setResult] = useState<ResultType | null>(null);
   const [copied, setCopied] = useState(false);
   const [showRawJson, setShowRawJson] = useState(false);
 
@@ -363,36 +390,27 @@ export default function App() {
     }
   };
 
-  const downloadZip = async () => {
-    const zip = new JSZip();
-    const username = answers[questions[0]] || "Anonymous";
+  const downloadAll = () => {
+    if (!result) return;
     
-    // Add tpm.conf
+    // Download tpm.conf
     if (result.tpmConf) {
-      zip.file("tpm.conf", result.tpmConf);
+      downloadFile(result.tpmConf, 'tpm.conf');
     }
     
-    // Add toothpastes
+    // Download toothpastes
     if (result.toothpastes) {
-      zip.file("toothpastes", result.toothpastes);
+      downloadFile(result.toothpastes, 'toothpastes');
     }
     
-    // Add binary pickstats
+    // Download binary pickstats
     if (result.pickstats) {
       // Convert hex string back to binary
-      const hexStr = result.pickstats;
-      const bytes = new Uint8Array(hexStr.match(/.{1,2}/g)?.map(byte => parseInt(byte, 16)) || []);
-      zip.file("pickstats", bytes, { binary: true });
+      const hexStr = result.pickstats.replace(/\s/g, '');
+      const matches = hexStr.match(/.{1,2}/g);
+      const bytes = new Uint8Array(matches?.map((byte: string) => parseInt(byte, 16)) || []);
+      downloadFile(bytes, 'pickstats', 'application/octet-stream');
     }
-    
-    // Generate and download
-    const content = await zip.generateAsync({ type: "blob" });
-    const url = URL.createObjectURL(content);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `tpm_files_user_${String(userIndex).padStart(4, '0')}.zip`;
-    a.click();
-    URL.revokeObjectURL(url);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -782,59 +800,66 @@ export default function App() {
             </div>
           )}
           
-          {Object.entries(result).map(([k, v]) => v && (
-            <div key={k} style={{ marginTop: '12px' }}>
-              <div style={{ 
-                display: 'flex', 
-                alignItems: 'center', 
-                gap: '8px', 
-                marginBottom: '4px'
-              }}>
-                <span style={{ 
-                  fontSize: '12px', 
-                  fontFamily: 'monospace', 
-                  fontWeight: 'bold',
-                  color: '#0f172a',
-                  background: '#f1f5f9',
-                  padding: '2px 8px',
-                  borderRadius: '4px'
+          {Object.entries(result).map(([k, v]) => {
+            if (!v) return null;
+            const key = k as keyof ResultType;
+            const value = result[key];
+            if (!value) return null;
+            
+            return (
+              <div key={k} style={{ marginTop: '12px' }}>
+                <div style={{ 
+                  display: 'flex', 
+                  alignItems: 'center', 
+                  gap: '8px', 
+                  marginBottom: '4px'
                 }}>
-                  ~/tpm/{k}
-                </span>
-                <span style={{ 
-                  fontSize: '10px', 
-                  color: '#64748b',
-                  background: '#e2e8f0',
-                  padding: '1px 6px',
-                  borderRadius: '3px'
+                  <span style={{ 
+                    fontSize: '12px', 
+                    fontFamily: 'monospace', 
+                    fontWeight: 'bold',
+                    color: '#0f172a',
+                    background: '#f1f5f9',
+                    padding: '2px 8px',
+                    borderRadius: '4px'
+                  }}>
+                    ~/tpm/{k}
+                  </span>
+                  <span style={{ 
+                    fontSize: '10px', 
+                    color: '#64748b',
+                    background: '#e2e8f0',
+                    padding: '1px 6px',
+                    borderRadius: '3px'
+                  }}>
+                    {k === 'pickstats' ? 'binary (C struct)' : `${value.toString().split('\n').length} lines`}
+                  </span>
+                </div>
+                <pre style={{ 
+                  background: '#0f172a', 
+                  color: k === 'pickstats' ? '#fcd34d' : '#a7f3d0', 
+                  padding: '12px', 
+                  borderRadius: '8px', 
+                  overflowX: 'auto', 
+                  margin: 0, 
+                  fontSize: k === 'pickstats' ? '11px' : '12px', 
+                  whiteSpace: 'pre-wrap',
+                  fontFamily: 'monospace',
+                  border: '1px solid #1e293b',
+                  maxHeight: k === 'pickstats' ? '100px' : '250px',
+                  overflowY: 'auto',
+                  wordBreak: 'break-all'
                 }}>
-                  {k === 'pickstats' ? 'binary (C struct)' : `${v.toString().split('\n').length} lines`}
-                </span>
+                  {value}
+                </pre>
               </div>
-              <pre style={{ 
-                background: '#0f172a', 
-                color: k === 'pickstats' ? '#fcd34d' : '#a7f3d0', 
-                padding: '12px', 
-                borderRadius: '8px', 
-                overflowX: 'auto', 
-                margin: 0, 
-                fontSize: k === 'pickstats' ? '11px' : '12px', 
-                whiteSpace: 'pre-wrap',
-                fontFamily: 'monospace',
-                border: '1px solid #1e293b',
-                maxHeight: k === 'pickstats' ? '100px' : '250px',
-                overflowY: 'auto',
-                wordBreak: 'break-all'
-              }}>
-                {v as string}
-              </pre>
-            </div>
-          ))}
+            );
+          })}
           
           <div style={{ marginTop: '24px', display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
             <button 
               type="button" 
-              onClick={downloadZip} 
+              onClick={downloadAll} 
               style={{ 
                 flex: 1,
                 minWidth: '120px',
@@ -855,7 +880,7 @@ export default function App() {
               onMouseEnter={e => e.currentTarget.style.transform = 'scale(1.01)'}
               onMouseLeave={e => e.currentTarget.style.transform = 'scale(1)'}
             >
-              📦 Download All (ZIP)
+              📦 Download All Files
             </button>
             <button 
               type="button" 
