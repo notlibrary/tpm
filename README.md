@@ -614,4 +614,10 @@ No MCP just random agent
 
 [TPM frontend is running here](https://tpmme.me)
 
+## Backend 
+For some people "chinese" folk method described above(just copy survey answers JSON and give it to a random agent) is not enough
+They need "enriched" reliable recommendations combined from few models and few toothpaste research databases
+To meet this VIP demand we provide backend MCP server running PostgreSQL toothpaste tech phenomenology research database
+This is an ongoing effort "when it's done"
+
 P.S. Do not forget to brush your hard disk with `dd` and `rm -rf /` toothpastes twice a day
