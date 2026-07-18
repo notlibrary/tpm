@@ -116,7 +116,8 @@ const questions: string[] = [
   "What is your current timezone offset?(hours)",
   "Delta days parameter adjustment?",
   "What config layout template code?",
-  "What interface localization language?"
+  "What interface localization language?",
+  "Add this answer to AI system prompt?"
 ];
 
 const default_answers: string[] = [
@@ -153,7 +154,8 @@ const default_answers: string[] = [
   "0",
   "0",
   "guwntdapobiTfWPlUsmI",
-  "en_US"
+  "en_US",
+  "Thanks you"
 ];
 
 // Generate binary pickstats file
