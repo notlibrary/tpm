@@ -126,9 +126,10 @@ init_tpm_console()
     
     freopen("CONOUT$", "w", stdout);
     freopen("CONIN$", "r", stdin);
-    
+
+#endif    
     fflush(stdout);
-#endif
+
 	return 0;
 }
 
@@ -2317,9 +2318,7 @@ do_not_test_me(int argc, char* argv[])
 	{"locale", required_argument,0, 'L'},	
     {0, 0, 0, 0} 
 };		
-#if defined(_WIN32) || defined(_WIN64)
     init_tpm_console();
-#endif
 	tpm_init_context(&topts); 
 	
 	result=read_config(topts.config_file_path_final,&topts);
