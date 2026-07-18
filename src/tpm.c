@@ -116,6 +116,22 @@ static const char toothpastes_file_name[MAX_PATH] ="toothpastes";
 static const char output_file_name[MAX_PATH] ="last_pick";
 static const char config_file_name[MAX_PATH] ="tpm.conf";
 
+static int
+init_tpm_console()
+{
+#if defined(_WIN32) || defined(_WIN64)
+	setvbuf(stdout, NULL, _IONBF, 0);
+	SetConsoleOutputCP(CP_UTF8);
+    SetConsoleCP(CP_UTF8);
+    
+    freopen("CONOUT$", "w", stdout);
+    freopen("CONIN$", "r", stdin);
+    
+    fflush(stdout);
+#endif
+	return 0;
+}
+
 static int 
 init_tpm_locale(char* locale_id, toothpaste_pick_options_t* opts)
 {
@@ -124,8 +140,6 @@ init_tpm_locale(char* locale_id, toothpaste_pick_options_t* opts)
     (void)locale_id; 
 
 #if defined(_WIN32) || defined(_WIN64)
-    SetConsoleOutputCP(CP_UTF8);
-    SetConsoleCP(CP_UTF8);
     fallback_locale = ".UTF-8";
 #else
     fallback_locale = "";
@@ -887,9 +901,9 @@ finish(int flag, toothpaste_pick_t* pick)
 #if defined(_WIN32) || defined(_WIN64)
         DWORD process_list[2];
         DWORD count = GetConsoleProcessList(process_list, 2);
-        
+		fflush(stdout);        
         printf("%s", _(user_strings[MSG_ANY_KEY]));
-        fflush(stdout); 
+    
 
         if (count == 1) 
         {
@@ -2304,7 +2318,7 @@ do_not_test_me(int argc, char* argv[])
     {0, 0, 0, 0} 
 };		
 #if defined(_WIN32) || defined(_WIN64)
-    setvbuf(stdout, NULL, _IONBF, 0);
+    init_tpm_console();
 #endif
 	tpm_init_context(&topts); 
 	
@@ -2449,6 +2463,7 @@ do_not_test_me(int argc, char* argv[])
 		save_default_config(cfg,&topts);
 		cfg_free(cfg);
 	}
+	fflush(output_file);
 	if ((output_file)!=stdout)
 	{
 		fclose(output_file);

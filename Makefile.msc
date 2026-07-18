@@ -3,7 +3,7 @@ CC = cl.exe
 LINKER = link.exe
 RC = rc.exe
 
-CFLAGS = /nologo /TC /O2 /DHAVE_MAIN /DENABLE_NLS=1 /FS /c /I"$(VCPKG_ROOT)\include" /I"src" /I"src\win"
+CFLAGS = /nologo /TC /O2 /utf-8 /DHAVE_MAIN /DENABLE_NLS=1 /FS /c /I"$(VCPKG_ROOT)\include" /I"src" /I"src\win"
 LFLAGS = /NOLOGO /LIBPATH:"$(VCPKG_ROOT)\lib" /OUT:
 SRC = src
 

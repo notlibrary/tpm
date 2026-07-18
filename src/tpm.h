@@ -362,6 +362,7 @@ static int check_visibility(int input_id, int new_pick_flag, int toothbrush_flag
 static int check_enhanced_toothpastes(const char* filename);
 static void free_context(toothpaste_pick_options_t* opts);
 static int init_tpm_locale(char* locale_id, toothpaste_pick_options_t* opts);
+static int init_tpm_console();
 #ifdef __cplusplus
 }
 #endif /*__cpluplus*/

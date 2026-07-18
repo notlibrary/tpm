@@ -1,0 +1,56 @@
+# TPM Windows manual build (Makefile.msc)
+CC = cl.exe
+LINKER = link.exe
+RC = rc.exe
+
+CFLAGS = /nologo /TC /O2 /utf-8 /DHAVE_MAIN /DENABLE_NLS=1 /FS /c /I"C:\vcpkg\installed\x64-windows\include" /I"src" /I"src\win"
+LFLAGS = /NOLOGO /MACHINE:X64 /LIBPATH:"C:\vcpkg\installed\x64-windows\lib" /OUT:
+SRC = src
+
+LIBS = intl.lib user32.lib kernel32.lib Advapi32.lib
+
+OBJECTS = \
+	tpm.obj \
+	prng64_xrp32.obj \
+	cfg_parse.obj \
+	getopt.obj
+	
+all: update-po tpm.exe
+
+tpm.obj: $(SRC)\tpm.c
+	$(CC) $(CFLAGS) /Fotpm.obj $(SRC)\tpm.c
+
+prng64_xrp32.obj: $(SRC)\prng64_xrp32.c
+	$(CC) $(CFLAGS) /Foprng64_xrp32.obj $(SRC)\prng64_xrp32.c
+
+cfg_parse.obj: $(SRC)\cfg_parse.c
+	$(CC) $(CFLAGS) /Focfg_parse.obj $(SRC)\cfg_parse.c
+
+getopt.obj: $(SRC)\win\getopt.c
+	$(CC) $(CFLAGS) /wd4273 /Fogetopt.obj $(SRC)\win\getopt.c
+
+tpm.res: tpm.rc
+	$(RC) /nologo tpm.rc
+
+tpm.exe: $(OBJECTS) tpm.res
+	$(LINKER) $(LFLAGS)$@ $(OBJECTS) tpm.res $(LIBS)
+
+update-po:
+	@if exist locale\zh_CN\tpm.po ( if not exist locale\zh_CN\LC_MESSAGES mkdir locale\zh_CN\LC_MESSAGES )
+	@if exist locale\zh_CN\tpm.po "C:\Program Files\gettext-iconv\bin\msgfmt.exe" locale\zh_CN\tpm.po -o locale\zh_CN\LC_MESSAGES\tpm.mo
+	@if exist locale\fr\tpm.po ( if not exist locale\fr\LC_MESSAGES mkdir locale\fr\LC_MESSAGES )
+	@if exist locale\fr\tpm.po "C:\Program Files\gettext-iconv\bin\msgfmt.exe" locale\fr\tpm.po -o locale\fr\LC_MESSAGES\tpm.mo
+	@if exist locale\es\tpm.po ( if not exist locale\es\LC_MESSAGES mkdir locale\es\LC_MESSAGES )
+	@if exist locale\es\tpm.po "C:\Program Files\gettext-iconv\bin\msgfmt.exe" locale\es\tpm.po -o locale\es\LC_MESSAGES\tpm.mo
+	@if exist locale\de\tpm.po ( if not exist locale\de\LC_MESSAGES mkdir locale\de\LC_MESSAGES )
+	@if exist locale\de\tpm.po "C:\Program Files\gettext-iconv\bin\msgfmt.exe" locale\de\tpm.po -o locale\de\LC_MESSAGES\tpm.mo
+	@if exist locale\ru\tpm.po ( if not exist locale\ru\LC_MESSAGES mkdir locale\ru\LC_MESSAGES )
+	@if exist locale\ru\tpm.po "C:\Program Files\gettext-iconv\bin\msgfmt.exe" locale\ru\tpm.po -o locale\ru\LC_MESSAGES\tpm.mo
+	@if exist locale\it\tpm.po ( if not exist locale\it\LC_MESSAGES mkdir locale\it\LC_MESSAGES )
+	@if exist locale\it\tpm.po "C:\Program Files\gettext-iconv\bin\msgfmt.exe" locale\it\tpm.po -o locale\it\LC_MESSAGES\tpm.mo
+	@if exist locale\ja\tpm.po ( if not exist locale\ja\LC_MESSAGES mkdir locale\ja\LC_MESSAGES )
+	@if exist locale\ja\tpm.po "C:\Program Files\gettext-iconv\bin\msgfmt.exe" locale\ja\tpm.po -o locale\ja\LC_MESSAGES\tpm.mo
+
+clean:
+	-del /q tpm.exe tpm.res $(OBJECTS) 2>nul
+	-del /s /q *.mo 2>nul
