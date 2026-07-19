@@ -1,14 +1,18 @@
 #!/usr/bin/env tclsh
 # ============================================
 # TOOTHPASTE PRODUCTION MANAGER GUI
-# Tcl/Tk with PostgreSQL Integration
+# Tcl/Tk with PostgreSQL (tdbc::postgres)
 # ============================================
 
 package require Tk
 package require ttk
-package require sqlite3
-# For PostgreSQL, we'll use the tdbc::postgres driver
-# package require tdbc::postgres
+
+# Try to load PostgreSQL driver
+set pg_available 0
+catch {
+    package require tdbc::postgres
+    set pg_available 1
+}
 
 # ============================================
 # 1. DATABASE CONNECTION
@@ -17,17 +21,28 @@ package require sqlite3
 namespace eval DB {
     variable conn ""
     variable connected 0
+    variable pg_available 0
+    
+    proc check_availability {} {
+        variable pg_available
+        return $pg_available
+    }
     
     proc connect {host port db user password} {
         variable conn
         variable connected
+        variable pg_available
+        
+        if {!$pg_available} {
+            error "PostgreSQL driver (tdbc::postgres) is not available"
+        }
         
         catch {
             # Using tdbc::postgres driver
-            # set conn [tdbc::postgres::connection new \
-            #     -host $host -port $port -db $db \
-            #     -user $user -password $password]
-            # set connected 1
+            set conn [tdbc::postgres::connection new \
+                -host $host -port $port -db $db \
+                -user $user -password $password]
+            set connected 1
         }
         return $connected
     }
@@ -41,6 +56,11 @@ namespace eval DB {
         }
     }
     
+    proc connected {} {
+        variable connected
+        return $connected
+    }
+    
     proc exec_query {sql} {
         variable conn
         variable connected
@@ -49,6 +69,31 @@ namespace eval DB {
         }
         return [$conn prepare $sql]
     }
+    
+    proc eval {sql} {
+        variable conn
+        if {!$connected} {
+            error "Not connected to database"
+        }
+        set stmt [$conn prepare $sql]
+        $stmt execute
+        set results {}
+        $stmt foreach row {
+            lappend results $row
+        }
+        $stmt close
+        return $results
+    }
+    
+    proc get_connection {} {
+        variable conn
+        return $conn
+    }
+}
+
+# Set PostgreSQL availability
+if {$pg_available} {
+    DB::pg_available 1
 }
 
 # ============================================
@@ -57,9 +102,16 @@ namespace eval DB {
 
 namespace eval App {
     variable current_frame ""
-    variable notebook ""
+    variable main_notebook ""
     variable status_var ""
     variable tree_vars
+    variable nav_tree ""
+    variable conn_entry
+    variable batch_form
+    variable form_form
+    variable comp_form
+    variable qc_form
+    variable report_text
     
     # Main window initialization
     proc init {} {
@@ -92,6 +144,12 @@ namespace eval App {
         
         # Initialize with dashboard
         show_dashboard
+        
+        # Check PostgreSQL driver availability
+        if {![DB::check_availability]} {
+            set_status "PostgreSQL driver not available! Please install tdbc::postgres" red
+            .toolbar.status_ind configure -text "● Driver Missing" -foreground orange
+        }
     }
     
     # Menu creation
@@ -264,8 +322,8 @@ namespace eval App {
         $parent add $content_frame -weight 1
         
         # Create notebook
-        set notebook [ttk::notebook $content_frame.notebook]
-        pack $notebook -fill both -expand true
+        set notebook_widget [ttk::notebook $content_frame.notebook]
+        pack $notebook_widget -fill both -expand true
         
         # Add tabs
         set tabs {
@@ -278,14 +336,14 @@ namespace eval App {
         }
         
         foreach {tab name} $tabs {
-            set frame [ttk::frame $notebook.$name]
-            $notebook add $frame -text $tab
+            set frame [ttk::frame $notebook_widget.$name]
+            $notebook_widget add $frame -text $tab
         }
         
-        variable notebook $notebook
+        variable main_notebook $notebook_widget
         
         # Initially show dashboard tab
-        $notebook select $notebook.dashboard
+        $notebook_widget select $notebook_widget.dashboard
         show_dashboard_content
     }
     
@@ -308,7 +366,6 @@ namespace eval App {
     
     # Update status bar time
     proc update_status_time {} {
-        variable status_var
         if {[winfo exists .statusbar.time]} {
             .statusbar.time configure -text [clock format [clock seconds] -format "%Y-%m-%d %H:%M:%S"]
         }
@@ -318,8 +375,10 @@ namespace eval App {
     # Set status message
     proc set_status {msg {color black}} {
         variable status_var
-        $status_var configure -text $msg -foreground $color
-        update idletasks
+        if {[winfo exists $status_var]} {
+            $status_var configure -text $msg -foreground $color
+            update idletasks
+        }
     }
 }
 
@@ -328,14 +387,27 @@ namespace eval App {
 # ============================================
 
 proc App::show_connection_dialog {} {
+    # Check if PostgreSQL driver is available
+    if {![DB::check_availability]} {
+        tk_messageBox -icon error -title "Driver Not Available" \
+            -message "PostgreSQL driver (tdbc::postgres) is not installed.\n\nPlease install it using:\n\n  teacup install tdbc::postgres\n\nOr download from:\n  https://github.com/tcltk/tdbcpostgres"
+        return
+    }
+    
     set w .connection_dialog
     catch {destroy $w}
     toplevel $w -class Dialog
     wm title $w "Database Connection"
-    wm geometry $w "400x250"
+    wm geometry $w "450x320"
     
     ttk::label $w.title -text "PostgreSQL Connection Settings" -font {Arial 12 bold}
     pack $w.title -pady 10
+    
+    # PostgreSQL version info
+    set ver_frame [ttk::frame $w.version]
+    pack $ver_frame -fill x -padx 10 -pady 5
+    ttk::label $ver_frame.lbl -text "Driver: tdbc::postgres (loaded)" -foreground green -font {Arial 9}
+    pack $ver_frame.lbl -side left
     
     set fields [list \
         [list "Host:" host "localhost"] \
@@ -373,10 +445,45 @@ proc App::show_connection_dialog {} {
     }
     pack $btn_frame.connect -side left -padx 10
     
+    ttk::button $btn_frame.test -text "Test Connection" -command {
+        App::test_connection
+    }
+    pack $btn_frame.test -side left -padx 10
+    
     ttk::button $btn_frame.cancel -text "Cancel" -command {
         destroy .connection_dialog
     }
     pack $btn_frame.cancel -side right -padx 10
+}
+
+proc App::test_connection {} {
+    variable conn_entry
+    
+    set host [$conn_entry(host) get]
+    set port [$conn_entry(port) get]
+    set db [$conn_entry(db) get]
+    set user [$conn_entry(user) get]
+    set pass [$conn_entry(pass) get]
+    
+    # Try to connect
+    set temp_conn [DB::connect $host $port $db $user $pass]
+    if {$temp_conn} {
+        # Test query
+        set conn [DB::get_connection]
+        set stmt [$conn prepare "SELECT version()"]
+        $stmt execute
+        $stmt foreach row {
+            set version [lindex $row 0]
+        }
+        $stmt close
+        
+        DB::disconnect
+        tk_messageBox -icon info -title "Success" \
+            -message "Connection successful!\nConnected to $db@$host\n\nPostgreSQL: $version"
+    } else {
+        tk_messageBox -icon error -title "Connection Failed" \
+            -message "Failed to connect to database.\nPlease check your settings."
+    }
 }
 
 proc App::connect_to_db {} {
@@ -411,13 +518,16 @@ proc App::disconnect_db {} {
 # ============================================
 
 proc App::show_dashboard {} {
-    variable notebook
-    $notebook select $notebook.dashboard
-    show_dashboard_content
+    variable main_notebook
+    if {[winfo exists $main_notebook]} {
+        $main_notebook select $main_notebook.dashboard
+        show_dashboard_content
+    }
 }
 
 proc App::show_dashboard_content {} {
-    set frame $notebook.dashboard
+    variable main_notebook
+    set frame $main_notebook.dashboard
     
     # Clear existing content
     foreach child [winfo children $frame] {
@@ -436,14 +546,18 @@ proc App::show_dashboard_content {} {
     set stats_frame [ttk::frame $frame.stats]
     pack $stats_frame -fill x -padx 10 -pady 5
     
-    # Stats boxes
-    set stats_data {
-        "Total Batches" "1,234" "#4CAF50"
-        "Active Formulations" "15" "#2196F3"
-        "QC Tests Today" "23" "#FF9800"
-        "Rejected Batches" "3" "#f44336"
-        "Materials in Stock" "45" "#9C27B0"
-        "Pending Orders" "8" "#00BCD4"
+    # Try to load stats from database
+    if {[DB::connected]} {
+        set stats_data [load_dashboard_stats]
+    } else {
+        set stats_data {
+            "Total Batches" "0" "#4CAF50"
+            "Active Formulations" "0" "#2196F3"
+            "QC Tests Today" "0" "#FF9800"
+            "Rejected Batches" "0" "#f44336"
+            "Materials in Stock" "0" "#9C27B0"
+            "Pending Orders" "0" "#00BCD4"
+        }
     }
     
     set col 0
@@ -483,10 +597,12 @@ proc App::show_dashboard_content {} {
     $tree column status -width 100
     pack $tree -fill both -expand true -padx 5 -pady 5
     
-    # Sample data
-    $tree insert {} end -text "BT20260115-0001" -values {"15:30" "Production" "Active"}
-    $tree insert {} end -text "BT20260115-0002" -values {"14:20" "QC Test" "Passed"}
-    $tree insert {} end -text "BT20260114-0003" -values {"11:45" "Stability" "In Progress"}
+    # Load recent activity from database
+    if {[DB::connected]} {
+        load_recent_activity $tree
+    } else {
+        $tree insert {} end -text "No data" -values {"-" "System" "Disconnected"}
+    }
     
     # Right side - Quick actions
     set right_frame [ttk::frame $main_frame.right -relief groove -borderwidth 1]
@@ -502,6 +618,7 @@ proc App::show_dashboard_content {} {
         "Create Report" "App::report_batch_summary"
     }
     
+    set idx 0
     foreach {action cmd} $actions {
         ttk::button $right_frame.btn$idx -text $action -command $cmd -width 25
         pack $right_frame.btn$idx -pady 5 -padx 10
@@ -512,13 +629,19 @@ proc App::show_dashboard_content {} {
     ttk::label $right_frame.stats_title -text "Today's Statistics" -font {Arial 10 bold}
     pack $right_frame.stats_title -pady 10 -anchor w
     
-    set today_stats {
-        "Batches Completed" 5
-        "QC Tests Performed" 12
-        "Materials Received" 3
-        "Samples in Lab" 8
+    # Load today's stats from database
+    if {[DB::connected]} {
+        set today_stats [load_today_stats]
+    } else {
+        set today_stats {
+            "Batches Completed" 0
+            "QC Tests Performed" 0
+            "Materials Received" 0
+            "Samples in Lab" 0
+        }
     }
     
+    set idx 0
     foreach {stat value} $today_stats {
         set f [ttk::frame $right_frame.stat$idx]
         pack $f -fill x -pady 2
@@ -534,10 +657,128 @@ proc App::show_dashboard_content {} {
 }
 
 # ============================================
-# 5. BATCH MANAGEMENT
+# 5. DATABASE LOADING FUNCTIONS (PostgreSQL)
+# ============================================
+
+proc App::load_dashboard_stats {} {
+    set conn [DB::get_connection]
+    set stats {}
+    
+    # Get total batches
+    set stmt [$conn prepare {SELECT COUNT(*) FROM production_batches}]
+    $stmt execute
+    $stmt foreach row {set total_batches [lindex $row 0]}
+    $stmt close
+    
+    # Get active formulations
+    set stmt [$conn prepare {SELECT COUNT(*) FROM formulations WHERE status = 'Active'}]
+    $stmt execute
+    $stmt foreach row {set active_formulations [lindex $row 0]}
+    $stmt close
+    
+    # Get QC tests today
+    set stmt [$conn prepare {SELECT COUNT(*) FROM qc_tests WHERE test_date >= CURRENT_DATE}]
+    $stmt execute
+    $stmt foreach row {set qc_today [lindex $row 0]}
+    $stmt close
+    
+    # Get rejected batches
+    set stmt [$conn prepare {SELECT COUNT(*) FROM production_batches WHERE status = 'Rejected'}]
+    $stmt execute
+    $stmt foreach row {set rejected [lindex $row 0]}
+    $stmt close
+    
+    # Get materials in stock
+    set stmt [$conn prepare {SELECT COUNT(DISTINCT compound_id) FROM raw_material_inventory WHERE quantity > 0}]
+    $stmt execute
+    $stmt foreach row {set materials [lindex $row 0]}
+    $stmt close
+    
+    return [list \
+        "Total Batches" $total_batches "#4CAF50" \
+        "Active Formulations" $active_formulations "#2196F3" \
+        "QC Tests Today" $qc_today "#FF9800" \
+        "Rejected Batches" $rejected "#f44336" \
+        "Materials in Stock" $materials "#9C27B0" \
+        "Pending Orders" 0 "#00BCD4" \
+    ]
+}
+
+proc App::load_recent_activity {tree} {
+    set conn [DB::get_connection]
+    
+    set stmt [$conn prepare {
+        SELECT batch_number, 
+               TO_CHAR(created_at, 'HH24:MI') as time,
+               'Production' as type,
+               status
+        FROM production_batches 
+        ORDER BY created_at DESC 
+        LIMIT 10
+    }]
+    $stmt execute
+    $stmt foreach row {
+        lassign $row batch time type status
+        $tree insert {} end -text $batch -values [list $time $type $status]
+    }
+    $stmt close
+    
+    # If no data, show a message
+    if {[$tree children {}] eq ""} {
+        $tree insert {} end -text "No recent batches" -values {"-" "System" "No data"}
+    }
+}
+
+proc App::load_today_stats {} {
+    set conn [DB::get_connection]
+    
+    # Get batches completed today
+    set stmt [$conn prepare {
+        SELECT COUNT(*) FROM production_batches 
+        WHERE status = 'Completed' 
+        AND actual_end_date >= CURRENT_DATE
+    }]
+    $stmt execute
+    $stmt foreach row {set batches_completed [lindex $row 0]}
+    $stmt close
+    
+    # Get QC tests today
+    set stmt [$conn prepare {
+        SELECT COUNT(*) FROM qc_tests 
+        WHERE test_date >= CURRENT_DATE
+    }]
+    $stmt execute
+    $stmt foreach row {set qc_performed [lindex $row 0]}
+    $stmt close
+    
+    # Get materials received today
+    set stmt [$conn prepare {
+        SELECT COUNT(*) FROM material_receipts 
+        WHERE receipt_date >= CURRENT_DATE
+    }]
+    $stmt execute
+    $stmt foreach row {set materials_received [lindex $row 0]}
+    $stmt close
+    
+    return [list \
+        "Batches Completed" $batches_completed \
+        "QC Tests Performed" $qc_performed \
+        "Materials Received" $materials_received \
+        "Samples in Lab" 0 \
+    ]
+}
+
+# ============================================
+# 6. BATCH MANAGEMENT
 # ============================================
 
 proc App::show_batch_form {} {
+    if {![DB::connected]} {
+        tk_messageBox -icon warning -title "Not Connected" \
+            -message "Please connect to the database first."
+        return
+    }
+    
     set w .batch_form
     catch {destroy $w}
     toplevel $w -class Dialog
@@ -547,6 +788,37 @@ proc App::show_batch_form {} {
     # Title
     ttk::label $w.title -text "Create New Production Batch" -font {Arial 14 bold}
     pack $w.title -pady 10
+    
+    # Load formulations from database
+    set conn [DB::get_connection]
+    set formulations_list {}
+    set stmt [$conn prepare "SELECT formulation_id, formulation_name FROM formulations WHERE status = 'Active'"]
+    $stmt execute
+    $stmt foreach row {
+        lassign $row id name
+        lappend formulations_list $name
+    }
+    $stmt close
+    
+    # Load facilities from database
+    set facilities_list {}
+    set stmt [$conn prepare "SELECT facility_id, facility_name FROM production_facilities WHERE is_active = true"]
+    $stmt execute
+    $stmt foreach row {
+        lassign $row id name
+        lappend facilities_list $name
+    }
+    $stmt close
+    
+    # Load supervisors from database
+    set supervisors_list {}
+    set stmt [$conn prepare "SELECT person_id, first_name || ' ' || last_name FROM persons WHERE role IN ('Production_Manager', 'Supervisor')"]
+    $stmt execute
+    $stmt foreach row {
+        lassign $row id name
+        lappend supervisors_list $name
+    }
+    $stmt close
     
     # Form fields
     set fields [list \
@@ -570,13 +842,21 @@ proc App::show_batch_form {} {
         
         if {$type eq "combobox"} {
             set widget [ttk::combobox $f.cb -width 30]
-            # Populate with sample data
             if {$var eq "formulation"} {
-                $widget configure -values {"Cavity Protection Classic" "Total Advanced Care" "Pro-Health Enamel" "3D White Professional"}
+                $widget configure -values $formulations_list
+                if {[llength $formulations_list] > 0} {
+                    $widget set [lindex $formulations_list 0]
+                }
             } elseif {$var eq "facility"} {
-                $widget configure -values {"New York Manufacturing Plant" "Ohio Production Facility" "UK Manufacturing Centre"}
+                $widget configure -values $facilities_list
+                if {[llength $facilities_list] > 0} {
+                    $widget set [lindex $facilities_list 0]
+                }
             } elseif {$var eq "supervisor"} {
-                $widget configure -values {"Dr. Smith" "Dr. Jones" "Dr. Kumar"}
+                $widget configure -values $supervisors_list
+                if {[llength $supervisors_list] > 0} {
+                    $widget set [lindex $supervisors_list 0]
+                }
             }
         } else {
             set widget [ttk::entry $f.entry -width 30]
@@ -585,7 +865,6 @@ proc App::show_batch_form {} {
         set App::batch_form($var) $widget
         
         if {$var eq "start_date" || $var eq "end_date"} {
-            # Add date picker (placeholder)
             $widget insert 0 [clock format [clock seconds] -format "%Y-%m-%d"]
         }
     }
@@ -627,27 +906,79 @@ proc App::save_batch {} {
     set supervisor [$batch_form(supervisor) get]
     set notes [$batch_form(notes) get]
     
-    if {$formulation eq "" || $quantity eq ""} {
+    if {$formulation eq "" || $quantity eq "" || $start_date eq "" || $end_date eq ""} {
         tk_messageBox -icon warning -title "Validation Error" \
             -message "Please fill in all required fields."
         return
     }
     
-    # In production, this would call the database stored procedure
-    # DB::exec_query "SELECT create_production_batch(...)"
+    set conn [DB::get_connection]
     
-    set_status "Batch created successfully!" green
+    # Get formulation_id
+    set formulation_id ""
+    set stmt [$conn prepare "SELECT formulation_id FROM formulations WHERE formulation_name = :name"]
+    $stmt set parameter name $formulation
+    $stmt execute
+    $stmt foreach row {set formulation_id [lindex $row 0]}
+    $stmt close
+    
+    # Get facility_id
+    set facility_id ""
+    set stmt [$conn prepare "SELECT facility_id FROM production_facilities WHERE facility_name = :name"]
+    $stmt set parameter name $facility
+    $stmt execute
+    $stmt foreach row {set facility_id [lindex $row 0]}
+    $stmt close
+    
+    # Get supervisor_id
+    set supervisor_id ""
+    set stmt [$conn prepare "SELECT person_id FROM persons WHERE first_name || ' ' || last_name = :name"]
+    $stmt set parameter name $supervisor
+    $stmt execute
+    $stmt foreach row {set supervisor_id [lindex $row 0]}
+    $stmt close
+    
+    # Call stored procedure
+    set stmt [$conn prepare {
+        SELECT create_production_batch(
+            :formulation_id,
+            :facility_id,
+            :quantity::DECIMAL,
+            :start_date::DATE,
+            :end_date::DATE,
+            :supervisor_id,
+            1
+        )
+    }]
+    
+    $stmt set parameter formulation_id $formulation_id    $stmt set parameter facility_id $facility_id
+    $stmt set parameter quantity $quantity
+    $stmt set parameter start_date $start_date
+    $stmt set parameter end_date $end_date
+    $stmt set parameter supervisor_id $supervisor_id
+    
+    $stmt execute
+    $stmt foreach row {set batch_id [lindex $row 0]}
+    $stmt close
+    
+    set_status "Batch created successfully! ID: $batch_id" green
     tk_messageBox -icon info -title "Success" \
-        -message "Production batch created successfully!\nBatch Number: BT20260115-0001"
+        -message "Production batch created successfully!\nBatch ID: $batch_id"
     destroy .batch_form
     show_batches
 }
 
 proc App::show_batches {} {
-    variable notebook
-    $notebook select $notebook.production
+    if {![DB::connected]} {
+        tk_messageBox -icon warning -title "Not Connected" \
+            -message "Please connect to the database first."
+        return
+    }
     
-    set frame $notebook.production
+    variable main_notebook
+    $main_notebook select $main_notebook.production
+    
+    set frame $main_notebook.production
     clear_content $frame
     
     # Title
@@ -661,7 +992,17 @@ proc App::show_batches {} {
     ttk::label $filter_frame.lbl -text "Status Filter:"
     pack $filter_frame.lbl -side left -padx 5
     
-    ttk::combobox $filter_frame.status -values {"All" "Planned" "In Production" "QC Testing" "Completed" "Released"}
+    set status_values [list "All"]
+    set conn [DB::get_connection]
+    set stmt [$conn prepare "SELECT DISTINCT status FROM production_batches ORDER BY status"]
+    $stmt execute
+    $stmt foreach row {
+        lassign $row status
+        lappend status_values $status
+    }
+    $stmt close
+    
+    ttk::combobox $filter_frame.status -values $status_values -width 15
     pack $filter_frame.status -side left -padx 5
     $filter_frame.status set "All"
     
@@ -701,15 +1042,8 @@ proc App::show_batches {} {
     pack $tree -side left -fill both -expand true
     pack $scrollbar -side right -fill y
     
-    # Sample data
-    foreach batch {
-        "BT20260115-0001" "Cavity Protection" "NY Plant" 2500 "2026-01-15" "2026-01-15" "Completed" 98.5
-        "BT20260115-0002" "Total Advanced" "Ohio Plant" 3000 "2026-01-15" "2026-01-16" "In Production" "-"
-        "BT20260114-0003" "Pro-Health" "NY Plant" 2000 "2026-01-14" "2026-01-14" "Completed" 97.2
-        "BT20260114-0004" "3D White" "UK Plant" 1500 "2026-01-14" "2026-01-14" "QC Testing" "-"
-    } {
-        $tree insert {} end -text [lindex $batch 0] -values [lrange $batch 1 end]
-    }
+    # Load batches from database
+    load_batches $tree
     
     # Double-click to view details
     bind $tree <<TreeviewSelect>> {App::show_batch_details %W}
@@ -717,24 +1051,141 @@ proc App::show_batches {} {
     set App::tree_vars(batches) $tree
 }
 
+proc App::load_batches {{tree ""}} {
+    if {$tree eq ""} {
+        variable tree_vars
+        if {[info exists tree_vars(batches)]} {
+            set tree $tree_vars(batches)
+        } else {
+            return
+        }
+    }
+    
+    # Clear existing items
+    $tree delete [$tree children {}]
+    
+    set conn [DB::get_connection]
+    set stmt [$conn prepare {
+        SELECT 
+            pb.batch_number,
+            f.formulation_name,
+            pf.facility_name,
+            pb.target_quantity_kg,
+            TO_CHAR(pb.planned_start_date, 'YYYY-MM-DD') as start_date,
+            TO_CHAR(pb.planned_end_date, 'YYYY-MM-DD') as end_date,
+            pb.status,
+            COALESCE(pb.yield_percentage::TEXT, '-') as yield
+        FROM production_batches pb
+        JOIN formulations f ON pb.formulation_id = f.formulation_id
+        JOIN production_facilities pf ON pb.facility_id = pf.facility_id
+        ORDER BY pb.created_at DESC
+        LIMIT 100
+    }]
+    $stmt execute
+    $stmt foreach row {
+        lassign $row batch_number formulation facility quantity start_date end_date status yield
+        $tree insert {} end -text $batch_number -values [list $formulation $facility $quantity $start_date $end_date $status $yield]
+    }
+    $stmt close
+    
+    if {[$tree children {}] eq ""} {
+        $tree insert {} end -text "No batches found" -values {"-" "-" "-" "-" "-" "-" "-"}
+    }
+    
+    set_status "Loaded batches" green
+}
+
 proc App::show_batch_details {tree} {
     set selection [$tree selection]
     if {$selection eq ""} return
     
     set batch [$tree item $selection -text]
-    tk_messageBox -info -title "Batch Details" \
-        -message "Batch: $batch\n\nDetails would be loaded from database."
+    
+    set w .batch_details
+    catch {destroy $w}
+    toplevel $w -class Dialog
+    wm title $w "Batch Details - $batch"
+    wm geometry $w "600x400"
+    
+    ttk::label $w.title -text "Batch: $batch" -font {Arial 14 bold}
+    pack $w.title -pady 10
+    
+    set text [text $w.text -wrap word -font {Courier 10} -yscrollcommand "$w.scroll set"]
+    pack $text -side left -fill both -expand true -padx 10 -pady 5
+    
+    set scrollbar [ttk::scrollbar $w.scroll -orient vertical -command "$text yview"]
+    pack $scrollbar -side right -fill y
+    
+    # Load batch details from database
+    set conn [DB::get_connection]
+    set stmt [$conn prepare {
+        SELECT 
+            pb.batch_number,
+            pb.target_quantity_kg,
+            pb.actual_quantity_kg,
+            pb.yield_percentage,
+            pb.planned_start_date,
+            pb.planned_end_date,
+            pb.actual_start_date,
+            pb.actual_end_date,
+            pb.status,
+            pb.shift,
+            pb.production_notes,
+            f.formulation_name,
+            pf.facility_name,
+            p.first_name || ' ' || p.last_name as supervisor
+        FROM production_batches pb
+        JOIN formulations f ON pb.formulation_id = f.formulation_id
+        JOIN production_facilities pf ON pb.facility_id = pf.facility_id
+        LEFT JOIN persons p ON pb.supervisor_id = p.person_id
+        WHERE pb.batch_number = :batch
+    }]
+    $stmt set parameter batch $batch
+    $stmt execute
+    
+    $text insert end "Batch Details\n"
+    $text insert end "=============\n\n"
+    
+    $stmt foreach row {
+        lassign $row batch_number target_quantity_kg actual_quantity_kg yield_percentage planned_start_date planned_end_date actual_start_date actual_end_date status shift production_notes formulation_name facility_name supervisor
+        $text insert end "Batch Number     : $batch_number\n"
+        $text insert end "Formulation      : $formulation_name\n"
+        $text insert end "Facility         : $facility_name\n"
+        $text insert end "Supervisor       : $supervisor\n"
+        $text insert end "Target Quantity  : $target_quantity_kg kg\n"
+        $text insert end "Actual Quantity  : $actual_quantity_kg kg\n"
+        $text insert end "Yield            : $yield_percentage%\n"
+        $text insert end "Planned Start    : $planned_start_date\n"
+        $text insert end "Planned End      : $planned_end_date\n"
+        $text insert end "Actual Start     : $actual_start_date\n"
+        $text insert end "Actual End       : $actual_end_date\n"
+        $text insert end "Status           : $status\n"
+        $text insert end "Shift            : $shift\n"
+        $text insert end "Production Notes : $production_notes\n"
+    }
+    $stmt close
+    
+    $text configure -state disabled
+    
+    ttk::button $w.close -text "Close" -command "destroy $w"
+    pack $w.close -pady 10
 }
 
 # ============================================
-# 6. FORMULATIONS MANAGEMENT
+# 7. FORMULATIONS MANAGEMENT
 # ============================================
 
 proc App::show_formulations {} {
-    variable notebook
-    $notebook select $notebook.formulations
+    if {![DB::connected]} {
+        tk_messageBox -icon warning -title "Not Connected" \
+            -message "Please connect to the database first."
+        return
+    }
     
-    set frame $notebook.formulations
+    variable main_notebook
+    $main_notebook select $main_notebook.formulations
+    
+    set frame $main_notebook.formulations
     clear_content $frame
     
     ttk::label $frame.title -text "Formulation Management" -font {Arial 16 bold}
@@ -780,172 +1231,133 @@ proc App::show_formulations {} {
     pack $tree -side left -fill both -expand true
     pack $scrollbar -side right -fill y
     
-    # Sample formulations
-    foreach form {
-        "FRM-001" "Colgate Cavity Protection" "Regular" "Mint" 7.0 1000 "Active"
-        "FRM-002" "Colgate Total" "Gum Care" "Peppermint" 6.8 1450 "Active"
-        "FRM-003" "Crest Pro-Health" "Enamel Repair" "Clean Mint" 7.2 1100 "Active"
-        "FRM-004" "Crest 3D White" "Whitening" "Radiant Mint" 6.5 1500 "Active"
-        "FRM-005" "Sensodyne Relief" "Sensitive" "Mint" 7.0 0 "Active"
-    } {
-        $tree insert {} end -text [lindex $form 0] -values [lrange $form 1 end]
-    }
+    # Load formulations from database
+    load_formulations $tree
     
     set App::tree_vars(formulations) $tree
 }
 
-proc App::show_formulation_form {} {
-    set w .formulation_form
-    catch {destroy $w}
-    toplevel $w -class Dialog
-    wm title $w "New Formulation"
-    wm geometry $w "700x600"
-    
-    # Notebook for form sections
-    set nb [ttk::notebook $w.nb]
-    pack $nb -fill both -expand true -padx 10 -pady 10
-    
-    # General info tab
-    set gen_frame [ttk::frame $nb.general]
-    $nb add $gen_frame -text "General Info"
-    
-    set fields {
-        "Formulation Code:" "code"
-        "Formulation Name:" "name"
-        "Brand:" "brand"
-        "Product Type:" "type"
-        "Flavor Profile:" "flavor"
-        "Target pH:" "ph"
-        "Fluoride (ppm):" "fluoride"
-        "Status:" "status"
-    }
-    
-    foreach {label var} $fields {
-        set f [ttk::frame $gen_frame.$var]
-        pack $f -fill x -pady 3 -padx 10
-        
-        ttk::label $f.lbl -text $label -width 20 -anchor e
-        pack $f.lbl -side left
-        
-        set entry [ttk::entry $f.entry -width 30]
-        pack $f.entry -side left -expand true -fill x
-        set App::form_form($var) $entry
-        
-        if {$var eq "status"} {
-            $entry insert 0 "Active"
+proc App::load_formulations {{tree ""}} {
+    if {$tree eq ""} {
+        variable tree_vars
+        if {[info exists tree_vars(formulations)]} {
+            set tree $tree_vars(formulations)
+        } else {
+            return
         }
     }
     
-    # Components tab
-    set comp_frame [ttk::frame $nb.components]
-    $nb add $comp_frame -text "Components"
+    # Clear existing items
+    $tree delete [$tree children {}]
     
-    # Components list with percentages
-    ttk::label $comp_frame.title -text "Formulation Components" -font {Arial 10 bold}
-    pack $comp_frame.title -pady 5
-    
-    set comp_tree [ttk::treeview $comp_frame.tree -columns {cas function min max target phase} -height 10]
-    $comp_tree heading #0 -text "Compound Name"
-    $comp_tree heading cas -text "CAS"
-    $comp_tree heading function -text "Function"
-    $comp_tree heading min -text "Min %"
-    $comp_tree heading max -text "Max %"
-    $comp_tree heading target -text "Target %"
-    $comp_tree heading phase -text "Phase"
-    
-    $comp_tree column #0 -width 150
-    $comp_tree column cas -width 120
-    $comp_tree column function -width 120
-    $comp_tree column min -width 60
-    $comp_tree column max -width 60
-    $comp_tree column target -width 60
-    $comp_tree column phase -width 80
-    
-    pack $comp_tree -fill both -expand true -padx 5 -pady 5
-    
-    # Add component button
-    ttk::button $comp_frame.add -text "Add Component" -command {App::add_component}
-    pack $comp_frame.add -pady 5
-    
-    # Buttons
-    set btn_frame [ttk::frame $w.buttons]
-    pack $btn_frame -fill x -pady 10
-    
-    ttk::button $btn_frame.save -text "Save Formulation" -command {
-        App::save_formulation
+    set conn [DB::get_connection]
+    set stmt [$conn prepare {
+        SELECT 
+            f.formulation_code,
+            b.brand_name,
+            f.product_type,
+            f.flavor_profile,
+            f.target_ph,
+            f.fluoride_ppm,
+            f.status
+        FROM formulations f
+        JOIN brands b ON f.brand_id = b.brand_id
+        WHERE f.is_active = true
+        ORDER BY f.formulation_code
+    }]
+    $stmt execute
+    $stmt foreach row {
+        lassign $row code brand type flavor ph fluoride status
+        $tree insert {} end -text $code -values [list $brand $type $flavor $ph $fluoride $status]
     }
-    pack $btn_frame.save -side left -padx 10
+    $stmt close
     
-    ttk::button $btn_frame.cancel -text "Cancel" -command {
-        destroy .formulation_form
+    if {[$tree children {}] eq ""} {
+        $tree insert {} end -text "No formulations found" -values {"-" "-" "-" "-" "-" "-"}
     }
-    pack $btn_frame.cancel -side right -padx 10
 }
 
-proc App::add_component {} {
-    set w .add_comp
-    catch {destroy $w}
-    toplevel $w -class Dialog
-    wm title $w "Add Component"
-    wm geometry $w "450x350"
-    
-    set fields {
-        "Compound:" "compound"
-        "Function:" "function"
-        "Min %:" "min"
-        "Max %:" "max"
-        "Target %:" "target"
-        "Phase:" "phase"
-    }
-    
-    foreach {label var} $fields {
-        set f [ttk::frame $w.$var]
-        pack $f -fill x -pady 3 -padx 10
-        
-        ttk::label $f.lbl -text $label -width 15 -anchor e
-        pack $f.lbl -side left
-        
-        if {$var eq "compound"} {
-            set widget [ttk::combobox $f.cb -width 30]
-            $widget configure -values {"Sodium Fluoride" "Glycerin" "Sorbitol" "Hydrated Silica" "SLS" "Peppermint Oil"}
-        } elseif {$var eq "phase"} {
-            set widget [ttk::combobox $f.cb -width 30]
-            $widget configure -values {"Aqueous" "Oil" "Powder" "Additive" "Flavor" "Active"}
-        } elseif {$var eq "function"} {
-            set widget [ttk::combobox $f.cb -width 30]
-            $widget configure -values {"Active Ingredient" "Humectant" "Abrasive" "Surfactant" "Flavor" "Binder" "Sweetener"}
+proc App::view_formulation_components {} {
+    variable tree_vars
+    if {[info exists tree_vars(formulations)]} {
+        set tree $tree_vars(formulations)
+        set selection [$tree selection]
+        if {$selection ne ""} {
+            set code [$tree item $selection -text]
+            set w .form_components
+            catch {destroy $w}
+            toplevel $w -class Dialog
+            wm title $w "Formulation Components - $code"
+            wm geometry $w "700x400"
+            
+            set comp_tree [ttk::treeview $w.tree -columns {function min max target phase} -height 15]
+            pack $comp_tree -fill both -expand true -padx 5 -pady 5
+            
+            $comp_tree heading #0 -text "Compound Name"
+            $comp_tree heading function -text "Function"
+            $comp_tree heading min -text "Min %"
+            $comp_tree heading max -text "Max %"
+            $comp_tree heading target -text "Target %"
+            $comp_tree heading phase -text "Phase"
+            
+            $comp_tree column #0 -width 200
+            $comp_tree column function -width 120
+            $comp_tree column min -width 80
+            $comp_tree column max -width 80
+            $comp_tree column target -width 80
+            $comp_tree column phase -width 80
+            
+            # Load components from database
+            set conn [DB::get_connection]
+            set stmt [$conn prepare {
+                SELECT 
+                    cc.compound_name,
+                    fc.function,
+                    fc.percentage_min,
+                    fc.percentage_max,
+                    fc.percentage_target,
+                    fc.phase
+                FROM formulation_components fc
+                JOIN chemical_compounds cc ON fc.compound_id = cc.compound_id
+                JOIN formulations f ON fc.formulation_id = f.formulation_id
+                WHERE f.formulation_code = :code
+                ORDER BY fc.addition_order
+            }]
+            $stmt set parameter code $code
+            $stmt execute
+            $stmt foreach row {
+                lassign $row name function min max target phase
+                $comp_tree insert {} end -text $name -values [list $function $min $max $target $phase]
+            }
+            $stmt close
+            
+            if {[$comp_tree children {}] eq ""} {
+                $comp_tree insert {} end -text "No components found" -values {"-" "-" "-" "-" "-"}
+            }
+            
+            ttk::button $w.close -text "Close" -command "destroy $w"
+            pack $w.close -pady 10
         } else {
-            set widget [ttk::entry $f.entry -width 30]
+            tk_messageBox -warning -title "Selection" "Please select a formulation to view components."
         }
-        pack $widget -side left -expand true -fill x
-        set App::comp_form($var) $widget
     }
-    
-    set btn_frame [ttk::frame $w.buttons]
-    pack $btn_frame -fill x -pady 10
-    
-    ttk::button $btn_frame.add -text "Add" -command {
-        # In production, add to component list
-        tk_messageBox -info "Added" "Component added to formulation"
-        destroy .add_comp
-    }
-    pack $btn_frame.add -side left -padx 10
-    
-    ttk::button $btn_frame.cancel -text "Cancel" -command {
-        destroy .add_comp
-    }
-    pack $btn_frame.cancel -side right -padx 10
 }
 
 # ============================================
-# 7. QUALITY CONTROL
+# 8. QUALITY CONTROL
 # ============================================
 
 proc App::show_qc_tests {} {
-    variable notebook
-    $notebook select $notebook.quality
+    if {![DB::connected]} {
+        tk_messageBox -icon warning -title "Not Connected" \
+            -message "Please connect to the database first."
+        return
+    }
     
-    set frame $notebook.quality
+    variable main_notebook
+    $main_notebook select $main_notebook.quality
+    
+    set frame $main_notebook.quality
     clear_content $frame
     
     ttk::label $frame.title -text "Quality Control Tests" -font {Arial 16 bold}
@@ -1003,18 +1415,52 @@ proc App::show_qc_tests {} {
     pack $tree -side left -fill both -expand true
     pack $scrollbar -side right -fill y
     
-    # Sample QC tests
-    foreach test {
-        "QC20260115-001" "BT20260115-0001" "pH Level" 6.9 6.5 7.5 "Passed" "2026-01-15"
-        "QC20260115-002" "BT20260115-0001" "Viscosity" 95000 80000 120000 "Passed" "2026-01-15"
-        "QC20260115-003" "BT20260115-0001" "Fluoride" 1010 950 1050 "Passed" "2026-01-15"
-        "QC20260115-004" "BT20260115-0002" "pH Level" 7.8 6.5 7.5 "Failed" "2026-01-15"
-        "QC20260114-001" "BT20260114-0003" "Density" 1.35 1.2 1.5 "Passed" "2026-01-14"
-    } {
-        $tree insert {} end -text [lindex $test 0] -values [lrange $test 1 end]
-    }
+    # Load QC tests from database
+    load_qc_tests $tree
     
     set App::tree_vars(qc_tests) $tree
+}
+
+proc App::load_qc_tests {{tree ""}} {
+    if {$tree eq ""} {
+        variable tree_vars
+        if {[info exists tree_vars(qc_tests)]} {
+            set tree $tree_vars(qc_tests)
+        } else {
+            return
+        }
+    }
+    
+    # Clear existing items
+    $tree delete [$tree children {}]
+    
+    set conn [DB::get_connection]
+    set stmt [$conn prepare {
+        SELECT 
+            qt.test_number,
+            pb.batch_number,
+            qp.parameter_name,
+            qt.test_result,
+            qp.target_min,
+            qp.target_max,
+            qt.status,
+            TO_CHAR(qt.test_date, 'YYYY-MM-DD') as test_date
+        FROM qc_tests qt
+        JOIN production_batches pb ON qt.batch_id = pb.batch_id
+        JOIN qc_parameters qp ON qt.parameter_id = qp.parameter_id
+        ORDER BY qt.test_date DESC
+        LIMIT 100
+    }]
+    $stmt execute
+    $stmt foreach row {
+        lassign $row test_number batch parameter result min max status test_date
+        $tree insert {} end -text $test_number -values [list $batch $parameter $result $min $max $status $test_date]
+    }
+    $stmt close
+    
+    if {[$tree children {}] eq ""} {
+        $tree insert {} end -text "No QC tests found" -values {"-" "-" "-" "-" "-" "-" "-"}
+    }
 }
 
 proc App::show_qc_test_form {} {
@@ -1023,6 +1469,30 @@ proc App::show_qc_test_form {} {
     toplevel $w -class Dialog
     wm title $w "Record QC Test"
     wm geometry $w "500x400"
+    
+    # Load parameters from database
+    set conn [DB::get_connection]
+    set parameters_list {}
+    set stmt [$conn prepare "SELECT parameter_id, parameter_name FROM qc_parameters ORDER BY parameter_name"]
+    $stmt execute
+    $stmt foreach row {
+        lassign $row id name
+        lappend parameters_list $name
+    }
+    $stmt close
+    
+    # Load labs from database
+    set labs_list {}
+    set stmt [$conn prepare "SELECT lab_id, lab_name FROM chemical_labs WHERE is_active = true"]
+    $stmt execute
+    $stmt foreach row {
+        lassign $row id name
+        lappend labs_list $name
+    }
+    $stmt close
+    if {[llength $labs_list] == 0} {
+        set labs_list {"QC Lab"}
+    }
     
     ttk::label $w.title -text "Record Quality Control Test" -font {Arial 14 bold}
     pack $w.title -pady 10
@@ -1045,10 +1515,16 @@ proc App::show_qc_test_form {} {
         
         if {$var eq "parameter"} {
             set widget [ttk::combobox $f.cb -width 30]
-            $widget configure -values {"pH Level" "Viscosity" "Fluoride Content" "Density" "Microbial Count" "Appearance"}
+            $widget configure -values $parameters_list
+            if {[llength $parameters_list] > 0} {
+                $widget set [lindex $parameters_list 0]
+            }
         } elseif {$var eq "lab"} {
             set widget [ttk::combobox $f.cb -width 30]
-            $widget configure -values {"R&D Lab" "QC Lab" "Stability Lab" "Micro Lab"}
+            $widget configure -values $labs_list
+            if {[llength $labs_list] > 0} {
+                $widget set [lindex $labs_list 0]
+            }
         } elseif {$var eq "result_status"} {
             set widget [ttk::combobox $f.cb -width 30]
             $widget configure -values {"Pass" "Fail" "Pending"}
@@ -1076,15 +1552,99 @@ proc App::show_qc_test_form {} {
     pack $btn_frame.cancel -side right -padx 10
 }
 
+proc App::save_qc_test {} {
+    variable qc_form
+    
+    set batch [$qc_form(batch) get]
+    set parameter [$qc_form(parameter) get]
+    set lab [$qc_form(lab) get]
+    set result [$qc_form(result) get]
+    set result_status [$qc_form(result_status) get]
+    set notes [$qc_form(notes) get]
+    
+    if {$batch eq "" || $parameter eq "" || $result eq ""} {
+        tk_messageBox -warning -title "Validation" \
+            -message "Please fill in all required fields."
+        return
+    }
+    
+    set conn [DB::get_connection]
+    
+    # Get batch_id
+    set batch_id ""
+    set stmt [$conn prepare "SELECT batch_id FROM production_batches WHERE batch_number = :batch"]
+    $stmt set parameter batch $batch
+    $stmt execute
+    $stmt foreach row {set batch_id [lindex $row 0]}
+    $stmt close
+    
+    if {$batch_id eq ""} {
+        tk_messageBox -warning -title "Error" \
+            -message "Batch '$batch' not found. Please enter a valid batch number."
+        return
+    }
+    
+    # Get parameter_id
+    set parameter_id ""
+    set stmt [$conn prepare "SELECT parameter_id FROM qc_parameters WHERE parameter_name = :name"]
+    $stmt set parameter name $parameter
+    $stmt execute
+    $stmt foreach row {set parameter_id [lindex $row 0]}
+    $stmt close
+    
+    # Get lab_id
+    set lab_id 1
+    set stmt [$conn prepare "SELECT lab_id FROM chemical_labs WHERE lab_name = :name"]
+    $stmt set parameter name $lab
+    $stmt execute
+    $stmt foreach row {set lab_id [lindex $row 0]}
+    $stmt close
+    
+    # Call stored procedure
+    set stmt [$conn prepare {
+        SELECT record_qc_test(
+            :batch_id,
+            :parameter_id,
+            :lab_id,
+            :result::DECIMAL,
+            :notes,
+            1,
+            :notes
+        )
+    }]
+    
+    $stmt set parameter batch_id $batch_id
+    $stmt set parameter parameter_id $parameter_id
+    $stmt set parameter lab_id $lab_id
+    $stmt set parameter result $result
+    $stmt set parameter notes $notes
+    
+    $stmt execute
+    $stmt foreach row {set test_id [lindex $row 0]}
+    $stmt close
+    
+    set_status "QC test recorded! ID: $test_id" green
+    tk_messageBox -icon info -title "Success" \
+        -message "QC test recorded successfully!\nTest ID: $test_id"
+    destroy .qc_form
+    show_qc_tests
+}
+
 # ============================================
-# 8. REPORTING FUNCTIONS
+# 9. REPORTING FUNCTIONS
 # ============================================
 
 proc App::report_batch_summary {} {
-    variable notebook
-    $notebook select $notebook.reports
+    if {![DB::connected]} {
+        tk_messageBox -icon warning -title "Not Connected" \
+            -message "Please connect to the database first."
+        return
+    }
     
-    set frame $notebook.reports
+    variable main_notebook
+    $main_notebook select $main_notebook.reports
+    
+    set frame $main_notebook.reports
     clear_content $frame
     
     ttk::label $frame.title -text "Batch Summary Report" -font {Arial 16 bold}
@@ -1102,14 +1662,14 @@ proc App::report_batch_summary {} {
     
     ttk::entry $param_frame.from_entry -width 15
     pack $param_frame.from_entry -side left
-    $param_frame.from_entry insert 0 "2026-01-01"
+    $param_frame.from_entry insert 0 [clock format [clock seconds] -format "%Y-%m-01"]
     
     ttk::label $param_frame.to -text "To:"
     pack $param_frame.to -side left -padx 5
     
     ttk::entry $param_frame.to_entry -width 15
     pack $param_frame.to_entry -side left
-    $param_frame.to_entry insert 0 "2026-01-31"
+    $param_frame.to_entry insert 0 [clock format [clock seconds] -format "%Y-%m-%d"]
     
     ttk::button $param_frame.run -text "Generate Report" -command {App::generate_batch_summary}
     pack $param_frame.run -side left -padx 10
@@ -1128,52 +1688,158 @@ proc App::report_batch_summary {} {
     set scrollbar [ttk::scrollbar $report_frame.scroll -orient vertical -command "$text yview"]
     pack $scrollbar -side right -fill y
     
-    # Sample report
-    $text insert end "= TOOTHPASTE PRODUCTION BATCH SUMMARY REPORT =\n"
-    $text insert end "Generated: [clock format [clock seconds] -format {%Y-%m-%d %H:%M:%S}]\n"
-    $text insert end "Period: 2026-01-01 to 2026-01-31\n"
-    $text insert end "-" * 60 "\n\n"
-    
-    $text insert end "Summary Statistics:\n"
-    $text insert end "------------------\n"
-    $text insert end "Total Batches      : 45\n"
-    $text insert end "Total Production   : 95,500 kg\n"
-    $text insert end "Average Yield      : 97.8%\n"
-    $text insert end "QC Pass Rate       : 93.3%\n"
-    $text insert end "Rejected Batches   : 3\n\n"
-    
-    $text insert end "Batch Details:\n"
-    $text insert end "-------------\n"
-    $text insert end "| Batch Number | Formulation      | Quantity (kg) | Yield % | Status     |\n"
-    $text insert end "|--------------|------------------|---------------|---------|------------|\n"
-    $text insert end "| BT20260115-001 | Cavity Protection | 2,500        | 98.5    | Released   |\n"
-    $text insert end "| BT20260115-002 | Total Advanced   | 3,000        | 97.2    | QC Testing |\n"
-    $text insert end "| BT20260114-003 | Pro-Health       | 2,000        | 96.8    | Released   |\n"
-    $text insert end "| BT20260114-004 | 3D White        | 1,500        | 95.0    | Completed  |\n"
+    # Generate report
+    if {[DB::connected]} {
+        generate_report_content $text
+    } else {
+        $text insert end "= NOT CONNECTED TO DATABASE =\n"
+        $text insert end "Please connect to the database first."
+    }
     
     $text configure -state disabled
     set App::report_text $text
 }
 
+proc App::generate_report_content {text} {
+    set conn [DB::get_connection]
+    
+    $text insert end "= TOOTHPASTE PRODUCTION BATCH SUMMARY REPORT =\n"
+    $text insert end "Generated: [clock format [clock seconds] -format {%Y-%m-%d %H:%M:%S}]\n"
+    $text insert end "-" * 60 "\n\n"
+    
+    # Get summary statistics
+    set stmt [$conn prepare {
+        SELECT 
+            COUNT(*) as total_batches,
+            SUM(target_quantity_kg) as total_target,
+            AVG(yield_percentage) as avg_yield,
+            COUNT(CASE WHEN status = 'Released' THEN 1 ELSE NULL END) as released,
+            COUNT(CASE WHEN status = 'Rejected' THEN 1 ELSE NULL END) as rejected
+        FROM production_batches
+        WHERE created_at >= CURRENT_DATE - INTERVAL '30 days'
+    }]
+    $stmt execute
+    $stmt foreach row {
+        lassign $row total total_target avg_yield released rejected
+        if {$total > 0} {
+            $text insert end "Summary Statistics (Last 30 Days):\n"
+            $text insert end "----------------------------------\n"
+            $text insert end "Total Batches      : $total\n"
+            $text insert end "Total Production   : [format "%.0f" $total_target] kg\n"
+            $text insert end "Average Yield      : [format "%.1f" $avg_yield]%\n"
+            $text insert end "Released Batches   : $released\n"
+            $text insert end "Rejected Batches   : $rejected\n\n"
+        } else {
+            $text insert end "No data available for the selected period.\n\n"
+        }
+    }
+    $stmt close
+    
+    # Get batch details
+    $text insert end "Batch Details (Recent):\n"
+    $text insert end "---------------------\n"
+    $text insert end "| Batch Number | Formulation      | Quantity (kg) | Yield % | Status     |\n"
+    $text insert end "|--------------|------------------|---------------|---------|------------|\n"
+    
+    set stmt [$conn prepare {
+        SELECT 
+            pb.batch_number,
+            f.formulation_name,
+            pb.target_quantity_kg,
+            pb.yield_percentage,
+            pb.status
+        FROM production_batches pb
+        JOIN formulations f ON pb.formulation_id = f.formulation_id
+        WHERE pb.created_at >= CURRENT_DATE - INTERVAL '30 days'
+        ORDER BY pb.created_at DESC
+        LIMIT 20
+    }]
+    $stmt execute
+    $stmt foreach row {
+        lassign $row batch formulation quantity yield status
+        set yield_val [expr {$yield eq "" ? "-" : [format "%.1f" $yield]}]
+        set line [format "| %-12s | %-16s | %-13s | %-7s | %-10s |" \
+            $batch [string range $formulation 0 16] $quantity $yield_val $status]
+        $text insert end "$line\n"
+    }
+    $stmt close
+}
+
 # ============================================
-# 9. UTILITY FUNCTIONS
+# 10. COMPOUND LIBRARY
 # ============================================
 
-# Clear content from a frame
+proc App::show_compound_library {} {
+    if {![DB::connected]} {
+        tk_messageBox -icon warning -title "Not Connected" \
+            -message "Please connect to the database first."
+        return
+    }
+    
+    set w .compounds
+    catch {destroy $w}
+    toplevel $w -class Dialog
+    wm title $w "Chemical Compound Library"
+    wm geometry $w "800x500"
+    
+    set tree [ttk::treeview $w.tree -columns {formula cas type state density ph} -height 20]
+    pack $tree -fill both -expand true -padx 5 -pady 5
+    
+    $tree heading #0 -text "Compound Name"
+    $tree heading formula -text "Formula"
+    $tree heading cas -text "CAS Number"
+    $tree heading type -text "Type"
+    $tree heading state -text "State"
+    $tree heading density -text "Density"
+    $tree heading ph -text "pH"
+    
+    $tree column #0 -width 200
+    $tree column formula -width 100
+    $tree column cas -width 120
+    $tree column type -width 120
+    $tree column state -width 80
+    $tree column density -width 80
+    $tree column ph -width 60
+    
+    # Load compounds from database
+    set conn [DB::get_connection]
+    set stmt [$conn prepare {
+        SELECT compound_name, chemical_formula, cas_number, compound_type, 
+               physical_state, density, ph_level
+        FROM chemical_compounds
+        WHERE is_active = true
+        ORDER BY compound_name
+    }]
+    $stmt execute
+    $stmt foreach row {
+        lassign $row name formula cas type state density ph
+        $tree insert {} end -text $name -values [list $formula $cas $type $state $density $ph]
+    }
+    $stmt close
+    
+    if {[$tree children {}] eq ""} {
+        $tree insert {} end -text "No compounds found" -values {"-" "-" "-" "-" "-" "-"}
+    }
+    
+    ttk::button $w.close -text "Close" -command "destroy $w"
+    pack $w.close -pady 10
+}
+
+# ============================================
+# 11. UTILITY FUNCTIONS
+# ============================================
+
 proc App::clear_content {frame} {
     foreach child [winfo children $frame] {
         destroy $child
     }
 }
 
-# Navigation handler
 proc App::navigate {tree} {
     set selection [$tree selection]
     if {$selection eq ""} return
     
-    set item [$tree item $selection]
     set tags [$tree tags $selection]
-    
     if {$tags ne ""} {
         set tag [lindex $tags 0]
         switch $tag {
@@ -1184,35 +1850,108 @@ proc App::navigate {tree} {
             "stability" {show_stability}
             "inventory" {report_inventory}
             "batchsummary" {report_batch_summary}
+            default {}
         }
     }
 }
 
-# Load initial data
 proc App::load_initial_data {} {
-    set_status "Loading data..."
-    # In production, load from database
-    set_status "Data loaded" green
+    set_status "Loading data..." blue
+    set conn [DB::get_connection]
+    
+    # Test connection by getting PostgreSQL version
+    set stmt [$conn prepare "SELECT version()"]
+    $stmt execute
+    $stmt foreach row {set version [lindex $row 0]}
+    $stmt close
+    
+    set_status "Connected to PostgreSQL: [string range $version 0 50]..." green
+    
+    # Refresh dashboard
+    show_dashboard
 }
 
-# Refresh current view
 proc App::refresh_current {} {
     set_status "Refreshing..."
     after 500 {set_status "Refreshed" green}
+    variable main_notebook
+    set current_tab [$main_notebook select]
+    set tab_name [string last "." $current_tab]
+    set tab_name [string range $current_tab [expr {$tab_name + 1}] end]
+    
+    switch $tab_name {
+        "dashboard" {show_dashboard}
+        "production" {show_batches}
+        "formulations" {show_formulations}
+        "quality" {show_qc_tests}
+        "reports" {report_batch_summary}
+        default {}
+    }
 }
 
-# Search function
 proc App::search {} {
     set search_text [.toolbar.search get]
     if {$search_text ne ""} {
         set_status "Searching for '$search_text'..."
-        # In production, perform search
-        tk_messageBox -info -title "Search Results" \
-            -message "Search for '$search_text' completed.\nFound 5 matching records."
+        set conn [DB::get_connection]
+        set results {}
+        
+        # Search in formulations
+        set stmt [$conn prepare {
+            SELECT 'Formulation' as type, formulation_code || ' - ' || formulation_name as name
+            FROM formulations 
+            WHERE formulation_code ILIKE :search OR formulation_name ILIKE :search
+            LIMIT 10
+        }]
+        $stmt set parameter search "%$search_text%"
+        $stmt execute
+        $stmt foreach row {
+            lassign $row type name
+            lappend results "$type: $name"
+        }
+        $stmt close
+        
+        # Search in compounds
+        set stmt [$conn prepare {
+            SELECT 'Compound' as type, compound_name
+            FROM chemical_compounds 
+            WHERE compound_name ILIKE :search OR cas_number ILIKE :search
+            LIMIT 10
+        }]
+        $stmt set parameter search "%$search_text%"
+        $stmt execute
+        $stmt foreach row {
+            lassign $row type name
+            lappend results "$type: $name"
+        }
+        $stmt close
+        
+        # Search in batches
+        set stmt [$conn prepare {
+            SELECT 'Batch' as type, batch_number
+            FROM production_batches 
+            WHERE batch_number ILIKE :search
+            LIMIT 10
+        }]
+        $stmt set parameter search "%$search_text%"
+        $stmt execute
+        $stmt foreach row {
+            lassign $row type name
+            lappend results "$type: $name"
+        }
+        $stmt close
+        
+        if {[llength $results] > 0} {
+            tk_messageBox -info -title "Search Results" \
+                -message "Found [llength $results] results:\n\n[join $results \n]"
+        } else {
+            tk_messageBox -info -title "Search Results" \
+                -message "No results found for '$search_text'"
+        }
+        set_status "Search completed" green
     }
 }
 
-# Export report
 proc App::export_report {} {
     set file [tk_getSaveFile -title "Export Report" -defaultextension .csv -filetypes {{"CSV Files" *.csv} {"All Files" *}}]
     if {$file ne ""} {
@@ -1222,7 +1961,6 @@ proc App::export_report {} {
     }
 }
 
-# Export PDF
 proc App::export_pdf {} {
     set file [tk_getSaveFile -title "Export PDF" -defaultextension .pdf -filetypes {{"PDF Files" *.pdf} {"All Files" *}}]
     if {$file ne ""} {
@@ -1232,24 +1970,20 @@ proc App::export_pdf {} {
     }
 }
 
-# Import data
 proc App::import_data {} {
-    set file [tk_getOpenFile -title "Import Data" -filetypes {{"CSV Files" *.csv} {"Excel Files" *.xlsx} {"All Files" *}}]
+    set file [tk_getOpenFile -title "Import Data" -filetypes {{"CSV Files" *.csv} {"All Files" *}}]
     if {$file ne ""} {
         set_status "Importing data from $file..."
-        # In production, process import
         tk_messageBox -info -title "Import" "Data imported from $file"
         set_status "Import completed" green
     }
 }
 
-# Show about dialog
 proc App::show_about {} {
     tk_messageBox -info -title "About" \
-        -message "Toothpaste Production Manager v2.0\n\nA comprehensive Tcl/Tk GUI for managing toothpaste production processes.\n\nDatabase: PostgreSQL\nLanguage: Tcl/Tk\n\n© 2026 Production Management Systems"
+        -message "Toothpaste Production Manager v2.0\n\nA comprehensive Tcl/Tk GUI for managing toothpaste production processes.\n\nDatabase: PostgreSQL\nLanguage: Tcl/Tk\nDriver: tdbc::postgres\n\n© 2026 Production Management Systems"
 }
 
-# Show help
 proc App::show_help {} {
     set w .help
     catch {destroy $w}
@@ -1290,230 +2024,22 @@ proc App::show_help {} {
     $text configure -state disabled
 }
 
-# Show settings
-proc App::show_settings {} {
-    tk_messageBox -info -title "Settings" \
-        -message "Application settings dialog would open here.\n\nConfigure:\n- Database connections\n- UI preferences\n- Notification settings\n- Report templates"
-}
-
-# Show system log
-proc App::show_log {} {
-    set w .log
-    catch {destroy $w}
-    toplevel $w -class Dialog
-    wm title $w "System Log"
-    wm geometry $w "700x400"
-    
-    set text [text $w.text -wrap none -font {Courier 9} -yscrollcommand "$w.scroll set"]
-    pack $text -side left -fill both -expand true
-    
-    set scrollbar [ttk::scrollbar $w.scroll -orient vertical -command "$text yview"]
-    pack $scrollbar -side right -fill y
-    
-    # Sample log entries
-    set log_entries {
-        "[2026-01-15 15:30:45] INFO: User logged in"
-        "[2026-01-15 15:31:12] INFO: Database connection established"
-        "[2026-01-15 15:32:05] INFO: Created new batch BT20260115-0001"
-        "[2026-01-15 15:35:20] INFO: QC Test recorded - Passed"
-        "[2026-01-15 15:40:15] WARNING: Batch BT20260115-0002 - pH deviation detected"
-        "[2026-01-15 15:45:00] INFO: Batch BT20260115-0001 - Completed"
-        "[2026-01-15 15:50:30] INFO: Report generated - Batch Summary"
-        "[2026-01-15 15:55:45] INFO: User logged out"
-    }
-    
-    foreach entry $log_entries {
-        $text insert end "$entry\n"
-    }
-    
-    $text configure -state disabled
-}
-
-# Show stability studies
-proc App::show_stability {} {
-    # Placeholder - would show stability studies
-    tk_messageBox -info -title "Stability Studies" \
-        -message "Stability studies management would appear here.\n\nFeatures:\n- View ongoing stability studies\n- Record test results\n- Monitor expiration dates\n- Generate stability reports"
-}
-
-# Show compound library
-proc App::show_compound_library {} {
-    set w .compounds
-    catch {destroy $w}
-    toplevel $w -class Dialog
-    wm title $w "Chemical Compound Library"
-    wm geometry $w "800x500"
-    
-    set tree [ttk::treeview $w.tree -columns {formula cas type state density ph} -height 20]
-    pack $tree -fill both -expand true -padx 5 -pady 5
-    
-    $tree heading #0 -text "Compound Name"
-    $tree heading formula -text "Formula"
-    $tree heading cas -text "CAS Number"
-    $tree heading type -text "Type"
-    $tree heading state -text "State"
-    $tree heading density -text "Density"
-    $tree heading ph -text "pH"
-    
-    $tree column #0 -width 200
-    $tree column formula -width 100
-    $tree column cas -width 120
-    $tree column type -width 120
-    $tree column state -width 80
-    $tree column density -width 80
-    $tree column ph -width 60
-    
-    # Sample compounds
-    foreach comp {
-        "Sodium Fluoride" "NaF" "7681-49-4" "Fluoride" "Solid" 2.558 7.0
-        "Glycerin" "C3H8O3" "56-81-5" "Humectant" "Liquid" 1.261 7.0
-        "Sorbitol" "C6H14O6" "50-70-4" "Humectant" "Liquid" 1.489 7.0
-        "Hydrated Silica" "SiO2·nH2O" "7631-86-9" "Abrasive" "Solid" 2.0 7.0
-        "SLS" "C12H25NaO4S" "151-21-3" "Surfactant" "Solid" 1.01 7.0
-        "Peppermint Oil" "-" "8006-90-4" "Flavor" "Liquid" 0.9 7.0
-        "Sodium Benzoate" "C7H5NaO2" "532-32-1" "Preservative" "Solid" 1.44 7.5
-    } {
-        $tree insert {} end -text [lindex $comp 0] -values [lrange $comp 1 end]
-    }
-}
-
-# Show suppliers
-proc App::show_suppliers {} {
-    tk_messageBox -info -title "Supplier Management" \
-        -message "Supplier management interface would appear here.\n\nManage:\n- Chemical suppliers\n- Supplier contracts\n- Material pricing\n- Quality ratings"
-}
-
-# Show lab equipment
-proc App::show_equipment {} {
-    tk_messageBox -info -title "Lab Equipment" \
-        -message "Laboratory equipment management would appear here.\n\nTrack:\n- Equipment inventory\n- Calibration schedules\n- Maintenance records\n- Equipment status"
-}
-
-# Show QC parameters
-proc App::show_qc_parameters {} {
-    tk_messageBox -info -title "QC Parameters" \
-        -message "Quality control parameters configuration.\n\nDefine:\n- Test parameters\n- Specifications\n- Acceptance criteria\n- Sampling frequency"
-}
-
-# Show schedule
-proc App::show_schedule {} {
-    tk_messageBox -info -title "Production Schedule" \
-        -message "Production scheduling calendar would appear here.\n\nPlan:\n- Weekly production runs\n- Resource allocation\n- Equipment scheduling\n- Staff assignments"
-}
-
-# Show component search
-proc App::show_component_search {} {
-    tk_messageBox -info -title "Component Search" \
-        -message "Search chemical components by:\n\n- Name\n- CAS Number\n- Function\n- Type\n- Supplier"
-}
-
-# Report inventory
-proc App::report_inventory {} {
-    tk_messageBox -info -title "Inventory Report" \
-        -message "Inventory status report would appear here.\n\nShow:\n- Raw material levels\n- Finished products\n- Low stock alerts\n- Expiry tracking"
-}
-
-# Report yield analysis
-proc App::report_yield_analysis {} {
-    tk_messageBox -info -title "Yield Analysis" \
-        -message "Production yield analysis report.\n\nAnalyze:\n- Batch yields by formulation\n- Efficiency trends\n- Loss points\n- Improvement opportunities"
-}
-
-# Report QC dashboard
-proc App::report_qc_dashboard {} {
-    tk_messageBox -info -title "QC Dashboard" \
-        -message "Quality control dashboard.\n\nMonitor:\n- Test results\n- Pass/fail rates\n- Trending analysis\n- Batch quality status"
-}
-
-# Generate batch summary
-proc App::generate_batch_summary {} {
-    set_status "Generating batch summary report..."
-    after 1000 {set_status "Report generated" green}
-    tk_messageBox -info -title "Report" "Batch summary report generated successfully!"
-}
-
-# Edit formulation
-proc App::edit_formulation {} {
-    variable tree_vars
-    if {[info exists tree_vars(formulations)]} {
-        set tree $tree_vars(formulations)
-        set selection [$tree selection]
-        if {$selection ne ""} {
-            set code [$tree item $selection -text]
-            tk_messageBox -info -title "Edit Formulation" \
-                -message "Editing formulation: $code\n\nThe full editing interface would open here."
-        } else {
-            tk_messageBox -warning -title "Selection" "Please select a formulation to edit."
-        }
-    }
-}
-
-# View formulation components
-proc App::view_formulation_components {} {
-    variable tree_vars
-    if {[info exists tree_vars(formulations)]} {
-        set tree $tree_vars(formulations)
-        set selection [$tree selection]
-        if {$selection ne ""} {
-            set code [$tree item $selection -text]
-            tk_messageBox -info -title "View Components" \
-                -message "Showing components for formulation: $code\n\nAll formulation components with percentages would be displayed."
-        } else {
-            tk_messageBox -warning -title "Selection" "Please select a formulation to view components."
-        }
-    }
-}
-
-# Load batches
-proc App::load_batches {} {
-    set_status "Loading batches..."
-    after 500 {set_status "Batches loaded" green}
-}
-
-# Load QC tests
-proc App::load_qc_tests {} {
-    set_status "Loading QC tests..."
-    after 500 {set_status "QC tests loaded" green}
-}
-
-# Save formulation
-proc App::save_formulation {} {
-    variable form_form
-    
-    set code [$form_form(code) get]
-    set name [$form_form(name) get]
-    
-    if {$code eq "" || $name eq ""} {
-        tk_messageBox -warning -title "Validation" \
-            -message "Please fill in required fields (Code and Name)."
-        return
-    }
-    
-    set_status "Saving formulation..."
-    after 500 {set_status "Formulation saved" green}
-    tk_messageBox -info -title "Success" "Formulation saved successfully!"
-    destroy .formulation_form
-}
-
-# Save QC test
-proc App::save_qc_test {} {
-    variable qc_form
-    
-    set batch [$qc_form(batch) get]
-    set parameter [$qc_form(parameter) get]
-    set result [$qc_form(result) get]
-    
-    if {$batch eq "" || $parameter eq "" || $result eq ""} {
-        tk_messageBox -warning -title "Validation" \
-            -message "Please fill in all required fields."
-        return
-    }
-    
-    set_status "Recording QC test..."
-    after 500 {set_status "QC test recorded" green}
-    tk_messageBox -info -title "Success" "QC test recorded successfully!"
-    destroy .qc_form
-}
+# Placeholder functions for unimplemented features
+proc App::show_settings {} { tk_messageBox -info -title "Settings" "Application settings dialog would open here." }
+proc App::show_log {} { tk_messageBox -info -title "System Log" "System log would appear here." }
+proc App::show_stability {} { tk_messageBox -info -title "Stability Studies" "Stability studies management would appear here." }
+proc App::show_suppliers {} { tk_messageBox -info -title "Supplier Management" "Supplier management interface would appear here." }
+proc App::show_equipment {} { tk_messageBox -info -title "Lab Equipment" "Laboratory equipment management would appear here." }
+proc App::show_qc_parameters {} { tk_messageBox -info -title "QC Parameters" "Quality control parameters configuration." }
+proc App::show_schedule {} { tk_messageBox -info -title "Production Schedule" "Production scheduling calendar would appear here." }
+proc App::show_component_search {} { tk_messageBox -info -title "Component Search" "Search chemical components by name, CAS, or type." }
+proc App::report_inventory {} { tk_messageBox -info -title "Inventory Report" "Inventory status report would appear here." }
+proc App::report_yield_analysis {} { tk_messageBox -info -title "Yield Analysis" "Production yield analysis report." }
+proc App::report_qc_dashboard {} { tk_messageBox -info -title "QC Dashboard" "Quality control dashboard." }
+proc App::generate_batch_summary {} { set_status "Generating batch summary report..."; after 1000 {set_status "Report generated" green}; tk_messageBox -info -title "Report" "Batch summary report generated successfully!" }
+proc App::edit_formulation {} { variable tree_vars; if {[info exists tree_vars(formulations)]} { set tree $tree_vars(formulations); set selection [$tree selection]; if {$selection ne ""} { set code [$tree item $selection -text]; tk_messageBox -info -title "Edit Formulation" "Editing formulation: $code" } else { tk_messageBox -warning -title "Selection" "Please select a formulation to edit." } } }
+proc App::show_formulation_form {} { tk_messageBox -info -title "New Formulation" "New formulation form would appear here." }
+proc App::show_batch_status {} { tk_messageBox -info -title "Batch Status" "Batch status dashboard would appear here." }
 
 # Exit application
 proc App::exit_app {} {
@@ -1525,7 +2051,7 @@ proc App::exit_app {} {
 }
 
 # ============================================
-# 10. START THE APPLICATION
+# 12. START THE APPLICATION
 # ============================================
 
 # Handle window close
