@@ -620,4 +620,6 @@ They need "enriched" reliable recommendations combined from few models and few t
 To meet this VIP demand we provide backend MCP server running PostgreSQL toothpaste tech phenomenology research database
 This is an ongoing effort "when it's done"
 
+<img width="699" height="453" alt="tpm_architecture" src="https://github.com/user-attachments/assets/dac806b1-12be-4dd5-96e4-f09ab8a688eb" />
+
 P.S. Do not forget to brush your hard disk with `dd` and `rm -rf /` toothpastes twice a day
