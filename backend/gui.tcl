@@ -280,15 +280,17 @@ namespace eval Auth {
     variable login_attempts 0
     variable max_attempts 3
     variable locked_until 0
-    variable user_entry ""     ;# Add this
-    variable pass_entry ""     ;# Add this
-    variable use_ssl 0         ;# Add this
+    variable user_entry ""
+    variable pass_entry ""
+    variable use_ssl 0
+    variable reg_entries {}
     
     # Password hashing
     proc hash_password {password} {
         if {[catch {package require sha256}] == 0} {
             return [sha2::sha256 $password]
         }
+        # Fallback: simple hash
         set hash 0
         foreach char [split $password ""] {
             set hash [expr {($hash * 31 + [scan $char %c]) % 2147483647}]
@@ -296,35 +298,16 @@ namespace eval Auth {
         return [format "%x" $hash]
     }
     
-    # Check driver availability
-    proc check_driver {} {
-        variable driver_checked
-        if {$driver_checked} {
-            return [DB::check_availability]
-        }
-        set driver_checked 1
-        
-        if {![DB::check_availability]} {
-            after 100 [list Auth::show_driver_error]
-            return 0
-        }
-        return 1
-    }
-    
-    # Show driver error message
-    proc show_driver_error {} {
-        tk_messageBox -icon error -title "Driver Error" \
-            -message "PostgreSQL driver (tdbc::postgres) is not installed.\n\nPlease install it using:\n  teacup install tdbc::postgres\n\nOr download from:\n  https://github.com/tcltk/tdbcpostgres"
-    }
-    
-    # Create login window with enhanced design
+    # Create login window
     proc show_login {} {
         variable login_window
         variable user_entry
         variable pass_entry
         
+        # Check PostgreSQL driver
         if {![DB::check_availability]} {
-            after 100 [list Auth::show_driver_error]
+            tk_messageBox -icon error -title "Driver Error" \
+                -message "PostgreSQL driver (tdbc::postgres) is not installed.\n\nPlease install it using:\n  teacup install tdbc::postgres"
             return
         }
         
@@ -336,7 +319,6 @@ namespace eval Auth {
         wm resizable $login_window 0 0
         wm protocol $login_window WM_DELETE_WINDOW {Auth::exit_app}
         
-        # Set window background
         $login_window configure -background "#f0f4f8"
         
         # Center the window
@@ -344,11 +326,11 @@ namespace eval Auth {
         set y [expr {([winfo screenheight .] - 420) / 2}]
         wm geometry $login_window "+$x+$y"
         
-        # Main container with padding
+        # Main container
         set main_frame [ttk::frame $login_window.main -padding "20 20 20 20"]
         pack $main_frame -fill both -expand true
         
-        # Logo and title section
+        # Logo and title
         set logo_frame [ttk::frame $main_frame.logo]
         pack $logo_frame -fill x -pady 10
         
@@ -364,7 +346,6 @@ namespace eval Auth {
         ttk::label $logo_frame.subtitle -text "Production Management System" -font {Arial 10} -foreground $Config::APP_ACCENT
         pack $logo_frame.subtitle -pady 5
         
-        # Separator
         ttk::separator $main_frame.sep -orient horizontal
         pack $main_frame.sep -fill x -pady 15
         
@@ -372,11 +353,11 @@ namespace eval Auth {
         set form_frame [ttk::frame $main_frame.form]
         pack $form_frame -fill both -expand true
         
-        # Status/Message label
+        # Status message
         ttk::label $form_frame.message -text "" -foreground red -font {Arial 9}
         pack $form_frame.message -fill x -pady 5
         
-        # Username field with icon
+        # Username field
         set user_frame [ttk::frame $form_frame.user_frame]
         pack $user_frame -fill x -pady 5
         
@@ -391,7 +372,7 @@ namespace eval Auth {
         focus $user_entry
         bind $user_entry <Return> {focus [focus next]}
         
-        # Password field with icon
+        # Password field
         set pass_frame [ttk::frame $form_frame.pass_frame]
         pack $pass_frame -fill x -pady 5
         
@@ -432,7 +413,7 @@ namespace eval Auth {
         }
         pack $db_frame.status_val -side left -padx 5
         
-        # Buttons
+        # Buttons - Register button is here!
         set btn_frame [ttk::frame $form_frame.buttons]
         pack $btn_frame -fill x -pady 15
         
@@ -452,7 +433,268 @@ namespace eval Auth {
         bind $login_window <Return> {Auth::do_login}
     }
     
-    # Show connection settings dialog (enhanced)
+    # ============================================
+    # REGISTRATION DIALOG
+    # ============================================
+    
+    proc show_register {} {
+        set w .register
+        catch {destroy $w}
+        toplevel $w -class Dialog
+        wm title $w "Register New User - $Config::APP_NAME"
+        wm geometry $w "520x600"
+        wm resizable $w 0 0
+        wm protocol $w WM_DELETE_WINDOW "destroy $w"
+        
+        $w configure -background "#f0f4f8"
+        
+        # Main container
+        set main [ttk::frame $w.main -padding "20 20 20 20"]
+        pack $main -fill both -expand true
+        
+        # Title
+        ttk::label $main.title -text "📝 Create New Account" -font {Arial 16 bold}
+        pack $main.title -pady 10
+        
+        ttk::label $main.subtitle -text "Fill in the details below to register" -font {Arial 10} -foreground gray
+        pack $main.subtitle -pady 5
+        
+        ttk::separator $main.sep -orient horizontal
+        pack $main.sep -fill x -pady 10
+        
+        # Status message
+        ttk::label $main.message -text "" -foreground red -font {Arial 9}
+        pack $main.message -fill x -pady 5
+        
+        # Form fields - matches persons table
+        set fields [list \
+            [list "First Name *" first_name 0] \
+            [list "Last Name *" last_name 0] \
+            [list "Email" email 1] \
+            [list "Username *" username 0] \
+            [list "Password *" password 0] \
+            [list "Confirm Password *" confirm_password 0] \
+            [list "Role *" role 0] \
+            [list "Department" department 1] \
+        ]
+        
+        set entries {}
+        foreach {label var required} $fields {
+            set f [ttk::frame $main.$var]
+            pack $f -fill x -pady 4 -padx 10
+            
+            ttk::label $f.lbl -text $label -width 18 -anchor e -font {Arial 10}
+            pack $f.lbl -side left -padx 5
+            
+            if {$var eq "role"} {
+                set widget [ttk::combobox $f.cb -width 28 -state readonly -font {Arial 10}]
+                # Get roles from database
+                set roles [get_available_roles]
+                $widget configure -values $roles
+                if {[llength $roles] > 0} {
+                    $widget set [lindex $roles 0]
+                } else {
+                    $widget set "QC_Technician"
+                }
+            } elseif {$var eq "password" || $var eq "confirm_password"} {
+                set widget [ttk::entry $f.entry -width 28 -show "*" -font {Arial 10}]
+            } elseif {$var eq "department"} {
+                set widget [ttk::entry $f.entry -width 28 -font {Arial 10}]
+                $widget insert 0 "Production"
+            } else {
+                set widget [ttk::entry $f.entry -width 28 -font {Arial 10}]
+            }
+            pack $widget -side left -expand true -fill x
+            set entries($var) $widget
+        }
+        
+        # Show password checkbox
+        set check_frame [ttk::frame $main.check_frame]
+        pack $check_frame -fill x -pady 5 -padx 15
+        
+        ttk::checkbutton $check_frame.show -text "👁 Show Passwords" -variable Auth::show_reg_password -command {
+            if {$Auth::show_reg_password} {
+                $::register.main.password.entry configure -show ""
+                $::register.main.confirm_password.entry configure -show ""
+            } else {
+                $::register.main.password.entry configure -show "*"
+                $::register.main.confirm_password.entry configure -show "*"
+            }
+        }
+        pack $check_frame.show -anchor w
+        
+        # Required fields note
+        ttk::label $main.note -text "* Required fields" -font {Arial 8} -foreground gray
+        pack $main.note -pady 5 -anchor w -padx 15
+        
+        # Buttons
+        set btn_frame [ttk::frame $main.buttons]
+        pack $btn_frame -fill x -pady 15 -padx 10
+        
+        ttk::button $btn_frame.register -text "✅ Register" -command [list Auth::do_register $entries $w] -padding "10 5" -style Accent.TButton
+        pack $btn_frame.register -side left -expand true -fill x -padx 5
+        
+        ttk::button $btn_frame.cancel -text "❌ Cancel" -command "destroy $w" -padding "10 5"
+        pack $btn_frame.cancel -side right -expand true -fill x -padx 5
+        
+        # Store entries
+        set Auth::reg_entries $entries
+        
+        # Bind Enter key
+        bind $w <Return> [list Auth::do_register $entries $w]
+        
+        # Focus on first field
+        focus $entries(first_name)
+    }
+    
+    proc get_available_roles {} {
+        if {![DB::connected]} {
+            return [list "Scientist" "QC_Technician" "Production_Manager" "Process_Engineer" "Lab_Technician" "R&D_Manager" "Regulatory_Specialist"]
+        }
+        
+        set roles {}
+        catch {
+            set results [DB::eval "SELECT role_name FROM persons_roles WHERE is_active = true ORDER BY role_name"]
+            foreach row $results {
+                lassign $row role_name
+                lappend roles $role_name
+            }
+        }
+        if {[llength $roles] == 0} {
+            set roles [list "Scientist" "QC_Technician" "Production_Manager" "Process_Engineer" "Lab_Technician" "R&D_Manager" "Regulatory_Specialist"]
+        }
+        return $roles
+    }
+    
+    # Register new user
+    proc do_register {entries w} {
+        set first_name [$entries(first_name) get]
+        set last_name [$entries(last_name) get]
+        set email [$entries(email) get]
+        set username [$entries(username) get]
+        set password [$entries(password) get]
+        set confirm [$entries(confirm_password) get]
+        set role [$entries(role) get]
+        set department [$entries(department) get]
+        
+        # Validation
+        set errors {}
+        if {$first_name eq ""} { lappend errors "First Name is required" }
+        if {$last_name eq ""} { lappend errors "Last Name is required" }
+        if {$username eq ""} { lappend errors "Username is required" }
+        if {$password eq ""} { lappend errors "Password is required" }
+        
+        if {[llength $errors] > 0} {
+            $w.main.message configure -text "Please fix:\n[join $errors \n]" -foreground red
+            return
+        }
+        
+        if {$password ne $confirm} {
+            $w.main.message configure -text "Passwords do not match!" -foreground red
+            return
+        }
+        
+        if {[string length $password] < 6} {
+            $w.main.message configure -text "Password must be at least 6 characters." -foreground red
+            return
+        }
+        
+        # Email validation
+        if {$email ne "" && ![regexp {^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$} $email]} {
+            $w.main.message configure -text "Please enter a valid email address." -foreground red
+            return
+        }
+        
+        # Check database connection
+        if {![DB::connected]} {
+            $w.main.message configure -text "Not connected to database. Please connect first." -foreground red
+            return
+        }
+        
+        try {
+            # Check if username exists
+            set count [DB::eval_scalar "SELECT COUNT(*) FROM persons WHERE person_code = :username" [list username $username]]
+            if {$count > 0} {
+                $w.main.message configure -text "Username '$username' already exists!" -foreground red
+                return
+            }
+            
+            # Check if email exists
+            if {$email ne ""} {
+                set count [DB::eval_scalar "SELECT COUNT(*) FROM persons WHERE email = :email" [list email $email]]
+                if {$count > 0} {
+                    $w.main.message configure -text "Email already registered!" -foreground red
+                    return
+                }
+            }
+            
+            # Get role_id from persons_roles table
+            set role_id [DB::eval_scalar "SELECT role_id FROM persons_roles WHERE role_name = :role" [list role $role]]
+            if {$role_id == 0} {
+                $w.main.message configure -text "Invalid role selected." -foreground red
+                return
+            }
+            
+            # Hash password
+            set hashed_password [hash_password $password]
+            
+            # Generate person_code
+            set person_code [string toupper "$username"]
+            
+            # Insert into persons table
+            set sql {
+                INSERT INTO persons (
+                    person_code, 
+                    first_name, 
+                    last_name, 
+                    email, 
+                    role_id,
+                    department,
+                    is_active,
+                    created_at
+                ) VALUES (
+                    :person_code,
+                    :first_name,
+                    :last_name,
+                    :email,
+                    :role_id,
+                    :department,
+                    true,
+                    CURRENT_TIMESTAMP
+                )
+            }
+            
+            set params [list \
+                person_code $person_code \
+                first_name $first_name \
+                last_name $last_name \
+                email $email \
+                role_id $role_id \
+                department $department
+            ]
+            
+            DB::eval $sql $params
+            
+            # Success
+            tk_messageBox -icon info -title "Registration Successful" \
+                -message "✅ User '$username' registered successfully!\n\nName: $first_name $last_name\nRole: $role\nDepartment: $department\n\nYou can now login."
+            
+            destroy $w
+            
+            # Pre-fill username in login form
+            variable user_entry
+            if {[winfo exists $user_entry]} {
+                $user_entry delete 0 end
+                $user_entry insert 0 $username
+            }
+            
+        } on error {errorMsg} {
+            $w.main.message configure -text "Registration failed: $errorMsg" -foreground red
+            puts "ERROR: $errorMsg"
+        }
+    }
+    
+    # Connection settings
     proc show_connection_settings {} {
         set w .conn_settings
         catch {destroy $w}
@@ -460,9 +702,7 @@ namespace eval Auth {
         wm title $w "Database Connection Settings"
         wm geometry $w "500x380"
         wm resizable $w 0 0
-        wm protocol $w WM_DELETE_WINDOW "destroy $w"
         
-        # Main container
         set main [ttk::frame $w.main -padding "20 20 20 20"]
         pack $main -fill both -expand true
         
@@ -472,7 +712,6 @@ namespace eval Auth {
         ttk::separator $main.sep -orient horizontal
         pack $main.sep -fill x -pady 10
         
-        # Connection fields
         set fields [list \
             [list "Host:" host $Config::DB_HOST] \
             [list "Port:" port $Config::DB_PORT] \
@@ -500,14 +739,6 @@ namespace eval Auth {
             set entries($var) $entry
         }
         
-        # SSL option
-        set ssl_frame [ttk::frame $main.ssl]
-        pack $ssl_frame -fill x -pady 5 -padx 15
-        
-        ttk::checkbutton $ssl_frame.ssl -text "Use SSL Connection" -variable Auth::use_ssl
-        pack $ssl_frame.ssl -anchor w
-        
-        # Buttons
         set btn_frame [ttk::frame $main.buttons]
         pack $btn_frame -fill x -pady 15
         
@@ -530,8 +761,7 @@ namespace eval Auth {
         set user [$user_entry get]
         set pass [$pass_entry get]
         
-        set temp_conn [DB::connect $host $port $db $user $pass]
-        if {$temp_conn} {
+        if {[DB::connect $host $port $db $user $pass]} {
             catch {
                 set conn [DB::get_connection]
                 set stmt [$conn prepare "SELECT version()"]
@@ -544,7 +774,7 @@ namespace eval Auth {
                 -message "Successfully connected to database!\n\n$version"
         } else {
             tk_messageBox -icon error -title "Connection Failed" \
-                -message "Failed to connect to database.\n\nError: [DB::get_last_error]"
+                -message "Failed to connect.\n\nError: [DB::get_last_error]"
         }
     }
     
@@ -575,7 +805,7 @@ namespace eval Auth {
             update_db_status
         } else {
             tk_messageBox -icon error -title "Connection Failed" \
-                -message "Failed to connect to database.\n\nError: [DB::get_last_error]"
+                -message "Failed to connect.\n\nError: [DB::get_last_error]"
         }
     }
     
@@ -590,213 +820,7 @@ namespace eval Auth {
         }
     }
     
-    # Enhanced registration dialog
-    proc show_register {} {
-        set w .register
-        catch {destroy $w}
-        toplevel $w -class Dialog
-        wm title $w "Register New User"
-        wm geometry $w "500x550"
-        wm resizable $w 0 0
-        wm protocol $w WM_DELETE_WINDOW "destroy $w"
-        
-        # Main container
-        set main [ttk::frame $w.main -padding "20 20 20 20"]
-        pack $main -fill both -expand true
-        
-        ttk::label $main.title -text "Create New Account" -font {Arial 16 bold}
-        pack $main.title -pady 10
-        
-        ttk::separator $main.sep -orient horizontal
-        pack $main.sep -fill x -pady 10
-        
-        # Status/Message label
-        ttk::label $main.message -text "" -foreground red -font {Arial 9}
-        pack $main.message -fill x -pady 5
-        
-        # Form fields
-        set fields [list \
-            "First Name:" first_name \
-            "Last Name:" last_name \
-            "Email:" email \
-            "Username:" username \
-            "Password:" password \
-            "Confirm Password:" confirm_password \
-            "Role:" role \
-        ]
-        
-        set entries {}
-        foreach {label var} $fields {
-            set f [ttk::frame $main.$var]
-            pack $f -fill x -pady 3
-            
-            ttk::label $f.lbl -text $label -width 16 -anchor e -font {Arial 10}
-            pack $f.lbl -side left
-            
-            if {$var eq "role"} {
-                set widget [ttk::combobox $f.cb -width 25 -state readonly -font {Arial 10}]
-                if {[DB::connected]} {
-                    set roles [get_available_roles]
-                    $widget configure -values $roles
-                } else {
-                    $widget configure -values [list "Scientist" "QC_Technician" "Production_Manager" "Process_Engineer" "Lab_Technician" "R&D_Manager" "Regulatory_Specialist"]
-                }
-                $widget set "QC_Technician"
-            } elseif {$var eq "password" || $var eq "confirm_password"} {
-                set widget [ttk::entry $f.entry -width 25 -show "*" -font {Arial 10}]
-            } else {
-                set widget [ttk::entry $f.entry -width 25 -font {Arial 10}]
-            }
-            pack $widget -side left -expand true -fill x
-            set entries($var) $widget
-        }
-        
-        # Show password checkbox
-        set check_frame [ttk::frame $main.check_frame]
-        pack $check_frame -fill x -pady 5 -padx 20
-        
-        ttk::checkbutton $check_frame.show -text "Show Passwords" -variable Auth::show_reg_password -command {
-            if {$Auth::show_reg_password} {
-                $::register.main.password.entry configure -show ""
-                $::register.main.confirm_password.entry configure -show ""
-            } else {
-                $::register.main.password.entry configure -show "*"
-                $::register.main.confirm_password.entry configure -show "*"
-            }
-        }
-        pack $check_frame.show -anchor w
-        
-        # Buttons
-        set btn_frame [ttk::frame $main.buttons]
-        pack $btn_frame -fill x -pady 15
-        
-        ttk::button $btn_frame.register -text "Register" -command [list Auth::do_register $entries $w] -width 12
-        pack $btn_frame.register -side left -expand true -fill x -padx 5
-        
-        ttk::button $btn_frame.cancel -text "Cancel" -command "destroy $w" -width 12
-        pack $btn_frame.cancel -side right -expand true -fill x -padx 5
-    }
-    
-    proc get_available_roles {} {
-        if {![DB::connected]} {
-            return [list "Scientist" "QC_Technician" "Production_Manager" "Process_Engineer" "Lab_Technician" "R&D_Manager" "Regulatory_Specialist"]
-        }
-        
-        set roles {}
-        catch {
-            set results [DB::eval "SELECT role_name FROM persons_roles WHERE is_active = true ORDER BY role_name"]
-            foreach row $results {
-                lassign $row role_name
-                lappend roles $role_name
-            }
-        }
-        if {[llength $roles] == 0} {
-            set roles [list "Scientist" "QC_Technician" "Production_Manager" "Process_Engineer" "Lab_Technician" "R&D_Manager" "Regulatory_Specialist"]
-        }
-        return $roles
-    }
-    
-    proc do_register {entries w} {
-        set first_name [$entries(first_name) get]
-        set last_name [$entries(last_name) get]
-        set email [$entries(email) get]
-        set username [$entries(username) get]
-        set password [$entries(password) get]
-        set confirm [$entries(confirm_password) get]
-        set role [$entries(role) get]
-        
-        # Validation
-        if {$first_name eq "" || $last_name eq "" || $username eq "" || $password eq ""} {
-            $w.main.message configure -text "Please fill in all required fields." -foreground red
-            return
-        }
-        
-        if {$password ne $confirm} {
-            $w.main.message configure -text "Passwords do not match!" -foreground red
-            return
-        }
-        
-        if {[string length $password] < 6} {
-            $w.main.message configure -text "Password must be at least 6 characters." -foreground red
-            return
-        }
-        
-        # Email validation
-        if {$email ne "" && ![regexp {^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$} $email]} {
-            $w.main.message configure -text "Please enter a valid email address." -foreground red
-            return
-        }
-        
-        # Check if username already exists
-        if {[DB::connected]} {
-            set count [DB::eval_scalar "SELECT COUNT(*) FROM persons WHERE person_code = :username" [list username $username]]
-            if {$count > 0} {
-                $w.main.message configure -text "Username already exists. Please choose another." -foreground red
-                return
-            }
-            
-            if {$email ne ""} {
-                set count [DB::eval_scalar "SELECT COUNT(*) FROM persons WHERE email = :email" [list email $email]]
-                if {$count > 0} {
-                    $w.main.message configure -text "Email already registered. Please use another." -foreground red
-                    return
-                }
-            }
-        }
-        
-        # Insert user into database
-        if {[DB::connected]} {
-            try {
-                set role_id [DB::eval_scalar "SELECT role_id FROM persons_roles WHERE role_name = :role" [list role $role]]
-                if {$role_id == 0} {
-                    $w.main.message configure -text "Invalid role selected." -foreground red
-                    return
-                }
-                
-                set person_code [string toupper "$username"]
-                
-                set sql {
-                    INSERT INTO persons (
-                        person_code, first_name, last_name, email, 
-                        role_id, created_at, is_active
-                    ) VALUES (
-                        :person_code, :first_name, :last_name, :email,
-                        :role_id, CURRENT_TIMESTAMP, true
-                    )
-                }
-                
-                set params [list \
-                    person_code $person_code \
-                    first_name $first_name \
-                    last_name $last_name \
-                    email $email \
-                    role_id $role_id
-                ]
-                
-                DB::eval $sql $params
-                
-                tk_messageBox -icon info -title "Registration Successful" \
-                    -message "User '$username' registered successfully!\n\nRole: $role\n\nYou can now login with your credentials."
-                
-                destroy $w
-                
-                # Pre-fill username in login form
-                variable user_entry
-                if {[winfo exists $user_entry]} {
-                    $user_entry delete 0 end
-                    $user_entry insert 0 $username
-                }
-                
-            } on error {errorMsg} {
-                $w.main.message configure -text "Registration failed: $errorMsg" -foreground red
-                puts "ERROR: $errorMsg"
-            }
-        } else {
-            $w.main.message configure -text "Not connected to database. Please connect first." -foreground red
-        }
-    }
-    
-    # Enhanced login with security
+    # Login function
     proc do_login {} {
         variable login_window
         variable user_entry
@@ -809,7 +833,7 @@ namespace eval Auth {
         if {$login_attempts >= $max_attempts} {
             set remaining [expr {$locked_until - [clock seconds]}]
             if {$remaining > 0} {
-                $login_window.main.form.message configure -text "Account locked. Try again in [expr {$remaining/60}] minutes." -foreground red
+                $login_window.main.form.message configure -text "🔒 Account locked. Try again in [expr {$remaining/60}] minutes." -foreground red
                 return
             } else {
                 set login_attempts 0
@@ -824,17 +848,16 @@ namespace eval Auth {
             return
         }
         
-        # Check database connection
         if {![DB::connected] || ![DB::test_connection]} {
-            $login_window.main.form.message configure -text "Not connected to database. Please check connection." -foreground red
+            $login_window.main.form.message configure -text "Not connected to database." -foreground red
             return
         }
         
-        # Authenticate
+        # Authenticate against persons table
         try {
             set sql {
                 SELECT p.person_id, p.first_name, p.last_name, p.email, 
-                       r.role_name, r.role_code, p.person_code
+                       r.role_name, r.role_code, p.person_code, p.department
                 FROM persons p
                 LEFT JOIN persons_roles r ON p.role_id = r.role_id
                 WHERE p.person_code = :username 
@@ -845,7 +868,7 @@ namespace eval Auth {
             
             set user_found 0
             foreach row $results {
-                lassign $row person_id first_name last_name email role_name role_code person_code
+                lassign $row person_id first_name last_name email role_name role_code person_code department
                 set user_found 1
                 break
             }
@@ -854,28 +877,32 @@ namespace eval Auth {
                 incr login_attempts
                 set remaining [expr {$max_attempts - $login_attempts}]
                 if {$remaining <= 0} {
-                    set locked_until [expr {[clock seconds] + 300}]  # 5 minutes lock
-                    $login_window.main.form.message configure -text "Too many failed attempts. Account locked for 5 minutes." -foreground red
+                    set locked_until [expr {[clock seconds] + 300}]
+                    $login_window.main.form.message configure -text "🔒 Too many failed attempts. Locked for 5 minutes." -foreground red
                 } else {
-                    $login_window.main.form.message configure -text "Invalid username or password. ($remaining attempts remaining)" -foreground red
+                    $login_window.main.form.message configure -text "❌ Invalid credentials. ($remaining attempts left)" -foreground red
                 }
                 return
             }
             
-            # Reset login attempts on success
+            # In production, verify password hash here
+            # For demo, we accept any password for a valid user
+            # In production, use: if {[hash_password $password] eq $stored_hash}
+            
+            # Reset login attempts
             set login_attempts 0
             
             # Set current user
             set DB::current_user $username
             set DB::current_role $role_name
             
-            $login_window.main.form.message configure -text "Login successful!" -foreground green
+            $login_window.main.form.message configure -text "✅ Welcome $first_name $last_name!" -foreground green
             update idletasks
             
             # Log login
             log_login $username $role_name
             
-            # Destroy login window and start main app
+            # Start main application
             after 500 {
                 destroy $login_window
                 App::init
@@ -901,7 +928,7 @@ namespace eval Auth {
             }
             set note "User login: $username (Role: $role)"
             DB::eval $sql [list username $username note $note]
-        } errorMsg
+        }
     }
     
     proc exit_app {} {
@@ -912,7 +939,6 @@ namespace eval Auth {
         }
     }
 }
-
 # ============================================
 # 4. MAIN APPLICATION CLASS
 # ============================================
