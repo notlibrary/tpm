@@ -1,4 +1,4 @@
-package require tdbc::postgres
+package require tdbc::postgres 1.0.0
 
 set db_host     "localhost"
 set db_port     5432
@@ -22,22 +22,39 @@ if {[catch {
 
 puts "Success!"
 
-set sql_query {
-    CREATE TABLE IF NOT EXISTS hello (
-        id INT
+set sql_create {
+    CREATE TABLE IF NOT EXISTS public.driver_users (
+        user_id SERIAL PRIMARY KEY,
+        username VARCHAR(50) NOT NULL,
+        email VARCHAR(100) UNIQUE NOT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )
 }
 
-puts "Creating table 'hello'..."
-
-if {[catch {
-    set statement [db prepare $sql_query]
-    $statement execute
-    $statement close
-    puts "Table 'hello' created successfully!"
-} err]} {
-    puts "Error creating table: $err"
+set sql_insert {
+    INSERT INTO public.driver_users (username, email) 
+    VALUES ('Hello', 'email@me')
+    ON CONFLICT (email) DO NOTHING
 }
 
-db close
+puts "Creating table 'driver_users'..."
+
+if {[catch {
+
+    set stmt1 [db prepare $sql_create]
+    $stmt1 execute
+    $stmt1 close
+    puts "Table 'driver_users' created successfully!"
+
+    puts "Inserting test data..."
+    set stmt2 [db prepare $sql_insert]
+    $stmt2 execute
+    $stmt2 close
+    puts "Data inserted successfully!"
+
+} err]} {
+    puts "Error executing SQL: $err"
+}
+
+db destroy
 puts "Connection closed"
