@@ -5,9 +5,181 @@
 -- ALL FORMULATIONS FIXED - ALL FUNCTIONS FIXED
 -- ============================================
 
+-- Create the database
+CREATE DATABASE toothpastes
+    WITH 
+    OWNER = postgres
+    ENCODING = 'UTF8'
+    LC_COLLATE = 'en_US.UTF-8'
+    LC_CTYPE = 'en_US.UTF-8'
+    TABLESPACE = pg_default
+    CONNECTION LIMIT = -1;
+
+-- Connect to the new database
+\c toothpastes;
+
+-- Set schema
+CREATE SCHEMA IF NOT EXISTS public;
+SET search_path TO public;
+
 -- Enable required extensions
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 CREATE EXTENSION IF NOT EXISTS "pgcrypto";
+
+-- ============================================
+-- 0. REFERENCE LOOKUP TABLES (Added)
+-- ============================================
+
+-- Person Roles Reference
+CREATE TABLE persons_roles (
+    role_id SERIAL PRIMARY KEY,
+    role_code VARCHAR(30) UNIQUE NOT NULL,
+    role_name VARCHAR(100) NOT NULL,
+    role_category VARCHAR(50) CHECK (role_category IN ('Scientific', 'Production', 'Quality', 'Regulatory', 'Management', 'Administrative')),
+    description TEXT,
+    is_active BOOLEAN DEFAULT true,
+    created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
+);
+
+INSERT INTO persons_roles (role_code, role_name, role_category, description) VALUES
+('SCIENTIST', 'Scientist', 'Scientific', 'Research and development scientist'),
+('CHEMIST', 'Chemist', 'Scientific', 'Formulation and analytical chemist'),
+('QC_TECHNICIAN', 'QC Technician', 'Quality', 'Quality control testing technician'),
+('PROD_MANAGER', 'Production Manager', 'Production', 'Manages production operations'),
+('RD_MANAGER', 'R&D Manager', 'Management', 'Manages research and development'),
+('REG_SPECIALIST', 'Regulatory Specialist', 'Regulatory', 'Handles regulatory compliance'),
+('PROC_ENGINEER', 'Process Engineer', 'Production', 'Process optimization engineer'),
+('LAB_TECHNICIAN', 'Lab Technician', 'Quality', 'Laboratory testing technician'),
+('QA_MANAGER', 'QA Manager', 'Quality', 'Quality assurance manager'),
+('SUPPLY_CHAIN', 'Supply Chain Manager', 'Management', 'Manages supply chain and logistics'),
+('MICROBIOLOGIST', 'Microbiologist', 'Scientific', 'Microbiological testing specialist'),
+('PACKAGING_ENG', 'Packaging Engineer', 'Production', 'Packaging design and testing');
+
+-- Company Types Reference
+CREATE TABLE company_types (
+    company_type_id SERIAL PRIMARY KEY,
+    type_code VARCHAR(30) UNIQUE NOT NULL,
+    type_name VARCHAR(100) NOT NULL,
+    type_category VARCHAR(50) CHECK (type_category IN ('Manufacturing', 'Supply', 'Service', 'Regulatory')),
+    description TEXT,
+    is_active BOOLEAN DEFAULT true,
+    created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
+);
+
+INSERT INTO company_types (type_code, type_name, type_category, description) VALUES
+('SUPPLIER', 'Supplier', 'Supply', 'Raw material and ingredient supplier'),
+('MANUFACTURER', 'Manufacturer', 'Manufacturing', 'Toothpaste manufacturing company'),
+('DISTRIBUTOR', 'Distributor', 'Service', 'Product distribution company'),
+('LAB', 'Laboratory', 'Service', 'Testing and research laboratory'),
+('REGULATORY', 'Regulatory Body', 'Regulatory', 'Regulatory authority or agency'),
+('CONTRACTOR', 'Contract Manufacturer', 'Manufacturing', 'Contract manufacturing services'),
+('PACKAGING', 'Packaging Supplier', 'Supply', 'Packaging material supplier'),
+('RND_LAB', 'R&D Laboratory', 'Service', 'Research and development lab'),
+('QC_LAB', 'QC Laboratory', 'Service', 'Quality control testing lab'),
+('STABILITY_LAB', 'Stability Lab', 'Service', 'Stability testing laboratory'),
+('MICRO_LAB', 'Microbiology Lab', 'Service', 'Microbiological testing laboratory');
+
+-- Compound Types Reference
+CREATE TABLE compound_types (
+    compound_type_id SERIAL PRIMARY KEY,
+    type_code VARCHAR(30) UNIQUE NOT NULL,
+    type_name VARCHAR(100) NOT NULL,
+    type_category VARCHAR(50) CHECK (type_category IN ('Active', 'Excipient', 'Functional', 'Processing_Aid')),
+    functional_group VARCHAR(50),
+    description TEXT,
+    is_active BOOLEAN DEFAULT true,
+    created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
+);
+
+INSERT INTO compound_types (type_code, type_name, type_category, functional_group, description) VALUES
+('ABRASIVE', 'Abrasive Agent', 'Functional', 'Cleaning', 'Provides cleaning action by mechanical abrasion'),
+('HUMECTANT', 'Humectant', 'Excipient', 'Moisture Control', 'Retains moisture in toothpaste'),
+('BINDER', 'Binder', 'Excipient', 'Structuring', 'Provides structure and consistency'),
+('SURFACTANT', 'Surfactant', 'Functional', 'Foaming', 'Creates foam and helps cleaning'),
+('FLAVOR', 'Flavoring Agent', 'Excipient', 'Sensory', 'Provides taste and mouthfeel'),
+('SWEETENER', 'Sweetener', 'Excipient', 'Sensory', 'Provides sweetness'),
+('PRESERVATIVE', 'Preservative', 'Excipient', 'Protection', 'Prevents microbial growth'),
+('FLUORIDE', 'Fluoride Compound', 'Active', 'Caries Prevention', 'Prevents dental caries'),
+('WHITENING_AGENT', 'Whitening Agent', 'Active', 'Whitening', 'Removes surface stains'),
+('ACTIVE_INGREDIENT', 'Active Ingredient', 'Active', 'Therapeutic', 'Therapeutic active ingredient'),
+('SOLVENT', 'Solvent', 'Excipient', 'Vehicle', 'Dissolves and disperses ingredients'),
+('PH_ADJUSTER', 'pH Adjuster', 'Excipient', 'Stabilization', 'Adjusts and stabilizes pH'),
+('COLORANT', 'Colorant', 'Excipient', 'Sensory', 'Provides color'),
+('THICKENER', 'Thickener', 'Excipient', 'Structuring', 'Increases viscosity'),
+('ANTIMICROBIAL', 'Antimicrobial Agent', 'Active', 'Protection', 'Controls oral bacteria'),
+('DESENSITIZING_AGENT', 'Desensitizing Agent', 'Active', 'Therapeutic', 'Reduces tooth sensitivity'),
+('ENAMEL_REPAIR', 'Enamel Repair Agent', 'Active', 'Restorative', 'Helps repair enamel'),
+('ANTICALCULUS', 'Anticalculus Agent', 'Active', 'Tartar Control', 'Prevents tartar formation'),
+('ANTIPLAQUE', 'Anti-Plaque Agent', 'Active', 'Protection', 'Prevents plaque formation'),
+('FLAVOR_ENHANCER', 'Flavor Enhancer', 'Excipient', 'Sensory', 'Enhances flavor perception');
+
+-- Product Types Reference
+CREATE TABLE product_types (
+    product_type_id SERIAL PRIMARY KEY,
+    type_code VARCHAR(50) UNIQUE NOT NULL,
+    type_name VARCHAR(100) NOT NULL,
+    type_category VARCHAR(50) CHECK (type_category IN ('Regular', 'Specialty', 'Therapeutic', 'Natural', 'Kids')),
+    target_audience VARCHAR(50),
+    key_benefits TEXT,
+    description TEXT,
+    is_active BOOLEAN DEFAULT true,
+    created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
+);
+
+INSERT INTO product_types (type_code, type_name, type_category, target_audience, key_benefits, description) VALUES
+('REGULAR_TOOTHPASTE', 'Regular Toothpaste', 'Regular', 'General', 'Daily cavity protection and freshening', 'Standard toothpaste for daily use'),
+('WHITENING', 'Whitening Toothpaste', 'Specialty', 'Adults', 'Removes stains and whitens teeth', 'Contains whitening agents for stain removal'),
+('SENSITIVE', 'Sensitive Toothpaste', 'Therapeutic', 'Sensitive teeth', 'Reduces tooth sensitivity', 'For individuals with sensitive teeth'),
+('KIDS', 'Kids Toothpaste', 'Specialty', 'Children', 'Gentle cleaning and cavity protection', 'Formulated for children with milder taste'),
+('HERBAL', 'Herbal Toothpaste', 'Natural', 'Natural product users', 'Natural ingredients for oral health', 'Contains herbal extracts and natural ingredients'),
+('FLUORIDE_FREE', 'Fluoride-Free Toothpaste', 'Natural', 'Fluoride avoiders', 'Natural cleaning without fluoride', 'Toothpaste without fluoride content'),
+('BAKING_SODA', 'Baking Soda Toothpaste', 'Natural', 'General', 'Gentle cleaning with baking soda', 'Contains baking soda for gentle cleaning'),
+('CHARCOAL', 'Charcoal Toothpaste', 'Specialty', 'Adults', 'Deep cleaning and whitening', 'Contains activated charcoal'),
+('ENAMEL_REPAIR', 'Enamel Repair Toothpaste', 'Therapeutic', 'Enamel wear', 'Repairs and strengthens enamel', 'Contains ingredients to repair enamel'),
+('ANTIBACTERIAL', 'Antibacterial Toothpaste', 'Therapeutic', 'Gum health', 'Controls oral bacteria', 'Contains antibacterial agents'),
+('TARTAR_CONTROL', 'Tartar Control Toothpaste', 'Therapeutic', 'Tartar prone', 'Prevents tartar buildup', 'Helps prevent tartar formation'),
+('GUM_CARE', 'Gum Care Toothpaste', 'Therapeutic', 'Gum health', 'Promotes gum health', 'Specifically formulated for gum care'),
+('DEEP_CLEAN', 'Deep Clean Toothpaste', 'Specialty', 'Adults', 'Deep cleaning action', 'Provides thorough cleaning'),
+('NATURAL_FORMULA', 'Natural Formula Toothpaste', 'Natural', 'Natural product users', 'All natural ingredients', 'Made from natural ingredients'),
+('TOTAL_CARE', 'Total Care Toothpaste', 'Regular', 'General', 'Complete oral care', 'All-in-one oral care solution'),
+('FRESH_BREATH', 'Fresh Breath Toothpaste', 'Specialty', 'General', 'Long lasting fresh breath', 'Formulated for breath freshness'),
+('REMINERALIZING', 'Remineralizing Toothpaste', 'Therapeutic', 'Enamel health', 'Remineralizes tooth enamel', 'Helps remineralize tooth enamel'),
+('PROBIOTIC', 'Probiotic Toothpaste', 'Therapeutic', 'Oral microbiome', 'Supports oral microbiome', 'Contains oral probiotics');
+
+-- Production Stage Types Reference
+CREATE TABLE stage_types (
+    stage_type_id SERIAL PRIMARY KEY,
+    type_code VARCHAR(30) UNIQUE NOT NULL,
+    type_name VARCHAR(100) NOT NULL,
+    type_category VARCHAR(50) CHECK (type_category IN ('Preparation', 'Manufacturing', 'Quality', 'Packaging', 'Storage')),
+    process_description TEXT,
+    typical_duration_minutes INTEGER,
+    requires_qc_check BOOLEAN DEFAULT false,
+    is_active BOOLEAN DEFAULT true,
+    created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
+);
+
+INSERT INTO stage_types (type_code, type_name, type_category, process_description, typical_duration_minutes, requires_qc_check) VALUES
+('PREPARATION', 'Preparation', 'Preparation', 'Raw material weighing and preparation', 30, false),
+('COMPOUNDING', 'Compounding', 'Manufacturing', 'Mixing of all ingredients', 45, true),
+('MIXING', 'Mixing', 'Manufacturing', 'Final mixing and homogenization', 60, true),
+('DEAERATION', 'Deaeration', 'Manufacturing', 'Removal of air bubbles from paste', 30, false),
+('COOLING', 'Cooling', 'Manufacturing', 'Cooling the mixture to desired temperature', 60, false),
+('HOLDING', 'Holding', 'Manufacturing', 'Holding tank for quality checks', 120, true),
+('FILLING', 'Filling', 'Packaging', 'Filling tubes with toothpaste', 90, true),
+('SEALING', 'Sealing', 'Packaging', 'Sealing the filled tubes', 30, true),
+('PACKAGING', 'Packaging', 'Packaging', 'Primary and secondary packaging', 60, false),
+('LABELING', 'Labeling', 'Packaging', 'Applying labels to packages', 30, false),
+('INSPECTION', 'Inspection', 'Quality', 'Final product quality inspection', 30, true),
+('STORAGE', 'Storage', 'Storage', 'Finished product storage', 0, false),
+('RAW_MATERIAL_QC', 'Raw Material QC', 'Quality', 'Quality control of incoming materials', 60, true),
+('IN_PROCESS_QC', 'In-Process QC', 'Quality', 'Quality checks during production', 15, true),
+('FINAL_QC', 'Final QC', 'Quality', 'Final product quality control', 45, true),
+('STABILITY_TESTING', 'Stability Testing', 'Quality', 'Product stability testing', 1440, true),
+('MICROBIAL_TESTING', 'Microbial Testing', 'Quality', 'Microbiological testing', 1440, true),
+('FLUORIDE_TESTING', 'Fluoride Testing', 'Quality', 'Fluoride content analysis', 120, true),
+('PACKAGING_INSPECTION', 'Packaging Inspection', 'Quality', 'Inspection of packaging quality', 30, false),
+('WEIGHT_CHECK', 'Weight Check', 'Quality', 'Fill weight verification', 15, true);
 
 -- ============================================
 -- 1. CORE REFERENCE TABLES
@@ -36,7 +208,7 @@ CREATE TABLE companies (
     legal_name VARCHAR(200),
     tax_id VARCHAR(50),
     registration_number VARCHAR(50),
-    company_type VARCHAR(50) CHECK (company_type IN ('Supplier', 'Manufacturer', 'Distributor', 'Lab', 'Regulatory', 'Contractor')),
+    company_type_id INTEGER REFERENCES company_types(company_type_id),
     parent_company_id INTEGER REFERENCES companies(company_id),
     country_id INTEGER REFERENCES countries(country_id),
     address TEXT,
@@ -52,7 +224,7 @@ CREATE TABLE companies (
 );
 
 CREATE INDEX idx_companies_country ON companies(country_id);
-CREATE INDEX idx_companies_type ON companies(company_type);
+CREATE INDEX idx_companies_type ON companies(company_type_id);
 CREATE INDEX idx_companies_code ON companies(company_code);
 
 -- Persons (Employees, Scientists, QC Personnel)
@@ -69,7 +241,7 @@ CREATE TABLE persons (
     company_id INTEGER REFERENCES companies(company_id),
     department VARCHAR(100),
     position VARCHAR(100),
-    role VARCHAR(50) CHECK (role IN ('Scientist', 'Chemist', 'QC_Technician', 'Production_Manager', 'R&D_Manager', 'Regulatory_Specialist', 'Process_Engineer', 'Lab_Technician')),
+    role_id INTEGER REFERENCES persons_roles(role_id),
     specialization VARCHAR(200),
     is_active BOOLEAN DEFAULT true,
     created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
@@ -78,7 +250,7 @@ CREATE TABLE persons (
 );
 
 CREATE INDEX idx_persons_company ON persons(company_id);
-CREATE INDEX idx_persons_role ON persons(role);
+CREATE INDEX idx_persons_role ON persons(role_id);
 CREATE INDEX idx_persons_email ON persons(email);
 
 -- ============================================
@@ -108,7 +280,7 @@ CREATE TABLE chemical_compounds (
     einics_number VARCHAR(20),
     inci_name VARCHAR(200),
     iupac_name VARCHAR(500),
-    compound_type VARCHAR(50) CHECK (compound_type IN ('Abraisive', 'Humectant', 'Binder', 'Surfactant', 'Flavor', 'Sweetener', 'Preservative', 'Fluoride', 'Whitening_Agent', 'Active_Ingredient', 'Solvent', 'pH_Adjuster', 'Colorant', 'Thickener', 'Antimicrobial', 'Desensitizing_Agent')),
+    compound_type_id INTEGER REFERENCES compound_types(compound_type_id),
     purity_min DECIMAL(5,2),
     purity_max DECIMAL(5,2),
     physical_state VARCHAR(20) CHECK (physical_state IN ('Solid', 'Liquid', 'Gas', 'Gel', 'Paste')),
@@ -128,7 +300,7 @@ CREATE TABLE chemical_compounds (
 );
 
 CREATE INDEX idx_compounds_cas ON chemical_compounds(cas_number);
-CREATE INDEX idx_compounds_type ON chemical_compounds(compound_type);
+CREATE INDEX idx_compounds_type ON chemical_compounds(compound_type_id);
 CREATE INDEX idx_compounds_code ON chemical_compounds(compound_code);
 CREATE INDEX idx_compounds_name ON chemical_compounds USING GIN (to_tsvector('english', compound_name));
 
@@ -202,7 +374,7 @@ CREATE TABLE formulations (
     formulation_name VARCHAR(200) NOT NULL,
     brand_id INTEGER REFERENCES brands(brand_id),
     version VARCHAR(20) DEFAULT '1.0',
-    product_type VARCHAR(100) CHECK (product_type IN ('Regular_Toothpaste', 'Whitening', 'Sensitive', 'Kids', 'Herbal', 'Fluoride_Free', 'Baking_Soda', 'Charcoal', 'Enamel_Repair', 'Antibacterial', 'Tartar_Control', 'Gum_Care', 'Deep_Clean', 'Natural_Formula')),
+    product_type_id INTEGER REFERENCES product_types(product_type_id),
     flavor_profile VARCHAR(100),
     target_ph DECIMAL(4,2),
     target_viscosity VARCHAR(50),
@@ -232,7 +404,7 @@ CREATE TABLE formulations (
 CREATE INDEX idx_formulations_brand ON formulations(brand_id);
 CREATE INDEX idx_formulations_status ON formulations(status);
 CREATE INDEX idx_formulations_code ON formulations(formulation_code);
-CREATE INDEX idx_formulations_type ON formulations(product_type);
+CREATE INDEX idx_formulations_type ON formulations(product_type_id);
 
 -- Formulation Components (Ingredients with percentages)
 CREATE TABLE formulation_components (
@@ -657,7 +829,7 @@ CREATE TABLE production_stages (
     stage_code VARCHAR(20) UNIQUE NOT NULL,
     stage_name VARCHAR(100) NOT NULL,
     stage_order INTEGER,
-    stage_type VARCHAR(50) CHECK (stage_type IN ('Preparation', 'Compounding', 'Mixing', 'Deaeration', 'Cooling', 'Holding', 'Filling', 'Sealing', 'Packaging', 'Labeling', 'Inspection', 'Storage')),
+    stage_type_id INTEGER REFERENCES stage_types(stage_type_id),
     description TEXT,
     default_temperature_celsius DECIMAL(5,2),
     default_humidity_percent DECIMAL(5,2),
@@ -922,7 +1094,10 @@ BEGIN
     INSERT INTO batch_stages (batch_id, stage_id, status)
     SELECT v_batch_id, stage_id, 'Pending'
     FROM production_stages
-    WHERE stage_type IN ('Preparation', 'Compounding', 'Mixing', 'Deaeration', 'Holding', 'Filling', 'Packaging', 'Inspection')
+    WHERE stage_type_id IN (
+        SELECT stage_type_id FROM stage_types 
+        WHERE type_code IN ('PREPARATION', 'COMPOUNDING', 'MIXING', 'DEAERATION', 'HOLDING', 'FILLING', 'PACKAGING', 'INSPECTION')
+    )
     ORDER BY stage_order;
     
     RAISE NOTICE 'Created production batch: % with ID: %', v_batch_number, v_batch_id;
@@ -1228,58 +1403,58 @@ INSERT INTO chemical_elements (symbol, name, atomic_number, atomic_mass, categor
 
 -- Insert chemical compounds
 INSERT INTO chemical_compounds (
-    compound_code, compound_name, chemical_formula, cas_number, compound_type, 
+    compound_code, compound_name, chemical_formula, cas_number, compound_type_id, 
     physical_state, solubility, density, ph_level
 ) VALUES
-('SOD-FLU', 'Sodium Fluoride', 'NaF', '7681-49-4', 'Fluoride', 'Solid', 'Water Soluble', 2.558, 7.0),
-('MFP', 'Sodium Monofluorophosphate', 'Na2PO3F', '7631-94-9', 'Fluoride', 'Solid', 'Water Soluble', 2.92, 7.0),
-('STAN-FLU', 'Stannous Fluoride', 'SnF2', '7783-47-3', 'Fluoride', 'Solid', 'Water Soluble', 4.57, 4.5),
-('GLYC', 'Glycerin', 'C3H8O3', '56-81-5', 'Humectant', 'Liquid', 'Miscible', 1.261, 7.0),
-('SORB', 'Sorbitol', 'C6H14O6', '50-70-4', 'Humectant', 'Liquid', 'Water Soluble', 1.489, 7.0),
-('PEG-400', 'Polyethylene Glycol 400', '(C2H4O)nH2O', '25322-68-3', 'Humectant', 'Liquid', 'Water Soluble', 1.128, 7.0),
-('SLS', 'Sodium Lauryl Sulfate', 'C12H25NaO4S', '151-21-3', 'Surfactant', 'Solid', 'Water Soluble', 1.01, 7.0),
-('SLA', 'Sodium Laureth Sulfate', 'C12H25(OC2H4)nOSO3Na', '9004-82-4', 'Surfactant', 'Liquid', 'Water Soluble', 1.05, 7.0),
-('SILICA', 'Hydrated Silica', 'SiO2·nH2O', '7631-86-9', 'Abraisive', 'Solid', 'Insoluble', 2.0, 7.0),
-('CAL-CARB', 'Calcium Carbonate', 'CaCO3', '471-34-1', 'Abraisive', 'Solid', 'Insoluble', 2.71, 9.0),
-('CMC', 'Carboxymethyl Cellulose', '[C6H7O2(OH)2OCH2COONa]n', '9004-32-4', 'Binder', 'Solid', 'Water Soluble', 1.6, 6.5),
-('XANTHAN', 'Xanthan Gum', 'C35H49O29', '11138-66-2', 'Binder', 'Solid', 'Water Soluble', 1.5, 6.0),
-('PEP-MINT', 'Peppermint Oil', NULL, '8006-90-4', 'Flavor', 'Liquid', 'Partially Soluble', 0.9, 7.0),
-('SPEAR', 'Spearmint Oil', NULL, '8008-79-5', 'Flavor', 'Liquid', 'Partially Soluble', 0.92, 7.0),
-('SACCH', 'Sodium Saccharin', 'C7H4NNaO3S', '128-44-9', 'Sweetener', 'Solid', 'Water Soluble', 0.828, 7.0),
-('ASP', 'Aspartame', 'C14H18N2O5', '22839-47-0', 'Sweetener', 'Solid', 'Water Soluble', 1.35, 7.0),
-('TIO2', 'Titanium Dioxide', 'TiO2', '13463-67-7', 'Colorant', 'Solid', 'Insoluble', 4.23, 7.0),
-('WATER', 'Purified Water', 'H2O', '7732-18-5', 'Solvent', 'Liquid', 'Miscible', 1.0, 7.0),
-('SOD-BEN', 'Sodium Benzoate', 'C7H5NaO2', '532-32-1', 'Preservative', 'Solid', 'Water Soluble', 1.44, 7.5),
-('POT-SORB', 'Potassium Sorbate', 'C6H7KO2', '590-00-1', 'Preservative', 'Solid', 'Water Soluble', 1.36, 7.0);
+('SOD-FLU', 'Sodium Fluoride', 'NaF', '7681-49-4', 4, 'Solid', 'Water Soluble', 2.558, 7.0),
+('MFP', 'Sodium Monofluorophosphate', 'Na2PO3F', '7631-94-9', 4, 'Solid', 'Water Soluble', 2.92, 7.0),
+('STAN-FLU', 'Stannous Fluoride', 'SnF2', '7783-47-3', 4, 'Solid', 'Water Soluble', 4.57, 4.5),
+('GLYC', 'Glycerin', 'C3H8O3', '56-81-5', 2, 'Liquid', 'Miscible', 1.261, 7.0),
+('SORB', 'Sorbitol', 'C6H14O6', '50-70-4', 2, 'Liquid', 'Water Soluble', 1.489, 7.0),
+('PEG-400', 'Polyethylene Glycol 400', '(C2H4O)nH2O', '25322-68-3', 2, 'Liquid', 'Water Soluble', 1.128, 7.0),
+('SLS', 'Sodium Lauryl Sulfate', 'C12H25NaO4S', '151-21-3', 3, 'Solid', 'Water Soluble', 1.01, 7.0),
+('SLA', 'Sodium Laureth Sulfate', 'C12H25(OC2H4)nOSO3Na', '9004-82-4', 3, 'Liquid', 'Water Soluble', 1.05, 7.0),
+('SILICA', 'Hydrated Silica', 'SiO2·nH2O', '7631-86-9', 1, 'Solid', 'Insoluble', 2.0, 7.0),
+('CAL-CARB', 'Calcium Carbonate', 'CaCO3', '471-34-1', 1, 'Solid', 'Insoluble', 2.71, 9.0),
+('CMC', 'Carboxymethyl Cellulose', '[C6H7O2(OH)2OCH2COONa]n', '9004-32-4', 14, 'Solid', 'Water Soluble', 1.6, 6.5),
+('XANTHAN', 'Xanthan Gum', 'C35H49O29', '11138-66-2', 14, 'Solid', 'Water Soluble', 1.5, 6.0),
+('PEP-MINT', 'Peppermint Oil', NULL, '8006-90-4', 5, 'Liquid', 'Partially Soluble', 0.9, 7.0),
+('SPEAR', 'Spearmint Oil', NULL, '8008-79-5', 5, 'Liquid', 'Partially Soluble', 0.92, 7.0),
+('SACCH', 'Sodium Saccharin', 'C7H4NNaO3S', '128-44-9', 6, 'Solid', 'Water Soluble', 0.828, 7.0),
+('ASP', 'Aspartame', 'C14H18N2O5', '22839-47-0', 6, 'Solid', 'Water Soluble', 1.35, 7.0),
+('TIO2', 'Titanium Dioxide', 'TiO2', '13463-67-7', 13, 'Solid', 'Insoluble', 4.23, 7.0),
+('WATER', 'Purified Water', 'H2O', '7732-18-5', 11, 'Liquid', 'Miscible', 1.0, 7.0),
+('SOD-BEN', 'Sodium Benzoate', 'C7H5NaO2', '532-32-1', 7, 'Solid', 'Water Soluble', 1.44, 7.5),
+('POT-SORB', 'Potassium Sorbate', 'C6H7KO2', '590-00-1', 7, 'Solid', 'Water Soluble', 1.36, 7.0);
 
 -- Insert companies
-INSERT INTO companies (company_code, company_name, legal_name, company_type, country_id) VALUES
-('P&G', 'Procter & Gamble', 'The Procter & Gamble Company', 'Manufacturer', 1),
-('COLGATE', 'Colgate-Palmolive', 'Colgate-Palmolive Company', 'Manufacturer', 1),
-('UNILEVER', 'Unilever', 'Unilever PLC', 'Manufacturer', 3),
-('GLAXO', 'GlaxoSmithKline', 'GlaxoSmithKline plc', 'Manufacturer', 3),
-('CHURCH-DW', 'Church & Dwight', 'Church & Dwight Co., Inc.', 'Manufacturer', 1),
-('HENKEL', 'Henkel AG', 'Henkel AG & Co. KGaA', 'Manufacturer', 4),
-('LION', 'Lion Corporation', 'Lion Corporation', 'Manufacturer', 8),
-('SUNSTAR', 'Sunstar Inc.', 'Sunstar Inc.', 'Manufacturer', 8),
-('PROD-LAB', 'Production Lab Services', 'Production Lab Services Inc.', 'Lab', 1),
-('QC-LAB', 'Quality Control Labs', 'Quality Control Laboratories Ltd.', 'Lab', 3),
-('BASF', 'BASF SE', 'BASF SE', 'Supplier', 4),
-('DOW', 'Dow Chemical', 'The Dow Chemical Company', 'Supplier', 1),
-('EVONIK', 'Evonik Industries', 'Evonik Industries AG', 'Supplier', 4),
-('SOLVAY', 'Solvay S.A.', 'Solvay S.A.', 'Supplier', 5),
-('CRODA', 'Croda International', 'Croda International Plc', 'Supplier', 3),
-('GIVAUDAN', 'Givaudan SA', 'Givaudan SA', 'Supplier', 10);
+INSERT INTO companies (company_code, company_name, legal_name, company_type_id, country_id) VALUES
+('P&G', 'Procter & Gamble', 'The Procter & Gamble Company', 2, 1),
+('COLGATE', 'Colgate-Palmolive', 'Colgate-Palmolive Company', 2, 1),
+('UNILEVER', 'Unilever', 'Unilever PLC', 2, 3),
+('GLAXO', 'GlaxoSmithKline', 'GlaxoSmithKline plc', 2, 3),
+('CHURCH-DW', 'Church & Dwight', 'Church & Dwight Co., Inc.', 2, 1),
+('HENKEL', 'Henkel AG', 'Henkel AG & Co. KGaA', 2, 4),
+('LION', 'Lion Corporation', 'Lion Corporation', 2, 8),
+('SUNSTAR', 'Sunstar Inc.', 'Sunstar Inc.', 2, 8),
+('PROD-LAB', 'Production Lab Services', 'Production Lab Services Inc.', 4, 1),
+('QC-LAB', 'Quality Control Labs', 'Quality Control Laboratories Ltd.', 5, 3),
+('BASF', 'BASF SE', 'BASF SE', 1, 4),
+('DOW', 'Dow Chemical', 'The Dow Chemical Company', 1, 1),
+('EVONIK', 'Evonik Industries', 'Evonik Industries AG', 1, 4),
+('SOLVAY', 'Solvay S.A.', 'Solvay S.A.', 1, 5),
+('CRODA', 'Croda International', 'Croda International Plc', 1, 3),
+('GIVAUDAN', 'Givaudan SA', 'Givaudan SA', 1, 10);
 
 -- Insert persons
-INSERT INTO persons (person_code, first_name, last_name, email, company_id, role, specialization) VALUES
-('DR-SMITH', 'Robert', 'Smith', 'r.smith@prodlab.com', 9, 'Scientist', 'Formulation Chemistry'),
-('DR-JONES', 'Sarah', 'Jones', 's.jones@qclab.com', 10, 'QC_Technician', 'Analytical Chemistry'),
-('DR-KUMAR', 'Raj', 'Kumar', 'r.kumar@prodlab.com', 9, 'Process_Engineer', 'Process Engineering'),
-('DR-WONG', 'Jennifer', 'Wong', 'j.wong@qclab.com', 10, 'Lab_Technician', 'Microbiology'),
-('DR-MILLER', 'David', 'Miller', 'd.miller@colgate.com', 2, 'R&D_Manager', 'Dental Science'),
-('DR-CHEN', 'Wei', 'Chen', 'w.chen@pg.com', 1, 'Scientist', 'Materials Science'),
-('DR-THOMPSON', 'Emma', 'Thompson', 'e.thompson@unilever.com', 3, 'Regulatory_Specialist', 'Regulatory Affairs');
+INSERT INTO persons (person_code, first_name, last_name, email, company_id, role_id, specialization) VALUES
+('DR-SMITH', 'Robert', 'Smith', 'r.smith@prodlab.com', 9, 1, 'Formulation Chemistry'),
+('DR-JONES', 'Sarah', 'Jones', 's.jones@qclab.com', 10, 3, 'Analytical Chemistry'),
+('DR-KUMAR', 'Raj', 'Kumar', 'r.kumar@prodlab.com', 9, 7, 'Process Engineering'),
+('DR-WONG', 'Jennifer', 'Wong', 'j.wong@qclab.com', 10, 8, 'Microbiology'),
+('DR-MILLER', 'David', 'Miller', 'd.miller@colgate.com', 2, 6, 'Dental Science'),
+('DR-CHEN', 'Wei', 'Chen', 'w.chen@pg.com', 1, 1, 'Materials Science'),
+('DR-THOMPSON', 'Emma', 'Thompson', 'e.thompson@unilever.com', 3, 5, 'Regulatory Affairs');
 
 -- Insert brands
 INSERT INTO brands (brand_code, brand_name, parent_company_id, market_segment) VALUES
@@ -1304,15 +1479,15 @@ INSERT INTO production_facilities (facility_code, facility_name, company_id, cou
 
 -- Insert formulations
 INSERT INTO formulations (
-    formulation_code, formulation_name, brand_id, product_type, 
+    formulation_code, formulation_name, brand_id, product_type_id, 
     flavor_profile, target_ph, fluoride_ppm, status, created_by
 ) VALUES
-('FRM-001', 'Cavity Protection Classic', 1, 'Regular_Toothpaste', 'Mint', 7.0, 1000, 'Active', 5),
-('FRM-002', 'Total Advanced Care', 2, 'Gum_Care', 'Peppermint', 6.8, 1450, 'Active', 5),
-('FRM-003', 'Pro-Health Enamel', 3, 'Enamel_Repair', 'Clean Mint', 7.2, 1100, 'Active', 6),
-('FRM-004', '3D White Professional', 4, 'Whitening', 'Radiant Mint', 6.5, 1500, 'Active', 6),
-('FRM-005', 'Sensitive Relief', 5, 'Sensitive', 'Mint', 7.0, 0, 'Active', 5),
-('FRM-006', 'Advanced Whitening', 6, 'Whitening', 'Fresh Mint', 6.8, 1450, 'Active', 5);
+('FRM-001', 'Cavity Protection Classic', 1, 1, 'Mint', 7.0, 1000, 'Active', 5),
+('FRM-002', 'Total Advanced Care', 2, 12, 'Peppermint', 6.8, 1450, 'Active', 5),
+('FRM-003', 'Pro-Health Enamel', 3, 9, 'Clean Mint', 7.2, 1100, 'Active', 6),
+('FRM-004', '3D White Professional', 4, 2, 'Radiant Mint', 6.5, 1500, 'Active', 6),
+('FRM-005', 'Sensitive Relief', 5, 3, 'Mint', 7.0, 0, 'Active', 5),
+('FRM-006', 'Advanced Whitening', 6, 2, 'Fresh Mint', 6.8, 1450, 'Active', 5);
 
 -- ============================================
 -- 17. COMPLETE FORMULATION COMPONENTS (ALL FIXED)
@@ -1461,15 +1636,15 @@ INSERT INTO chemical_labs (lab_code, lab_name, company_id, facility_id, lab_type
 -- 21. INSERT PRODUCTION STAGES
 -- ============================================
 
-INSERT INTO production_stages (stage_code, stage_name, stage_order, stage_type, default_temperature_celsius, default_duration_minutes, is_critical_control_point) VALUES
-('PREP-01', 'Raw Material Preparation', 1, 'Preparation', 25.0, 30, false),
-('COMP-01', 'Compounding', 2, 'Compounding', 25.0, 45, true),
-('MIX-01', 'Mixing', 3, 'Mixing', 25.0, 60, true),
-('DEAER-01', 'Deaeration', 4, 'Deaeration', 25.0, 30, false),
-('HOLD-01', 'Holding Tank', 5, 'Holding', 25.0, 120, false),
-('FILL-01', 'Filling', 6, 'Filling', 25.0, 90, true),
-('PACK-01', 'Packaging', 7, 'Packaging', 25.0, 60, false),
-('INSP-01', 'Final Inspection', 8, 'Inspection', 25.0, 30, true);
+INSERT INTO production_stages (stage_code, stage_name, stage_order, stage_type_id, default_temperature_celsius, default_duration_minutes, is_critical_control_point) VALUES
+('PREP-01', 'Raw Material Preparation', 1, 1, 25.0, 30, false),
+('COMP-01', 'Compounding', 2, 2, 25.0, 45, true),
+('MIX-01', 'Mixing', 3, 3, 25.0, 60, true),
+('DEAER-01', 'Deaeration', 4, 4, 25.0, 30, false),
+('HOLD-01', 'Holding Tank', 5, 6, 25.0, 120, false),
+('FILL-01', 'Filling', 6, 7, 25.0, 90, true),
+('PACK-01', 'Packaging', 7, 9, 25.0, 60, false),
+('INSP-01', 'Final Inspection', 8, 11, 25.0, 30, true);
 
 -- ============================================
 -- 22. ADDITIONAL INDEXES FOR PERFORMANCE
@@ -1637,7 +1812,7 @@ END $$;
 
 -- Create application user
 -- CREATE USER toothpaste_app WITH PASSWORD 'secure_password';
--- GRANT CONNECT ON DATABASE toothpaste_db TO toothpaste_app;
+-- GRANT CONNECT ON DATABASE toothpastes TO toothpaste_app;
 -- GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO toothpaste_app;
 -- GRANT USAGE ON ALL SEQUENCES IN SCHEMA public TO toothpaste_app;
 
