@@ -14,8 +14,8 @@ set DB_HOST "localhost"
 set DB_PORT "5432"
 set DB_NAME "toothpastes"
 set DB_USER "postgres"
-set DB_PASS ""
-set PG_PATH "C:/Program Files/PostgreSQL/14/bin"  ;# Adjust this path
+set DB_PASS "arizona42"
+set PG_PATH "C:/Program Files/PostgreSQL/14/bin"
 set SQL_FILE "db.sql"
 
 # ============================================
@@ -43,6 +43,9 @@ proc check_postgres {} {
         lappend possible_paths "C:/Program Files/PostgreSQL/13/bin"
         lappend possible_paths "C:/Program Files/PostgreSQL/12/bin"
         lappend possible_paths "C:/Program Files/PostgreSQL/11/bin"
+        lappend possible_paths "C:/Program Files/PostgreSQL/10/bin"
+        lappend possible_paths "C:/Program Files/PostgreSQL/9.6/bin"
+        lappend possible_paths "C:/Program Files (x86)/PostgreSQL/9.6/bin"
     } else {
         lappend possible_paths "/usr/bin"
         lappend possible_paths "/usr/local/bin"
@@ -73,29 +76,54 @@ proc check_postgres {} {
         }
     }
     
-    # If not found, try which/where
-    if {$::tcl_platform(platform) ne "windows"} {
-        catch {
-            set psql_exe [exec which psql 2>/dev/null]
-            if {$psql_exe ne ""} {
-                return $psql_exe
-            }
-        }
-    }
-    
     return ""
 }
 
-# Test PostgreSQL connection
-proc test_postgres_connection {} {
-    global DB_HOST DB_PORT DB_USER DB_PASS
+# Try to find PostgreSQL installation
+proc find_postgres_installation {} {
+    global PG_PATH
+    
+    set found_paths [list]
+    
+    # Check common paths
+    set common_paths [list \
+        "C:/Program Files/PostgreSQL/16/bin" \
+        "C:/Program Files/PostgreSQL/15/bin" \
+        "C:/Program Files/PostgreSQL/14/bin" \
+        "C:/Program Files/PostgreSQL/13/bin" \
+        "C:/Program Files/PostgreSQL/12/bin" \
+        "C:/Program Files/PostgreSQL/11/bin" \
+        "C:/Program Files/PostgreSQL/10/bin" \
+        "C:/Program Files (x86)/PostgreSQL/14/bin" \
+        "C:/Program Files (x86)/PostgreSQL/13/bin" \
+    ]
+    
+    foreach path $common_paths {
+        set psql_exe [file join $path "psql.exe"]
+        if {[file exists $psql_exe]} {
+            lappend found_paths $path
+        }
+    }
+    
+    return $found_paths
+}
+
+# Test PostgreSQL connection with various settings
+proc test_postgres_connection {{password ""}} {
+    global DB_HOST DB_PORT DB_USER
     
     set psql_exe [check_postgres]
     if {$psql_exe eq ""} {
-        return [list 0 "PostgreSQL client (psql) not found"]
+        return [list 0 "PostgreSQL client (psql) not found.\n\nPlease install PostgreSQL or set the correct path."]
     }
     
-    # Try to connect and get version
+    # Use provided password or global
+    if {$password eq ""} {
+        global DB_PASS
+        set password $DB_PASS
+    }
+    
+    # Try to connect with current settings
     set cmd [list $psql_exe]
     lappend cmd -h $DB_HOST
     lappend cmd -p $DB_PORT
@@ -103,58 +131,33 @@ proc test_postgres_connection {} {
     lappend cmd -d postgres
     lappend cmd -c "SELECT version()"
     
-    if {$DB_PASS ne ""} {
-        set env(PGPASSWORD) $DB_PASS
+    # Set password via environment variable
+    if {$password ne ""} {
+        set env(PGPASSWORD) $password
+    } else {
+        catch {unset env(PGPASSWORD)}
     }
+    
+    # Add --no-password flag to prevent password prompt
+    lappend cmd --no-password
     
     set result [catch {exec {*}$cmd} output]
     
     if {$result != 0} {
-        return [list 0 "Cannot connect to PostgreSQL at $DB_HOST:$DB_PORT\n\nError: $output\n\nPlease check:\n1. PostgreSQL service is running\n2. Host and port are correct\n3. Username and password are correct"]
+        # Check if error contains password prompt message
+        if {[string match "*password*" $output]} {
+            return [list 0 "Incorrect password.\n\nPlease try a different password."]
+        }
+        if {[string match "*Connection refused*" $output]} {
+            return [list 0 "PostgreSQL is not running on $DB_HOST:$DB_PORT\n\nPlease start PostgreSQL first."]
+        }
+        if {[string match "*does not exist*" $output]} {
+            return [list 0 "Database 'postgres' does not exist.\n\nPlease check your PostgreSQL installation."]
+        }
+        return [list 0 "Connection failed: $output"]
     }
     
     return [list 1 $output]
-}
-
-# Execute PostgreSQL command
-proc exec_psql {args} {
-    global DB_HOST DB_PORT DB_USER DB_PASS
-    
-    set psql_exe [check_postgres]
-    if {$psql_exe eq ""} {
-        error "PostgreSQL client (psql) not found. Please install PostgreSQL or set PG_PATH."
-    }
-    
-    set cmd [list $psql_exe]
-    lappend cmd -h $DB_HOST
-    lappend cmd -p $DB_PORT
-    lappend cmd -U $DB_USER
-    
-    # Set password via environment variable
-    if {$DB_PASS ne ""} {
-        set env(PGPASSWORD) $DB_PASS
-    } else {
-        # Try to use no password
-        lappend cmd -w
-    }
-    
-    foreach arg $args {
-        lappend cmd $arg
-    }
-    
-    puts "DEBUG: Executing psql with args: [lrange $args 0 end]"
-    
-    set result [catch {exec {*}$cmd} output]
-    
-    if {$result != 0} {
-        # Check if it's a connection error
-        if {[string match "*Connection refused*" $output] || [string match "*could not connect*" $output]} {
-            error "PostgreSQL connection failed:\n$output\n\nPlease make sure PostgreSQL is running and accessible."
-        }
-        error "Command failed: $output"
-    }
-    
-    return $output
 }
 
 # ============================================
@@ -168,13 +171,13 @@ proc install_database {} {
     catch {destroy $w}
     toplevel $w -class Dialog
     wm title $w "Toothpaste Database Installation"
-    wm geometry $w "700x600"
+    wm geometry $w "750x650"
     wm resizable $w 0 0
     wm protocol $w WM_DELETE_WINDOW {exit}
     
     # Center the window
-    set x [expr {([winfo screenwidth .] - 700) / 2}]
-    set y [expr {([winfo screenheight .] - 600) / 2}]
+    set x [expr {([winfo screenwidth .] - 750) / 2}]
+    set y [expr {([winfo screenheight .] - 650) / 2}]
     wm geometry $w "+$x+$y"
     
     # Main container
@@ -218,6 +221,9 @@ proc install_database {} {
     ttk::button $btn_frame.test -text "🔍 Test Connection" -command [list test_connection_proc $text] -padding "10 5"
     pack $btn_frame.test -side left -expand true -fill x -padx 5
     
+    ttk::button $btn_frame.detect -text "🔎 Detect PostgreSQL" -command [list detect_postgres_proc $text] -padding "10 5"
+    pack $btn_frame.detect -side left -expand true -fill x -padx 5
+    
     ttk::button $btn_frame.close -text "❌ Close" -command "destroy $w" -padding "10 5"
     pack $btn_frame.close -side right -expand true -fill x -padx 5
     
@@ -232,11 +238,77 @@ proc log_message {text msg {color "black"}} {
     update idletasks
 }
 
-proc test_connection_proc {text} {
-    log_message $text "🔍 Testing PostgreSQL connection..." 
+proc detect_postgres_proc {text} {
+    log_message $text "🔎 Detecting PostgreSQL installation..." 
     log_message $text "========================================" 
     
-    set result [test_postgres_connection]
+    # Find PostgreSQL installations
+    set found_paths [find_postgres_installation]
+    
+    if {[llength $found_paths] > 0} {
+        log_message $text "✅ Found PostgreSQL installations:" 
+        foreach path $found_paths {
+            log_message $text "   - $path" 
+        }
+    } else {
+        log_message $text "❌ No PostgreSQL installations found in common paths!" 
+    }
+    
+    # Check current path
+    global PG_PATH
+    set psql_exe [check_postgres]
+    if {$psql_exe ne ""} {
+        log_message $text "✅ Current PostgreSQL client: $psql_exe" 
+    } else {
+        log_message $text "❌ PostgreSQL client not found at: $PG_PATH" 
+    }
+    
+    # Check if service is running
+    if {$::tcl_platform(platform) eq "windows"} {
+        catch {
+            set output [exec sc query state= all]
+            set lines [split $output "\n"]
+            set postgres_services [list]
+            
+            foreach line $lines {
+                if {[string match "*postgres*" [string tolower $line]]} {
+                    lappend postgres_services [string trim $line]
+                }
+            }
+            
+            if {[llength $postgres_services] > 0} {
+                log_message $text "✅ PostgreSQL services found:" 
+                foreach service $postgres_services {
+                    log_message $text "   - $service" 
+                }
+            } else {
+                log_message $text "⚠️ No PostgreSQL services found in services.msc" 
+            }
+        }
+    }
+    
+    tk_messageBox -icon info -title "Detection Complete" \
+        -message "PostgreSQL detection complete.\n\nCheck the log for details.\n\nIf PostgreSQL is installed but not found, please set the correct path in the configuration."
+}
+
+proc test_connection_proc {text} {
+    global DB_PASS DB_USER DB_HOST DB_PORT
+    
+    log_message $text "🔍 Testing PostgreSQL connection..." 
+    log_message $text "========================================" 
+    log_message $text "   Host: $DB_HOST" 
+    log_message $text "   Port: $DB_PORT" 
+    log_message $text "   User: $DB_USER" 
+    
+    # If no password set, ask for it
+    if {$DB_PASS eq ""} {
+        set DB_PASS [get_password_dialog "Enter PostgreSQL Password" "Please enter the password for user '$DB_USER':\n\nIf you don't know the password, try:\n- Empty (no password)\n- postgres\n- The password you set during installation"]
+        if {$DB_PASS eq ""} {
+            log_message $text "⚠️ No password entered. Trying empty password..." 
+        }
+    }
+    
+    set result [test_postgres_connection $DB_PASS]
     set status [lindex $result 0]
     set message [lindex $result 1]
     
@@ -244,13 +316,83 @@ proc test_connection_proc {text} {
         log_message $text "✅ Connection successful!" 
         log_message $text "$message" 
         tk_messageBox -icon info -title "✅ Connection Successful" \
-            -message "Successfully connected to PostgreSQL!\n\n$message"
+            -message "Successfully connected to PostgreSQL!\n\n$message\n\nPassword works!"
     } else {
         log_message $text "❌ Connection failed!" 
         log_message $text "$message" 
+        
+        # Try common passwords
+        log_message $text "   Trying common passwords..." 
+        set common_passwords [list "" "postgres" "admin" "password" "123456" "root"]
+        
+        foreach pwd $common_passwords {
+            if {$pwd eq $DB_PASS} continue
+            log_message $text "   Trying password: '$pwd'" 
+            set result [test_postgres_connection $pwd]
+            set status [lindex $result 0]
+            if {$status} {
+                log_message $text "✅ Found working password: '$pwd'" 
+                set DB_PASS $pwd
+                tk_messageBox -icon info -title "Password Found" \
+                    -message "✅ Found working password!\n\nPassword: '$pwd'\n\nThis password works for user '$DB_USER'."
+                return
+            }
+        }
+        
+        # If we get here, none of the common passwords worked
+        set DB_PASS ""
         tk_messageBox -icon error -title "❌ Connection Failed" \
-            -message "PostgreSQL connection test failed.\n\n$message"
+            -message "PostgreSQL connection test failed.\n\n$message\n\nTried common passwords but none worked.\n\nPlease check:\n1. PostgreSQL is running\n2. Host and port are correct\n3. Username is correct\n4. Password is correct\n\nYou may need to reset your PostgreSQL password."
     }
+}
+
+proc get_password_dialog {title message} {
+    set w .password_dialog
+    catch {destroy $w}
+    toplevel $w -class Dialog
+    wm title $w $title
+    wm geometry $w "450x200"
+    wm resizable $w 0 0
+    
+    # Center the window
+    set x [expr {([winfo screenwidth .] - 450) / 2}]
+    set y [expr {([winfo screenheight .] - 200) / 2}]
+    wm geometry $w "+$x+$y"
+    
+    set main [ttk::frame $w.main -padding "20 20 20 20"]
+    pack $main -fill both -expand true
+    
+    ttk::label $main.message -text $message -font {Arial 10} -wraplength 400 -justify left
+    pack $main.message -pady 5
+    
+    set pass_entry [ttk::entry $main.password -width 30 -show "*" -font {Arial 10}]
+    pack $pass_entry -pady 10 -fill x
+    
+    set btn_frame [ttk::frame $main.buttons]
+    pack $btn_frame -fill x -pady 5
+    
+    ttk::button $btn_frame.ok -text "OK" -command [list set ::password_result [$pass_entry get]] -padding "10 5"
+    pack $btn_frame.ok -side left -expand true -fill x -padx 5
+    
+    ttk::button $btn_frame.cancel -text "Cancel" -command [list set ::password_result ""] -padding "10 5"
+    pack $btn_frame.cancel -side right -expand true -fill x -padx 5
+    
+    ttk::button $btn_frame.empty -text "Try Empty" -command [list set ::password_result ""] -padding "10 5"
+    pack $btn_frame.empty -side right -expand true -fill x -padx 5
+    
+    bind $w <Return> [list set ::password_result [$pass_entry get]]
+    focus $pass_entry
+    
+    # Wait for the dialog to close
+    tkwait window $w
+    
+    # Return the password
+    if {[info exists ::password_result]} {
+        set result $::password_result
+        unset ::password_result
+        return $result
+    }
+    return ""
 }
 
 proc install_db_proc {text progress w} {
@@ -261,9 +403,20 @@ proc install_db_proc {text progress w} {
     log_message $text "🚀 Starting database installation..." 
     log_message $text "========================================" 
     
+    # Check if password is set
+    global DB_PASS DB_USER DB_HOST DB_PORT
+    
+    # If no password set, ask for it
+    if {$DB_PASS eq ""} {
+        set DB_PASS [get_password_dialog "Enter PostgreSQL Password" "Please enter the password for user '$DB_USER':\n\nIf you don't know the password, try:\n- Empty (no password)\n- postgres\n- The password you set during installation"]
+        if {$DB_PASS eq ""} {
+            log_message $text "⚠️ No password entered. Trying empty password..." 
+        }
+    }
+    
     # Step 0: Test connection first
     log_message $text "\n📌 Step 0: Testing PostgreSQL connection..." 
-    set conn_test [test_postgres_connection]
+    set conn_test [test_postgres_connection $DB_PASS]
     set conn_status [lindex $conn_test 0]
     set conn_message [lindex $conn_test 1]
     
@@ -272,22 +425,49 @@ proc install_db_proc {text progress w} {
         log_message $text "$conn_message" 
         $progress stop
         $w.main.buttons.install configure -state normal
-        tk_messageBox -icon error -title "Connection Error" \
-            -message "Cannot connect to PostgreSQL.\n\n$conn_message\n\nPlease make sure:\n1. PostgreSQL is installed and running\n2. The connection settings are correct\n3. The service is accessible"
-        return
+        
+        # Try common passwords
+        log_message $text "   Trying common passwords..." 
+        set common_passwords [list "" "postgres" "admin" "password" "123456" "root"]
+        set found_pwd 0
+        
+        foreach pwd $common_passwords {
+            if {$pwd eq $DB_PASS} continue
+            log_message $text "   Trying password: '$pwd'" 
+            set result [test_postgres_connection $pwd]
+            set status [lindex $result 0]
+            if {$status} {
+                log_message $text "✅ Found working password: '$pwd'" 
+                set DB_PASS $pwd
+                set found_pwd 1
+                break
+            }
+        }
+        
+        if {$found_pwd} {
+            tk_messageBox -icon info -title "Password Found" \
+                -message "✅ Found working password!\n\nPassword: '$DB_PASS'\n\nContinuing with installation..."
+            # Continue with installation
+        } else {
+            set DB_PASS ""
+            tk_messageBox -icon error -title "Connection Error" \
+                -message "Cannot connect to PostgreSQL.\n\n$conn_message\n\nPlease check:\n1. PostgreSQL is installed and running\n2. The connection settings are correct\n3. The password is correct\n\nYou may need to reset your PostgreSQL password."
+            return
+        }
+    } else {
+        log_message $text "✅ PostgreSQL connection successful" 
     }
-    log_message $text "✅ PostgreSQL connection successful" 
     
     # Check PostgreSQL client
     log_message $text "\n📌 Step 1: Checking PostgreSQL client..."
     set psql_exe [check_postgres]
     if {$psql_exe eq ""} {
         log_message $text "❌ ERROR: PostgreSQL client (psql) not found!" 
-        log_message $text "   Please set PG_PATH in the script or install PostgreSQL." 
+        log_message $text "   Please set the correct path in the configuration." 
         $progress stop
         $w.main.buttons.install configure -state normal
         tk_messageBox -icon error -title "Error" \
-            -message "PostgreSQL client (psql) not found.\n\nPlease install PostgreSQL or set PG_PATH in the script."
+            -message "PostgreSQL client (psql) not found.\n\nPlease set the correct path in the configuration."
         return
     }
     log_message $text "✅ Found PostgreSQL client: $psql_exe" 
@@ -310,14 +490,14 @@ proc install_db_proc {text progress w} {
     if {[catch {
         exec_psql -d postgres -c "DROP DATABASE IF EXISTS $::DB_NAME;"
     } errorMsg]} {
-        # Check if error is about connection
-        if {[string match "*Connection refused*" $errorMsg] || [string match "*could not connect*" $errorMsg]} {
-            log_message $text "❌ PostgreSQL connection error!" 
+        if {[string match "*password*" $errorMsg]} {
+            log_message $text "❌ Password error!" 
             log_message $text "$errorMsg" 
             $progress stop
             $w.main.buttons.install configure -state normal
-            tk_messageBox -icon error -title "Connection Error" \
-                -message "PostgreSQL connection error.\n\n$errorMsg\n\nPlease check your PostgreSQL service."
+            set DB_PASS ""
+            tk_messageBox -icon error -title "Password Error" \
+                -message "Password required or incorrect.\n\n$errorMsg"
             return
         }
         log_message $text "⚠️ Warning: Could not drop database: $errorMsg" 
@@ -332,6 +512,16 @@ proc install_db_proc {text progress w} {
     if {[catch {
         exec_psql -d postgres -c "CREATE DATABASE $::DB_NAME WITH OWNER = $::DB_USER ENCODING = 'UTF8';"
     } errorMsg]} {
+        if {[string match "*password*" $errorMsg]} {
+            log_message $text "❌ Password error!" 
+            log_message $text "$errorMsg" 
+            $progress stop
+            $w.main.buttons.install configure -state normal
+            set DB_PASS ""
+            tk_messageBox -icon error -title "Password Error" \
+                -message "Password required or incorrect.\n\n$errorMsg"
+            return
+        }
         log_message $text "❌ ERROR creating database: $errorMsg" 
         $progress stop
         $w.main.buttons.install configure -state normal
@@ -348,6 +538,16 @@ proc install_db_proc {text progress w} {
     if {[catch {
         exec_psql -d $::DB_NAME -f $SQL_FILE
     } errorMsg]} {
+        if {[string match "*password*" $errorMsg]} {
+            log_message $text "❌ Password error!" 
+            log_message $text "$errorMsg" 
+            $progress stop
+            $w.main.buttons.install configure -state normal
+            set DB_PASS ""
+            tk_messageBox -icon error -title "Password Error" \
+                -message "Password required or incorrect.\n\n$errorMsg"
+            return
+        }
         log_message $text "❌ ERROR running schema: $errorMsg" 
         $progress stop
         $w.main.buttons.install configure -state normal
@@ -366,39 +566,6 @@ proc install_db_proc {text progress w} {
         log_message $text "✅ Tables found: $result" 
     } errorMsg]} {
         log_message $text "⚠️ Could not verify tables: $errorMsg" 
-    } else {
-        # Check for specific tables
-        set tables [list "persons_roles" "persons" "formulations" "production_batches" "qc_tests" "users"]
-        foreach table $tables {
-            if {[catch {
-                set count [exec_psql -d $::DB_NAME -t -c "SELECT COUNT(*) FROM $table"]
-                set count [string trim $count]
-                if {$count ne "" && $count != "0"} {
-                    log_message $text "   - $table: $count rows" 
-                } elseif {$count == "0"} {
-                    log_message $text "   - $table: empty (created)" 
-                } else {
-                    log_message $text "   - $table: created" 
-                }
-            } errorMsg]} {
-                log_message $text "   - $table: NOT FOUND" 
-            }
-        }
-    }
-    
-    # Step 5: Check admin user
-    log_message $text "\n📌 Step 6: Checking admin user..." 
-    
-    if {[catch {
-        set count [exec_psql -d $::DB_NAME -t -c "SELECT COUNT(*) FROM users WHERE username = 'admin'"]
-        set count [string trim $count]
-        if {$count > 0} {
-            log_message $text "✅ Admin user found (username: admin, password: admin)" 
-        } else {
-            log_message $text "⚠️ Admin user not found. Please check the schema." 
-        }
-    } errorMsg]} {
-        log_message $text "⚠️ Could not check admin user: $errorMsg" 
     }
     
     # Summary
@@ -408,6 +575,7 @@ proc install_db_proc {text progress w} {
     log_message $text "\n📋 Database: $::DB_NAME" 
     log_message $text "📋 Host: $::DB_HOST:$::DB_PORT" 
     log_message $text "📋 User: $::DB_USER" 
+    log_message $text "📋 Password: $::DB_PASS" 
     log_message $text "\n🔐 Default admin login:" 
     log_message $text "   Username: admin" 
     log_message $text "   Password: admin" 
@@ -417,7 +585,52 @@ proc install_db_proc {text progress w} {
     $w.main.buttons.install configure -state normal
     
     tk_messageBox -icon info -title "Installation Complete" \
-        -message "✅ Database installation completed successfully!\n\nDatabase: $::DB_NAME\nHost: $::DB_HOST:$::DB_PORT\nUser: $::DB_USER\n\nDefault admin login:\nUsername: admin\nPassword: admin"
+        -message "✅ Database installation completed successfully!\n\nDatabase: $::DB_NAME\nHost: $::DB_HOST:$::DB_PORT\nUser: $::DB_USER\nPassword: $::DB_PASS\n\nDefault admin login:\nUsername: admin\nPassword: admin"
+}
+
+# Execute PostgreSQL command
+proc exec_psql {args} {
+    global DB_HOST DB_PORT DB_USER DB_PASS
+    
+    set psql_exe [check_postgres]
+    if {$psql_exe eq ""} {
+        error "PostgreSQL client (psql) not found."
+    }
+    
+    set cmd [list $psql_exe]
+    lappend cmd -h $DB_HOST
+    lappend cmd -p $DB_PORT
+    lappend cmd -U $DB_USER
+    
+    # Set password via environment variable
+    if {$DB_PASS ne ""} {
+        set env(PGPASSWORD) $DB_PASS
+    } else {
+        catch {unset env(PGPASSWORD)}
+    }
+    
+    # Add --no-password flag to prevent password prompt
+    lappend cmd --no-password
+    
+    foreach arg $args {
+        lappend cmd $arg
+    }
+    
+    puts "DEBUG: Executing psql with args: [lrange $args 0 end]"
+    
+    set result [catch {exec {*}$cmd} output]
+    
+    if {$result != 0} {
+        if {[string match "*password*" $output]} {
+            error "Password required or incorrect."
+        }
+        if {[string match "*Connection refused*" $output] || [string match "*could not connect*" $output]} {
+            error "PostgreSQL connection failed:\n$output"
+        }
+        error "Command failed: $output"
+    }
+    
+    return $output
 }
 
 # ============================================
@@ -429,12 +642,12 @@ proc show_config_dialog {} {
     catch {destroy $w}
     toplevel $w -class Dialog
     wm title $w "Database Configuration"
-    wm geometry $w "550x500"
+    wm geometry $w "550x550"
     wm resizable $w 0 0
     
     # Center the window
     set x [expr {([winfo screenwidth .] - 550) / 2}]
-    set y [expr {([winfo screenheight .] - 500) / 2}]
+    set y [expr {([winfo screenheight .] - 550) / 2}]
     wm geometry $w "+$x+$y"
     
     set main [ttk::frame $w.main -padding "20 20 20 20"]
@@ -497,6 +710,10 @@ proc show_config_dialog {} {
     ttk::button $check_frame.test -text "🔌 Test Connection" -command [list test_connection_config] -padding "8 4"
     pack $check_frame.test -side left -padx 5
     
+    # Detect button
+    ttk::button $check_frame.detect -text "🔎 Find PostgreSQL" -command [list detect_config] -padding "8 4"
+    pack $check_frame.detect -side left -padx 5
+    
     # Buttons
     set btn_frame [ttk::frame $main.buttons]
     pack $btn_frame -fill x -pady 15
@@ -507,7 +724,7 @@ proc show_config_dialog {} {
     ttk::button $btn_frame.cancel -text "❌ Cancel" -command "destroy $w" -padding "10 5"
     pack $btn_frame.cancel -side right -expand true -fill x -padx 5
     
-    # Store the entries array in global scope for access by other procs
+    # Store the entries array in global scope
     global config_entries
     array set config_entries [array get entries]
 }
@@ -527,27 +744,64 @@ proc check_postgres_path {} {
     } else {
         set status .config.main.check.status
         $status configure -text "❌ PostgreSQL not found. Please check the path." -foreground red
+        
+        # Try to find it
+        set found_paths [find_postgres_installation]
+        if {[llength $found_paths] > 0} {
+            tk_messageBox -icon warning -title "PostgreSQL Not Found at Path" \
+                -message "PostgreSQL not found at the specified path.\n\nFound PostgreSQL in these locations:\n[join $found_paths "\n"]\n\nPlease update the path accordingly."
+        } else {
+            tk_messageBox -icon warning -title "PostgreSQL Not Found" \
+                -message "PostgreSQL client (psql) not found.\n\nPlease install PostgreSQL or set the correct path."
+        }
+    }
+}
+
+proc detect_config {} {
+    global config_entries
+    
+    # Find PostgreSQL installations
+    set found_paths [find_postgres_installation]
+    
+    if {[llength $found_paths] > 0} {
+        # Use the first found path
+        set dir [lindex $found_paths 0]
+        $config_entries(pgpath) delete 0 end
+        $config_entries(pgpath) insert 0 $dir
+        
+        tk_messageBox -icon info -title "PostgreSQL Found" \
+            -message "Found PostgreSQL at:\n$dir\n\nPath has been updated."
+    } else {
         tk_messageBox -icon warning -title "PostgreSQL Not Found" \
-            -message "PostgreSQL client (psql) not found.\n\nPlease check the path and try again."
+            -message "No PostgreSQL installations found in common paths.\n\nPlease install PostgreSQL or set the path manually.\n\nDownload from:\nhttps://www.postgresql.org/download/"
     }
 }
 
 proc test_connection_config {} {
-    global config_entries DB_HOST DB_PORT DB_USER DB_PASS
+    global config_entries DB_HOST DB_PORT DB_USER DB_PASS PG_PATH
     
     # Get values from the configuration dialog
     set DB_HOST [$config_entries(host) get]
     set DB_PORT [$config_entries(port) get]
     set DB_USER [$config_entries(user) get]
     set DB_PASS [$config_entries(pass) get]
+    set PG_PATH [$config_entries(pgpath) get]
+    
+    # If password is empty, ask for it
+    if {$DB_PASS eq ""} {
+        set DB_PASS [get_password_dialog "Enter PostgreSQL Password" "Please enter the password for user '$DB_USER':\n\nCommon passwords to try:\n- (empty)\n- postgres\n- admin\n- The password you set during installation"]
+        if {$DB_PASS ne ""} {
+            $config_entries(pass) insert 0 $DB_PASS
+        }
+    }
     
     # Test the connection
-    set result [test_postgres_connection]
+    set result [test_postgres_connection $DB_PASS]
     set status [lindex $result 0]
     set message [lindex $result 1]
     
     if {$status} {
-        # Extract just the PostgreSQL version from the output
+        # Extract just the PostgreSQL version
         set version ""
         foreach line [split $message "\n"] {
             if {[string match "*PostgreSQL*" $line]} {
@@ -560,23 +814,32 @@ proc test_connection_config {} {
         }
         
         tk_messageBox -icon info -title "✅ Connection Successful" \
-            -message "Successfully connected to PostgreSQL!\n\n$version\n\nConnection Details:\nHost: $DB_HOST\nPort: $DB_PORT\nUser: $DB_USER"
+            -message "Successfully connected to PostgreSQL!\n\n$version\n\nConnection Details:\nHost: $DB_HOST\nPort: $DB_PORT\nUser: $DB_USER\nPassword: $DB_PASS"
     } else {
-        # Show detailed error message with troubleshooting tips
-        set error_msg "❌ Connection Failed!\n\nError Details:\n$message\n\n─────────────────────────────\n\nTroubleshooting Tips:\n"
-        append error_msg "• Make sure PostgreSQL service is running\n"
-        append error_msg "  (Windows: Check Services - services.msc)\n"
-        append error_msg "  (Linux/Mac: sudo systemctl status postgresql)\n"
-        append error_msg "• Verify host and port are correct\n"
-        append error_msg "  (Default: localhost:5432)\n"
-        append error_msg "• Check username and password\n"
-        append error_msg "  (Default user: postgres)\n"
-        append error_msg "• Make sure PostgreSQL accepts connections\n"
-        append error_msg "  (Check pg_hba.conf configuration)\n"
-        append error_msg "• Verify PostgreSQL is installed correctly"
+        # Try common passwords
+        set common_passwords [list "" "postgres" "admin" "password" "123456" "root"]
+        set found_pwd 0
         
-        tk_messageBox -icon error -title "❌ Connection Failed" \
-            -message $error_msg
+        foreach pwd $common_passwords {
+            if {$pwd eq $DB_PASS} continue
+            set result [test_postgres_connection $pwd]
+            set status [lindex $result 0]
+            if {$status} {
+                set DB_PASS $pwd
+                $config_entries(pass) delete 0 end
+                $config_entries(pass) insert 0 $pwd
+                set found_pwd 1
+                break
+            }
+        }
+        
+        if {$found_pwd} {
+            tk_messageBox -icon info -title "✅ Password Found" \
+                -message "Found working password: '$DB_PASS'\n\nPassword has been updated in the configuration."
+        } else {
+            tk_messageBox -icon error -title "❌ Connection Failed" \
+                -message "PostgreSQL connection test failed.\n\n$message\n\nTried common passwords but none worked.\n\nPlease check:\n1. PostgreSQL is running\n2. Host and port are correct\n3. Username is correct\n4. Password is correct"
+        }
     }
 }
 
@@ -590,14 +853,22 @@ proc save_config {} {
     set DB_PASS [$config_entries(pass) get]
     set PG_PATH [$config_entries(pgpath) get]
     
+    # If password is empty, ask for it
+    if {$DB_PASS eq ""} {
+        set DB_PASS [get_password_dialog "Enter PostgreSQL Password" "Please enter the password for user '$DB_USER':\n\nIf you don't know the password, try:\n- Empty (no password)\n- postgres\n- The password you set during installation"]
+        if {$DB_PASS ne ""} {
+            $config_entries(pass) insert 0 $DB_PASS
+        }
+    }
+    
     # Test connection first
-    set result [test_postgres_connection]
+    set result [test_postgres_connection $DB_PASS]
     set status [lindex $result 0]
     
     if {!$status} {
         set message [lindex $result 1]
         tk_messageBox -icon warning -title "Connection Warning" \
-            -message "Cannot connect to PostgreSQL at $DB_HOST:$DB_PORT\n\n$message\n\nPlease fix the connection settings and try again."
+            -message "Cannot connect to PostgreSQL.\n\n$message\n\nPlease fix the connection settings and try again."
         return
     }
     
@@ -606,82 +877,60 @@ proc save_config {} {
 }
 
 # ============================================
-# Command-line mode
+# Main Entry Point
 # ============================================
 
-proc run_command_line {} {
-    global DB_HOST DB_PORT DB_NAME DB_USER DB_PASS PG_PATH SQL_FILE
-    
+# Check if running with GUI or command line
+if {[info exists ::argv] && [lsearch -exact $::argv "--cli"] != -1} {
+    # Command line mode
     puts "🚀 Toothpaste Database Installation (Command Line)"
     puts "================================================"
     puts ""
-
-    # Test connection first
-    puts "📋 Testing PostgreSQL connection..."
-    set result [test_postgres_connection]
+    
+    # Ask for password
+    puts -nonewline "Enter PostgreSQL password for user 'postgres' (press Enter for empty): "
+    flush stdout
+    if {$::tcl_platform(platform) ne "windows"} {
+        exec stty -echo
+        gets stdin DB_PASS
+        exec stty echo
+        puts ""
+    } else {
+        gets stdin DB_PASS
+    }
+    
+    # Test connection with the provided password
+    puts "📋 Testing connection..."
+    set result [test_postgres_connection $DB_PASS]
     set status [lindex $result 0]
-    set message [lindex $result 1]
     
     if {!$status} {
-        puts "❌ $message"
-        puts ""
-        puts "Please check:"
-        puts "1. PostgreSQL service is running"
-        puts "2. Host and port are correct"
-        puts "3. Username and password are correct"
-        puts "4. PostgreSQL is accepting connections"
+        puts "❌ Connection failed: [lindex $result 1]"
         exit 1
     }
-    puts "✅ PostgreSQL connection successful"
     
-    # Check PostgreSQL client
-    puts "📋 Checking PostgreSQL client..."
-    set psql_exe [check_postgres]
-    if {$psql_exe eq ""} {
-        puts "❌ ERROR: PostgreSQL client (psql) not found!"
-        puts "   Please install PostgreSQL or set PG_PATH."
-        exit 1
-    }
-    puts "✅ Found PostgreSQL client: $psql_exe"
+    puts "✅ Connection successful!"
     
-    # Check SQL file
+    # Check if db.sql exists
     if {![file exists $SQL_FILE]} {
         puts "❌ ERROR: SQL file '$SQL_FILE' not found!"
         exit 1
     }
-    puts "✅ Found SQL file: $SQL_FILE"
     
-    # Drop database
-    puts "\n📌 Dropping existing database..."
-    if {[catch {exec_psql -d postgres -c "DROP DATABASE IF EXISTS $DB_NAME;"} errorMsg]} {
-        puts "⚠️ Warning: $errorMsg"
-    } else {
-        puts "✅ Database dropped (if it existed)"
-    }
-    
-    # Create database
-    puts "\n📌 Creating new database..."
+    # Install database
+    puts "\n📌 Creating database..."
     if {[catch {exec_psql -d postgres -c "CREATE DATABASE $DB_NAME WITH OWNER = $DB_USER ENCODING = 'UTF8';"} errorMsg]} {
         puts "❌ ERROR: $errorMsg"
         exit 1
     }
     puts "✅ Database created"
     
-    # Run schema
     puts "\n📌 Creating schema..."
     if {[catch {exec_psql -d $DB_NAME -f $SQL_FILE} errorMsg]} {
         puts "❌ ERROR: $errorMsg"
         exit 1
     }
     puts "✅ Schema created"
-    
-    # Verify
-    puts "\n📌 Verifying installation..."
-    if {[catch {set result [exec_psql -d $DB_NAME -t -c "SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = 'public'"]} errorMsg]} {
-        puts "⚠️ Could not verify tables: $errorMsg"
-    } else {
-        puts "✅ Tables found: [string trim $result]"
-    }
     
     puts "\n✅ INSTALLATION COMPLETE!"
     puts "================================================"
@@ -693,26 +942,53 @@ proc run_command_line {} {
     puts "   Username: admin"
     puts "   Password: admin"
     puts "================================================"
-}
-
-# ============================================
-# Main Entry Point
-# ============================================
-
-# Check if running with GUI or command line
-if {[info exists ::argv] && [lsearch -exact $::argv "--cli"] != -1} {
-    # Command line mode
-    run_command_line
 } else {
     # GUI mode
     if {[catch {package require Tk}]} {
         puts "Tk not available. Running in command line mode..."
-        run_command_line
+        # Run command line mode
+        puts "🚀 Toothpaste Database Installation (Command Line)"
+        puts "================================================"
+        puts ""
+        puts -nonewline "Enter PostgreSQL password for user 'postgres' (press Enter for empty): "
+        flush stdout
+        if {$::tcl_platform(platform) ne "windows"} {
+            exec stty -echo
+            gets stdin DB_PASS
+            exec stty echo
+            puts ""
+        } else {
+            gets stdin DB_PASS
+        }
+        
+        set result [test_postgres_connection $DB_PASS]
+        set status [lindex $result 0]
+        if {!$status} {
+            puts "❌ Connection failed: [lindex $result 1]"
+            exit 1
+        }
+        puts "✅ Connection successful!"
+        
+        if {[file exists $SQL_FILE]} {
+            if {[catch {exec_psql -d postgres -c "CREATE DATABASE $DB_NAME WITH OWNER = $DB_USER ENCODING = 'UTF8';"} errorMsg]} {
+                puts "❌ ERROR: $errorMsg"
+                exit 1
+            }
+            puts "✅ Database created"
+            
+            if {[catch {exec_psql -d $DB_NAME -f $SQL_FILE} errorMsg]} {
+                puts "❌ ERROR: $errorMsg"
+                exit 1
+            }
+            puts "✅ Schema created"
+            
+            puts "\n✅ INSTALLATION COMPLETE!"
+        } else {
+            puts "❌ SQL file not found!"
+        }
     } else {
         # Show configuration dialog first
         show_config_dialog
-        
-        # Enter Tk event loop
         vwait forever
     }
 }
