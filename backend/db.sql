@@ -10,7 +10,7 @@ CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 CREATE EXTENSION IF NOT EXISTS "pgcrypto";
 
 -- ============================================
--- 0. REFERENCE LOOKUP TABLES (Added)
+-- 0. REFERENCE LOOKUP TABLES
 -- ============================================
 
 -- Person Roles Reference
@@ -165,114 +165,6 @@ INSERT INTO stage_types (type_code, type_name, type_category, process_descriptio
 ('WEIGHT_CHECK', 'Weight Check', 'Quality', 'Fill weight verification', 15, true);
 
 -- ============================================
--- 0.5. USER AUTHENTICATION TABLE
--- ============================================
-
--- Users table for authentication
-CREATE TABLE tp_users (
-    user_id SERIAL PRIMARY KEY,
-    username VARCHAR(50) UNIQUE NOT NULL,
-    password_hash VARCHAR(255) NOT NULL,
-    salt VARCHAR(50) NOT NULL,
-    person_id INTEGER REFERENCES persons(person_id) ON DELETE CASCADE,
-    is_active BOOLEAN DEFAULT true,
-    last_login TIMESTAMPTZ,
-    created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
-    metadata JSONB
-);
-
-CREATE INDEX idx_users_username ON users(username);
-CREATE INDEX idx_users_person ON users(person_id);
-CREATE INDEX idx_users_active ON users(is_active);
-
--- Insert default admin user
--- Password: admin (hashed with SHA256)
--- Salt: random_salt_123
-INSERT INTO users (username, password_hash, salt, person_id, is_active)
-VALUES (
-    'admin',
-    '8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918', -- SHA256 of 'admin'
-    'random_salt_123',
-    (SELECT person_id FROM persons WHERE person_code = 'DR-SMITH' LIMIT 1),
-    true
-);
-
--- Create a function to verify user credentials
-CREATE OR REPLACE FUNCTION authenticate_user(
-    p_username VARCHAR,
-    p_password VARCHAR
-)
-RETURNS TABLE(
-    user_id INTEGER,
-    username VARCHAR,
-    person_id INTEGER,
-    role_name VARCHAR,
-    is_active BOOLEAN
-) AS $$
-DECLARE
-    v_user_id INTEGER;
-    v_person_id INTEGER;
-    v_password_hash VARCHAR;
-    v_salt VARCHAR;
-    v_is_active BOOLEAN;
-    v_role_name VARCHAR;
-BEGIN
-    -- Get user details
-    SELECT u.user_id, u.person_id, u.password_hash, u.salt, u.is_active,
-           r.role_name
-    INTO v_user_id, v_person_id, v_password_hash, v_salt, v_is_active, v_role_name
-    FROM users u
-    LEFT JOIN persons p ON u.person_id = p.person_id
-    LEFT JOIN persons_roles r ON p.role_id = r.role_id
-    WHERE u.username = p_username;
-    
-    -- Check if user exists and is active
-    IF v_user_id IS NULL OR NOT v_is_active THEN
-        RETURN;
-    END IF;
-    
-    -- In a real system, you would verify the password hash here
-    -- For demo, we accept any password for a valid user
-    -- In production, use: IF encode(sha256(p_password || v_salt), 'hex') = v_password_hash THEN
-    
-    -- Return user info
-    RETURN QUERY
-    SELECT v_user_id, p_username, v_person_id, v_role_name, v_is_active;
-END;
-$$ LANGUAGE plpgsql;
-
--- Trigger to update updated_at timestamp
-CREATE OR REPLACE FUNCTION update_users_timestamp()
-RETURNS TRIGGER AS $$
-BEGIN
-    NEW.updated_at = CURRENT_TIMESTAMP;
-    RETURN NEW;
-END;
-$$ LANGUAGE plpgsql;
-
-CREATE TRIGGER trg_update_users_timestamp
-BEFORE UPDATE ON users
-FOR EACH ROW
-EXECUTE FUNCTION update_users_timestamp();
-
--- Trigger to log login attempts
-CREATE OR REPLACE FUNCTION log_user_login()
-RETURNS TRIGGER AS $$
-BEGIN
-    UPDATE users 
-    SET last_login = CURRENT_TIMESTAMP 
-    WHERE user_id = NEW.user_id;
-    RETURN NEW;
-END;
-$$ LANGUAGE plpgsql;
-
-CREATE TRIGGER trg_log_user_login
-AFTER UPDATE OF last_login ON users
-FOR EACH ROW
-WHEN (NEW.last_login IS DISTINCT FROM OLD.last_login)
-EXECUTE FUNCTION log_user_login();
--- ============================================
 -- 1. CORE REFERENCE TABLES
 -- ============================================
 
@@ -343,6 +235,103 @@ CREATE TABLE persons (
 CREATE INDEX idx_persons_company ON persons(company_id);
 CREATE INDEX idx_persons_role ON persons(role_id);
 CREATE INDEX idx_persons_email ON persons(email);
+
+-- ============================================
+-- 1.5 USER AUTHENTICATION TABLE (MOVED HERE)
+-- ============================================
+
+-- Users table for authentication
+CREATE TABLE tp_users (
+    user_id SERIAL PRIMARY KEY,
+    username VARCHAR(50) UNIQUE NOT NULL,
+    password_hash VARCHAR(255) NOT NULL,
+    salt VARCHAR(50) NOT NULL,
+    person_id INTEGER REFERENCES persons(person_id) ON DELETE CASCADE,
+    is_active BOOLEAN DEFAULT true,
+    last_login TIMESTAMPTZ,
+    created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+    metadata JSONB
+);
+
+CREATE INDEX idx_users_username ON tp_users(username);
+CREATE INDEX idx_users_person ON tp_users(person_id);
+CREATE INDEX idx_users_active ON tp_users(is_active);
+
+-- Create a function to verify user credentials
+CREATE OR REPLACE FUNCTION authenticate_user(
+    p_username VARCHAR,
+    p_password VARCHAR
+)
+RETURNS TABLE(
+    user_id INTEGER,
+    username VARCHAR,
+    person_id INTEGER,
+    role_name VARCHAR,
+    is_active BOOLEAN
+) AS $$
+DECLARE
+    v_user_id INTEGER;
+    v_person_id INTEGER;
+    v_password_hash VARCHAR;
+    v_salt VARCHAR;
+    v_is_active BOOLEAN;
+    v_role_name VARCHAR;
+BEGIN
+    -- Get user details
+    SELECT u.user_id, u.person_id, u.password_hash, u.salt, u.is_active,
+           r.role_name
+    INTO v_user_id, v_person_id, v_password_hash, v_salt, v_is_active, v_role_name
+    FROM tp_users u
+    LEFT JOIN persons p ON u.person_id = p.person_id
+    LEFT JOIN persons_roles r ON p.role_id = r.role_id
+    WHERE u.username = p_username;
+    
+    -- Check if user exists and is active
+    IF v_user_id IS NULL OR NOT v_is_active THEN
+        RETURN;
+    END IF;
+    
+    -- In a real system, you would verify the password hash here
+    -- For demo, we accept any password for a valid user
+    -- In production, use: IF encode(sha256(p_password || v_salt), 'hex') = v_password_hash THEN
+    
+    -- Return user info
+    RETURN QUERY
+    SELECT v_user_id, p_username, v_person_id, v_role_name, v_is_active;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Trigger to update updated_at timestamp
+CREATE OR REPLACE FUNCTION update_users_timestamp()
+RETURNS TRIGGER AS $$
+BEGIN
+    NEW.updated_at = CURRENT_TIMESTAMP;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER trg_update_users_timestamp
+BEFORE UPDATE ON tp_users
+FOR EACH ROW
+EXECUTE FUNCTION update_users_timestamp();
+
+-- Trigger to log login attempts
+CREATE OR REPLACE FUNCTION log_user_login()
+RETURNS TRIGGER AS $$
+BEGIN
+    UPDATE tp_users 
+    SET last_login = CURRENT_TIMESTAMP 
+    WHERE user_id = NEW.user_id;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER trg_log_user_login
+AFTER UPDATE OF last_login ON tp_users
+FOR EACH ROW
+WHEN (NEW.last_login IS DISTINCT FROM OLD.last_login)
+EXECUTE FUNCTION log_user_login();
 
 -- ============================================
 -- 2. CHEMICAL COMPOUNDS & INGREDIENTS
@@ -1444,7 +1433,6 @@ $$ LANGUAGE plpgsql;
 -- 15. CREATE TRIGGERS
 -- ============================================
 
--- Create the triggers
 CREATE OR REPLACE TRIGGER trg_update_inventory_on_receipt
 AFTER UPDATE OF qc_status ON material_receipts
 FOR EACH ROW
@@ -1547,6 +1535,16 @@ INSERT INTO persons (person_code, first_name, last_name, email, company_id, role
 ('DR-CHEN', 'Wei', 'Chen', 'w.chen@pg.com', 1, 1, 'Materials Science'),
 ('DR-THOMPSON', 'Emma', 'Thompson', 'e.thompson@unilever.com', 3, 5, 'Regulatory Affairs');
 
+-- Insert default admin user (now after persons exist)
+INSERT INTO tp_users (username, password_hash, salt, person_id, is_active)
+VALUES (
+    'admin',
+    '8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918', -- SHA256 of 'admin'
+    'random_salt_123',
+    (SELECT person_id FROM persons WHERE person_code = 'DR-SMITH' LIMIT 1),
+    true
+);
+
 -- Insert brands
 INSERT INTO brands (brand_code, brand_name, parent_company_id, market_segment) VALUES
 ('COL-CAV', 'Colgate Cavity Protection', 2, 'Mid-Range'),
@@ -1581,10 +1579,10 @@ INSERT INTO formulations (
 ('FRM-006', 'Advanced Whitening', 6, 2, 'Fresh Mint', 6.8, 1450, 'Active', 5);
 
 -- ============================================
--- 17. COMPLETE FORMULATION COMPONENTS (ALL FIXED)
+-- 17. COMPLETE FORMULATION COMPONENTS
 -- ============================================
 
--- FRM-001: Cavity Protection Classic - Total: 100.12%
+-- FRM-001: Cavity Protection Classic
 INSERT INTO formulation_components (formulation_id, compound_id, percentage_min, percentage_max, percentage_target, phase, function) VALUES
 (1, 18, 30.0, 40.0, 34.0, 'Aqueous', 'Solvent'),
 (1, 5, 15.0, 25.0, 20.0, 'Aqueous', 'Humectant'),
@@ -1601,7 +1599,7 @@ INSERT INTO formulation_components (formulation_id, compound_id, percentage_min,
 (1, 20, 0.1, 0.3, 0.2, 'Additive', 'Preservative'),
 (1, 17, 0.3, 0.8, 0.5, 'Additive', 'Colorant');
 
--- FRM-002: Total Advanced Care - Total: 100.13%
+-- FRM-002: Total Advanced Care
 INSERT INTO formulation_components (formulation_id, compound_id, percentage_min, percentage_max, percentage_target, phase, function) VALUES
 (2, 18, 25.0, 35.0, 30.0, 'Aqueous', 'Solvent'),
 (2, 6, 20.0, 30.0, 25.0, 'Aqueous', 'Humectant'),
@@ -1616,7 +1614,7 @@ INSERT INTO formulation_components (formulation_id, compound_id, percentage_min,
 (2, 16, 0.1, 0.3, 0.2, 'Additive', 'Sweetener'),
 (2, 19, 0.1, 0.4, 0.35, 'Additive', 'Preservative');
 
--- FRM-003: Pro-Health Enamel - Total: 100.22%
+-- FRM-003: Pro-Health Enamel
 INSERT INTO formulation_components (formulation_id, compound_id, percentage_min, percentage_max, percentage_target, phase, function) VALUES
 (3, 18, 35.0, 45.0, 40.0, 'Aqueous', 'Solvent'),
 (3, 5, 15.0, 25.0, 20.0, 'Aqueous', 'Humectant'),
@@ -1632,7 +1630,7 @@ INSERT INTO formulation_components (formulation_id, compound_id, percentage_min,
 (3, 19, 0.1, 0.4, 0.2, 'Additive', 'Preservative'),
 (3, 17, 0.3, 0.8, 0.5, 'Additive', 'Colorant');
 
--- FRM-004: 3D White Professional - Total: 100.08%
+-- FRM-004: 3D White Professional
 INSERT INTO formulation_components (formulation_id, compound_id, percentage_min, percentage_max, percentage_target, phase, function) VALUES
 (4, 18, 30.0, 40.0, 35.0, 'Aqueous', 'Solvent'),
 (4, 6, 15.0, 25.0, 20.0, 'Aqueous', 'Humectant'),
@@ -1646,7 +1644,7 @@ INSERT INTO formulation_components (formulation_id, compound_id, percentage_min,
 (4, 15, 0.1, 0.3, 0.2, 'Additive', 'Sweetener'),
 (4, 19, 0.1, 0.4, 0.3, 'Additive', 'Preservative');
 
--- FRM-005: Sensitive Relief - Total: 100.30%
+-- FRM-005: Sensitive Relief
 INSERT INTO formulation_components (formulation_id, compound_id, percentage_min, percentage_max, percentage_target, phase, function) VALUES
 (5, 18, 35.0, 45.0, 40.0, 'Aqueous', 'Solvent'),
 (5, 5, 15.0, 25.0, 20.0, 'Aqueous', 'Humectant'),
@@ -1662,7 +1660,7 @@ INSERT INTO formulation_components (formulation_id, compound_id, percentage_min,
 (5, 19, 0.1, 0.4, 0.2, 'Additive', 'Preservative'),
 (5, 17, 0.3, 0.8, 0.5, 'Additive', 'Colorant');
 
--- FRM-006: Advanced Whitening - Total: 100.18%
+-- FRM-006: Advanced Whitening
 INSERT INTO formulation_components (formulation_id, compound_id, percentage_min, percentage_max, percentage_target, phase, function) VALUES
 (6, 18, 30.0, 40.0, 35.0, 'Aqueous', 'Solvent'),
 (6, 6, 15.0, 25.0, 20.0, 'Aqueous', 'Humectant'),
@@ -1827,7 +1825,6 @@ END $$;
 -- 24. FUNCTION SIGNATURE VERIFICATION
 -- ============================================
 
--- Check function signatures
 SELECT 
     proname AS function_name,
     pg_get_function_result(oid) AS return_type,
