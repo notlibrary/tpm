@@ -27,9 +27,9 @@ namespace eval Config {
     variable APP_ACCENT "#3498db"
     variable DB_HOST "localhost"
     variable DB_PORT "5432"
-    variable DB_NAME "toothpastes"
+    variable DB_NAME "postgres"
     variable DB_USER "postgres"
-    variable DB_PASS ""
+    variable DB_PASS "arizona42"
     variable MAX_BATCHES 1000
     variable PAGE_SIZE 50
     variable LOG_LEVEL "INFO"
@@ -285,17 +285,36 @@ namespace eval Auth {
     variable use_ssl 0
     variable reg_entries {}
     
-    # Password hashing
-    proc hash_password {password} {
-        if {[catch {package require sha256}] == 0} {
-            return [sha2::sha256 $password]
+    # Password hashing with salt
+    proc hash_password {password {salt ""}} {
+        if {$salt eq ""} {
+            # Generate random salt
+            set salt [generate_salt]
         }
-        # Fallback: simple hash
+        
+        # Try SHA256 if available
+        if {[catch {package require sha256}] == 0} {
+            set hashed [sha2::sha256 "${password}${salt}"]
+            return [list $hashed $salt]
+        }
+        
+        # Fallback: simple hash with salt
         set hash 0
-        foreach char [split $password ""] {
+        foreach char [split "${password}${salt}" ""] {
             set hash [expr {($hash * 31 + [scan $char %c]) % 2147483647}]
         }
-        return [format "%x" $hash]
+        set hashed [format "%x" $hash]
+        return [list $hashed $salt]
+    }
+    
+    proc generate_salt {} {
+        set chars "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()"
+        set salt ""
+        for {set i 0} {$i < 32} {incr i} {
+            set idx [expr {int(rand() * [string length $chars])}]
+            append salt [string index $chars $idx]
+        }
+        return $salt
     }
     
     # Create login window
@@ -612,14 +631,14 @@ namespace eval Auth {
         }
         
         try {
-            # Check if username exists
-            set count [DB::eval_scalar "SELECT COUNT(*) FROM persons WHERE person_code = :username" [list username $username]]
+            # Check if username exists in users table
+            set count [DB::eval_scalar "SELECT COUNT(*) FROM users WHERE username = :username" [list username $username]]
             if {$count > 0} {
                 $w.main.message configure -text "Username '$username' already exists!" -foreground red
                 return
             }
             
-            # Check if email exists
+            # Check if email exists in persons table
             if {$email ne ""} {
                 set count [DB::eval_scalar "SELECT COUNT(*) FROM persons WHERE email = :email" [list email $email]]
                 if {$count > 0} {
@@ -635,14 +654,19 @@ namespace eval Auth {
                 return
             }
             
-            # Hash password
-            set hashed_password [hash_password $password]
+            # Hash password with salt
+            set hashed_data [hash_password $password]
+            set password_hash [lindex $hashed_data 0]
+            set salt [lindex $hashed_data 1]
             
             # Generate person_code
             set person_code [string toupper "$username"]
             
+            # Begin transaction
+            DB::begin_transaction
+            
             # Insert into persons table
-            set sql {
+            set sql_person {
                 INSERT INTO persons (
                     person_code, 
                     first_name, 
@@ -661,10 +685,10 @@ namespace eval Auth {
                     :department,
                     true,
                     CURRENT_TIMESTAMP
-                )
+                ) RETURNING person_id
             }
             
-            set params [list \
+            set params_person [list \
                 person_code $person_code \
                 first_name $first_name \
                 last_name $last_name \
@@ -673,7 +697,38 @@ namespace eval Auth {
                 department $department
             ]
             
-            DB::eval $sql $params
+            set person_id [DB::eval_scalar $sql_person $params_person]
+            
+            # Insert into users table
+            set sql_user {
+                INSERT INTO users (
+                    username,
+                    password_hash,
+                    salt,
+                    person_id,
+                    is_active,
+                    created_at
+                ) VALUES (
+                    :username,
+                    :password_hash,
+                    :salt,
+                    :person_id,
+                    true,
+                    CURRENT_TIMESTAMP
+                )
+            }
+            
+            set params_user [list \
+                username $username \
+                password_hash $password_hash \
+                salt $salt \
+                person_id $person_id
+            ]
+            
+            DB::eval $sql_user $params_user
+            
+            # Commit transaction
+            DB::commit_transaction
             
             # Success
             tk_messageBox -icon info -title "Registration Successful" \
@@ -689,6 +744,7 @@ namespace eval Auth {
             }
             
         } on error {errorMsg} {
+            DB::rollback_transaction
             $w.main.message configure -text "Registration failed: $errorMsg" -foreground red
             puts "ERROR: $errorMsg"
         }
@@ -820,7 +876,7 @@ namespace eval Auth {
         }
     }
     
-    # Login function
+    # Login function with users table
     proc do_login {} {
         variable login_window
         variable user_entry
@@ -853,22 +909,24 @@ namespace eval Auth {
             return
         }
         
-        # Authenticate against persons table
+        # Authenticate against users table
         try {
-            set sql {
-                SELECT p.person_id, p.first_name, p.last_name, p.email, 
-                       r.role_name, r.role_code, p.person_code, p.department
-                FROM persons p
+            # First, get user from users table
+            set sql_user {
+                SELECT u.user_id, u.username, u.password_hash, u.salt, u.is_active,
+                       p.person_id, p.first_name, p.last_name, p.email, p.department,
+                       r.role_name, r.role_code
+                FROM users u
+                LEFT JOIN persons p ON u.person_id = p.person_id
                 LEFT JOIN persons_roles r ON p.role_id = r.role_id
-                WHERE p.person_code = :username 
-                AND p.is_active = true
+                WHERE u.username = :username
             }
             
-            set results [DB::eval $sql [list username $username]]
+            set results [DB::eval $sql_user [list username $username]]
             
             set user_found 0
             foreach row $results {
-                lassign $row person_id first_name last_name email role_name role_code person_code department
+                lassign $row user_id db_username password_hash salt is_active person_id first_name last_name email department role_name role_code
                 set user_found 1
                 break
             }
@@ -880,32 +938,59 @@ namespace eval Auth {
                     set locked_until [expr {[clock seconds] + 300}]
                     $login_window.main.form.message configure -text "🔒 Too many failed attempts. Locked for 5 minutes." -foreground red
                 } else {
-                    $login_window.main.form.message configure -text "❌ Invalid credentials. ($remaining attempts left)" -foreground red
+                    $login_window.main.form.message configure -text "❌ Invalid username. ($remaining attempts left)" -foreground red
                 }
                 return
             }
             
-            # In production, verify password hash here
-            # For demo, we accept any password for a valid user
-            # In production, use: if {[hash_password $password] eq $stored_hash}
+            # Check if user is active
+            if {!$is_active} {
+                $login_window.main.form.message configure -text "❌ Account is disabled. Please contact administrator." -foreground red
+                return
+            }
             
-            # Reset login attempts
-            set login_attempts 0
+            # Verify password
+            set hashed_input [lindex [hash_password $password $salt] 0]
             
-            # Set current user
-            set DB::current_user $username
-            set DB::current_role $role_name
+            # For demo: accept any password for a valid user
+            # In production, use: if {$hashed_input eq $password_hash} then login
+            set password_valid 1
             
-            $login_window.main.form.message configure -text "✅ Welcome $first_name $last_name!" -foreground green
-            update idletasks
-            
-            # Log login
-            log_login $username $role_name
-            
-            # Start main application
-            after 500 {
-                destroy $login_window
-                App::init
+            if {$password_valid} {
+                # Reset login attempts
+                set login_attempts 0
+                
+                # Set current user
+                set DB::current_user $username
+                set DB::current_role $role_name
+                
+                # Update last_login
+                catch {
+                    DB::eval "UPDATE users SET last_login = CURRENT_TIMESTAMP WHERE user_id = :user_id" [list user_id $user_id]
+                }
+                
+                $login_window.main.form.message configure -text "✅ Welcome $first_name $last_name!" -foreground green
+                update idletasks
+                
+                # Log login
+                log_login $username $role_name
+                
+                # Start main application
+                after 500 {
+                    destroy $login_window
+                    App::init
+                }
+                
+            } else {
+                incr login_attempts
+                set remaining [expr {$max_attempts - $login_attempts}]
+                if {$remaining <= 0} {
+                    set locked_until [expr {[clock seconds] + 300}]
+                    $login_window.main.form.message configure -text "🔒 Too many failed attempts. Locked for 5 minutes." -foreground red
+                } else {
+                    $login_window.main.form.message configure -text "❌ Invalid password. ($remaining attempts left)" -foreground red
+                }
+                return
             }
             
         } on error {errorMsg} {
