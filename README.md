@@ -618,8 +618,12 @@ No MCP just random agent
 For some people "chinese" folk method described above(just copy survey answers JSON and give it to a random agent) is not enough
 They need "enriched" reliable recommendations combined from few models and few toothpaste research databases
 To meet this VIP demand we provide backend MCP server running PostgreSQL toothpaste tech phenomenology research database
-This is an ongoing effort "when it's done" To ensure authenticity in the high end special cases this recommendations must be
-digitally signed by production manager dentist or lab researcher  
+controlled by TCL script Basically backend simulates toothpaste production process from formulation to batches
+and everything else that happening between in the global toothpaste company
+
+This is an ongoing effort "when it's done" 
+
+To ensure authenticity in the high end special cases this recommendations must be digitally signed by production manager dentist or lab researcher 
 
 <img width="699" height="453" alt="tpm_architecture" src="https://github.com/user-attachments/assets/dac806b1-12be-4dd5-96e4-f09ab8a688eb" />
 
