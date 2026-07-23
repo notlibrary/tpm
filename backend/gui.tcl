@@ -712,29 +712,29 @@ proc init {} {
 
     # Content area
     proc create_content_area {parent} {
-        set content_frame [ttk::frame $parent.content]
-        $parent add $content_frame -weight 1
+    set content_frame [ttk::frame $parent.content]
+    $parent add $content_frame -weight 1
 
-        set notebook_widget [ttk::notebook $content_frame.notebook -padding "2 2 2 2"]
-        pack $notebook_widget -fill both -expand true
+    set notebook_widget [ttk::notebook $content_frame.notebook -padding "2 2 2 2"]
+    pack $notebook_widget -fill both -expand true
 
-        set tabs {
-            "🏠 Dashboard" "dashboard"
-            "📋 Production" "production"
-            "🧪 Formulations" "formulations"
-            "✅ Quality" "quality"
-            "📦 Inventory" "inventory"
-            "📊 Reports" "reports"
-        }
-        foreach {tab name} $tabs {
-            set frame [ttk::frame $notebook_widget.$name -padding "5 5 5 5"]
-            $notebook_widget add $frame -text $tab
-        }
-
-        variable main_notebook $notebook_widget
-        $notebook_widget select $notebook_widget.dashboard
-        show_dashboard_content
+    set tabs {
+        "🏠 Dashboard" "dashboard"
+        "📋 Production" "production"
+        "🧪 Formulations" "formulations"
+        "✅ Quality" "quality"
+        "📦 Inventory" "inventory"
+        "📊 Reports" "reports"
     }
+    foreach {tab name} $tabs {
+        set frame [ttk::frame $notebook_widget.$name -padding "5 5 5 5"]
+        $notebook_widget add $frame -text $tab
+    }
+
+    variable main_notebook $notebook_widget
+    $notebook_widget select $notebook_widget.dashboard
+    App::show_dashboard_content
+}
 
     # Status bar
     proc create_statusbar {} {
@@ -814,51 +814,52 @@ proc init {} {
     }
 
     # Load initial data
-    proc load_initial_data {} {
-        show_progress "Loading data..."
-        after 100 {
-            show_dashboard_content
-            if {[DB::connected]} {
-                update_recent_batches
-                update_dashboard_stats
-            }
-            hide_progress
-            set_status "Ready" green
-        }
-    }
+	proc load_initial_data {} {
+		show_progress "Loading data..."
+		after 100 {
+			App::show_dashboard_content
+			if {[DB::connected]} {
+				App::update_recent_batches
+				App::update_dashboard_stats
+			}
+			App::hide_progress
+			App::set_status "Ready" green
+		}
+	}
 
     # Navigation handler
-    proc navigate {tree} {
-        set selection [$tree selection]
-        if {$selection eq ""} return
-        set tags [$tree tags $selection]
-        if {$tags ne ""} {
-            set tag [lindex $tags 0]
-            switch $tag {
-                "dashboard" {show_dashboard}
-                "batches" {show_batches}
-                "schedule" {show_schedule}
-                "facilities" {show_facilities}
-                "formulations" {show_formulations}
-                "components" {show_component_search}
-                "compounds" {show_compound_library}
-                "qctests" {show_qc_tests}
-                "stability" {show_stability}
-                "qcparams" {show_qc_parameters}
-                "rawmaterials" {show_raw_materials}
-                "finished" {show_finished_products}
-                "receipts" {show_material_receipts}
-                "batchsummary" {report_batch_summary}
-                "yield" {report_yield_analysis}
-                "qcreport" {report_quality}
-                "inventoryreport" {report_inventory}
-                "users" {show_user_management}
-                "audit" {show_audit_log}
-                "settings" {show_settings}
-                default {set_status "Feature: $tag" blue}
-            }
+	proc navigate {tree} {
+    set selection [$tree selection]
+    if {$selection eq ""} return
+
+    set tags [$tree item $selection -tags]
+    if {$tags ne ""} {
+        set tag [lindex $tags 0]
+        switch $tag {
+            "dashboard" {show_dashboard}
+            "batches" {show_batches}
+            "schedule" {show_schedule}
+            "facilities" {show_facilities}
+            "formulations" {show_formulations}
+            "components" {show_component_search}
+            "compounds" {show_compound_library}
+            "qctests" {show_qc_tests}
+            "stability" {show_stability}
+            "qcparams" {show_qc_parameters}
+            "rawmaterials" {show_raw_materials}
+            "finished" {show_finished_products}
+            "receipts" {show_material_receipts}
+            "batchsummary" {report_batch_summary}
+            "yield" {report_yield_analysis}
+            "qcreport" {report_quality}
+            "inventoryreport" {report_inventory}
+            "users" {show_user_management}
+            "audit" {show_audit_log}
+            "settings" {show_settings}
+            default {set_status "Feature: $tag" blue}
         }
     }
+}
 
     # Logout
     proc logout {} {
@@ -883,11 +884,11 @@ proc init {} {
         DB::disconnect
         set_status "Disconnected from database" red
         .toolbar.status.indicator configure -text "● Disconnected" -foreground red
-        tk_messageBox -info -title "Disconnected" "Disconnected from database."
+        tk_messageBox -icon info -title "Disconnected" "Disconnected from database."
     }
 
     proc show_connection_dialog {} {
-        tk_messageBox -info -title "Connection Settings" "Connection settings dialog would appear here."
+        tk_messageBox -icon info -title "Connection Settings" "Connection settings dialog would appear here."
     }
 
     # Apply filter
@@ -949,34 +950,34 @@ proc init {} {
         }
         if {[llength $results] > 0} {
             set msg "Found [llength $results] results:\n\n[join $results \n]"
-            tk_messageBox -info -title "Search Results" -message $msg
+            tk_messageBox -icon info -title "Search Results" -message $msg
         } else {
-            tk_messageBox -info -title "Search Results" \
+            tk_messageBox -icon info -title "Search Results" \
                 -message "No results found for '$query'"
         }
         set_status "Search completed" green
     }
 
     # Refresh current view
-    proc refresh_current {} {
-        variable main_notebook
-        set current_tab [$main_notebook select]
-        set tab_name [string last "." $current_tab]
-        set tab_name [string range $current_tab [expr {$tab_name + 1}] end]
-        show_progress "Refreshing..."
-        after 300 {
-            switch $tab_name {
-                "dashboard" {show_dashboard_content}
-                "production" {show_batches}
-                "formulations" {show_formulations}
-                "quality" {show_qc_tests}
-                "inventory" {show_raw_materials}
-                "reports" {report_batch_summary}
-                default {show_dashboard_content}
-            }
-            hide_progress
-        }
-    }
+	proc refresh_current {} {
+		variable main_notebook
+		set current_tab [$main_notebook select]
+		set tab_name [string last "." $current_tab]
+		set tab_name [string range $current_tab [expr {$tab_name + 1}] end]
+		show_progress "Refreshing..."
+		after 300 {
+			switch $tab_name {
+				"dashboard" {App::show_dashboard_content}
+				"production" {show_batches}
+				"formulations" {show_formulations}
+				"quality" {show_qc_tests}
+				"inventory" {show_raw_materials}
+				"reports" {report_batch_summary}
+				default {App::show_dashboard_content}
+			}
+			hide_progress
+		}
+	}
 
     proc clear_content {frame} {
         foreach child [winfo children $frame] {
@@ -993,7 +994,7 @@ proc App::show_dashboard {} {
     variable main_notebook
     if {[winfo exists $main_notebook]} {
         $main_notebook select $main_notebook.dashboard
-        show_dashboard_content
+        App::show_dashboard_content
     }
 }
 
@@ -1244,7 +1245,7 @@ proc App::update_recent_batches {} {
 
 proc App::update_dashboard_stats {} {
     if {[winfo exists .mainpane.content.notebook.dashboard.main.stats]} {
-        show_dashboard_content
+        App::show_dashboard_content
     }
 }
 
@@ -2468,7 +2469,7 @@ proc App::show_compound_details {tree} {
     set selection [$tree selection]
     if {$selection eq ""} return
     set name [$tree item $selection -text]
-    tk_messageBox -info -title "Compound Details" \
+    tk_messageBox -icon info -title "Compound Details" \
         -message "📋 Compound: $name\n\nFull details would appear here.\nThis feature is being enhanced."
 }
 
@@ -2481,7 +2482,7 @@ proc App::export_csv {} {
         -filetypes {{"CSV Files" *.csv} {"All Files" *}}]
     if {$file ne ""} {
         set_status "Exporting CSV to $file..." blue
-        tk_messageBox -info -title "Export" "CSV exported to $file"
+        tk_messageBox -icon info -title "Export" "CSV exported to $file"
         set_status "CSV export completed" green
     }
 }
@@ -2491,7 +2492,7 @@ proc App::export_pdf {} {
         -filetypes {{"PDF Files" *.pdf} {"All Files" *}}]
     if {$file ne ""} {
         set_status "Exporting PDF to $file..." blue
-        tk_messageBox -info -title "Export" "PDF exported to $file"
+        tk_messageBox -icon info -title "Export" "PDF exported to $file"
         set_status "PDF export completed" green
     }
 }
@@ -2501,7 +2502,7 @@ proc App::export_data {} {
         -filetypes {{"JSON Files" *.json} {"All Files" *}}]
     if {$file ne ""} {
         set_status "Exporting data to $file..." blue
-        tk_messageBox -info -title "Export" "Data exported to $file"
+        tk_messageBox -icon info -title "Export" "Data exported to $file"
         set_status "Export completed" green
     }
 }
@@ -2511,13 +2512,13 @@ proc App::import_data {} {
         -filetypes {{"CSV Files" *.csv} {"JSON Files" *.json} {"All Files" *}}]
     if {$file ne ""} {
         set_status "Importing data from $file..." blue
-        tk_messageBox -info -title "Import" "Data imported from $file"
+        tk_messageBox -icon info -title "Import" "Data imported from $file"
         set_status "Import completed" green
     }
 }
 
 proc App::print_report {} {
-    tk_messageBox -info -title "Print Report" "Print dialog would appear here."
+    tk_messageBox -icon info -title "Print Report" "Print dialog would appear here."
 }
 
 proc App::copy_batch_info {tree} {
@@ -2532,51 +2533,50 @@ proc App::copy_batch_info {tree} {
 # ============================================
 # 15. PLACEHOLDER FUNCTIONS
 # ============================================
-
-proc App::show_schedule {} { tk_messageBox -info -title "Production Schedule" "Production scheduling calendar would appear here." }
-proc App::show_facilities {} { tk_messageBox -info -title "Facilities" "Facility management would appear here." }
-proc App::show_production_dashboard {} { tk_messageBox -info -title "Production Dashboard" "Enhanced production dashboard would appear here." }
-proc App::show_formulation_form {} { tk_messageBox -info -title "New Formulation" "New formulation form would appear here." }
-proc App::edit_formulation {} { tk_messageBox -info -title "Edit Formulation" "Edit formulation form would appear here." }
-proc App::validate_formulas {} { tk_messageBox -info -title "Formula Validation" "Formula validation results would appear here." }
-proc App::show_component_search {} { tk_messageBox -info -title "Component Search" "Component search interface would appear here." }
-proc App::show_stability {} { tk_messageBox -info -title "Stability Studies" "Stability studies management would appear here." }
-proc App::show_qc_parameters {} { tk_messageBox -info -title "QC Parameters" "QC parameters configuration would appear here." }
-proc App::show_qc_dashboard {} { tk_messageBox -info -title "QC Dashboard" "Quality control dashboard would appear here." }
-proc App::show_raw_materials {} { tk_messageBox -info -title "Raw Materials" "Raw materials inventory would appear here." }
-proc App::show_finished_products {} { tk_messageBox -info -title "Finished Products" "Finished products inventory would appear here." }
-proc App::show_material_receipts {} { tk_messageBox -info -title "Material Receipts" "Material receipts management would appear here." }
-proc App::show_suppliers {} { tk_messageBox -info -title "Supplier Management" "Supplier management would appear here." }
-proc App::show_inventory_dashboard {} { tk_messageBox -info -title "Inventory Dashboard" "Inventory dashboard would appear here." }
-proc App::show_batch_status {} { tk_messageBox -info -title "Batch Status" "Batch status dashboard would appear here." }
-proc App::show_user_management {} { tk_messageBox -info -title "User Management" "User management would appear here (Admin only)." }
-proc App::show_audit_log {} { tk_messageBox -info -title "Audit Log" "Audit log would appear here (Admin only)." }
-proc App::show_system_config {} { tk_messageBox -info -title "System Configuration" "System configuration would appear here (Admin only)." }
-proc App::show_db_maintenance {} { tk_messageBox -info -title "Database Maintenance" "Database maintenance tools would appear here." }
-proc App::show_role_management {} { tk_messageBox -info -title "Role Management" "Role management would appear here (Admin only)." }
-proc App::show_data_browser {} { tk_messageBox -info -title "Data Browser" "Data browser would appear here." }
-proc App::show_query_builder {} { tk_messageBox -info -title "Query Builder" "Query builder would appear here." }
-proc App::backup_database {} { tk_messageBox -info -title "Backup Database" "Database backup would start here." }
-proc App::restore_database {} { tk_messageBox -info -title "Restore Database" "Database restore would start here." }
-proc App::show_settings {} { tk_messageBox -info -title "Settings" "Application settings would appear here." }
-proc App::show_log {} { tk_messageBox -info -title "System Log" "System log would appear here." }
-proc App::show_shortcuts {} { tk_messageBox -info -title "Keyboard Shortcuts" "Keyboard shortcuts reference would appear here." }
-proc App::check_updates {} { tk_messageBox -info -title "Check Updates" "Checking for updates...\n\nYou are running the latest version." }
-proc App::report_production {} { tk_messageBox -info -title "Production Report" "Production report would appear here." }
-proc App::report_quality {} { tk_messageBox -info -title "Quality Report" "Quality report would appear here." }
-proc App::report_cost_analysis {} { tk_messageBox -info -title "Cost Analysis" "Cost analysis report would appear here." }
-proc App::report_yield_analysis {} { tk_messageBox -info -title "Yield Analysis" "Yield analysis report would appear here." }
-proc App::report_inventory {} { tk_messageBox -info -title "Inventory Report" "Inventory report would appear here." }
-proc App::export_batches {} { tk_messageBox -info -title "Export Batches" "Batch export would start here." }
-proc App::show_qc_test_details {tree} { tk_messageBox -info -title "QC Test Details" "QC test details would appear here." }
-proc App::show_production_chart {} { tk_messageBox -info -title "Production Chart" "Production chart would appear here." }
+proc App::show_schedule {} { tk_messageBox -icon info -title "Production Schedule" -message "Production scheduling calendar would appear here." }
+proc App::show_facilities {} { tk_messageBox -icon info -title "Facilities" -message "Facility management would appear here." }
+proc App::show_production_dashboard {} { tk_messageBox -icon info -title "Production Dashboard" -message "Enhanced production dashboard would appear here." }
+proc App::show_formulation_form {} { tk_messageBox -icon info -title "New Formulation" -message "New formulation form would appear here." }
+proc App::edit_formulation {} { tk_messageBox -icon info -title "Edit Formulation" -message "Edit formulation form would appear here." }
+proc App::validate_formulas {} { tk_messageBox -icon info -title "Formula Validation" -message "Formula validation results would appear here." }
+proc App::show_component_search {} { tk_messageBox -icon info -title "Component Search" -message "Component search interface would appear here." }
+proc App::show_stability {} { tk_messageBox -icon info -title "Stability Studies" -message "Stability studies management would appear here." }
+proc App::show_qc_parameters {} { tk_messageBox -icon info -title "QC Parameters" -message "QC parameters configuration would appear here." }
+proc App::show_qc_dashboard {} { tk_messageBox -icon info -title "QC Dashboard" -message "Quality control dashboard would appear here." }
+proc App::show_raw_materials {} { tk_messageBox -icon info -title "Raw Materials" -message "Raw materials inventory would appear here." }
+proc App::show_finished_products {} { tk_messageBox -icon info -title "Finished Products" -message "Finished products inventory would appear here." }
+proc App::show_material_receipts {} { tk_messageBox -icon info -title "Material Receipts" -message "Material receipts management would appear here." }
+proc App::show_suppliers {} { tk_messageBox -icon info -title "Supplier Management" -message "Supplier management would appear here." }
+proc App::show_inventory_dashboard {} { tk_messageBox -icon info -title "Inventory Dashboard" -message "Inventory dashboard would appear here." }
+proc App::show_batch_status {} { tk_messageBox -icon info -title "Batch Status" -message "Batch status dashboard would appear here." }
+proc App::show_user_management {} { tk_messageBox -icon info -title "User Management" -message "User management would appear here (Admin only)." }
+proc App::show_audit_log {} { tk_messageBox -icon info -title "Audit Log" -message "Audit log would appear here (Admin only)." }
+proc App::show_system_config {} { tk_messageBox -icon info -title "System Configuration" -message "System configuration would appear here (Admin only)." }
+proc App::show_db_maintenance {} { tk_messageBox -icon info -title "Database Maintenance" -message "Database maintenance tools would appear here." }
+proc App::show_role_management {} { tk_messageBox -icon info -title "Role Management" -message "Role management would appear here (Admin only)." }
+proc App::show_data_browser {} { tk_messageBox -icon info -title "Data Browser" -message "Data browser would appear here." }
+proc App::show_query_builder {} { tk_messageBox -icon info -title "Query Builder" -message "Query builder would appear here." }
+proc App::backup_database {} { tk_messageBox -icon info -title "Backup Database" -message "Database backup would start here." }
+proc App::restore_database {} { tk_messageBox -icon info -title "Restore Database" -message "Database restore would start here." }
+proc App::show_settings {} { tk_messageBox -icon info -title "Settings" -message "Application settings would appear here." }
+proc App::show_log {} { tk_messageBox -icon info -title "System Log" -message "System log would appear here." }
+proc App::show_shortcuts {} { tk_messageBox -icon info -title "Keyboard Shortcuts" -message "Keyboard shortcuts reference would appear here." }
+proc App::check_updates {} { tk_messageBox -icon info -title "Check Updates" -message "Checking for updates...\n\nYou are running the latest version." }
+proc App::report_production {} { tk_messageBox -icon info -title "Production Report" -message "Production report would appear here." }
+proc App::report_quality {} { tk_messageBox -icon info -title "Quality Report" -message "Quality report would appear here." }
+proc App::report_cost_analysis {} { tk_messageBox -icon info -title "Cost Analysis" -message "Cost analysis report would appear here." }
+proc App::report_yield_analysis {} { tk_messageBox -icon info -title "Yield Analysis" -message "Yield analysis report would appear here." }
+proc App::report_inventory {} { tk_messageBox -icon info -title "Inventory Report" -message "Inventory report would appear here." }
+proc App::export_batches {} { tk_messageBox -icon info -title "Export Batches" -message "Batch export would start here." }
+proc App::show_qc_test_details {tree} { tk_messageBox -icon info -title "QC Test Details" -message "QC test details would appear here." }
+proc App::show_production_chart {} { tk_messageBox -icon info -title "Production Chart" -message "Production chart would appear here." }
 
 # ============================================
 # 16. ABOUT AND HELP
 # ============================================
 
 proc App::show_about {} {
-    tk_messageBox -info -title "About $Config::APP_NAME" \
+    tk_messageBox -icon info -title "About $Config::APP_NAME" \
         -message "🧴 $Config::APP_NAME v$Config::APP_VERSION\n\nA comprehensive Tcl/Tk GUI for managing toothpaste production processes.\n\nDatabase: PostgreSQL\nLanguage: Tcl/Tk\nDriver: tdbc::postgres\n\nFeatures:\n• Production Batch Management\n• Formulation Management\n• Quality Control Testing\n• Inventory Management\n• Reporting and Analytics\n• User Administration\n\n© 2026 Production Management Systems\n\nLicensed under MIT License"
 }
 
