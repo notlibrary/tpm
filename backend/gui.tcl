@@ -323,6 +323,265 @@ proc authenticate_user {username password} {
     return $authenticated
 }
 
+# Генератор случайной соли (32 символа)
+proc generate_random_salt {} {
+    set chars "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()"
+    set salt ""
+    for {set i 0} {$i < 32} {incr i} {
+        set idx [expr {int(rand() * [string length $chars])}]
+        append salt [string index $chars $idx]
+    }
+    return $salt
+}
+
+proc show_register_dialog {} {
+    set w .register
+    catch {destroy $w}
+    toplevel $w -class Dialog
+    wm title $w "Register New User"
+    wm geometry $w "450x550"
+    wm resizable $w 0 0
+    wm transient $w .
+    grab set $w   ;# <-- ИСПРАВЛЕНО: grab set вместо wm grab
+
+    if {![DB::connected]} {
+        if {![DB::connect $Config::DB_HOST $Config::DB_PORT $Config::DB_NAME $Config::DB_USER $Config::DB_PASS]} {
+            tk_messageBox -icon error -title "Database Error" \
+                -message "Could not connect to database:\n[DB::get_last_error]"
+            destroy $w
+            return
+        }
+    }
+
+    set main [ttk::frame $w.main -padding "15 15 15 15"]
+    pack $main -fill both -expand true
+
+    ttk::label $main.title -text "📝 Create New Account" -font {Arial 14 bold}
+    pack $main.title -pady 10
+
+    ttk::label $main.sub -text "Fill in the details below" -font {Arial 9} -foreground gray
+    pack $main.sub -pady 5
+
+    ttk::separator $main.sep -orient horizontal
+    pack $main.sep -fill x -pady 10
+
+    # Переменные для полей
+    set fields {
+        first_name "First Name *"
+        last_name  "Last Name *"
+        email      "Email"
+        username   "Username *"
+        password   "Password *"
+        confirm    "Confirm Password *"
+        role       "Role *"
+    }
+
+    array set entries {}   ;# <-- ИСПРАВЛЕНО: объявляем массив
+    foreach {var label} $fields {
+        set f [ttk::frame $main.$var]
+        pack $f -fill x -pady 4
+
+        ttk::label $f.lbl -text $label -width 18 -anchor e -font {Arial 10}
+        pack $f.lbl -side left -padx 5
+
+        if {$var eq "role"} {
+            set widget [ttk::combobox $f.cb -width 28 -state readonly -font {Arial 10}]
+            set roles [get_roles_list]
+            $widget configure -values $roles
+            if {[llength $roles] > 0} {
+                $widget set [lindex $roles 0]
+            } else {
+                $widget set "QC_Technician"
+            }
+        } elseif {$var eq "password" || $var eq "confirm"} {
+            set widget [ttk::entry $f.entry -width 28 -show "*" -font {Arial 10}]
+        } else {
+            set widget [ttk::entry $f.entry -width 28 -font {Arial 10}]
+        }
+        pack $widget -side left -expand true -fill x
+        set entries($var) $widget
+    }
+
+    # Чекбокс показа паролей
+    set show_pass 0
+    set check_frame [ttk::frame $main.show]
+    pack $check_frame -fill x -pady 5 -padx 10
+    ttk::checkbutton $check_frame.cb -text "👁 Show Passwords" -variable show_pass -command "
+        if {\$show_pass} {
+            $w.main.password.entry configure -show \"\"
+            $w.main.confirm.entry configure -show \"\"
+        } else {
+            $w.main.password.entry configure -show \"*\"
+            $w.main.confirm.entry configure -show \"*\"
+        }
+    "
+    pack $check_frame.cb -anchor w
+
+    ttk::label $main.note -text "* Required fields" -font {Arial 8} -foreground gray
+    pack $main.note -pady 5 -anchor w -padx 10
+
+    # Сообщение об ошибке
+    ttk::label $main.err -text "" -foreground red -font {Arial 9}
+    pack $main.err -fill x -pady 5
+
+    # Кнопки
+    set btn_frame [ttk::frame $main.buttons]
+    pack $btn_frame -fill x -pady 15
+    ttk::button $btn_frame.register -text "✅ Register" -command [list register_user $w] -padding "10 5" -style Accent.TButton
+    pack $btn_frame.register -side left -expand true -fill x -padx 5
+    ttk::button $btn_frame.cancel -text "❌ Cancel" -command "destroy $w" -padding "10 5"
+    pack $btn_frame.cancel -side right -expand true -fill x -padx 5
+
+    bind $w <Return> [list register_user $w]
+    focus $entries(first_name)
+}
+proc get_roles_list {} {
+    if {![DB::connected]} {
+        return [list "Scientist" "QC_Technician" "Production_Manager" "Process_Engineer" "Lab_Technician" "R&D_Manager" "Regulatory_Specialist"]
+    }
+    set roles {}
+    catch {
+        set results [DB::eval "SELECT role_name FROM persons_roles WHERE is_active = true ORDER BY role_name"]
+        foreach row $results {
+            lassign $row role_name
+            lappend roles $role_name
+        }
+    }
+    if {[llength $roles] == 0} {
+        set roles [list "Scientist" "QC_Technician" "Production_Manager" "Process_Engineer" "Lab_Technician" "R&D_Manager" "Regulatory_Specialist"]
+    }
+    return $roles
+}
+
+proc register_user {w} {
+    # Получить виджеты из окна
+    set entries(first_name) $w.main.first_name.entry
+    set entries(last_name)  $w.main.last_name.entry
+    set entries(email)      $w.main.email.entry
+    set entries(username)   $w.main.username.entry
+    set entries(password)   $w.main.password.entry
+    set entries(confirm)    $w.main.confirm.entry
+    set entries(role)       $w.main.role.cb
+
+    # Собрать данные
+    set first_name [string trim [$entries(first_name) get]]
+    set last_name  [string trim [$entries(last_name) get]]
+    set email      [string trim [$entries(email) get]]
+    set username   [string trim [$entries(username) get]]
+    set password   [$entries(password) get]
+    set confirm    [$entries(confirm) get]
+    set role       [$entries(role) get]
+
+    # Проверки
+    set errors {}
+    if {$first_name eq ""} { lappend errors "First Name is required" }
+    if {$last_name eq ""}  { lappend errors "Last Name is required" }
+    if {$username eq ""}   { lappend errors "Username is required" }
+    if {$password eq ""}   { lappend errors "Password is required" }
+    if {$role eq ""}       { lappend errors "Role is required" }
+
+    if {[llength $errors] > 0} {
+        $w.main.err configure -text "Please fix:\n[join $errors \n]"
+        return
+    }
+
+    if {$password ne $confirm} {
+        $w.main.err configure -text "Passwords do not match!"
+        return
+    }
+
+    if {[string length $password] < 6} {
+        $w.main.err configure -text "Password must be at least 6 characters."
+        return
+    }
+
+    if {$email ne "" && ![regexp {^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$} $email]} {
+        $w.main.err configure -text "Please enter a valid email address."
+        return
+    }
+
+    # Проверка уникальности
+    set count [DB::eval_scalar "SELECT COUNT(*) FROM tp_users WHERE username = :username" [list username $username]]
+    if {$count > 0} {
+        $w.main.err configure -text "Username '$username' already exists!"
+        return
+    }
+
+    if {$email ne ""} {
+        set count [DB::eval_scalar "SELECT COUNT(*) FROM persons WHERE email = :email" [list email $email]]
+        if {$count > 0} {
+            $w.main.err configure -text "Email already registered!"
+            return
+        }
+    }
+
+    # Получить role_id
+    set role_id [DB::eval_scalar "SELECT role_id FROM persons_roles WHERE role_name = :role" [list role $role]]
+    if {$role_id == 0} {
+        $w.main.err configure -text "Invalid role selected."
+        return
+    }
+
+    # Хеширование пароля с солью
+    set salt [generate_random_salt]
+    set hashed [native_sha256 "${password}${salt}"]
+
+    set person_code [string toupper $username]
+
+    DB::begin_transaction
+    try {
+        # Вставка в persons
+        set sql_person {
+            INSERT INTO persons (
+                person_code, first_name, last_name, email, role_id,
+                is_active, created_at
+            ) VALUES (
+                :person_code, :first_name, :last_name, :email, :role_id,
+                true, CURRENT_TIMESTAMP
+            ) RETURNING person_id
+        }
+        set params_person [list \
+            person_code $person_code \
+            first_name $first_name \
+            last_name $last_name \
+            email $email \
+            role_id $role_id
+        ]
+        set person_id [DB::eval_scalar $sql_person $params_person]
+
+        # Вставка в tp_users
+        set sql_user {
+            INSERT INTO tp_users (
+                username, password_hash, salt, person_id, is_active, created_at
+            ) VALUES (
+                :username, :password_hash, :salt, :person_id, true, CURRENT_TIMESTAMP
+            )
+        }
+        set params_user [list \
+            username $username \
+            password_hash $hashed \
+            salt $salt \
+            person_id $person_id
+        ]
+        DB::eval $sql_user $params_user
+
+        DB::commit_transaction
+
+        tk_messageBox -icon info -title "Registration Successful" \
+            -message "✅ User '$username' registered successfully!\n\nYou can now login."
+
+        destroy $w
+
+        # Автоматически подставить имя пользователя в форму входа
+        global login_user
+        set login_user $username
+
+    } on error {err} {
+        DB::rollback_transaction
+        $w.main.err configure -text "Registration failed: $err"
+        puts "ERROR: $err"
+    }
+}
 # ============================================
 # 5. LOGIN WINDOW (from login.tcl)
 # ============================================
@@ -380,7 +639,7 @@ proc handle_login {} {
 
 proc create_login_window {} {
     wm title . "Login - $Config::APP_NAME"
-    wm geometry . "320x180"
+    wm geometry . "320x220"
     wm resizable . 0 0
 
     global login_user login_pass
@@ -398,13 +657,19 @@ proc create_login_window {} {
     pack $f.lbl_pass -fill x -pady {0 2}
     pack $f.ent_pass -fill x -pady {0 15}
 
-    ttk::button $f.btn_login -text "Login" -command handle_login -default active
-    pack $f.btn_login -fill x -ipady 3
+    # Контейнер для двух кнопок в ряд
+    set btn_frame [ttk::frame $f.btns]
+    pack $btn_frame -fill x -pady 5
+
+    ttk::button $btn_frame.login -text "Login" -command handle_login -default active -padding "8 4"
+    pack $btn_frame.login -side left -expand true -fill x -padx 2
+
+    ttk::button $btn_frame.register -text "Register" -command show_register_dialog -padding "8 4"
+    pack $btn_frame.register -side right -expand true -fill x -padx 2
 
     bind . <Return> {handle_login}
     focus $f.ent_user
 }
-
 # ============================================
 # 6. MAIN APPLICATION CLASS (FULL FROM ORIGINAL)
 # ============================================
