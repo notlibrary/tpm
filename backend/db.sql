@@ -213,7 +213,7 @@ CREATE INDEX idx_companies_code ON companies(company_code);
 -- Persons (Employees, Scientists, QC Personnel)
 CREATE TABLE persons (
     person_id SERIAL PRIMARY KEY,
-    person_code VARCHAR(20) UNIQUE NOT NULL,
+    person_code VARCHAR(50) UNIQUE NOT NULL,
     first_name VARCHAR(100) NOT NULL,
     last_name VARCHAR(100) NOT NULL,
     middle_name VARCHAR(100),
