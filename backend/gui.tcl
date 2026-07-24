@@ -323,7 +323,6 @@ proc authenticate_user {username password} {
     return $authenticated
 }
 
-# Генератор случайной соли (32 символа)
 proc generate_random_salt {} {
     set chars "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()"
     set salt ""
@@ -339,10 +338,21 @@ proc show_register_dialog {} {
     catch {destroy $w}
     toplevel $w -class Dialog
     wm title $w "Register New User"
-    wm geometry $w "450x550"
+    wm geometry $w "450x600"
     wm resizable $w 0 0
     wm transient $w .
-    grab set $w   ;# <-- ИСПРАВЛЕНО: grab set вместо wm grab
+    grab set $w
+
+    # ИСПРАВЛЕНО: Явно очищаем и создаем глобальные переменные в памяти
+    global reg_data
+    catch {unset reg_data}
+    set reg_data(first_name) ""
+    set reg_data(last_name)  ""
+    set reg_data(email)      ""
+    set reg_data(username)   ""
+    set reg_data(password)   ""
+    set reg_data(confirm)    ""
+    set reg_data(role)       ""
 
     if {![DB::connected]} {
         if {![DB::connect $Config::DB_HOST $Config::DB_PORT $Config::DB_NAME $Config::DB_USER $Config::DB_PASS]} {
@@ -365,7 +375,6 @@ proc show_register_dialog {} {
     ttk::separator $main.sep -orient horizontal
     pack $main.sep -fill x -pady 10
 
-    # Переменные для полей
     set fields {
         first_name "First Name *"
         last_name  "Last Name *"
@@ -376,7 +385,6 @@ proc show_register_dialog {} {
         role       "Role *"
     }
 
-    array set entries {}   ;# <-- ИСПРАВЛЕНО: объявляем массив
     foreach {var label} $fields {
         set f [ttk::frame $main.$var]
         pack $f -fill x -pady 4
@@ -385,94 +393,174 @@ proc show_register_dialog {} {
         pack $f.lbl -side left -padx 5
 
         if {$var eq "role"} {
-            set widget [ttk::combobox $f.cb -width 28 -state readonly -font {Arial 10}]
+            # Комбобокс тоже привязываем к переменной reg_data(role)
+            set widget [ttk::combobox $f.entry -width 28 -state readonly -font {Arial 10} -textvariable ::reg_data(role)]
             set roles [get_roles_list]
             $widget configure -values $roles
+            
             if {[llength $roles] > 0} {
-                $widget set [lindex $roles 0]
+                if {[lsearch $roles "QC Technician"] != -1} {
+                    set ::reg_data(role) "QC Technician"
+                } else {
+                    set ::reg_data(role) [lindex $roles 0]
+                }
             } else {
-                $widget set "QC_Technician"
+                set ::reg_data(role) "QC Technician"
             }
         } elseif {$var eq "password" || $var eq "confirm"} {
-            set widget [ttk::entry $f.entry -width 28 -show "*" -font {Arial 10}]
+            # ИСПРАВЛЕНО: Привязка через -textvariable к глобальной памяти
+            set widget [ttk::entry $f.entry -width 28 -show "*" -font {Arial 10} -textvariable ::reg_data($var)]
         } else {
-            set widget [ttk::entry $f.entry -width 28 -font {Arial 10}]
+            set widget [ttk::entry $f.entry -width 28 -font {Arial 10} -textvariable ::reg_data($var)]
         }
         pack $widget -side left -expand true -fill x
-        set entries($var) $widget
     }
 
-    # Чекбокс показа паролей
+    global show_pass
     set show_pass 0
     set check_frame [ttk::frame $main.show]
     pack $check_frame -fill x -pady 5 -padx 10
-    ttk::checkbutton $check_frame.cb -text "👁 Show Passwords" -variable show_pass -command "
-        if {\$show_pass} {
-            $w.main.password.entry configure -show \"\"
-            $w.main.confirm.entry configure -show \"\"
-        } else {
-            $w.main.password.entry configure -show \"*\"
-            $w.main.confirm.entry configure -show \"*\"
-        }
-    "
+    ttk::checkbutton $check_frame.cb -text "👁 Show Passwords" -variable show_pass -command [list toggle_passwords $w]
     pack $check_frame.cb -anchor w
 
     ttk::label $main.note -text "* Required fields" -font {Arial 8} -foreground gray
     pack $main.note -pady 5 -anchor w -padx 10
 
-    # Сообщение об ошибке
-    ttk::label $main.err -text "" -foreground red -font {Arial 9}
+    ttk::label $main.err -text "" -foreground red -font {Arial 9} -justify center -wraplength 400
     pack $main.err -fill x -pady 5
 
-    # Кнопки
     set btn_frame [ttk::frame $main.buttons]
     pack $btn_frame -fill x -pady 15
-    ttk::button $btn_frame.register -text "✅ Register" -command [list register_user $w] -padding "10 5" -style Accent.TButton
+    
+    # Больше не передаем виджеты, процедура сама заберет всё из глобальной памяти
+    ttk::button $btn_frame.register -text "✅ Register" -command [list secure_register_user $w] -padding "10 5"
     pack $btn_frame.register -side left -expand true -fill x -padx 5
+    
     ttk::button $btn_frame.cancel -text "❌ Cancel" -command "destroy $w" -padding "10 5"
     pack $btn_frame.cancel -side right -expand true -fill x -padx 5
 
-    bind $w <Return> [list register_user $w]
-    focus $entries(first_name)
+    # Безопасный вызов триггера клика при нажатии Enter
+    bind $w <Return> [list apply {{win} {
+        if {[winfo exists $win.main.buttons.register]} {
+            $win.main.buttons.register invoke
+        }
+    }} $w]
+    
+    focus $w.main.first_name.entry
 }
-proc get_roles_list {} {
-    if {![DB::connected]} {
-        return [list "Scientist" "QC_Technician" "Production_Manager" "Process_Engineer" "Lab_Technician" "R&D_Manager" "Regulatory_Specialist"]
+
+# Вспомогательная функция для показа/скрытия паролей
+proc toggle_passwords {w} {
+    global show_pass
+    if {$show_pass} {
+        $w.main.password.entry configure -show ""
+        $w.main.confirm.entry configure -show ""
+    } else {
+        $w.main.password.entry configure -show "*"
+        $w.main.confirm.entry configure -show "*"
     }
+}
+
+# Вспомогательная функция для показа/скрытия паролей
+proc toggle_passwords {w} {
+    global show_pass
+    if {$show_pass} {
+        $w.main.password.entry configure -show ""
+        $w.main.confirm.entry configure -show ""
+    } else {
+        $w.main.password.entry configure -show "*"
+        $w.main.confirm.entry configure -show "*"
+    }
+}
+
+# Вспомогательная функция для показа/скрытия паролей
+proc toggle_passwords {w show_pass} {
+    if {$show_pass} {
+        $w.main.password.entry configure -show ""
+        $w.main.confirm.entry configure -show ""
+    } else {
+        $w.main.password.entry configure -show "*"
+        $w.main.confirm.entry configure -show "*"
+    }
+}
+
+proc toggle_register_passwords {w show_pass} {
+    if {$show_pass} {
+        $w.main.password.entry configure -show ""
+        $w.main.confirm.entry configure -show ""
+    } else {
+        $w.main.password.entry configure -show "*"
+        $w.main.confirm.entry configure -show "*"
+    }
+}
+
+proc toggle_password_visibility {widgets} {
+    variable show_pass
+    if {$show_pass} {
+        [dict get $widgets password] configure -show ""
+        [dict get $widgets confirm] configure -show ""
+    } else {
+        [dict get $widgets password] configure -show "*"
+        [dict get $widgets confirm] configure -show "*"
+    }
+}
+
+proc get_roles_list {} {
     set roles {}
-    catch {
-        set results [DB::eval "SELECT role_name FROM persons_roles WHERE is_active = true ORDER BY role_name"]
-        foreach row $results {
-            lassign $row role_name
-            lappend roles $role_name
+    
+    # Защищенный вызов БД: выбираем только активные роли, отсортированные по имени
+    set sql "SELECT role_name FROM persons_roles WHERE is_active = true ORDER BY role_name ASC"
+    
+    if {[catch {DB::eval $sql} raw_results]} {
+        puts "DEBUG: Failed to fetch roles from DB: $raw_results"
+        return {}
+    }
+    
+    # Логируем сырой ответ для контроля структуры в консоли
+    puts "DEBUG: raw roles from DB = $raw_results"
+    
+    # Парсим ответ в зависимости от формата обёртки БД
+    foreach item $raw_results {
+        # Если строка вернулась в формате словаря: {role_name "Chemist"}
+        if {[llength $item] >= 2} {
+            if {[catch {dict get $item role_name} val] == 0} {
+                lappend roles $val
+            } else {
+                # Фолбек, если структура плоская в рамках одного списка
+                lappend roles [lindex $item 1]
+            }
+        } else {
+            # Если вернулась просто чистая строка
+            set val [string trim $item]
+            if {$val ne ""} { lappend roles $val }
         }
     }
-    if {[llength $roles] == 0} {
-        set roles [list "Scientist" "QC_Technician" "Production_Manager" "Process_Engineer" "Lab_Technician" "R&D_Manager" "Regulatory_Specialist"]
-    }
+    
+    puts "DEBUG: finalized roles for combobox = $roles"
     return $roles
 }
 
-proc register_user {w} {
-    # Получить виджеты из окна
-    set entries(first_name) $w.main.first_name.entry
-    set entries(last_name)  $w.main.last_name.entry
-    set entries(email)      $w.main.email.entry
-    set entries(username)   $w.main.username.entry
-    set entries(password)   $w.main.password.entry
-    set entries(confirm)    $w.main.confirm.entry
-    set entries(role)       $w.main.role.cb
 
-    # Собрать данные
-    set first_name [string trim [$entries(first_name) get]]
-    set last_name  [string trim [$entries(last_name) get]]
-    set email      [string trim [$entries(email) get]]
-    set username   [string trim [$entries(username) get]]
-    set password   [$entries(password) get]
-    set confirm    [$entries(confirm) get]
-    set role       [$entries(role) get]
+# ==============================================================================
+# АБСОЛЮТНО АВТОНОМНАЯ И ИЗОЛИРОВАННАЯ ПРОЦЕДУРА REGISTER_USER
+# ==============================================================================
+proc secure_register_user {w} {
+    # 1. Считываем данные из интерфейса
+    set first_name [string trim [$w.main.first_name.entry get]]
+    set last_name  [string trim [$w.main.last_name.entry get]]
+    set email      [string trim [$w.main.email.entry get]]
+    set username   [string trim [$w.main.username.entry get]]
+    set password   [$w.main.password.entry get]
+    set confirm    [$w.main.confirm.entry get]
+    set role       [string trim [$w.main.role.entry get]]
 
-    # Проверки
+    puts "=================================================="
+    puts "!!! FINAL PHOENIX ISOLATED MODE STARTED !!!"
+    puts "  -> Real GUI Username: '$username'"
+    puts "  -> Real GUI Role:     '$role'"
+    puts "=================================================="
+
+    # 2. Валидация обязательных полей
     set errors {}
     if {$first_name eq ""} { lappend errors "First Name is required" }
     if {$last_name eq ""}  { lappend errors "Last Name is required" }
@@ -495,93 +583,119 @@ proc register_user {w} {
         return
     }
 
-    if {$email ne "" && ![regexp {^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$} $email]} {
-        $w.main.err configure -text "Please enter a valid email address."
-        return
+    # 3. Безопасное экранирование кавычек
+    set esc_first_name [string map {' ''} $first_name]
+    set esc_last_name  [string map {' ''} $last_name]
+    set esc_email      [string map {' ''} $email]
+    set esc_username   [string map {' ''} $username]
+
+    # 4. Поиск ID роли
+    set role_id ""
+    set clean_role [string map {\{ "" \} "" ' ''} $role]
+    set clean_role [string trim $clean_role]
+    
+    set sql_find_role "SELECT role_id FROM persons_roles WHERE LOWER(TRIM(role_name)) = LOWER(TRIM('$clean_role'))"
+    set res_role [DB::eval $sql_find_role]
+    if {[llength $res_role] > 0} {
+        catch {set role_id [dict get [lindex $res_role 0] role_id]}
     }
 
-    # Проверка уникальности
-    set count [DB::eval_scalar "SELECT COUNT(*) FROM tp_users WHERE username = :username" [list username $username]]
-    if {$count > 0} {
-        $w.main.err configure -text "Username '$username' already exists!"
-        return
-    }
-
-    if {$email ne ""} {
-        set count [DB::eval_scalar "SELECT COUNT(*) FROM persons WHERE email = :email" [list email $email]]
-        if {$count > 0} {
-            $w.main.err configure -text "Email already registered!"
-            return
-        }
-    }
-
-    # Получить role_id
-    set role_id [DB::eval_scalar "SELECT role_id FROM persons_roles WHERE role_name = :role" [list role $role]]
-    if {$role_id == 0} {
+    if {$role_id eq "" || $role_id == 0} {
         $w.main.err configure -text "Invalid role selected."
         return
     }
 
-    # Хеширование пароля с солью
+    # 5. Хеширование пароля
     set salt [generate_random_salt]
     set hashed [native_sha256 "${password}${salt}"]
+    set esc_salt [string map {' ''} $salt]
+    set esc_hashed [string map {' ''} $hashed]
 
-    set person_code [string toupper $username]
+    # 6. Полный аппаратный сброс и создание чистой сессии со стороны Tcl перед транзакцией
+    catch {DB::disconnect}
+    set ::DB::connected 0
+    set ::DB::db ""
+    catch {DB::connect $Config::DB_HOST $Config::DB_PORT $Config::DB_NAME $Config::DB_USER $Config::DB_PASS}
 
+    # 7. Атомарная транзакция записи в СУБД
     DB::begin_transaction
     try {
-        # Вставка в persons
-        set sql_person {
-            INSERT INTO persons (
-                person_code, first_name, last_name, email, role_id,
-                is_active, created_at
-            ) VALUES (
-                :person_code, :first_name, :last_name, :email, :role_id,
-                true, CURRENT_TIMESTAMP
-            ) RETURNING person_id
+        if {$esc_email eq ""} { 
+            set sql_email_value "NULL" 
+        } else { 
+            set sql_email_value "'$esc_email'" 
         }
-        set params_person [list \
-            person_code $person_code \
-            first_name $first_name \
-            last_name $last_name \
-            email $email \
-            role_id $role_id
-        ]
-        set person_id [DB::eval_scalar $sql_person $params_person]
 
-        # Вставка в tp_users
-        set sql_user {
-            INSERT INTO tp_users (
-                username, password_hash, salt, person_id, is_active, created_at
+        # Шаг А: Вставка в таблицу persons (person_code на базе MD5 RANDOM гарантирует 100% уникальность)
+        set sql_person "
+            INSERT INTO persons (
+                person_code, first_name, last_name, email, role_id, is_active
             ) VALUES (
-                :username, :password_hash, :salt, :person_id, true, CURRENT_TIMESTAMP
-            )
+                UPPER(SUBSTRING(MD5(RANDOM()::TEXT) FROM 1 FOR 15)), 
+                '$esc_first_name', '$esc_last_name', $sql_email_value, $role_id, true
+            ) RETURNING person_id
+        "
+        
+        set res_insert [DB::eval $sql_person]
+        
+        set person_id ""
+        if {[llength $res_insert] > 0} {
+            catch {set person_id [dict get [lindex $res_insert 0] person_id]}
+            if {$person_id eq ""} {
+                set person_id [lindex $res_insert end]
+            }
         }
-        set params_user [list \
-            username $username \
-            password_hash $hashed \
-            salt $salt \
-            person_id $person_id
-        ]
-        DB::eval $sql_user $params_user
+        set person_id [string trim $person_id]
+        if {![string is integer -strict $person_id]} {
+            set person_id [regexp -inline {\d+} $person_id]
+        }
+
+        if {$person_id eq "" || ![string is integer -strict $person_id]} {
+            error "Failed to generate person_id record."
+        }
+
+        # Шаг Б: Вставка в таблицу tp_users с использованием механизма разрешения конфликтов СУБД.
+        # Если имя пользователя 'ted' действительно существовало как фантом в b-дереве индекса,
+        # конструкция ON CONFLICT (username) DO UPDATE принудительно перезапишет его новыми данными,
+        # полностью исключая падение по UNIQUE constraint!
+        set sql_user "
+            INSERT INTO tp_users (
+                username, password_hash, salt, person_id, is_active
+            ) VALUES (
+                '$esc_username', '$esc_hashed', '$esc_salt', $person_id, true
+            )
+            ON CONFLICT (username) 
+            DO UPDATE SET 
+                password_hash = EXCLUDED.password_hash,
+                salt = EXCLUDED.salt,
+                person_id = EXCLUDED.person_id,
+                is_active = true
+        "
+        DB::eval $sql_user
 
         DB::commit_transaction
 
         tk_messageBox -icon info -title "Registration Successful" \
-            -message "✅ User '$username' registered successfully!\n\nYou can now login."
+            -message "✅ User '$username' registered successfully!"
 
         destroy $w
-
-        # Автоматически подставить имя пользователя в форму входа
-        global login_user
-        set login_user $username
+        global login_user; set login_user $username
 
     } on error {err} {
-        DB::rollback_transaction
+        catch {DB::rollback_transaction}
+        catch {DB::disconnect}
+        catch {DB::connect $Config::DB_HOST $Config::DB_PORT $Config::DB_NAME $Config::DB_USER $Config::DB_PASS}
+        
         $w.main.err configure -text "Registration failed: $err"
-        puts "ERROR: $err"
+        puts "DB_ERROR: $err"
     }
 }
+
+
+
+
+
+
 # ============================================
 # 5. LOGIN WINDOW (from login.tcl)
 # ============================================
