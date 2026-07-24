@@ -555,9 +555,10 @@ proc secure_register_user {w} {
     set role       [string trim [$w.main.role.entry get]]
 
     puts "=================================================="
-    puts "!!! FINAL PHOENIX ISOLATED MODE STARTED !!!"
+    puts "!!! MASTER UPSERT ON CONFLICT MODE STARTED !!!"
     puts "  -> Real GUI Username: '$username'"
     puts "  -> Real GUI Role:     '$role'"
+    puts "  -> Real GUI Email:    '$email'"
     puts "=================================================="
 
     # 2. Валидация обязательных полей
@@ -580,6 +581,11 @@ proc secure_register_user {w} {
 
     if {[string length $password] < 6} {
         $w.main.err configure -text "Password must be at least 6 characters."
+        return
+    }
+
+    if {$email ne "" && ![regexp {^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$} $email]} {
+        $w.main.err configure -text "Please enter a valid email address."
         return
     }
 
@@ -611,7 +617,7 @@ proc secure_register_user {w} {
     set esc_salt [string map {' ''} $salt]
     set esc_hashed [string map {' ''} $hashed]
 
-    # 6. Полный аппаратный сброс и создание чистой сессии со стороны Tcl перед транзакцией
+    # 6. Полный аппаратный сброс сессии перед транзакцией
     catch {DB::disconnect}
     set ::DB::connected 0
     set ::DB::db ""
@@ -620,21 +626,37 @@ proc secure_register_user {w} {
     # 7. Атомарная транзакция записи в СУБД
     DB::begin_transaction
     try {
-        if {$esc_email eq ""} { 
-            set sql_email_value "NULL" 
-        } else { 
-            set sql_email_value "'$esc_email'" 
+        # Шаг А: Вставка в таблицу persons с защитой ON CONFLICT по Email
+        if {$esc_email eq ""} {
+            # Если email пустой, ON CONFLICT не сработает (NULL не вызывает конфликтов), 
+            # поэтому генерируем случайный код сотрудника
+            set sql_person "
+                INSERT INTO persons (
+                    person_code, first_name, last_name, email, role_id, is_active
+                ) VALUES (
+                    UPPER(SUBSTRING(MD5(RANDOM()::TEXT) FROM 1 FOR 15)), 
+                    '$esc_first_name', '$esc_last_name', NULL, $role_id, true
+                ) RETURNING person_id
+            "
+        } else {
+            # ИСПРАВЛЕНО: Если email введен, активируем ON CONFLICT (email) DO UPDATE.
+            # Если такой email уже есть, база данных обновит ФИО и вернет его person_id,
+            # предотвращая ошибку persons_email_key!
+            set sql_person "
+                INSERT INTO persons (
+                    person_code, first_name, last_name, email, role_id, is_active
+                ) VALUES (
+                    UPPER(SUBSTRING(MD5(RANDOM()::TEXT) FROM 1 FOR 15)), 
+                    '$esc_first_name', '$esc_last_name', '$esc_email', $role_id, true
+                )
+                ON CONFLICT (email) 
+                DO UPDATE SET 
+                    first_name = EXCLUDED.first_name,
+                    last_name = EXCLUDED.last_name,
+                    role_id = EXCLUDED.role_id
+                RETURNING person_id
+            "
         }
-
-        # Шаг А: Вставка в таблицу persons (person_code на базе MD5 RANDOM гарантирует 100% уникальность)
-        set sql_person "
-            INSERT INTO persons (
-                person_code, first_name, last_name, email, role_id, is_active
-            ) VALUES (
-                UPPER(SUBSTRING(MD5(RANDOM()::TEXT) FROM 1 FOR 15)), 
-                '$esc_first_name', '$esc_last_name', $sql_email_value, $role_id, true
-            ) RETURNING person_id
-        "
         
         set res_insert [DB::eval $sql_person]
         
@@ -651,13 +673,10 @@ proc secure_register_user {w} {
         }
 
         if {$person_id eq "" || ![string is integer -strict $person_id]} {
-            error "Failed to generate person_id record."
+            error "Failed to generate or retrieve person_id record."
         }
 
-        # Шаг Б: Вставка в таблицу tp_users с использованием механизма разрешения конфликтов СУБД.
-        # Если имя пользователя 'ted' действительно существовало как фантом в b-дереве индекса,
-        # конструкция ON CONFLICT (username) DO UPDATE принудительно перезапишет его новыми данными,
-        # полностью исключая падение по UNIQUE constraint!
+        # Шаг Б: Вставка в таблицу tp_users с автоматическим разрешением конфликтов имен пользователей
         set sql_user "
             INSERT INTO tp_users (
                 username, password_hash, salt, person_id, is_active
@@ -686,14 +705,16 @@ proc secure_register_user {w} {
         catch {DB::disconnect}
         catch {DB::connect $Config::DB_HOST $Config::DB_PORT $Config::DB_NAME $Config::DB_USER $Config::DB_PASS}
         
-        $w.main.err configure -text "Registration failed: $err"
+        if {[string match "*tp_users_username_key*" $err] || [string match "*username*unique*" [string tolower $err]]} {
+            $w.main.err configure -text "Username '$username' already exists! Please choose another."
+        } elseif {[string match "*persons_email_key*" $err] || [string match "*email*unique*" [string tolower $err]]} {
+            $w.main.err configure -text "Email '$email' is already registered! Please use another."
+        } else {
+            $w.main.err configure -text "Registration failed: $err"
+        }
         puts "DB_ERROR: $err"
     }
 }
-
-
-
-
 
 
 # ============================================
