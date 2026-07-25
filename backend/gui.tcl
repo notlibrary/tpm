@@ -756,10 +756,41 @@ proc handle_login {} {
     }
 }
 
+proc logout {} {
+    if {[tk_messageBox -icon question -type yesno -title "Logout" \
+            -message "Are you sure you want to logout?"] eq "yes"} {
+        
+        # 1. Отключаемся от базы данных
+        DB::disconnect
+        
+        # 2. Очищаем верхнее меню, чтобы избежать конфликтов имен виджетов
+        . configure -menu ""
+        catch {destroy .menubar}
+        
+        # 3. Очищаем все виджеты из главного окна, не уничтожая само окно "."
+        foreach child [winfo children .] {
+            if {[winfo exists $child]} {
+                destroy $child
+            }
+        }
+        
+        # 4. Перерисовываем окно авторизации
+        create_login_window
+    }
+}
+
 proc create_login_window {} {
+    # 1. Сбрасываем ограничения размера от главного окна
+    wm minsize . 0 0
+    wm resizable . 1 1
+
+    # 2. Устанавливаем параметры окна логина
     wm title . "Login - $Config::APP_NAME"
     wm geometry . "320x220"
     wm resizable . 0 0
+
+    # 3. НАСТРОЙКА КРЕСТИКА (X): Полный выход из приложения при закрытии окна логина
+    wm protocol . WM_DELETE_WINDOW {exit}
 
     global login_user login_pass
 
@@ -776,7 +807,7 @@ proc create_login_window {} {
     pack $f.lbl_pass -fill x -pady {0 2}
     pack $f.ent_pass -fill x -pady {0 15}
 
-    # Контейнер для двух кнопок в ряд
+    # Контейнер для кнопок
     set btn_frame [ttk::frame $f.btns]
     pack $btn_frame -fill x -pady 5
 
@@ -789,6 +820,8 @@ proc create_login_window {} {
     bind . <Return> {handle_login}
     focus $f.ent_user
 }
+
+
 # ============================================
 # 6. MAIN APPLICATION CLASS (FULL FROM ORIGINAL)
 # ============================================
@@ -1246,15 +1279,28 @@ proc init {} {
 }
 
     # Logout
-    proc logout {} {
-        if {[tk_messageBox -icon question -type yesno -title "Logout" \
-                -message "Are you sure you want to logout?"] eq "yes"} {
-            DB::disconnect
-            destroy .
-            create_login_window
+proc logout {} {
+    if {[tk_messageBox -icon question -type yesno -title "Logout" \
+            -message "Are you sure you want to logout?"] eq "yes"} {
+        
+        # 1. Отключаемся от базы данных
+        DB::disconnect
+        
+        # 2. Очищаем верхнее меню, чтобы избежать конфликтов имен виджетов
+        . configure -menu ""
+        catch {destroy .menubar}
+        
+        # 3. Очищаем все виджеты из главного окна, не уничтожая само окно "."
+        foreach child [winfo children .] {
+            if {[winfo exists $child]} {
+                destroy $child
+            }
         }
+        
+        # 4. Перерисовываем окно авторизации
+        create_login_window
     }
-
+}
     proc exit_app {} {
         if {[tk_messageBox -icon question -type yesno -title "Exit" \
                 -message "Are you sure you want to exit?"] eq "yes"} {
