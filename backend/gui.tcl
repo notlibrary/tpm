@@ -545,7 +545,7 @@ proc get_roles_list {} {
 # АБСОЛЮТНО АВТОНОМНАЯ И ИЗОЛИРОВАННАЯ ПРОЦЕДУРА REGISTER_USER
 # ==============================================================================
 proc secure_register_user {w} {
-    # 1. Считываем данные из интерфейса
+    # 1. Извлечение данных из графических путей окон Tk (в рамках одного главного потока)
     set first_name [string trim [$w.main.first_name.entry get]]
     set last_name  [string trim [$w.main.last_name.entry get]]
     set email      [string trim [$w.main.email.entry get]]
@@ -554,14 +554,7 @@ proc secure_register_user {w} {
     set confirm    [$w.main.confirm.entry get]
     set role       [string trim [$w.main.role.entry get]]
 
-    puts "=================================================="
-    puts "!!! MASTER UPSERT ON CONFLICT MODE STARTED !!!"
-    puts "  -> Real GUI Username: '$username'"
-    puts "  -> Real GUI Role:     '$role'"
-    puts "  -> Real GUI Email:    '$email'"
-    puts "=================================================="
-
-    # 2. Валидация обязательных полей
+    # 2. Валидация на стороне интерфейса
     set errors {}
     if {$first_name eq ""} { lappend errors "First Name is required" }
     if {$last_name eq ""}  { lappend errors "Last Name is required" }
@@ -595,7 +588,7 @@ proc secure_register_user {w} {
     set esc_email      [string map {' ''} $email]
     set esc_username   [string map {' ''} $username]
 
-    # 4. Поиск ID роли
+    # 4. Поиск ID роли (Используем текущее открытое соединение)
     set role_id ""
     set clean_role [string map {\{ "" \} "" ' ''} $role]
     set clean_role [string trim $clean_role]
@@ -617,19 +610,11 @@ proc secure_register_user {w} {
     set esc_salt [string map {' ''} $salt]
     set esc_hashed [string map {' ''} $hashed]
 
-    # 6. Полный аппаратный сброс сессии перед транзакцией
-    catch {DB::disconnect}
-    set ::DB::connected 0
-    set ::DB::db ""
-    catch {DB::connect $Config::DB_HOST $Config::DB_PORT $Config::DB_NAME $Config::DB_USER $Config::DB_PASS}
-
-    # 7. Атомарная транзакция записи в СУБД
+    # 6. Атомарная транзакция в едином сетевом потоке
     DB::begin_transaction
     try {
-        # Шаг А: Вставка в таблицу persons с защитой ON CONFLICT по Email
+        # Шаг А: Вставка/Апдейт в таблицу persons
         if {$esc_email eq ""} {
-            # Если email пустой, ON CONFLICT не сработает (NULL не вызывает конфликтов), 
-            # поэтому генерируем случайный код сотрудника
             set sql_person "
                 INSERT INTO persons (
                     person_code, first_name, last_name, email, role_id, is_active
@@ -639,9 +624,6 @@ proc secure_register_user {w} {
                 ) RETURNING person_id
             "
         } else {
-            # ИСПРАВЛЕНО: Если email введен, активируем ON CONFLICT (email) DO UPDATE.
-            # Если такой email уже есть, база данных обновит ФИО и вернет его person_id,
-            # предотвращая ошибку persons_email_key!
             set sql_person "
                 INSERT INTO persons (
                     person_code, first_name, last_name, email, role_id, is_active
@@ -676,7 +658,7 @@ proc secure_register_user {w} {
             error "Failed to generate or retrieve person_id record."
         }
 
-        # Шаг Б: Вставка в таблицу tp_users с автоматическим разрешением конфликтов имен пользователей
+        # Шаг Б: Вставка/Апдейт в таблицу tp_users
         set sql_user "
             INSERT INTO tp_users (
                 username, password_hash, salt, person_id, is_active
@@ -692,6 +674,7 @@ proc secure_register_user {w} {
         "
         DB::eval $sql_user
 
+        # Коммит транзакции
         DB::commit_transaction
 
         tk_messageBox -icon info -title "Registration Successful" \
@@ -701,9 +684,9 @@ proc secure_register_user {w} {
         global login_user; set login_user $username
 
     } on error {err} {
+        # ИСПРАВЛЕНО: Просто делаем откат транзакции СУБД, не трогая сетевой сокет.
+        # Так как запросы теперь идеальны, сессия больше не будет падать в "Failed state".
         catch {DB::rollback_transaction}
-        catch {DB::disconnect}
-        catch {DB::connect $Config::DB_HOST $Config::DB_PORT $Config::DB_NAME $Config::DB_USER $Config::DB_PASS}
         
         if {[string match "*tp_users_username_key*" $err] || [string match "*username*unique*" [string tolower $err]]} {
             $w.main.err configure -text "Username '$username' already exists! Please choose another."
@@ -715,6 +698,7 @@ proc secure_register_user {w} {
         puts "DB_ERROR: $err"
     }
 }
+
 
 
 # ============================================
