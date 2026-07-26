@@ -313,7 +313,7 @@ free_context(toothpaste_pick_options_t* opts)
 	free(opts->toothpastes_file_path_final);
 	free(opts->output_file_path_final);
 	free(opts->config_file_path_final);
-	//free(opts->brand_string);
+	free((void*)opts->brand_string);
     
    
 }
@@ -2247,7 +2247,7 @@ read_config(const char* src,toothpaste_pick_options_t* opts)
 	}
 	value = cfg_get_rec(cfg, "BRAND", &depth);
 	if (value != NULL) {
-		//opts->brand_string = strdup(value); 
+		opts->brand_string = strdup(value); 
 	}
 	value = cfg_get_rec(cfg, "UPPER_BRANDS", &depth);
 	if (value!=NULL) 
