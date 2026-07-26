@@ -10,7 +10,7 @@ extern "C" {
 #define TPM_STRING "tpm"
 #define TPM_VERSION_MAJOR 0
 #define TPM_VERSION_MINOR 7
-#define TPM_VERSION_PATCH 2
+#define TPM_VERSION_PATCH 3
 
 #undef _CRT_NONSTDC_NO_DEPRECATE 
 #define _CRT_NONSTDC_NO_DEPRECATE 
@@ -328,7 +328,7 @@ static int finish(int flag,toothpaste_pick_t* pick);
 static char* get_user_home_dir(void);
 static int get_current_username(char* buffer, size_t buffer_size);
 static void version(void);
-static const char* cfg_get_rec(const struct cfg_struct* cfg, const char* key);
+static const char* cfg_get_rec(const struct cfg_struct* cfg, const char* key, int* depth);
 static int read_config(const char* src,toothpaste_pick_options_t* opts);
 static dental_formula_t parse_dental_formula(const char* formula_str);
 static void save_default_config(struct cfg_struct* cfg,toothpaste_pick_options_t* opts);

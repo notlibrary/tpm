@@ -36,6 +36,7 @@ INSERT INTO persons_roles (role_code, role_name, role_category, description) VAL
 ('QA_MANAGER', 'QA Manager', 'Quality', 'Quality assurance manager'),
 ('SUPPLY_CHAIN', 'Supply Chain Manager', 'Management', 'Manages supply chain and logistics'),
 ('MICROBIOLOGIST', 'Microbiologist', 'Scientific', 'Microbiological testing specialist'),
+('SYSADMIN', 'System Administrator', 'IT', 'Server software and database specialist'),
 ('PACKAGING_ENG', 'Packaging Engineer', 'Production', 'Packaging design and testing');
 
 -- Company Types Reference
