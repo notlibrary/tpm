@@ -312,7 +312,8 @@ free_context(toothpaste_pick_options_t* opts)
 	free(opts->stats_file_path_final);
 	free(opts->toothpastes_file_path_final);
 	free(opts->output_file_path_final);
-	free(opts->config_file_path_final);	
+	free(opts->config_file_path_final);
+	//free(opts->brand_string);
     
    
 }
@@ -1195,32 +1196,21 @@ eval_username(toothpaste_pick_t* pick, toothpaste_pick_options_t* topts)
 {
     if (topts == NULL || pick == NULL) return 1;
 
-    if (pick->who != NULL) {
-        free(pick->who);
-        pick->who = NULL;
-    }
-
-    pick->who = (char*)malloc(UNLEN + 1);
-    if (pick->who == NULL) {
-        return MALLOC_FAILED;
-    }
-    memset(pick->who, 0, UNLEN + 1);
-
-    if (topts->username != NULL && topts->username[0] != '\0') {
-        strncpy(pick->who, topts->username, UNLEN);
-        pick->who[UNLEN] = '\0'; 
-        return 0; 
-    }
-
     char username[UNLEN + 1];
     memset(username, 0, sizeof(username));
-    if (get_current_username(username, sizeof(username)) == 0) {
+
+    pick->who = malloc(UNLEN + 1);
+    if (pick->who == NULL) return 1;
+    memset(pick->who, 0, UNLEN + 1);
+
+    if (get_current_username(username, sizeof(username)) != 0) {
         strncpy(pick->who, username, UNLEN);
-        pick->who[UNLEN] = '\0';
-        return 0;
+    } else if (topts->username != NULL) {
+        strncpy(pick->who, topts->username, UNLEN);
+    } else {
+        strncpy(pick->who, user_strings[MSG_ANON], UNLEN);
     }
 
-    strncpy(pick->who, _(user_strings[MSG_ANON]), UNLEN);
     pick->who[UNLEN] = '\0';
     return 0;
 }
@@ -2257,7 +2247,7 @@ read_config(const char* src,toothpaste_pick_options_t* opts)
 	}
 	value = cfg_get_rec(cfg, "BRAND", &depth);
 	if (value != NULL) {
-		opts->brand_string = strdup(value); 
+		//opts->brand_string = strdup(value); 
 	}
 	value = cfg_get_rec(cfg, "UPPER_BRANDS", &depth);
 	if (value!=NULL) 
@@ -2298,7 +2288,7 @@ do_not_test_me(int argc, char* argv[])
 	int result;
 	int opt;
 	FILE* output_file;
-	toothpaste_pick_options_t topts;
+	toothpaste_pick_options_t topts={0};
 	struct cfg_struct* cfg;
 	int option_index = 0;
 	toothpaste_pick_t pick;
