@@ -728,7 +728,7 @@ find_item_with_max_rating(list_node_t* where)
 		
 	while (current != NULL) 
 	{
-		if (current->data.tube_mass_g>max_rating)
+		if (current->data.rating>max_rating)
 		{
 			max_index =	current->data.index;
 			max_rating =current->data.rating;
@@ -747,7 +747,7 @@ find_item_with_min_rating(list_node_t* where)
 		
 	while (current != NULL) 
 	{
-		if (current->data.tube_mass_g<min_rating)
+		if (current->data.rating<min_rating)
 		{
 			min_index =	current->data.index;
 			min_rating =current->data.rating;
@@ -1752,7 +1752,8 @@ tpm_pick_toothpaste(list_node_t* head, toothpaste_pick_options_t* topts, toothpa
     pick->CSV = malloc(OUTPUT_BLOCK_SIZE);
     pick->waste_report = NULL;
     pick->head = head;
-    
+    pick->where = head;
+	
     if (!pick->message || !pick->JSON || !pick->CSV) {
 
         free(pick->message); free(pick->JSON); free(pick->CSV);
@@ -1834,7 +1835,6 @@ tpm_pick_toothpaste(list_node_t* head, toothpaste_pick_options_t* topts, toothpa
                 pick->what = get_item_by_index(head, i);
     }
     
-    pick->where = head;
     
     if (pick->what.toothpaste_brand == NULL) {
 
