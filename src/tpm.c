@@ -1,6 +1,10 @@
 /*
 	TPM Toothpaste Picking Manager source code 0BSD license
 */
+/*
+	Any sufficiently complicated C or Fortran program contains an 
+	ad hoc, informally-specified, bug-ridden, slow implementation of half of Common Lisp. 
+*/
 #include "tpm.h"
 
 #define	TPM_NO_ERROR 0
@@ -15,7 +19,6 @@
 #define PICK_NULL 9
 #define	NO_TOOTHPASTES_AVAILBLE 10
 #define	NULL_CONTEXT 11
-
 
 
 static const toothpaste_data_t toothpastes[TOTAL_TOOTHPASTES]={
