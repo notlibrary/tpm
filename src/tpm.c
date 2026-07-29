@@ -2321,169 +2321,203 @@ parse_dental_formula(const char* formula_str)
 }
 
 static int
-read_config(const char* src,toothpaste_pick_options_t* opts)
+read_config(const char *src, toothpaste_pick_options_t *opts)
 {
-	struct cfg_struct* cfg;
-	int reset_counters_v=0;
-	int set_counters_v=0;
-	const char* value = NULL;
-	static int recursion =0;
-	int depth = 16;
-	int result = 0;
-	
-	cfg = cfg_init();
-	if (cfg_load(cfg, src) < 0)
-	{
-		fprintf(stderr,"%s", _(error_strings[CONFIG_LOAD_FAILED]));
-		opts->config_load_failure=1;
-		return -1;
+    struct cfg_struct *cfg = NULL;
+    const char *value = NULL;
+    static int recursion = 0;
+    int depth = 16;
+    int result = 0;
+    int reset_counters_v = 0;
+    int set_counters_v = 0;
+
+    if (src == NULL || opts == NULL)
+        return -1;
+
+    cfg = cfg_init();
+    if (cfg == NULL)
+        return -1;
+
+    if (cfg_load(cfg, src) < 0)
+    {
+        fprintf(stderr, "%s", _(error_strings[CONFIG_LOAD_FAILED]));
+        opts->config_load_failure = 1;
+        result = -1;
+        goto cleanup;
     }
-	value = cfg_get_rec(cfg, "LOAD_CONFIG", &depth);
-	if ((value!=NULL) && (strcmp(src,value)==0) && (recursion < MAX_CONFIG_RECURSION)) 		
-	{
-		recursion++;
-		result=read_config(value,opts);
-	}
-	opts->username=malloc(UNLEN);
-	memset(opts->username,0,UNLEN);
-	value = cfg_get_rec(cfg, "USERNAME",&depth);
-	if (value!=NULL)
-	{		
-		strncpy(opts->username, value,UNLEN); 
-	}	
-	value = cfg_get_rec(cfg,"DENTAL_FORMULA", &depth);
-	if (value!=NULL)
-	{		
-		opts->formula=parse_dental_formula(value); 
-	}
-	
-	value = cfg_get_rec(cfg, "TIMEZONE", &depth);
-	if ((value!=NULL) && atoi(value)>=-MAX_TIMEZONE_DELTA && atoi(value)<=MAX_TIMEZONE_DELTA) 
-	{
-		opts->delta_hours=atoi(value);
-	}
-	value = cfg_get_rec(cfg, "DELTA_DAYS", &depth);
-	if (value!=NULL)
-	{	
-		opts->delta_days = atoi(value);
-	}
-	
-	value = cfg_get_rec(cfg, "MEME", &depth);
-	if (value!=NULL)
-	{	
-		strncpy(opts->meme_payload,value,MAX_TOOTHPASTE_LINE-1);
-	}
 
-	value = cfg_get_rec(cfg, "TEMPLATE", &depth);
-	if (value!=NULL)
-	{	
-		strncpy(opts->tpm_template,value,TOTAL_OUTPUT_STRINGS+1);
-	}
-	
-	value = cfg_get_rec(cfg, "LOCALE", &depth);
-	if (value!=NULL)
-	{	
-		strncpy(opts->tpm_locale,value,MAX_LOCALE_CODE); 
-	}
-	
-	value = cfg_get_rec(cfg, "PICK_TYPE", &depth);
-	if ((value!=NULL) && atoi(value)>=0 && atoi(value)<TOTAL_PICK_TYPE_STRINGS)
-	{
-		opts->ptype =  atoi(value);
-	}
-	value = cfg_get_rec(cfg, "VERBOSE", &depth);
-	if (value!=NULL)
-	{
-		opts->verbose = atoi(value);
-	}		
-	value = cfg_get_rec(cfg, "TOOTHPASTES", &depth);
-	if (value!=NULL)
-	{
-		strncpy(opts->toothpastes_file_path_final,value,MAX_PATH); 
-	}
-	value = cfg_get_rec(cfg, "LAST_PICK", &depth);
-	if (value!=NULL) 
-	{
-		strncpy(opts->output_file_path_final,value,MAX_PATH);
-	}	
-	value = cfg_get_rec(cfg, "PICK_STATS", &depth); 
-	if (value!=NULL) 
-	{
-		strncpy(opts->stats_file_path_final,value,MAX_PATH); 
-	}
-	value = cfg_get_rec(cfg, "LIST_TOOTHPASTES", &depth);
-	if (value!=NULL) 
-	{
-		opts->lat_flag =  atoi(value);
-	}
-	value = cfg_get_rec(cfg, "OUTPUT_JSON", &depth);
-	if (value!=NULL) 
-	{
-		opts->json_flag =  atoi(value);
-	}
-	value = cfg_get_rec(cfg, "OUTPUT_CSV", &depth);
-	if (value!=NULL) 
-	{
-		opts->csv_flag =  atoi(value);
-	}
-	value = cfg_get_rec(cfg, "FAKE_STATS", &depth);
-	if (value!=NULL) 
-	{
-		opts->fake_stats =  atoi(value);
-	}
-	value = cfg_get_rec(cfg, "OUTPUT_FILE", &depth);
-	if (value!=NULL) 
-	{
-		opts->output_to_file =  atoi(value);
-	}
-	value = cfg_get_rec(cfg, "PICK_INDEX", &depth);
-	if (value!=NULL) 
-	{
-	char *end = NULL;
-	unsigned long tmp;
+    value = cfg_get_rec(cfg, "LOAD_CONFIG", &depth);
+    if (src != NULL &&
+        value != NULL &&
+        strcmp(src, value) == 0 &&
+        recursion < MAX_CONFIG_RECURSION)
+    {
+        recursion++;
+        result = read_config(value, opts);
+        recursion--;
+        if (result < 0)
+            goto cleanup;
+    }
 
-		errno = 0;
-		tmp = strtoul(value, &end, 10);
+    free(opts->username);
+    opts->username = calloc(1, UNLEN);
+    if (opts->username == NULL)
+    {
+        result = -1;
+        goto cleanup;
+    }
 
-		if (errno != 0 ||
-			end == value ||
-			*end != '\0' ||
-			tmp > UINT_MAX) {
-			/* Invalid configuration value */
-			return -1;    /* or whatever read_config() uses */
-		}
+    value = cfg_get_rec(cfg, "USERNAME", &depth);
+    if (value != NULL)
+    {
+        strncpy(opts->username, value, UNLEN - 1);
+        opts->username[UNLEN - 1] = '\0';
+    }
 
-		opts->pick_by_index_index = (unsigned int)tmp;
-	}
-	value = cfg_get_rec(cfg, "BRAND", &depth);
-	if (value != NULL) {
-		opts->brand_string = strdup(value); 
-	}
-	value = cfg_get_rec(cfg, "UPPER_BRANDS", &depth);
-	if (value!=NULL) 
-	{
-		opts->upper_brands = atoi(value);
-	}
-	value = cfg_get_rec(cfg, "RESET_COUNTER", &depth);
-	if (value!=NULL) 
-	{
-		reset_counters_v=atoi(cfg_get_rec(cfg, "RESET_COUNTER", &depth));
-	}
-	if (reset_counters_v)
-	{
-		reset_counters(opts);
-	}
-	value = cfg_get_rec(cfg, "SET_COUNTER", &depth);
-	if (value!=NULL) 
-	{
-		set_counters_v=atoi(cfg_get_rec(cfg, "SET_COUNTER", &depth));
-	}
-	if (set_counters_v)
-	{ 
-		set_counters(&set_counters_v,opts);
-	}
-	cfg_free(cfg);
-	return result;
+    value = cfg_get_rec(cfg, "DENTAL_FORMULA", &depth);
+    if (value != NULL)
+        opts->formula = parse_dental_formula(value);
+
+    value = cfg_get_rec(cfg, "TIMEZONE", &depth);
+    if (value != NULL)
+    {
+        int tz = atoi(value);
+        if (tz >= -MAX_TIMEZONE_DELTA && tz <= MAX_TIMEZONE_DELTA)
+            opts->delta_hours = tz;
+    }
+
+    value = cfg_get_rec(cfg, "DELTA_DAYS", &depth);
+    if (value != NULL)
+        opts->delta_days = atoi(value);
+
+    value = cfg_get_rec(cfg, "MEME", &depth);
+    if (value != NULL)
+    {
+        strncpy(opts->meme_payload, value, MAX_TOOTHPASTE_LINE - 1);
+        opts->meme_payload[MAX_TOOTHPASTE_LINE - 1] = '\0';
+    }
+
+    value = cfg_get_rec(cfg, "TEMPLATE", &depth);
+    if (value != NULL)
+    {
+        strncpy(opts->tpm_template, value, TOTAL_OUTPUT_STRINGS);
+        opts->tpm_template[TOTAL_OUTPUT_STRINGS] = '\0';
+    }
+
+    value = cfg_get_rec(cfg, "LOCALE", &depth);
+    if (value != NULL)
+    {
+        strncpy(opts->tpm_locale, value, MAX_LOCALE_CODE - 1);
+        opts->tpm_locale[MAX_LOCALE_CODE - 1] = '\0';
+    }
+
+    value = cfg_get_rec(cfg, "PICK_TYPE", &depth);
+    if (value != NULL)
+    {
+        int tmp = atoi(value);
+        if (tmp >= 0 && tmp < TOTAL_PICK_TYPE_STRINGS)
+            opts->ptype = tmp;
+    }
+
+    value = cfg_get_rec(cfg, "VERBOSE", &depth);
+    if (value != NULL)
+        opts->verbose = atoi(value);
+
+    value = cfg_get_rec(cfg, "TOOTHPASTES", &depth);
+    if (value != NULL)
+    {
+        strncpy(opts->toothpastes_file_path_final, value, MAX_PATH - 1);
+        opts->toothpastes_file_path_final[MAX_PATH - 1] = '\0';
+    }
+
+    value = cfg_get_rec(cfg, "LAST_PICK", &depth);
+    if (value != NULL)
+    {
+        strncpy(opts->output_file_path_final, value, MAX_PATH - 1);
+        opts->output_file_path_final[MAX_PATH - 1] = '\0';
+    }
+
+    value = cfg_get_rec(cfg, "PICK_STATS", &depth);
+    if (value != NULL)
+    {
+        strncpy(opts->stats_file_path_final, value, MAX_PATH - 1);
+        opts->stats_file_path_final[MAX_PATH - 1] = '\0';
+    }
+
+    value = cfg_get_rec(cfg, "LIST_TOOTHPASTES", &depth);
+    if (value != NULL)
+        opts->lat_flag = atoi(value);
+
+    value = cfg_get_rec(cfg, "OUTPUT_JSON", &depth);
+    if (value != NULL)
+        opts->json_flag = atoi(value);
+
+    value = cfg_get_rec(cfg, "OUTPUT_CSV", &depth);
+    if (value != NULL)
+        opts->csv_flag = atoi(value);
+
+    value = cfg_get_rec(cfg, "FAKE_STATS", &depth);
+    if (value != NULL)
+        opts->fake_stats = atoi(value);
+
+    value = cfg_get_rec(cfg, "OUTPUT_FILE", &depth);
+    if (value != NULL)
+        opts->output_to_file = atoi(value);
+
+    value = cfg_get_rec(cfg, "PICK_INDEX", &depth);
+    if (value != NULL)
+    {
+        char *end = NULL;
+        unsigned long tmp;
+
+        errno = 0;
+        tmp = strtoul(value, &end, 10);
+
+        if (errno != 0 ||
+            end == value ||
+            *end != '\0' ||
+            tmp > UINT_MAX)
+        {
+            result = -1;
+            goto cleanup;
+        }
+
+        opts->pick_by_index_index = (unsigned int)tmp;
+    }
+
+    value = cfg_get_rec(cfg, "BRAND", &depth);
+    if (value != NULL)
+    {
+        free(opts->brand_string);
+        opts->brand_string = strdup(value);
+        if (opts->brand_string == NULL)
+        {
+            result = -1;
+            goto cleanup;
+        }
+    }
+
+    value = cfg_get_rec(cfg, "UPPER_BRANDS", &depth);
+    if (value != NULL)
+        opts->upper_brands = atoi(value);
+
+    value = cfg_get_rec(cfg, "RESET_COUNTER", &depth);
+    if (value != NULL)
+        reset_counters_v = atoi(value);
+
+    if (reset_counters_v)
+        reset_counters(opts);
+
+    value = cfg_get_rec(cfg, "SET_COUNTER", &depth);
+    if (value != NULL)
+        set_counters_v = atoi(value);
+
+    if (set_counters_v)
+        set_counters(&set_counters_v, opts);
+
+cleanup:
+    cfg_free(cfg);
+    return result;
 }
 
 #ifdef HAVE_MAIN
