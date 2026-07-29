@@ -458,138 +458,205 @@ check_enhanced_toothpastes(const char* filename)
 }
 
 
-int 
-tpm_load_list_from_file(const char* filename,toothpaste_pick_options_t* opts,list_node_t** head) 
+int
+tpm_load_list_from_file(const char *filename,
+                        toothpaste_pick_options_t *opts,
+                        list_node_t **head)
 {
     unsigned int i;
     unsigned int cnt = 0;
-    FILE* file; 
+    FILE *file;
     toothpaste_data_t temp_data;
     char line[MAX_LINE_LENGTH];
     char long_line[4 * MAX_LINE_LENGTH];
-	
 
     file = fopen(filename, "r");
-    
-    if (file == NULL) 
+
+    if (file == NULL)
     {
         perror(_(error_strings[TOOTHPASTES_FAILED]));
+
         for (i = 0; i < TOTAL_TOOTHPASTES; i++)
         {
-            memset(&temp_data, 0, sizeof(toothpaste_data_t));
+            memset(&temp_data, 0, sizeof(temp_data));
             temp_data = toothpastes[i];
-            
-            temp_data.toothpaste_brand = toothpastes[i].toothpaste_brand ? strdup(toothpastes[i].toothpaste_brand) : NULL;
-            temp_data.toothbrush_brand = toothpastes[i].toothbrush_brand ? strdup(toothpastes[i].toothbrush_brand) : NULL;
-            temp_data.toothbrush_color = toothpastes[i].toothbrush_color ? strdup(toothpastes[i].toothbrush_color) : NULL;
-            
-            *head = add_to_list(*head, temp_data);    
+
+            temp_data.toothpaste_brand =
+                toothpastes[i].toothpaste_brand ?
+                strdup(toothpastes[i].toothpaste_brand) : NULL;
+
+            temp_data.toothbrush_brand =
+                toothpastes[i].toothbrush_brand ?
+                strdup(toothpastes[i].toothbrush_brand) : NULL;
+
+            temp_data.toothbrush_color =
+                toothpastes[i].toothbrush_color ?
+                strdup(toothpastes[i].toothbrush_color) : NULL;
+
+            *head = add_to_list(*head, temp_data);
         }
+
         return TOOTHPASTES_FAILED;
     }
-    
-	opts->enhanced_toothpastes = check_enhanced_toothpastes(filename);
-	
-    while (fgets(line, sizeof(line), file) != NULL) 
+
+    opts->enhanced_toothpastes = check_enhanced_toothpastes(filename);
+
+    while (fgets(line, sizeof(line), file) != NULL)
     {
+        char *current = line;
+        int parsed_items;
 
-        char* current = line;
-
-        while (isspace((unsigned char)*current)) 
+        while (isspace((unsigned char)*current))
         {
             current++;
         }
 
-        if (*current == '\0' || *current == COMMENT_CHAR) 
+        if (*current == '\0' || *current == COMMENT_CHAR)
         {
-            continue; 
+            continue;
         }
-        
+
+        memset(&temp_data, 0, sizeof(temp_data));
+
         temp_data.toothpaste_brand = malloc(MAX_TOOTHPASTE_LINE);
         temp_data.toothbrush_brand = malloc(MAX_TOOTHPASTE_LINE);
         temp_data.toothbrush_color = malloc(MAX_TOOTHBRUSH_COLOR);
-        
-        if (!temp_data.toothpaste_brand || !temp_data.toothbrush_brand || !temp_data.toothbrush_color) {
+
+        if (temp_data.toothpaste_brand == NULL ||
+            temp_data.toothbrush_brand == NULL ||
+            temp_data.toothbrush_color == NULL)
+        {
             perror(_(error_strings[MALLOC_FAILED]));
+
             free(temp_data.toothpaste_brand);
             free(temp_data.toothbrush_brand);
             free(temp_data.toothbrush_color);
+
             fclose(file);
+            free_list(*head);
+            *head = NULL;
+
             return MALLOC_FAILED;
         }
-        
+
         memset(temp_data.toothpaste_brand, 0, MAX_TOOTHPASTE_LINE);
         memset(temp_data.toothbrush_brand, 0, MAX_TOOTHPASTE_LINE);
         memset(temp_data.toothbrush_color, 0, MAX_TOOTHBRUSH_COLOR);
         memset(long_line, 0, sizeof(long_line));
-        
-        int parsed_items = 0;
 
-        if (!opts->enhanced_toothpastes) {
-            parsed_items = sscanf(current, "%u, %4095[^,],%u,%u\n", 
-                                  &temp_data.index, long_line, &temp_data.tube_mass_g, &temp_data.rating);
-            if (parsed_items == 4) {
-                strncpy(temp_data.toothbrush_color, toothpastes[0].toothbrush_color, MAX_TOOTHBRUSH_COLOR - 1);
-                strncpy(temp_data.toothbrush_brand, toothpastes[0].toothbrush_brand, MAX_TOOTHPASTE_LINE - 1);
-                temp_data.toothbrush_length_cm = toothpastes[0].toothbrush_length_cm;
-                temp_data.toothbrush_hardness = toothpastes[0].toothbrush_hardness;
+        if (!opts->enhanced_toothpastes)
+        {
+            parsed_items = sscanf(current,
+                                  "%u, %4095[^,],%u,%u",
+                                  &temp_data.index,
+                                  long_line,
+                                  &temp_data.tube_mass_g,
+                                  &temp_data.rating);
+
+            if (parsed_items == 4)
+            {
+                strncpy(temp_data.toothbrush_color,
+                        toothpastes[0].toothbrush_color,
+                        MAX_TOOTHBRUSH_COLOR - 1);
+
+                strncpy(temp_data.toothbrush_brand,
+                        toothpastes[0].toothbrush_brand,
+                        MAX_TOOTHPASTE_LINE - 1);
+
+                temp_data.toothbrush_length_cm =
+                    toothpastes[0].toothbrush_length_cm;
+                temp_data.toothbrush_hardness =
+                    toothpastes[0].toothbrush_hardness;
             }
         }
-        else {
-            parsed_items = sscanf(current, "%u, %4095[^,],%u,%u,%32[^,],%128[^,],%u,%u\n", 
-                                  &temp_data.index, long_line, &temp_data.tube_mass_g, &temp_data.rating,
-                                  temp_data.toothbrush_color, temp_data.toothbrush_brand, 
-                                  &temp_data.toothbrush_length_cm, &temp_data.toothbrush_hardness);
-        }
-        
-        if ((!opts->enhanced_toothpastes && parsed_items == 4) || (opts->enhanced_toothpastes && parsed_items == 8)) 
+        else
         {
-    
-			snprintf(temp_data.toothpaste_brand,
-					 MAX_TOOTHPASTE_LINE,
-					 "%.*s",
-					 MAX_TOOTHPASTE_LINE - 1,
-					 long_line);
+            parsed_items = sscanf(current,
+                                  "%u, %4095[^,],%u,%u,%32[^,],%128[^,],%u,%u",
+                                  &temp_data.index,
+                                  long_line,
+                                  &temp_data.tube_mass_g,
+                                  &temp_data.rating,
+                                  temp_data.toothbrush_color,
+                                  temp_data.toothbrush_brand,
+                                  &temp_data.toothbrush_length_cm,
+                                  &temp_data.toothbrush_hardness);
+        }
+
+        if ((!opts->enhanced_toothpastes && parsed_items == 4) ||
+            (opts->enhanced_toothpastes && parsed_items == 8))
+        {
+            snprintf(temp_data.toothpaste_brand,
+                     MAX_TOOTHPASTE_LINE,
+                     "%.*s",
+                     MAX_TOOTHPASTE_LINE - 1,
+                     long_line);
+
             ltrim(rtrim(temp_data.toothpaste_brand));
-            
+
             temp_data.type = PASTE_RANNDOM;
-            if (0 == strcmp(toothpaste_type_strings[1], temp_data.toothpaste_brand))
+
+            if (temp_data.toothpaste_brand != NULL)
             {
-                temp_data.type = PASTE_NOTHING;
+                if (strcmp(toothpaste_type_strings[1],
+                           temp_data.toothpaste_brand) == 0)
+                {
+                    temp_data.type = PASTE_NOTHING;
+                }
+                else if (strcmp(toothpaste_type_strings[2],
+                                temp_data.toothpaste_brand) == 0)
+                {
+                    temp_data.type = PASTE_UNKNOWN;
+                }
             }
-            
-            if (0 == strcmp(toothpaste_type_strings[2], temp_data.toothpaste_brand))
-            {
-                temp_data.type = PASTE_UNKNOWN;    
-            }        
-            
-            *head = add_to_list(*head, temp_data);    
+
+            *head = add_to_list(*head, temp_data);
+
             cnt++;
-            if (cnt > MAX_TOOTHPASTE_LINES) { break; }
-        } 
-        else 
+
+            if (cnt > MAX_TOOTHPASTE_LINES)
+            {
+                break;
+            }
+        }
+        else
         {
-         
             free(temp_data.toothpaste_brand);
             free(temp_data.toothbrush_brand);
             free(temp_data.toothbrush_color);
         }
     }
-    
-    if (cnt == 1 && *head != NULL) {
+
+    if (cnt == 1 && *head != NULL)
+    {
         (*head)->data.type = PASTE_NULL;
     }
-    
+
     if (cnt == 0)
     {
         for (i = 0; i < TOTAL_TOOTHPASTES; i++)
         {
+            memset(&temp_data, 0, sizeof(temp_data));
             temp_data = toothpastes[i];
-			*head = add_to_list(*head, temp_data);    
+
+            temp_data.toothpaste_brand =
+                toothpastes[i].toothpaste_brand ?
+                strdup(toothpastes[i].toothpaste_brand) : NULL;
+
+            temp_data.toothbrush_brand =
+                toothpastes[i].toothbrush_brand ?
+                strdup(toothpastes[i].toothbrush_brand) : NULL;
+
+            temp_data.toothbrush_color =
+                toothpastes[i].toothbrush_color ?
+                strdup(toothpastes[i].toothbrush_color) : NULL;
+
+            *head = add_to_list(*head, temp_data);
         }
     }
-    
+
     fclose(file);
+
     return TPM_NO_ERROR;
 }
 
@@ -1147,76 +1214,129 @@ rand_range(uint64_t min, uint64_t max)
     return (r % range) + min;
 }
 
-static char* 
-report_wasted_tubes(list_node_t* head,toothpaste_pick_stats_t* stats)
+static char *
+report_wasted_tubes(list_node_t *head, toothpaste_pick_stats_t *stats)
 {
-	char* report;
-	unsigned int* rip_tubes;
-	unsigned int total_toothpastes=count_list(head);
-	unsigned int i=0;
-	unsigned int total_wasted=0;
-	char report_term[MAX_REPORT_TERM];
-	unsigned int total_nulls=0;
-	toothpaste_pick_stats_t real_stats;
-	
-	memset(report_term,0,MAX_REPORT_TERM);
-	rip_tubes=malloc(sizeof(unsigned int)*total_toothpastes);
-	memset(rip_tubes,0,sizeof(unsigned int)*total_toothpastes);
-	report=malloc(total_toothpastes*MAX_REPORT_TERM);
-	memset(report,0,total_toothpastes*MAX_REPORT_TERM);
-	list_node_t* current = head;
-	
-	
-	
-    while (current != NULL) 
-	{
-		if (current->data.type==PASTE_NOTHING) 
-		{
-			rip_tubes[total_nulls]=0;
-			total_nulls++;
-		}	
-		current = current->next;	
-	}
-	if (total_toothpastes==total_nulls)
-		real_stats.total_picks=stats->total_picks;
-	else
-		real_stats.total_picks=stats->total_picks*(total_toothpastes-total_nulls)/total_toothpastes;
-	current = head;
-	while (current != NULL) 
-	{
-		 if (current->data.type==PASTE_NOTHING) 
-		 {	
-			rip_tubes[i]=0;
-		 }
-		 else
-		 {
-			if (total_toothpastes==total_nulls)
-				rip_tubes[i]=0;
-			else
-				rip_tubes[i]=(real_stats.total_picks/(total_toothpastes-total_nulls))*GRAMS_PER_NURDLE/current->data.tube_mass_g;
-		 }       
-		
-        total_wasted+=rip_tubes[i];
-		current = current->next;
-		i++;		
-	}
-	for (i=0;i<total_toothpastes;i++)
-	{
-		if (i==total_toothpastes-1)
-		{
-			snprintf(report_term,MAX_REPORT_TERM,"%u=%u",rip_tubes[i],total_wasted);
-		}
-		else
-		{
-			snprintf(report_term,MAX_REPORT_TERM,"%u+",rip_tubes[i]);
-		}	
-			size_t rem = total_toothpastes * MAX_REPORT_TERM
-						 - strlen(report) - 1;
-			strncat(report, report_term, rem);
-	}
-	
-	free(rip_tubes);
-	return report;
+    char *report;
+    unsigned int *rip_tubes;
+    unsigned int total_toothpastes = count_list(head);
+    unsigned int i = 0U;
+    unsigned int total_wasted = 0U;
+    char report_term[MAX_REPORT_TERM];
+    unsigned int total_nulls = 0U;
+    toothpaste_pick_stats_t real_stats;
+    list_node_t *current;
+
+    memset(&real_stats, 0, sizeof(real_stats));
+    memset(report_term, 0, sizeof(report_term));
+
+    if (total_toothpastes == 0U)
+    {
+        report = calloc(1U, 1U);
+        return report;
+    }
+
+    rip_tubes = calloc(total_toothpastes, sizeof(*rip_tubes));
+    if (rip_tubes == NULL)
+    {
+        return NULL;
+    }
+
+    report = calloc((size_t)total_toothpastes, MAX_REPORT_TERM);
+    if (report == NULL)
+    {
+        free(rip_tubes);
+        return NULL;
+    }
+
+    current = head;
+
+    while (current != NULL)
+    {
+        if (current->data.type == PASTE_NOTHING)
+        {
+            total_nulls++;
+        }
+
+        current = current->next;
+    }
+
+    if (total_toothpastes == total_nulls)
+    {
+        real_stats.total_picks = stats->total_picks;
+    }
+    else
+    {
+        real_stats.total_picks =
+            (stats->total_picks * (total_toothpastes - total_nulls))
+            / total_toothpastes;
+    }
+
+    current = head;
+    i = 0U;
+
+    while (current != NULL)
+    {
+        if (current->data.type == PASTE_NOTHING)
+        {
+            rip_tubes[i] = 0U;
+        }
+        else if (total_toothpastes == total_nulls ||
+                 current->data.tube_mass_g == 0U)
+        {
+            rip_tubes[i] = 0U;
+        }
+        else
+        {
+            rip_tubes[i] =
+                (real_stats.total_picks /
+                 (total_toothpastes - total_nulls))
+                * GRAMS_PER_NURDLE
+                / current->data.tube_mass_g;
+        }
+
+        total_wasted += rip_tubes[i];
+
+        current = current->next;
+        i++;
+    }
+
+    for (i = 0U; i < total_toothpastes; i++)
+    {
+        size_t used;
+        size_t rem;
+
+        if (i == (total_toothpastes - 1U))
+        {
+            (void)snprintf(report_term,
+                           sizeof(report_term),
+                           "%u=%u",
+                           rip_tubes[i],
+                           total_wasted);
+        }
+        else
+        {
+            (void)snprintf(report_term,
+                           sizeof(report_term),
+                           "%u+",
+                           rip_tubes[i]);
+        }
+
+        used = strlen(report);
+
+        if (used >= ((size_t)total_toothpastes * MAX_REPORT_TERM))
+        {
+            break;
+        }
+
+        rem = ((size_t)total_toothpastes * MAX_REPORT_TERM) - used - 1U;
+
+        strncat(report, report_term, rem);
+    }
+
+    free(rip_tubes);
+
+    return report;
 }
 
 static int
@@ -1764,6 +1884,7 @@ char_to_strnum(char input)
 }
 
 
+#define TPM_RARE_ERROR 42
 TPM int 
 tpm_pick_toothpaste(list_node_t* head, toothpaste_pick_options_t* topts, toothpaste_pick_t* pick)
 {
@@ -1773,11 +1894,11 @@ tpm_pick_toothpaste(list_node_t* head, toothpaste_pick_options_t* topts, toothpa
     int new_pick_flag = 0;
     int dentist_flag = 0;
     int toothbrush_flag = 0;
-    unsigned int brand_len;
+    size_t brand_len;
     char* toothpaste_picking_message[TOTAL_OUTPUT_STRINGS];
 	char current_char;
 	int str_num = 0;
-	int interval;
+	unsigned int interval;
     size_t current_len;
 	size_t remaining_space;
 	
@@ -1854,11 +1975,20 @@ tpm_pick_toothpaste(list_node_t* head, toothpaste_pick_options_t* topts, toothpa
 
 		seed_xrp32((uint64_t)total_seconds_rand);
 		
-        i = rand_range(0, pick->total_toothpastes);
+		uint64_t value = rand_range(0, pick->total_toothpastes);
+
+		if (value >= (uint64_t)pick->total_toothpastes) {
+			/* Should never happen if rand_range() is correct */
+			return TPM_RARE_ERROR;   /* or handle appropriately */
+		}
+
+		i = (unsigned int)value;
+		
+      
     }
 
   
-    if (i < 0 || i >= pick->total_toothpastes) {
+    if ( i >= pick->total_toothpastes) {
         i = 0; 
     }
 
@@ -1898,7 +2028,7 @@ tpm_pick_toothpaste(list_node_t* head, toothpaste_pick_options_t* topts, toothpa
     {    
         for (k = 0; k < brand_len; k++)
         {
-            pick->what.toothpaste_brand[k] = toupper((unsigned char)pick->what.toothpaste_brand[k]);
+            pick->what.toothpaste_brand[k] = (char)toupper((unsigned char)pick->what.toothpaste_brand[k]);
         }
     }
     
@@ -1907,11 +2037,18 @@ tpm_pick_toothpaste(list_node_t* head, toothpaste_pick_options_t* topts, toothpa
     {    
         for (k = 0; k < brand_len; k++)
         {
-            pick->what.toothpaste_brand[k] = toupper((unsigned char)pick->what.toothpaste_brand[k]);
+            pick->what.toothpaste_brand[k] =(char)toupper((unsigned char)pick->what.toothpaste_brand[k]);;
         }
     }
     
-    pick->j = (pick->day) % TOTAL_DAYS_OF_WEEK;
+    rem = pick->day % (time_t)TOTAL_DAYS_OF_WEEK;
+
+	if (rem < 0 || rem > INT_MAX) {
+	
+		return TPM_RARE_ERROR;   /* or other appropriate action */
+	}
+
+	pick->j = (int)rem;
     
     if ((total_seconds - pick->stats.last_pick_time) > (SECONDS_PER_DAY - PICK_TIMEOUT_SECONDS)) 
     {
@@ -2048,30 +2185,34 @@ tpm_pick_toothpaste(list_node_t* head, toothpaste_pick_options_t* topts, toothpa
     written = snprintf(csv_ptr, csv_rem, "%s,%s,%d,%d,%d,", 
                        pick->who, pick_type_strings[topts->ptype], 
                        new_pick_flag, toothbrush_flag, dentist_flag);
-    if (written > 0 && (size_t)written < csv_rem) { csv_ptr += written; csv_rem -= written; }
+    if (written > 0 && (size_t)written < csv_rem) 
+	{
+		csv_ptr += (size_t) written; 
+		csv_rem -= (size_t) written; 
+	}
 
 
     written = snprintf(csv_ptr, csv_rem, "%s,%d,%d,", 
                        pick->what.toothpaste_brand, pick->what.tube_mass_g, pick->what.rating);
-    if (written > 0 && (size_t)written < csv_rem) { csv_ptr += written; csv_rem -= written; }
+    if (written > 0 && (size_t)written < csv_rem) { csv_ptr += (size_t) written; csv_rem -= (size_t) written; }
 
 
     written = snprintf(csv_ptr, csv_rem, "%s,%s,%d,%d,", 
                        pick->what.toothbrush_color, pick->what.toothbrush_brand, 
                        pick->what.toothbrush_length_cm, pick->what.toothbrush_hardness);
-    if (written > 0 && (size_t)written < csv_rem) { csv_ptr += written; csv_rem -= written; }
+    if (written > 0 && (size_t)written < csv_rem) { csv_ptr += (size_t) written; csv_rem -= (size_t) written; }
 
 
     written = snprintf(csv_ptr, csv_rem, "%d,%d,%s,", 
                        i, pick->total_toothpastes, toothpaste_type_strings[pick->what.type]);
-    if (written > 0 && (size_t)written < csv_rem) { csv_ptr += written; csv_rem -= written; }
+    if (written > 0 && (size_t)written < csv_rem) { csv_ptr += (size_t) written; csv_rem -= (size_t) written; }
 
 
-    written = snprintf(csv_ptr, csv_rem, "%u-%u-%u-%u,%s,%u,", 
+    written = snprintf(csv_ptr, csv_rem, "%u-%u-%u-%u,%s,%lu,", 
                        topts->formula.brush_times_per_day, topts->formula.minutes_per_brush, 
                        topts->formula.swap_toothbrush_times_per_year, topts->formula.visit_dentist_times_per_year,
                        days_of_week[pick->j], pick->day);
-    if (written > 0 && (size_t)written < csv_rem) { csv_ptr += written; csv_rem -= written; }
+    if (written > 0 && (size_t)written < csv_rem) { csv_ptr += (size_t) written; csv_rem -= (size_t) written; }
 
    
     written = snprintf(csv_ptr, csv_rem, LINE_FORMAT_CSV, 
@@ -2298,7 +2439,21 @@ read_config(const char* src,toothpaste_pick_options_t* opts)
 	value = cfg_get_rec(cfg, "PICK_INDEX", &depth);
 	if (value!=NULL) 
 	{
-		opts->pick_by_index_index =  atoi(value);
+	char *end = NULL;
+	unsigned long tmp;
+
+		errno = 0;
+		tmp = strtoul(value, &end, 10);
+
+		if (errno != 0 ||
+			end == value ||
+			*end != '\0' ||
+			tmp > UINT_MAX) {
+			/* Invalid configuration value */
+			return -1;    /* or whatever read_config() uses */
+		}
+
+		opts->pick_by_index_index = (unsigned int)tmp;
 	}
 	value = cfg_get_rec(cfg, "BRAND", &depth);
 	if (value != NULL) {
@@ -2382,7 +2537,7 @@ do_not_test_me(int argc, char* argv[])
 	tpm_init_context(&topts); 
 	
 	result=read_config(topts.config_file_path_final,&topts);
-	if (result<0);
+	if (result<0){};
 	topts.config_load_failure=!file_exists_fopen(topts.config_file_path_final);
 	while ((opt = getopt_long(argc, argv, "awjCvxqlrUFf:t:o:c:s:p:i:b:z:d:m:T:L:",long_options,&option_index)) != -1) 
 	{
@@ -2442,10 +2597,25 @@ do_not_test_me(int argc, char* argv[])
 				if (atoi(optarg)>=0 && atoi(optarg)<TOTAL_PICK_TYPE_STRINGS)
 				topts.ptype=atoi(optarg);
 			break; 	
-			case 'i':
+			case 'i': {
 				topts.ptype=PICK_BY_INDEX;
-				topts.pick_by_index_index=atoi(optarg);
-			break;
+				char *end = NULL;
+				unsigned long value;
+
+				errno = 0;
+				value = strtoul(optarg, &end, 10);
+
+				if (errno != 0 ||
+					end == optarg ||
+					*end != '\0' ||
+					value > UINT_MAX) {
+					fprintf(stderr, "Invalid index: %s\n", optarg);
+					return EXIT_FAILURE;
+				}
+
+				topts.pick_by_index_index = (unsigned int)value;
+				break;
+			}
 			case 'b':
 				topts.ptype=PICK_BY_BRAND;
 				topts.brand_string=optarg;

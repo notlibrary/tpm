@@ -100,7 +100,7 @@ static char* cfg_norm_key(const char* key)
   tkey[tlen] = '\0';
   /* Lowercase key and copy */
   for (i = 0; i < tlen; i++)
-    tkey[i] = tolower(key[i]);
+    tkey[i] = (char)tolower((unsigned char)key[i]);
 
   return tkey;
 }

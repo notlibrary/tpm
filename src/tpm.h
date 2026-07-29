@@ -26,6 +26,8 @@ extern "C" {
 #include <time.h>
 #include <string.h>
 #include <ctype.h>
+#include <errno.h>
+#include <limits.h>
 
 /* Compiling gettext to WASM is walking hell example better off 
 If you can contribute it to this project then you are really and I mean really good email me to 
@@ -256,11 +258,11 @@ typedef struct toothpaste_pick_options_t
     int csv_flag;
     unsigned int pick_by_index_index;
     char* username;
-    const char* brand_string;
+    char* brand_string;
     int upper_brands;
     dental_formula_t formula;
     char* meme_payload;
-    int time_of_day_ind;
+    time_t time_of_day_ind;
     char* tpm_template;
 
     int enhanced_toothpastes;
@@ -293,7 +295,7 @@ typedef struct toothpaste_pick_t
 	toothpaste_pick_options_t* opts;
 	struct list_node_t* head;
 	int j;
-	unsigned int day;
+	time_t day;
 }toothpaste_pick_t;
 
 
@@ -320,7 +322,7 @@ static toothpaste_data_t find_item_with_min_rating(list_node_t* where);
 static void free_list(list_node_t* head);
 static int reset_counters(toothpaste_pick_options_t* opts);
 static int set_counters(void* optarg,toothpaste_pick_options_t* opts);
-static unsigned int read_counters(toothpaste_pick_stats_t* stats,int fake_stats,toothpaste_pick_options_t* opts);
+static size_t read_counters(toothpaste_pick_stats_t* stats,int fake_stats,toothpaste_pick_options_t* opts);
 static int list_available_toothpastes(toothpaste_pick_t* pick);
 static int write_counters(toothpaste_pick_stats_t stats,int fake_stats,toothpaste_pick_options_t* opts);
 static void stop_system(void);
@@ -362,7 +364,7 @@ static int check_visibility(int input_id, int new_pick_flag, int toothbrush_flag
 static int check_enhanced_toothpastes(const char* filename);
 static void free_context(toothpaste_pick_options_t* opts);
 static int init_tpm_locale(char* locale_id, toothpaste_pick_options_t* opts);
-static int init_tpm_console();
+static int init_tpm_console(void);
 #ifdef __cplusplus
 }
 #endif /*__cpluplus*/

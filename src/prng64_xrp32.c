@@ -144,7 +144,7 @@ chacha20_xor(chacha20_context_t *ctx, uint8_t *bytes, size_t n_bytes)
 #endif
 
 static xrp_state_t* 
-get_xrp_state()
+get_xrp_state(void)
 {
 	static xrp_state_t xrp;
 	return &xrp; 
