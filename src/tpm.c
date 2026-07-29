@@ -281,23 +281,23 @@ tpm_init_context(toothpaste_pick_options_t* opts)
 
     /* Append TPM directory */
 #if defined(_WIN32) || defined(_WIN64)
-    strncat(user_home_dir_static, "\\tpm\\", MAX_PATH / 2);
+    strncat(user_home_dir_static, "\\tpm\\", MAX_PATH - strlen(user_home_dir_static) - 1);
 #else
-    strncat(user_home_dir_static, "/tpm/", MAX_PATH / 2);
+    strncat(user_home_dir_static, "/tpm/", MAX_PATH - strlen(user_home_dir_static) - 1);
 #endif
 
     /* Build full paths */
     strncpy(opts->stats_file_path_final, user_home_dir_static, MAX_PATH - 1);
-    strncat(opts->stats_file_path_final, stats_file_name, MAX_PATH / 2);
+    strncat(opts->stats_file_path_final, stats_file_name, MAX_PATH - strlen(opts->stats_file_path_final) - 1);
 
     strncpy(opts->toothpastes_file_path_final, user_home_dir_static, MAX_PATH - 1);
-    strncat(opts->toothpastes_file_path_final, toothpastes_file_name, MAX_PATH / 2);
+    strncat(opts->toothpastes_file_path_final, toothpastes_file_name, MAX_PATH - strlen(opts->toothpastes_file_path_final) - 1);
 
     strncpy(opts->output_file_path_final, user_home_dir_static, MAX_PATH - 1);
-    strncat(opts->output_file_path_final, output_file_name, MAX_PATH / 2);
+    strncat(opts->output_file_path_final, output_file_name, MAX_PATH - strlen(opts->output_file_path_final) - 1);
 
     strncpy(opts->config_file_path_final, user_home_dir_static, MAX_PATH - 1);
-    strncat(opts->config_file_path_final, config_file_name, MAX_PATH / 2);
+    strncat(opts->config_file_path_final, config_file_name, MAX_PATH - strlen(opts->config_file_path_final) - 1);
 
     memset(opts->tpm_locale, 0, MAX_LOCALE_CODE + 1);
 
@@ -372,20 +372,21 @@ rtrim(char *s)
 }
 
 static void
-ltrim(char *s) 
+ltrim(char *s)
 {
-    char* tmp = s;
+    char *tmp;
 
-	while (isspace(*tmp)) 
-	{
-		++tmp;
-	}
+    if (s == NULL)
+        return;
 
-    memmove(s, tmp, tmp - s); 
-                               
-	return;
+    tmp = s;
+
+    while (isspace((unsigned char)*tmp))
+        ++tmp;
+
+    if (tmp != s)
+        memmove(s, tmp, strlen(tmp) + 1);
 }
-
 static int
 check_enhanced_toothpastes(const char* filename)
 {
@@ -461,7 +462,7 @@ tpm_load_list_from_file(const char* filename,toothpaste_pick_options_t* opts,lis
     toothpaste_data_t temp_data;
     char line[MAX_LINE_LENGTH];
     char long_line[4 * MAX_LINE_LENGTH];
-    size_t copy_len=0;
+	
 
     file = fopen(filename, "r");
     
@@ -539,9 +540,11 @@ tpm_load_list_from_file(const char* filename,toothpaste_pick_options_t* opts,lis
         if ((!opts->enhanced_toothpastes && parsed_items == 4) || (opts->enhanced_toothpastes && parsed_items == 8)) 
         {
     
-			copy_len = strlen(long_line);
-			memcpy(temp_data.toothpaste_brand, long_line, copy_len);
-			temp_data.toothpaste_brand[copy_len] = '\0';
+			snprintf(temp_data.toothpaste_brand,
+					 MAX_TOOTHPASTE_LINE,
+					 "%.*s",
+					 MAX_TOOTHPASTE_LINE - 1,
+					 long_line);
             ltrim(rtrim(temp_data.toothpaste_brand));
             
             temp_data.type = PASTE_RANNDOM;
@@ -592,7 +595,7 @@ display_list(list_node_t* head, toothpaste_pick_t* pick)
     list_node_t* current = head;
 	char line[4*MAX_TOOTHPASTE_LINE];
 	int i = 0;
-	unsigned int len =0;
+	size_t len =0;
 	
 	memset(line,0,4*MAX_TOOTHPASTE_LINE);
 	memset(pick->message,0,OUTPUT_BLOCK_SIZE);
@@ -612,7 +615,7 @@ display_list(list_node_t* head, toothpaste_pick_t* pick)
 			len = strlen(current->data.toothpaste_brand);
 			for (i =0; i<len; i++)
 			{
-				current->data.toothpaste_brand[i]=toupper(current->data.toothpaste_brand[i]);
+				current->data.toothpaste_brand[i]=toupper((unsigned char)current->data.toothpaste_brand[i]);
 			}
 		}
 		if (!pick->opts->enhanced_toothpastes)
@@ -624,7 +627,9 @@ display_list(list_node_t* head, toothpaste_pick_t* pick)
 			snprintf(line,4*MAX_TOOTHPASTE_LINE,"%d,%.120s,%d,%d,%.30s,%.120s,%u,%u\n", current->data.index, current->data.toothpaste_brand, current->data.tube_mass_g, current->data.rating, current->data.toothbrush_color, current->data.toothbrush_brand, current->data.toothbrush_length_cm, current->data.toothbrush_hardness);
 		}
 		
-        strncat(pick->message,line,MAX_LINE_LENGTH);
+        size_t rem = OUTPUT_BLOCK_SIZE - strlen(pick->message) - 1;
+		strncat(pick->message, line, rem);
+		
 		current = current->next;
 		cnt++;
 		if (cnt>MAX_TOOTHPASTE_LINES){break;}
@@ -704,7 +709,7 @@ static toothpaste_data_t
 find_item_with_min_mass(list_node_t* where)
 {
 	list_node_t* current = where;
-	unsigned int min_mass=100000;
+	unsigned int min_mass=UINT_MAX;
 	unsigned int min_index=0;		
 		
 	while (current != NULL) 
@@ -742,7 +747,7 @@ static toothpaste_data_t
 find_item_with_min_rating(list_node_t* where)
 {
 	list_node_t* current = where;
-	unsigned int min_rating=100;
+	unsigned int min_rating=UINT_MAX;
 	unsigned int min_index=0;		
 		
 	while (current != NULL) 
@@ -1043,7 +1048,7 @@ version(void)
 #else
     printf("%s %s","%s\n",_(user_strings[MSG_COMPILER]),user_strings[MSG_COMPILER_UNKNOWN]);
 #endif
-	exit(EXIT_FAILURE);
+	exit(EXIT_SUCCESS);
 	return;
 }
 
@@ -1089,26 +1094,28 @@ tpm_get_toothpaste_picking_CSV(toothpaste_pick_t* pick, char** dest)
 static uint64_t
 rand_range(uint64_t min, uint64_t max)
 {
-    int r;
-    uint64_t range = max - min;
-    uint64_t buckets = XRP_MAX / range;
-    uint64_t limit = buckets * range;
-	
-	if (min == max) 
-	{
-		return min; 
-	}
-    if (min>max) 
-	{
-		SWAP(min,max); 
-	}
-    do 
-	{
-        r = prng64_xrp32();
-    } 
-	while (r >= limit);
+    uint64_t r;
+    uint64_t range;
+    uint64_t buckets;
+    uint64_t limit;
 
-    return (r % (max - min)) + min; 
+    if (min == max)
+        return min;
+
+    if (min > max)
+        SWAP(min, max);
+
+    range = max - min;
+    buckets = XRP_MAX / range;
+    limit = buckets * range;
+
+    do
+    {
+        r = prng64_xrp32();
+    }
+    while (r >= limit);
+
+    return (r % range) + min;
 }
 
 static char* 
@@ -1174,7 +1181,9 @@ report_wasted_tubes(list_node_t* head,toothpaste_pick_stats_t* stats)
 		{
 			snprintf(report_term,MAX_REPORT_TERM,"%u+",rip_tubes[i]);
 		}	
-		strncat(report,report_term,MAX_REPORT_TERM);
+			size_t rem = total_toothpastes * MAX_REPORT_TERM
+						 - strlen(report) - 1;
+			strncat(report, report_term, rem);
 	}
 	
 	free(rip_tubes);
