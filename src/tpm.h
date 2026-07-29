@@ -28,6 +28,7 @@ extern "C" {
 #include <ctype.h>
 #include <errno.h>
 #include <limits.h>
+#include <inttypes.h>
 
 /* Compiling gettext to WASM is walking hell example better off 
 If you can contribute it to this project then you are really and I mean really good email me to 
@@ -112,11 +113,7 @@ memcpy(swap_temp,&y,sizeof(x)); \
 memcpy(&y,&x,       sizeof(x)); \
 memcpy(&x,swap_temp,sizeof(x)); \
 } while(0)
-#if defined(_WIN32) || defined (_WIN64) || defined(__clang__) || defined(__EMSCRIPTEN__)
-#define LINE_FORMAT_CSV "%u,%llu,%s,%s,%s"
-#else
-#define LINE_FORMAT_CSV "%u,%lu,%s,%s,%s"
-#endif
+#define LINE_FORMAT_CSV "%u,%jd,%s,%s,%s"
 
 #define TOTAL_TOOTHPASTE_TYPES 5
 #define TOTAL_ERROR_MESSAGES 12

@@ -19,7 +19,7 @@
 #define PICK_NULL 9
 #define	NO_TOOTHPASTES_AVAILBLE 10
 #define	NULL_CONTEXT 11
-
+#define TPM_RARE_ERROR 42
 
 static const toothpaste_data_t toothpastes[TOTAL_TOOTHPASTES]={
 	{PASTE_BUILTIN,0,"BUILTIN TOOTHPASTE 1",75,90,"White", "Builtin Toothbrush 1",20,50},
@@ -1659,10 +1659,10 @@ str_day_of_the_week(toothpaste_pick_t* pick, toothpaste_pick_options_t* topts)
     const char* translated_msg_day = _(user_strings[MSG_DAY]);
     const char* translated_day_name = _(days_of_week[pick->j]);
 
-    snprintf(line, MAX_LINE_LENGTH, "%s %s %lu \n", 
+    snprintf(line, MAX_LINE_LENGTH, "%s %s %jd \n", 
              translated_msg_day, 
              translated_day_name, 
-             pick->day);
+             (intmax_t)pick->day);
 		
     return line;
 }
@@ -1884,7 +1884,6 @@ char_to_strnum(char input)
 }
 
 
-#define TPM_RARE_ERROR 42
 TPM int 
 tpm_pick_toothpaste(list_node_t* head, toothpaste_pick_options_t* topts, toothpaste_pick_t* pick)
 {
@@ -2208,15 +2207,15 @@ tpm_pick_toothpaste(list_node_t* head, toothpaste_pick_options_t* topts, toothpa
     if (written > 0 && (size_t)written < csv_rem) { csv_ptr += (size_t) written; csv_rem -= (size_t) written; }
 
 
-    written = snprintf(csv_ptr, csv_rem, "%u-%u-%u-%u,%s,%lu,", 
+    written = snprintf(csv_ptr, csv_rem, "%u-%u-%u-%u,%s,%jd,", 
                        topts->formula.brush_times_per_day, topts->formula.minutes_per_brush, 
                        topts->formula.swap_toothbrush_times_per_year, topts->formula.visit_dentist_times_per_year,
-                       days_of_week[pick->j], pick->day);
+                       days_of_week[pick->j], (intmax_t)pick->day);
     if (written > 0 && (size_t)written < csv_rem) { csv_ptr += (size_t) written; csv_rem -= (size_t) written; }
 
    
     written = snprintf(csv_ptr, csv_rem, LINE_FORMAT_CSV, 
-                       pick->stats.total_picks, pick->stats.last_pick_time, 
+                       pick->stats.total_picks, (intmax_t)pick->stats.last_pick_time, 
                        pick->waste_report, topts->toothpastes_file_path_final, topts->meme_payload);
     
 
