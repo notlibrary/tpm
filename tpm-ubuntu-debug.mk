@@ -10,12 +10,16 @@ SHAREDIR  = $(PREFIX)/share
 MANDIR    = $(SHAREDIR)/man/man1
 LOCALEDIR = $(SHAREDIR)/locale
 
-CFLAGS=-g -Wall -Os -DHAVE_MAIN -DENABLE_NLS=1 -DLOCALEDIR=\"$(LOCALEDIR)\" -Wextra -Wpedantic -Werror \
--Wconversion -Wsign-conversion \
--Wshadow -Wcast-qual \
--Wstrict-prototypes \
--fsanitize=undefined -fsanitize=address \
--fanalyzer
+CFLAGS = -g -O1 \
+    -Wall -Wextra -Wpedantic -Werror \
+    -Wconversion -Wsign-conversion \
+    -Wshadow -Wcast-qual \
+    -Wstrict-prototypes \
+    -fanalyzer \
+    -fsanitize=address,undefined \
+    -DHAVE_MAIN \
+    -DENABLE_NLS=1 \
+    -DLOCALEDIR=\"$(LOCALEDIR)\"
 
 CURRENT_DIR=$(CURDIR)
 SRC=src
