@@ -627,4 +627,18 @@ To ensure authenticity in the high end special cases this recommendations must b
 
 <img width="699" height="453" alt="tpm_architecture" src="https://github.com/user-attachments/assets/dac806b1-12be-4dd5-96e4-f09ab8a688eb" />
 
+## AI
+Although invented by humans this program is written with heavy multiple AI usage (ChatGPT DeepSeek and Google AI)
+Here is the final ChatGPT scores:
+| Category              |                                                 Rating |
+| --------------------- | -----------------------------------------------------: |
+| Correctness           |                                             **9.5/10** |
+| Memory safety         | **10/10** (clean Valgrind Memcheck is a strong signal) |
+| Compiler cleanliness  |          **10/10** (strict warnings treated as errors) |
+| Portability           |                                             **9.5/10** |
+| Defensive programming |                                               **9/10** |
+| Maintainability       |                                           **8.5–9/10** |
+| Overall               |                                         **9.5–9.8/10** |
+
+
 P.S. Do not forget to brush your hard disk with `dd` and `rm -rf /` toothpastes twice a day
