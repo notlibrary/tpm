@@ -120,7 +120,7 @@ static const char output_file_name[MAX_PATH] ="last_pick";
 static const char config_file_name[MAX_PATH] ="tpm.conf";
 
 static int
-init_tpm_console()
+init_tpm_console(void)
 {
 #if defined(_WIN32) || defined(_WIN64)
 	setvbuf(stdout, NULL, _IONBF, 0);
@@ -355,20 +355,25 @@ add_to_list(list_node_t* head, toothpaste_data_t p_data)
     return head;
 }
 
-static char*
-rtrim(char *s) 
+static char* 
+rtrim(char *s)
 {
-    int i = strlen(s) - 1; 
+    size_t len;
 
-    while (i >= 0 && isspace((unsigned char)s[i])) 
-	{
-        i--;
+    if (s == NULL) {
+        return NULL;
     }
 
-  
-    s[i + 1] = '\0';
-	
-	return s;
+    len = strlen(s);
+
+    while (len > 0 &&
+           isspace((unsigned char)s[len - 1])) {
+        --len;
+    }
+
+    s[len] = '\0';
+
+    return s;
 }
 
 static void
@@ -594,7 +599,7 @@ display_list(list_node_t* head, toothpaste_pick_t* pick)
 	unsigned int cnt=0;
     list_node_t* current = head;
 	char line[4*MAX_TOOTHPASTE_LINE];
-	int i = 0;
+	size_t i = 0;
 	size_t len =0;
 	
 	memset(line,0,4*MAX_TOOTHPASTE_LINE);
@@ -615,7 +620,7 @@ display_list(list_node_t* head, toothpaste_pick_t* pick)
 			len = strlen(current->data.toothpaste_brand);
 			for (i =0; i<len; i++)
 			{
-				current->data.toothpaste_brand[i]=toupper((unsigned char)current->data.toothpaste_brand[i]);
+				current->data.toothpaste_brand[i]=(char)toupper((unsigned char)current->data.toothpaste_brand[i]);
 			}
 		}
 		if (!pick->opts->enhanced_toothpastes)
@@ -802,6 +807,7 @@ reset_counters(toothpaste_pick_options_t* opts)
 	return 0;
 }
 
+#define INVALID_ARGUMENT 1
 static int 
 set_counters(void* optarg,toothpaste_pick_options_t* opts) 
 {
@@ -809,7 +815,20 @@ set_counters(void* optarg,toothpaste_pick_options_t* opts)
 	unsigned int zero=0;
 	time_t total_seconds=time(NULL)+opts->delta_hours*SECONDS_PER_HOUR;
 	
-	zero = atoi(optarg);
+
+	char *end = NULL;
+	unsigned long value;
+
+	errno = 0;
+	value = strtoul(optarg, &end, 10);
+
+	if (errno != 0 || end == optarg || *end != '\0' ||
+		value > UINT_MAX) {
+		return INVALID_ARGUMENT; 
+	}
+
+	zero = (unsigned int)value;
+
 	file_ptr = fopen(opts->stats_file_path_final, "wb");
 	if (file_ptr == NULL) 
 	{
@@ -826,11 +845,11 @@ set_counters(void* optarg,toothpaste_pick_options_t* opts)
 	return 0;
 }
 
-static unsigned int
+static size_t
 read_counters(toothpaste_pick_stats_t* stats,int fake_stats,toothpaste_pick_options_t* opts)
 {
 	FILE* file_ptr;
-	unsigned int nbytes=0;
+	size_t nbytes=0;
 	
 	stats->total_picks=0;
 	stats->last_pick_time=0;
@@ -850,8 +869,18 @@ read_counters(toothpaste_pick_stats_t* stats,int fake_stats,toothpaste_pick_opti
 	}
 	else 
 	{
-		seed_xrp32(time(NULL));
-		stats->total_picks=rand_range(0,BRUSHES_PER_LIFETIME);
+		seed_xrp32((uint64_t)time(NULL));
+		
+		uint64_t value = rand_range(0, BRUSHES_PER_LIFETIME);
+
+		if (value > UINT_MAX) {
+			/* Handle impossible/out-of-range value */
+			return 0; /* or another error code */
+		}
+
+		stats->total_picks = (unsigned int)value;
+		
+		
 		stats->last_pick_time=time(NULL)-SECONDS_PER_DAY+opts->delta_hours*SECONDS_PER_HOUR;
 	}
 	return nbytes;
@@ -1124,7 +1153,7 @@ report_wasted_tubes(list_node_t* head,toothpaste_pick_stats_t* stats)
 	char* report;
 	unsigned int* rip_tubes;
 	unsigned int total_toothpastes=count_list(head);
-	int i=0;
+	unsigned int i=0;
 	unsigned int total_wasted=0;
 	char report_term[MAX_REPORT_TERM];
 	unsigned int total_nulls=0;
@@ -1510,7 +1539,7 @@ str_day_of_the_week(toothpaste_pick_t* pick, toothpaste_pick_options_t* topts)
     const char* translated_msg_day = _(user_strings[MSG_DAY]);
     const char* translated_day_name = _(days_of_week[pick->j]);
 
-    snprintf(line, MAX_LINE_LENGTH, "%s %s %u \n", 
+    snprintf(line, MAX_LINE_LENGTH, "%s %s %lu \n", 
              translated_msg_day, 
              translated_day_name, 
              pick->day);
@@ -1738,7 +1767,7 @@ char_to_strnum(char input)
 TPM int 
 tpm_pick_toothpaste(list_node_t* head, toothpaste_pick_options_t* topts, toothpaste_pick_t* pick)
 {
-    int i = 0, k, ti;
+    unsigned int i = 0, k, ti;
     time_t total_seconds = time(NULL) + topts->delta_days * SECONDS_PER_DAY + topts->delta_hours * SECONDS_PER_HOUR;
     char line[MAX_LINE_LENGTH];
     int new_pick_flag = 0;
@@ -1797,8 +1826,14 @@ tpm_pick_toothpaste(list_node_t* head, toothpaste_pick_options_t* topts, toothpa
     pick->day = total_seconds / SECONDS_PER_DAY;
     
 
-    i = pick->day % pick->total_toothpastes;
-    
+	time_t rem = pick->day % (time_t)pick->total_toothpastes;
+
+	if (rem < 0 || (uintmax_t)rem > UINT_MAX) {
+		/* Handle error */
+	}
+
+	i = (unsigned int)rem;
+		
 
     if (topts->ptype == PICK_BY_INDEX) 
     {
@@ -1810,7 +1845,15 @@ tpm_pick_toothpaste(list_node_t* head, toothpaste_pick_options_t* topts, toothpa
     }
     else if (topts->ptype == PICK_RANDOM) 
     {
-        seed_xrp32(total_seconds);
+        
+		time_t total_seconds_rand = time(NULL);
+
+		if (total_seconds_rand == (time_t)-1) {
+			total_seconds_rand = 0;
+		}
+
+		seed_xrp32((uint64_t)total_seconds_rand);
+		
         i = rand_range(0, pick->total_toothpastes);
     }
 
