@@ -628,7 +628,7 @@ To ensure authenticity in the high end special cases this recommendations must b
 <img width="699" height="453" alt="tpm_architecture" src="https://github.com/user-attachments/assets/dac806b1-12be-4dd5-96e4-f09ab8a688eb" />
 
 ## AI
-Although invented by humans this program is written with heavy multiple AI usage (ChatGPT DeepSeek and Google AI)
+Although invented by humans this program is written with heavy multiple generative AI usage (ChatGPT DeepSeek and Google AI)
 Here is the final ChatGPT scores:
 | Category              |                                                 Rating |
 | --------------------- | -----------------------------------------------------: |
