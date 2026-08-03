@@ -299,7 +299,7 @@ tpm_init_context(toothpaste_pick_options_t* opts)
     strncpy(opts->config_file_path_final, user_home_dir_static, MAX_PATH - 1);
     strncat(opts->config_file_path_final, config_file_name, MAX_PATH - strlen(opts->config_file_path_final) - 1);
 
-    memset(opts->tpm_locale, 0, MAX_LOCALE_CODE + 1);
+    memset(opts->tpm_locale, 0, MAX_LOCALE_CODE );
 
     return TPM_NO_ERROR;
 }
@@ -1037,90 +1037,132 @@ finish(int flag, toothpaste_pick_t* pick)
     return 0;
 }
 
-static char* 
-get_user_home_dir(void) 
+static char*
+get_user_home_dir(void)
 {
-    char* home_dir = NULL;
+    char *home_dir = NULL;
 
 #if defined(_WIN32) || defined(_WIN64)
-    const char* user_profile_env = getenv("USERPROFILE");
-	const char* home_drive;
-    const char* home_path;
-	size_t len; 
-	
-    if (user_profile_env != NULL) 
-	{
-        home_dir = _strdup(user_profile_env); 
-    } 
-	else {
-		home_drive = getenv("HOMEDRIVE");
-		home_path = getenv("HOMEPATH");
-		if (home_drive != NULL && home_path != NULL) 
-		{
-			len = strlen(home_drive) + strlen(home_path) + 1;
-			home_dir = malloc(len);
-			if (home_dir != NULL) 
-			{
-				snprintf(home_dir, len, "%s%s", home_drive, home_path);
-			}
-		}
+
+    const char *user_profile = getenv("USERPROFILE");
+
+    if (user_profile != NULL)
+    {
+        home_dir = _strdup(user_profile);
     }
-#else
-    const char* home_env = getenv("HOME");
-    struct passwd *pwd;
-    uid_t uid;
-	
-    if (home_env != NULL) 
-	{
-        home_dir = strdup(home_env);
-    } 
-	else 
-	{
-        uid = getuid();
-		pwd = getpwuid(uid);
-        if (pwd != NULL) {
-            home_dir = strdup(pwd->pw_dir);
+    else
+    {
+        const char *drive = getenv("HOMEDRIVE");
+        const char *path  = getenv("HOMEPATH");
+
+        if (drive != NULL && path != NULL)
+        {
+            size_t len = strlen(drive) + strlen(path) + 1;
+
+            home_dir = malloc(len);
+
+            if (home_dir != NULL)
+            {
+                snprintf(home_dir, len, "%s%s", drive, path);
+            }
         }
     }
+
+#elif defined(__EMSCRIPTEN__)
+
+    /* Pure WASI/Emscripten has no passwd database. */
+    {
+        const char *home = getenv("HOME");
+
+        if (home != NULL)
+            home_dir = strdup(home);
+    }
+
+#else
+
+    const char *home = getenv("HOME");
+
+    if (home != NULL)
+    {
+        home_dir = strdup(home);
+    }
+    else
+    {
+        struct passwd *pwd = getpwuid(getuid());
+
+        if (pwd != NULL)
+            home_dir = strdup(pwd->pw_dir);
+    }
+
 #endif
+
     return home_dir;
 }
 
-static int 
-get_current_username(char* buffer, size_t buffer_size) 
+static int
+get_current_username(char *buffer, size_t buffer_size)
 {
-#if defined(_WIN32) || defined(_WIN64)
-    DWORD len = (DWORD)buffer_size;
-	
-    if (GetUserName(buffer, &len)) 
-	{
-        return 0; 
-    }
-    return -1; 
-#else
-    uid_t uid = geteuid();
-    struct passwd *pw = getpwuid(uid);
-	const char* user_env = getenv("LOGNAME");
-	
-    if (pw != NULL) 
-	{
-        strncpy(buffer, pw->pw_name, buffer_size-1);
-        buffer[buffer_size - 1] = '\0';
-        return 0; 
-    }
-    
+    if (buffer == NULL || buffer_size == 0)
+        return -1;
 
-    if (user_env == NULL) 
-	{
-        user_env = getenv("USER");
-    }
-    if (user_env != NULL) 
-	{
-        strncpy(buffer, user_env, buffer_size-1);
+#if defined(_WIN32) || defined(_WIN64)
+
+    DWORD len = (DWORD)buffer_size;
+
+    if (GetUserNameA(buffer, &len))
+        return 0;
+
+    return -1;
+
+#elif defined(__EMSCRIPTEN__)
+
+    {
+        const char *user = getenv("LOGNAME");
+
+        if (user == NULL)
+            user = getenv("USER");
+
+        if (user == NULL)
+            user = getenv("USERNAME");
+
+        if (user == NULL)
+            return -1;
+
+        strncpy(buffer, user, buffer_size - 1);
         buffer[buffer_size - 1] = '\0';
+
         return 0;
     }
-    return -1; 
+
+#else
+
+    {
+        struct passwd *pw = getpwuid(geteuid());
+
+        if (pw != NULL)
+        {
+            strncpy(buffer, pw->pw_name, buffer_size - 1);
+            buffer[buffer_size - 1] = '\0';
+            return 0;
+        }
+
+        {
+            const char *user = getenv("LOGNAME");
+
+            if (user == NULL)
+                user = getenv("USER");
+
+            if (user != NULL)
+            {
+                strncpy(buffer, user, buffer_size - 1);
+                buffer[buffer_size - 1] = '\0';
+                return 0;
+            }
+        }
+
+        return -1;
+    }
+
 #endif
 }
 
@@ -1353,26 +1395,37 @@ eval_total_toothpastes(toothpaste_pick_t* pick,toothpaste_pick_options_t* topts)
 
 
 static int
-eval_username(toothpaste_pick_t* pick, toothpaste_pick_options_t* topts)
+eval_username(toothpaste_pick_t *pick, toothpaste_pick_options_t *topts)
 {
-    if (topts == NULL || pick == NULL) return 1;
+    char username[UNLEN + 1] = {0};
+    const char *source = NULL;
 
-    char username[UNLEN + 1];
-    memset(username, 0, sizeof(username));
+    if (pick == NULL || topts == NULL)
+        return 1;
 
-    pick->who = malloc(UNLEN + 1);
-    if (pick->who == NULL) return 1;
-    memset(pick->who, 0, UNLEN + 1);
-
-    if (get_current_username(username, sizeof(username)) != 0) {
-        strncpy(pick->who, username, UNLEN);
-    } else if (topts->username != NULL) {
-        strncpy(pick->who, topts->username, UNLEN);
-    } else {
-        strncpy(pick->who, user_strings[MSG_ANON], UNLEN);
+    /* 1. Config/command-line username takes precedence */
+    if (topts->username != NULL && topts->username[0] != '\0')
+    {
+        source = topts->username;
+    }
+    /* 2. Otherwise use the current OS username */
+    else if (get_current_username(username, sizeof(username)) == 0)
+    {
+        source = username;
+    }
+    /* 3. Fallback */
+    else
+    {
+        source = user_strings[MSG_ANON];
     }
 
+    pick->who = malloc(UNLEN + 1);
+    if (pick->who == NULL)
+        return 1;
+
+    strncpy(pick->who, source, UNLEN);
     pick->who[UNLEN] = '\0';
+
     return 0;
 }
 
@@ -1691,29 +1744,43 @@ str_total_picks(toothpaste_pick_t* pick, toothpaste_pick_options_t* topts)
 static char*
 str_last_pick_time(toothpaste_pick_t* pick, toothpaste_pick_options_t* topts)
 {
-    if (topts == NULL || pick == NULL) return NULL;		
+    if (topts == NULL || pick == NULL)
+        return NULL;
 
-    char* line = malloc(MAX_TOOTHPASTE_LINE);
-    if (line == NULL) return NULL; 
-    
-    memset(line, 0, MAX_TOOTHPASTE_LINE);			
- 
-    const char* translated_label = _(user_strings[MSG_LAST_PICK_TIME]);
+    char *line = malloc(MAX_TOOTHPASTE_LINE);
+    if (line == NULL)
+        return NULL;
 
-    char *raw_time = ctime(&pick->stats.last_pick_time);
-    char clean_time[26] = {0}; 
-    
-    if (raw_time != NULL) {
-        snprintf(clean_time, sizeof(clean_time), "%s", raw_time);
-       
-        size_t len = strlen(clean_time);
-        if (len > 0 && clean_time[len - 1] == '\n') {
-            clean_time[len - 1] = '\0';
+    memset(line, 0, MAX_TOOTHPASTE_LINE);
+
+    const char *translated_label = _(user_strings[MSG_LAST_PICK_TIME]);
+
+    char time_string[64] = "";
+
+    {
+        struct tm tm_buf;
+
+#if defined(_WIN32) || defined(_WIN64)
+        if (localtime_s(&tm_buf, &pick->stats.last_pick_time) == 0)
+#elif defined(__EMSCRIPTEN__) || defined(__wasi__)
+        if (localtime_r(&pick->stats.last_pick_time, &tm_buf) != NULL)
+#else
+        if (localtime_r(&pick->stats.last_pick_time, &tm_buf) != NULL)
+#endif
+        {
+            strftime(time_string,
+                     sizeof(time_string),
+                     "%Y-%m-%d %H:%M:%S",
+                     &tm_buf);
         }
     }
 
-    snprintf(line, MAX_TOOTHPASTE_LINE, "%s %s\n", translated_label, clean_time);
-		
+    snprintf(line,
+             MAX_TOOTHPASTE_LINE,
+             "%s %s\n",
+             translated_label,
+             time_string);
+
     return line;
 }
 
@@ -1894,12 +1961,14 @@ tpm_pick_toothpaste(list_node_t* head, toothpaste_pick_options_t* topts, toothpa
     int dentist_flag = 0;
     int toothbrush_flag = 0;
     size_t brand_len;
-    char* toothpaste_picking_message[TOTAL_OUTPUT_STRINGS];
+    char* toothpaste_picking_message[TOTAL_OUTPUT_STRINGS] = { NULL };
 	char current_char;
 	int str_num = 0;
 	unsigned int interval;
     size_t current_len;
 	size_t remaining_space;
+	
+	int result = TPM_NO_ERROR;
 	
     pick->opts = topts;
     memset(line, 0, MAX_LINE_LENGTH);
@@ -1913,7 +1982,8 @@ tpm_pick_toothpaste(list_node_t* head, toothpaste_pick_options_t* topts, toothpa
     pick->where = head;
 	
     if (!pick->message || !pick->JSON || !pick->CSV) {
-
+		result = MALLOC_FAILED;
+		goto cleanup;
         free(pick->message); free(pick->JSON); free(pick->CSV);
         return MALLOC_FAILED; 
     }
@@ -1922,13 +1992,24 @@ tpm_pick_toothpaste(list_node_t* head, toothpaste_pick_options_t* topts, toothpa
     memset(pick->message, 0, OUTPUT_BLOCK_SIZE);
     memset(pick->CSV, 0, OUTPUT_BLOCK_SIZE);    
     
-    eval_username(pick, topts);
-    eval_total_toothpastes(pick, topts);
+	if (eval_username(pick, topts) != 0)
+	{
+		result = MALLOC_FAILED;
+		goto cleanup;
+	}
+
+	if (eval_total_toothpastes(pick, topts) != 0)
+	{
+		result = NO_TOOTHPASTES_LOADED;
+		goto cleanup;
+	}
     
 
     if (pick->total_toothpastes <= 0) {
         snprintf(pick->message, OUTPUT_BLOCK_SIZE,"%s", _(error_strings[NO_TOOTHPASTES_AVAILBLE]));
-        return NO_TOOTHPASTES_AVAILBLE; 
+        result = NO_TOOTHPASTES_AVAILBLE;
+		goto cleanup;
+		return NO_TOOTHPASTES_AVAILBLE; 
     }
 
     read_counters(&pick->stats, pick->opts->fake_stats,pick->opts);
@@ -1978,6 +2059,8 @@ tpm_pick_toothpaste(list_node_t* head, toothpaste_pick_options_t* topts, toothpa
 
 		if (value >= (uint64_t)pick->total_toothpastes) {
 			/* Should never happen if rand_range() is correct */
+			result=TPM_RARE_ERROR;
+			goto cleanup;
 			return TPM_RARE_ERROR;   /* or handle appropriately */
 		}
 
@@ -2043,7 +2126,8 @@ tpm_pick_toothpaste(list_node_t* head, toothpaste_pick_options_t* topts, toothpa
     rem = pick->day % (time_t)TOTAL_DAYS_OF_WEEK;
 
 	if (rem < 0 || rem > INT_MAX) {
-	
+		result = TPM_RARE_ERROR;
+		goto cleanup;
 		return TPM_RARE_ERROR;   /* or other appropriate action */
 	}
 
@@ -2229,7 +2313,36 @@ tpm_pick_toothpaste(list_node_t* head, toothpaste_pick_options_t* topts, toothpa
 	{
 		list_available_toothpastes(pick);
 	}	
-	return TPM_NO_ERROR;
+	result = TPM_NO_ERROR;
+	goto cleanup;
+	
+	cleanup:
+
+	for (ti = 0; ti < TOTAL_OUTPUT_STRINGS; ++ti)
+	{
+		free(toothpaste_picking_message[ti]);
+		toothpaste_picking_message[ti] = NULL;
+	}
+
+	if (result != TPM_NO_ERROR)
+	{
+		free(pick->message);
+		pick->message = NULL;
+
+		free(pick->JSON);
+		pick->JSON = NULL;
+
+		free(pick->CSV);
+		pick->CSV = NULL;
+
+		free(pick->who);
+		pick->who = NULL;
+
+		free(pick->waste_report);
+		pick->waste_report = NULL;
+	}
+
+return result;
 }
 
 static void 
@@ -2366,13 +2479,16 @@ read_config(const char *src, toothpaste_pick_options_t *opts)
         goto cleanup;
     }
 
-    value = cfg_get_rec(cfg, "USERNAME", &depth);
-    if (value != NULL)
-    {
-        strncpy(opts->username, value, UNLEN - 1);
-        opts->username[UNLEN - 1] = '\0';
-    }
+	value = cfg_get_rec(cfg, "USERNAME", &depth);
 
+	if (value != NULL && value[0] != '\0')
+	{
+		free(opts->username);
+		opts->username = strdup(value);
+
+		if (opts->username == NULL)
+			return MALLOC_FAILED;
+	}
     value = cfg_get_rec(cfg, "DENTAL_FORMULA", &depth);
     if (value != NULL)
         opts->formula = parse_dental_formula(value);

@@ -65,19 +65,30 @@ yendorium@gmail.com before trying the whole pull request thing out*/
 #include "cfg_parse.h"
 
 #if defined(_WIN32) || defined(_WIN64)
+
 #include <windows.h>
 #include <winbase.h>
 #include <shlobj.h>
 #include <direct.h>
 #include <Lmcons.h>
+
 #define STATIC_GETOPT
-#include "win\getopt.h"
+#include "win/getopt.h"
+
 #pragma comment(lib, "advapi32.lib")
+
+#elif defined(__wasi__)
+
+#include <unistd.h>
+#include <getopt.h>
+
 #else
+
 #include <unistd.h>
 #include <getopt.h>
 #include <sys/types.h>
 #include <pwd.h>
+
 #endif
 
 #define TPM
