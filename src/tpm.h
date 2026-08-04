@@ -36,7 +36,7 @@ yendorium@gmail.com before trying the whole pull request thing out*/
 
 # include <locale.h>
 
-#if defined(__EMSCRIPTEN__)
+#if defined(__EMSCRIPTEN__) || defined(__wasi__)
 # undef ENABLE_NLS
 # define ENABLE_NLS 0
 #else

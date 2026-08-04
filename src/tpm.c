@@ -485,7 +485,6 @@ tpm_load_list_from_file(const char *filename,
     char long_line[4 * MAX_LINE_LENGTH];
 
     file = fopen(filename, "r");
-
     if (file == NULL)
     {
         perror(_(error_strings[TOOTHPASTES_FAILED]));
@@ -1082,7 +1081,7 @@ get_user_home_dir(void)
         }
     }
 
-#elif defined(__EMSCRIPTEN__)
+#elif defined(__EMSCRIPTEN__) || defined(__wasi__)
 
     /* Pure WASI/Emscripten has no passwd database. */
     {
@@ -1128,7 +1127,7 @@ get_current_username(char *buffer, size_t buffer_size)
 
     return -1;
 
-#elif defined(__EMSCRIPTEN__)
+#elif defined(__EMSCRIPTEN__) || defined(__wasi__)
 
     {
         const char *user = getenv("LOGNAME");
@@ -2551,14 +2550,13 @@ read_config(const char *src, toothpaste_pick_options_t *opts)
     value = cfg_get_rec(cfg, "VERBOSE", &depth);
     if (value != NULL)
         opts->verbose = atoi(value);
-
+#if !defined(__EMSCRIPTEN__) && !defined(__wasi__)
     value = cfg_get_rec(cfg, "TOOTHPASTES", &depth);
     if (value != NULL)
     {
         strncpy(opts->toothpastes_file_path_final, value, MAX_PATH - 1);
         opts->toothpastes_file_path_final[MAX_PATH - 1] = '\0';
     }
-
     value = cfg_get_rec(cfg, "LAST_PICK", &depth);
     if (value != NULL)
     {
@@ -2572,6 +2570,7 @@ read_config(const char *src, toothpaste_pick_options_t *opts)
         strncpy(opts->stats_file_path_final, value, MAX_PATH - 1);
         opts->stats_file_path_final[MAX_PATH - 1] = '\0';
     }
+#endif	
 
     value = cfg_get_rec(cfg, "LIST_TOOTHPASTES", &depth);
     if (value != NULL)

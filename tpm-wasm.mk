@@ -1,36 +1,56 @@
-# TPM WASM build Makefile
-CC=emcc
-CP=cp -f
-MKDIR=mkdir -p
-RM=rm -f
+# --- WASI SDK Configuration ---
+# Uses the environment variable if set, otherwise defaults to the standard install path
+WASI_SDK_PATH ?= /opt/wasi-sdk
 
-CFLAGS=-Wall -Os -sSTANDALONE_WASM=1 -sWASM_BIGINT -DHAVE_MAIN --minify=0 -sMODULARIZE=0
-CURRENT_DIR=$(CURDIR)
-SRC=src
-SOURCES=    $(SRC)/tpm.c \
-			$(SRC)/prng64_xrp32.c \
-			$(SRC)/cfg_parse.c
-			
-OBJECTS=    tpm.o \
-			prng64_xrp32.o \
-			cfg_parse.o
+CC      = $(WASI_SDK_PATH)/bin/clang
+AR      = $(WASI_SDK_PATH)/bin/llvm-ar
+RM      = rm -f
+CP      = cp -f
+MKDIR   = mkdir -p
+
+# Флаги компиляции (исправлен таргет)
+CFLAGS  = \
+    --sysroot=$(WASI_SDK_PATH)/share/wasi-sysroot \
+    --target=wasm32-wasip1 \
+    -O2 \
+    -Wall \
+    -Wextra \
+    -DHAVE_MAIN
+
+# Флаги линковки (ОБЯЗАТЕЛЬНО добавлен --sysroot и изменен таргет)
+LDFLAGS = \
+    --sysroot=$(WASI_SDK_PATH)/share/wasi-sysroot \
+    --target=wasm32-wasip1
+
+SRC = src
+
+SOURCES = \
+    $(SRC)/tpm.c \
+    $(SRC)/prng64_xrp32.c \
+    $(SRC)/cfg_parse.c
+
+OBJECTS = \
+    tpm.o \
+    prng64_xrp32.o \
+    cfg_parse.o
 
 .PHONY: all clean dist
 
 all: tpm.wasm
 
 tpm.wasm: $(OBJECTS)
-	$(CC) $(CFLAGS) $(OBJECTS) -o tpm.wasm
+	$(CC) $(LDFLAGS) $(OBJECTS) -o $@
 
 %.o: $(SRC)/%.c
 	$(CC) $(CFLAGS) -c $< -o $@
-	
-clean:	
-	$(RM) tpm.wasm $(OBJECTS)
-	$(RM) -r tpm-wasm-bin-amd64
-	$(RM) tpm-wasm-bin-amd64.tar.gz
+
+clean:
+	$(RM) $(OBJECTS) tpm.wasm
+	$(RM) -r tpm-wasm-bin tpm-wasm-bin.tar.gz
 
 dist: all
-	$(MKDIR) tpm-wasm-bin-amd64
-	cp tpm.conf.sample toothpastes.sample toothpastes-enhanced.sample tpm.wasm README.md LICENSE tpm-wasm-bin-amd64
-	tar -czf tpm-wasm-bin-amd64.tar.gz tpm-wasm-bin-amd64
+	$(MKDIR) tpm-wasm-bin
+	$(CP) tpm.wasm tpm-wasm-bin
+	$(CP) README.md LICENSE toothpastes.sample tpm.conf.sample tpm-wasm-bin 2>/dev/null || true
+	tar -czf tpm-wasm-bin.tar.gz tpm-wasm-bin
+
