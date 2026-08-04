@@ -280,10 +280,24 @@ tpm_init_context(toothpaste_pick_options_t* opts)
     }
 
     /* Append TPM directory */
-#if defined(_WIN32) || defined(_WIN64)
-    strncat(user_home_dir_static, "\\tpm\\", MAX_PATH - strlen(user_home_dir_static) - 1);
+#if defined(__EMSCRIPTEN__) || defined(__wasi__)
+    /* Use the current preopened directory */
+    user_home_dir_static[0] = '.';
+    user_home_dir_static[1] = '/';
+    user_home_dir_static[2] = '\0';
+
+#elif defined(_WIN32) || defined(_WIN64)
+
+    strncat(user_home_dir_static,
+            "\\tpm\\",
+            MAX_PATH - strlen(user_home_dir_static) - 1);
+
 #else
-    strncat(user_home_dir_static, "/tpm/", MAX_PATH - strlen(user_home_dir_static) - 1);
+
+    strncat(user_home_dir_static,
+            "/tpm/",
+            MAX_PATH - strlen(user_home_dir_static) - 1);
+
 #endif
 
     /* Build full paths */
