@@ -329,7 +329,7 @@ static toothpaste_data_t find_item_with_max_rating(list_node_t* where);
 static toothpaste_data_t find_item_with_min_rating(list_node_t* where);
 static void free_list(list_node_t* head);
 static int reset_counters(toothpaste_pick_options_t* opts);
-static int set_counters(void* optarg,toothpaste_pick_options_t* opts);
+static int set_counters(void* opt_arg,toothpaste_pick_options_t* opts);
 static size_t read_counters(toothpaste_pick_stats_t* stats,int fake_stats,toothpaste_pick_options_t* opts);
 static int list_available_toothpastes(toothpaste_pick_t* pick);
 static int write_counters(toothpaste_pick_stats_t stats,int fake_stats,toothpaste_pick_options_t* opts);

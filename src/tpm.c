@@ -890,7 +890,7 @@ reset_counters(toothpaste_pick_options_t* opts)
 
 #define INVALID_ARGUMENT 1
 static int 
-set_counters(void* optarg,toothpaste_pick_options_t* opts) 
+set_counters(void* opt_arg,toothpaste_pick_options_t* opts) 
 {
 	FILE* file_ptr;
 	unsigned int zero=0;
@@ -901,9 +901,9 @@ set_counters(void* optarg,toothpaste_pick_options_t* opts)
 	unsigned long value;
 
 	errno = 0;
-	value = strtoul(optarg, &end, 10);
+	value = strtoul(opt_arg, &end, 10);
 
-	if (errno != 0 || end == optarg || *end != '\0' ||
+	if (errno != 0 || end == opt_arg || *end != '\0' ||
 		value > UINT_MAX) {
 		return INVALID_ARGUMENT; 
 	}
@@ -2548,7 +2548,7 @@ read_config(const char *src, toothpaste_pick_options_t *opts)
     {
         int tmp = atoi(value);
         if (tmp >= 0 && tmp < TOTAL_PICK_TYPE_STRINGS)
-            opts->ptype = tmp;
+            opts->ptype = (pick_type_t) tmp;
     }
 
     value = cfg_get_rec(cfg, "VERBOSE", &depth);
@@ -2761,7 +2761,7 @@ do_not_test_me(int argc, char* argv[])
 			break;
 			case 'p':
 				if (atoi(optarg)>=0 && atoi(optarg)<TOTAL_PICK_TYPE_STRINGS)
-				topts.ptype=atoi(optarg);
+				topts.ptype=(pick_type_t) atoi(optarg);
 			break; 	
 			case 'i': {
 				topts.ptype=PICK_BY_INDEX;
