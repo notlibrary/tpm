@@ -1,3 +1,4 @@
+#TPM manual WASM release build Makefile
 # --- WASI SDK Configuration ---
 # Uses the environment variable if set, otherwise defaults to the standard install path
 WASI_SDK_PATH ?= /opt/wasi-sdk

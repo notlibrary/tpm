@@ -1,4 +1,4 @@
-#TPM manual Ubuntu Makefile
+#TPM manual Ubuntu debug build Makefile
 CC=gcc
 CP=cp -f
 MKDIR=mkdir -p

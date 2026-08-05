@@ -1,4 +1,4 @@
-#TPM manual Ubuntu Makefile
+#TPM manual release build Ubuntu Makefile
 CC=gcc
 CP=cp -f
 MKDIR=mkdir -p

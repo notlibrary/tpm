@@ -1,4 +1,4 @@
-# TPM Windows manual build (Makefile.msc)
+# TPM Windows manual debug build (Makefile-debug.msc)
 CC = cl.exe
 LINKER = link.exe
 RC = rc.exe
