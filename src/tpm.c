@@ -129,7 +129,8 @@ init_tpm_console(void)
     
     freopen("CONOUT$", "w", stdout);
     freopen("CONIN$", "r", stdin);
-
+#elif defined(__EMSCRIPTEN__) || defined(__wasi__)
+	setvbuf(stdout, NULL, _IONBF, 0);
 #endif    
     fflush(stdout);
 
@@ -1043,7 +1044,10 @@ finish(int flag, toothpaste_pick_t* pick)
             fflush(stdin);
             getchar(); 
         }
-#else
+#elif defined(__EMSCRIPTEN__) || defined(__wasi__)
+		fflush(stdout);
+		stop_system();
+#else	
         stop_system();
 #endif
     }
