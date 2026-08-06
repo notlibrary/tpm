@@ -575,7 +575,7 @@ Judge for yourself if this is a good deal or not and why
 - It serves the basic crucial user need independently OS type SQL support just does not matter
 - It helps utilize the 5$ VPSes and old computers including SBCs by running on them useful payload
 - It has perfectly fine sane regular ordinary usual predictable behavior(almost pedantic) that makes perfect sense 
-- And finally it's the tiny size less than 44KB with `-Os` flag almost 1.5 times smaller than LMDB (Windows .exe however has 200KB builtin .ico)
+- And finally it's the tiny size less than 48KB with `-Os` flag almost 1.(3) times smaller than LMDB (Windows .exe however has 200KB builtin .ico)
 
 OK program is good users are bad what now?
 You are getting it just pick again you have ~30000 tries per lifetime
