@@ -245,7 +245,9 @@ Also sometimes is possible to add 5th term toothpaste grams per nurdle but this 
 
 `-C --csv` output and appends the CSV with last pick info instead toothpaste picking message
 
-`-v --version` show the toothpaste picking manager version
+`-v` show the toothpaste picking manager version short
+
+`--version` show the toothpaste picking manager version full
 
 `-x --random` perform a random toothpaste pick
 
@@ -471,7 +473,7 @@ A few shell one-liners demonstrating tpm usage
 	tpm -qU
 	echo hi | tpm | head -n 4 | tail -n 1
 	tpm -C >> picks.csv
-	tpm -v | grep Compiler
+	tpm --version | grep Compiler
 	man tpm
     echo | ./tpm --fake_stats -c tpm.conf toothpastes
 	wasmtime --dir=. tpm.wasm
