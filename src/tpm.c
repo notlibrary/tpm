@@ -1207,6 +1207,14 @@ version(void)
 	return;
 }
 
+static void
+version_short(void)
+{
+	printf("%s %u.%u.%u \n",TPM_STRING,TPM_VERSION_MAJOR,TPM_VERSION_MINOR,TPM_VERSION_PATCH);
+	exit(EXIT_SUCCESS);
+	return;
+}
+
 TPM int 
 tpm_get_toothpaste_picking_message(toothpaste_pick_t* pick, char** dest)
 {
@@ -2677,7 +2685,7 @@ do_not_test_me(int argc, char* argv[])
     {"weight",  no_argument,       0, 'w'},
     {"json",  no_argument, 0, 'j'},
     {"csv",  no_argument, 0, 'C'},
-    {"version", no_argument,       0, 'v'},
+    {"version", no_argument,       0, 'V'},
     {"random", no_argument,       0, 'x'},
     {"quiet", no_argument,       0, 'q'},
     {"list", no_argument,       0, 'l'},
@@ -2721,8 +2729,11 @@ do_not_test_me(int argc, char* argv[])
 			case 'C':
 			topts.csv_flag=1;
 			break;
-			case 'v':
+			case 'V':
 			version();
+			break;
+			case 'v':
+			version_short();
 			break;
 			case 'x':
 			topts.ptype = PICK_RANDOM;

@@ -338,6 +338,7 @@ static int finish(int flag,toothpaste_pick_t* pick);
 static char* get_user_home_dir(void);
 static int get_current_username(char* buffer, size_t buffer_size);
 static void version(void);
+static void version_short(void);
 static const char* cfg_get_rec(const struct cfg_struct* cfg, const char* key, int* depth);
 static int read_config(const char* src,toothpaste_pick_options_t* opts);
 static dental_formula_t parse_dental_formula(const char* formula_str);
