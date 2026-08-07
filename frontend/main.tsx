@@ -60,6 +60,7 @@ interface TPMConfig {
 
 // Binary pickstats struct (C representation)
 interface ToothpastePickStats {
+  first_pick_time: number;
   last_pick_time: number;  // time_t
   total_picks: number;     // unsigned int
 }
@@ -160,9 +161,10 @@ const default_answers: string[] = [
 
 // Generate binary pickstats file
 function generateBinaryPickStats(stats: ToothpastePickStats): Uint8Array {
-  const buffer = new ArrayBuffer(12);
+  const buffer = new ArrayBuffer(20);
   const view = new DataView(buffer);
   
+  view.setBigUint64(0, BigInt(stats.first_pick_time), true);
   view.setBigUint64(0, BigInt(stats.last_pick_time), true);
   view.setUint32(8, stats.total_picks, true);
   
@@ -366,7 +368,7 @@ function generateTPMConfig(answers: Record<string, string>, username: string): T
   const timezone = parseInt(answers[questions[30]]) || 0;
   const deltaDays = parseInt(answers[questions[31]]) || 0;
   const meme = answers[questions[17]] || "MOAR";
-  const template = answers[questions[32]] || "guwntdapobiTfWPlUsmI";
+  const template = answers[questions[32]] || "guwntdapobiTfWPlcUsmI";
   const locale = answers[questions[33]] || "en_US.UTF-8";
 
   return {
@@ -540,6 +542,7 @@ export default function App() {
         
         const pickStats: ToothpastePickStats = {
           last_pick_time: Math.floor(Date.now() / 1000),
+		  first_pick_time: Math.floor(Date.now() / 1000),
           total_picks: 0
         };
         const binaryData = generateBinaryPickStats(pickStats);
