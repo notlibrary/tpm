@@ -244,53 +244,57 @@ msgid "Last pick time:"
 msgstr ""
 
 #: tpm.c:95
-msgid "Good"
+msgid "Brushing coverage:"
 msgstr ""
 
 #: tpm.c:96
-msgid "Press Enter to continue..."
+msgid "Good"
 msgstr ""
 
 #: tpm.c:97
-msgid "Compiler:"
+msgid "Press Enter to continue..."
 msgstr ""
 
 #: tpm.c:98
-msgid "Compiled on:"
+msgid "Compiler:"
 msgstr ""
 
 #: tpm.c:99
-msgid "Anonymous"
+msgid "Compiled on:"
 msgstr ""
 
 #: tpm.c:100
-msgid "Output pick to file "
+msgid "Anonymous"
 msgstr ""
 
 #: tpm.c:101
-msgid "Brand None"
+msgid "Output pick to file "
 msgstr ""
 
 #: tpm.c:102
-msgid "Compiler unknown"
+msgid "Brand None"
 msgstr ""
 
 #: tpm.c:103
-msgid "Usage:"
+msgid "Compiler unknown"
 msgstr ""
 
 #: tpm.c:104
-msgid "BUILTIN TOOTHPASTE 1"
+msgid "Usage:"
 msgstr ""
 
 #: tpm.c:105
-msgid "BUILTIN TOOTHPASTE 2"
+msgid "BUILTIN TOOTHPASTE 1"
 msgstr ""
 
 #: tpm.c:106
-msgid "BUILTIN TOOTHPASTE 3"
+msgid "BUILTIN TOOTHPASTE 2"
 msgstr ""
 
 #: tpm.c:107
+msgid "BUILTIN TOOTHPASTE 3"
+msgstr ""
+
+#: tpm.c:108
 msgid "Press any key to continue . . ."
 msgstr ""

@@ -2071,7 +2071,39 @@ tpm_pick_toothpaste(list_node_t* head, toothpaste_pick_options_t* topts, toothpa
     }
 
     read_counters(&pick->stats, pick->opts->fake_stats,pick->opts);
-	pick->coverage_percents=(unsigned int)((TOTAL_PERCENTS*pick->stats.total_picks)/((pick->stats.last_pick_time-pick->stats.first_pick_time)/(SECONDS_PER_DAY)));
+
+
+printf("total_picks = %u\n", pick->stats.total_picks);
+printf("first_pick_time = %jd\n", (intmax_t)pick->stats.first_pick_time);
+printf("last_pick_time = %jd\n", (intmax_t)pick->stats.last_pick_time);
+printf("brush_times_per_day = %u\n",
+
+       pick->opts->formula.brush_times_per_day);
+printf("sizeof(time_t) = %zu\n", sizeof(time_t));
+
+	time_t elapsed = pick->stats.last_pick_time - pick->stats.first_pick_time;
+
+	if (elapsed < 0)
+		elapsed = 0;
+
+	/* Round up partial days, minimum 1 day */
+	unsigned int days =
+		(unsigned int)((elapsed + SECONDS_PER_DAY - 1) / SECONDS_PER_DAY);
+
+	if (days == 0)
+		days = 1;
+
+	/* Calculate coverage percentage */
+	pick->coverage_percents =
+		(unsigned int)(
+			((uint64_t)TOTAL_PERCENTS * (uint64_t)pick->stats.total_picks) /
+			((uint64_t)days * (uint64_t)pick->opts->formula.brush_times_per_day)
+    );
+
+/* Optional: clamp to 100% */
+if (pick->coverage_percents > TOTAL_PERCENTS)
+    pick->coverage_percents = TOTAL_PERCENTS;
+
 	pick->waste_report = report_wasted_tubes(head, &pick->stats);
     pick->toothpaste_pick_index = pick->stats.total_picks;
     pick->when = total_seconds;

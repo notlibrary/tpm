@@ -245,6 +245,10 @@ msgid "Last pick time:"
 msgstr "Ora dell'ultima selezione:"
 
 #: tpm.c:95
+msgid "Brushing coverage:"
+msgstr "Copertura dello spazzolamento:"
+
+#: tpm.c:95
 msgid "Good"
 msgstr "Buono"
 

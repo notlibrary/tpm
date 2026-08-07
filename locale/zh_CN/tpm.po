@@ -245,6 +245,10 @@ msgid "Last pick time:"
 msgstr "上次选择时间："
 
 #: tpm.c:95
+msgid "Brushing coverage:"
+msgstr "刷牙覆盖率："
+
+#: tpm.c:95
 msgid "Good"
 msgstr "良好"
 
