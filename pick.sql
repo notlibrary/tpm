@@ -38,6 +38,7 @@ CREATE TABLE IF NOT EXISTS picks (
 	 day_counter INTEGER,
 	 total_picks INTEGER,
 	 last_pick_time INTEGER,
+	 coverage_percent INTEGER,
 	 wasted_tubes_report TEXT,
 	 toothpastes_file_path TEXT,
 	 meme_payload TEXT

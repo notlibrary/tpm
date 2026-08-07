@@ -124,22 +124,22 @@ memcpy(swap_temp,&y,sizeof(x)); \
 memcpy(&y,&x,       sizeof(x)); \
 memcpy(&x,swap_temp,sizeof(x)); \
 } while(0)
-#define LINE_FORMAT_CSV "%u,%jd,%s,%s,%s"
+#define LINE_FORMAT_CSV "%u,%jd,%u,%s,%s,%s"
 
 #define TOTAL_TOOTHPASTE_TYPES 5
 #define TOTAL_ERROR_MESSAGES 12
-#define TOTAL_USER_MESSAGES 34
+#define TOTAL_USER_MESSAGES 35
 #define TOTAL_USER_ARMOUR 10
 
 #define BRUSHES_PER_LIFETIME 30000
 #define GRAMS_PER_NURDLE 2
 #define MAX_REPORT_TERM 10
-#define TOTAL_OUTPUT_STRINGS 20
-#define DEFAULT_OUTPUT_TEMPLATE "guwntdapobiTfWPlUsmI"
+#define TOTAL_OUTPUT_STRINGS 21
+#define DEFAULT_OUTPUT_TEMPLATE "guwntdapobiTfWPlcUsmI"
 #define MAX_TOOTHBRUSH_COLOR 32
 #define ENHANCED_MODE_COMAS 7
 #define MAX_LOCALE_CODE 16
-
+#define TOTAL_PERCENTS 100
 
 typedef enum user_msg_t
 {
@@ -164,6 +164,7 @@ typedef enum user_msg_t
 	MSG_SOURCE,
 	MSG_MEME,
 	MSG_LAST_PICK_TIME,
+	MSG_COVERAGE,
 	MSG_GOOD,
 	MSG_PAUSE,
 	MSG_COMPILER,
@@ -221,6 +222,7 @@ typedef enum toothpaste_type_t
 
 typedef struct toothpaste_pick_stats_t
 {
+	time_t first_pick_time;
 	time_t last_pick_time;
 	unsigned int total_picks;
 }toothpaste_pick_stats_t;
@@ -295,6 +297,7 @@ typedef struct toothpaste_pick_t
 	unsigned int total_toothpastes;	
 	time_t when;
 	toothpaste_pick_stats_t stats;
+	unsigned int coverage_percents;
 	unsigned int toothpaste_pick_index;
 	char* message;
 	char* JSON;
@@ -362,6 +365,7 @@ static char* str_dental_formula(toothpaste_pick_t* pick,toothpaste_pick_options_
 static char* str_day_of_the_week(toothpaste_pick_t* pick,toothpaste_pick_options_t* topts);
 static char* str_total_picks(toothpaste_pick_t* pick,toothpaste_pick_options_t* topts);
 static char* str_last_pick_time(toothpaste_pick_t* pick,toothpaste_pick_options_t* topts);
+static char* str_brushing_coverage(toothpaste_pick_t* pick,toothpaste_pick_options_t* topts);
 static char* str_tubes_wasted(toothpaste_pick_t* pick,toothpaste_pick_options_t* topts);
 static char* str_source(toothpaste_pick_t* pick,toothpaste_pick_options_t* topts);
 static char* str_meme(toothpaste_pick_t* pick,toothpaste_pick_options_t* topts);

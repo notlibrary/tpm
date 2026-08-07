@@ -134,6 +134,7 @@ Dental Formula: 1-10-2-2
 Day: Sunday 20583
 Total picks: 75
 Last pick time: Sun May 10 09:00:02 2026
+Brushing coverage: 100%
 Tubes wasted: 0+0+0=0
 Source: C:\Users\Serenity\tpm\toothpastes
 Meme: https://www.youtube.com/watch?v=dQw4w9WgXcQ
@@ -207,8 +208,8 @@ still better than being stereotypical rotten teeth open source bum
 There is also third output mode `CSV` for those who want to save pick info
 When active it auto appends current pick info to giant CSV with all picks collection `picks.CSV`
 This is purely optional
-The CSV record format for CSV mode follows default mode total 23 attributes:
-`#username, pick_type, new_pick_flag,new_toothbrush_flag,new_dentist_visit, toothpaste_brand, tube_mass_g, toothpaste_rating,toothbrush_color, toothbrush_brand, toothbrush_length_cm, toothbrush_hardness, toothpaste_index, total_toothpastes, toothpaste_type, dental_formula, day_of_the_week, day_counter,total_picks,last_pick_time,wasted_tubes_report,toothpastes_file_path,meme_payload `
+The CSV record format for CSV mode follows default mode total 24 attributes:
+`#username, pick_type, new_pick_flag,new_toothbrush_flag,new_dentist_visit, toothpaste_brand, tube_mass_g, toothpaste_rating,toothbrush_color, toothbrush_brand, toothbrush_length_cm, toothbrush_hardness, toothpaste_index, total_toothpastes, toothpaste_type, dental_formula, day_of_the_week, day_counter,total_picks,last_pick_time,coverage_percent,wasted_tubes_report,toothpastes_file_path,meme_payload `
 
 Unfortunately brushing teeth over the Internets is full of bs anyway you need someone who mastered the matter to finally cut it off 
 
@@ -286,6 +287,8 @@ Also sometimes is possible to add 5th term toothpaste grams per nurdle but this 
 `-T --template [template]` set output template
 
 `-L --locale` set output locale
+
+`-I --first_pick_time [days_ago]` set first pick time in days ago current time
 
 `toothpastes_path` path to the toothpastes CSV file
 
@@ -367,7 +370,7 @@ UPPER_BRANDS=0
 TIMEZONE=0
 DELTA_DAYS=0
 MEME=42
-TEMPLATE="guwntdapobiTfWPlUsmI"
+TEMPLATE="guwntdapobiTfWPlcUsmI"
 LOCALE="en_US.UTF-8"
 ```
 
@@ -422,7 +425,7 @@ UPPERCASE the brand string to ensure it's seen first through running down termin
 ## Templater output table
 Templater is used to control the TPM output
 
-`guwntdapobiTfWPlUsmI` is a standard default TPM output template
+`guwntdapobiTfWPlcUsmI` is a standard default TPM output template
 
 `g` good time of the day
 
@@ -455,6 +458,8 @@ Templater is used to control the TPM output
 `P` total picks
 
 `l` last pick time
+
+`c` brushing coverage percent
 
 `U` tubes wasted
 

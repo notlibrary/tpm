@@ -95,6 +95,7 @@ static const char* user_strings[TOTAL_USER_MESSAGES]={
 	gettext_noop("Source:"),
 	gettext_noop("Meme:"),
 	gettext_noop("Last pick time:"),
+	gettext_noop("Brushing coverage:"),
 	gettext_noop("Good"),
 	gettext_noop("Press Enter to continue..."),
 	gettext_noop("Compiler:"),
@@ -934,6 +935,7 @@ read_counters(toothpaste_pick_stats_t* stats,int fake_stats,toothpaste_pick_opti
 	
 	stats->total_picks=0;
 	stats->last_pick_time=0;
+	stats->first_pick_time=0;
 	if (!fake_stats)
 	{	
 		file_ptr = fopen(opts->stats_file_path_final, "rb");
@@ -945,6 +947,7 @@ read_counters(toothpaste_pick_stats_t* stats,int fake_stats,toothpaste_pick_opti
 
 		nbytes=fread(&(stats->total_picks), sizeof(unsigned int), 1, file_ptr);
 		nbytes+=fread(&(stats->last_pick_time), sizeof(time_t), 1, file_ptr);
+		nbytes+=fread(&(stats->first_pick_time), sizeof(time_t), 1, file_ptr);
 	   
 		fclose(file_ptr);	
 	}
@@ -963,6 +966,8 @@ read_counters(toothpaste_pick_stats_t* stats,int fake_stats,toothpaste_pick_opti
 		
 		
 		stats->last_pick_time=time(NULL)-SECONDS_PER_DAY+opts->delta_hours*SECONDS_PER_HOUR;
+		
+		stats->first_pick_time = stats->last_pick_time;
 	}
 	return nbytes;
 }
@@ -988,6 +993,7 @@ write_counters(toothpaste_pick_stats_t stats,int fake_stats,toothpaste_pick_opti
 		}
 		fwrite(&stats.total_picks, sizeof(unsigned int), 1, file_ptr);
 		fwrite(&stats.last_pick_time, sizeof(time_t), 1, file_ptr);
+		fwrite(&stats.first_pick_time, sizeof(time_t), 1, file_ptr);
 		fclose(file_ptr);
 	}
 	return 0;
@@ -1766,6 +1772,30 @@ str_total_picks(toothpaste_pick_t* pick, toothpaste_pick_options_t* topts)
     return line;
 }
 
+static char* 
+str_brushing_coverage(toothpaste_pick_t* pick,toothpaste_pick_options_t* topts)
+{
+	if (topts == NULL || pick == NULL)
+	return NULL;
+
+    char *line = malloc(MAX_TOOTHPASTE_LINE);
+    if (line == NULL)
+        return NULL;
+
+    memset(line, 0, MAX_TOOTHPASTE_LINE);
+
+    const char *translated_label = _(user_strings[MSG_COVERAGE]);
+	
+	snprintf(line,
+		 MAX_TOOTHPASTE_LINE,
+		 "%s %u%%\n",
+		 translated_label,
+		 pick->coverage_percents);
+
+    return line;
+
+}
+
 static char*
 str_last_pick_time(toothpaste_pick_t* pick, toothpaste_pick_options_t* topts)
 {
@@ -1889,7 +1919,7 @@ str_quiet(toothpaste_pick_t* pick, toothpaste_pick_options_t* topts)
 
 static int
 check_visibility(int input_id, int new_pick_flag, int toothbrush_flag, int dentist_flag, int verbose) {
-    if (input_id == 19) {
+    if (input_id == 20) {
         return verbose ? 0 : 1;   // show only in quiet mode
     }
     if (!verbose) return 0;       // if quiet, hide everything else
@@ -1954,18 +1984,21 @@ char_to_strnum(char input)
 		break;		
 		case 'l':
 		return 15;
-		break;		
-		case 'U':
+		break;
+		case 'c':
 		return 16;
-		break;		
-		case 's':
+		break;			
+		case 'U':
 		return 17;
 		break;		
-		case 'm':
+		case 's':
 		return 18;
+		break;		
+		case 'm':
+		return 19;
 		break;
 		case 'I':
-		return 19;
+		return 20;
 		break;			
 		
 		default:
@@ -2038,7 +2071,8 @@ tpm_pick_toothpaste(list_node_t* head, toothpaste_pick_options_t* topts, toothpa
     }
 
     read_counters(&pick->stats, pick->opts->fake_stats,pick->opts);
-    pick->waste_report = report_wasted_tubes(head, &pick->stats);
+	pick->coverage_percents=(unsigned int)((TOTAL_PERCENTS*pick->stats.total_picks)/((pick->stats.last_pick_time-pick->stats.first_pick_time)/(SECONDS_PER_DAY)));
+	pick->waste_report = report_wasted_tubes(head, &pick->stats);
     pick->toothpaste_pick_index = pick->stats.total_picks;
     pick->when = total_seconds;
 
@@ -2201,10 +2235,11 @@ tpm_pick_toothpaste(list_node_t* head, toothpaste_pick_options_t* topts, toothpa
 	toothpaste_picking_message[13] = 	str_day_of_the_week(pick,topts);
 	toothpaste_picking_message[14] = 	str_total_picks(pick,topts);
 	toothpaste_picking_message[15] = 	str_last_pick_time(pick,topts);
-	toothpaste_picking_message[16] = 	str_tubes_wasted(pick,topts);
-	toothpaste_picking_message[17] = 	str_source(pick,topts);
-	toothpaste_picking_message[18] = 	str_meme(pick,topts);
-	toothpaste_picking_message[19] = 	str_quiet(pick,topts);
+	toothpaste_picking_message[16] =	str_brushing_coverage(pick,topts);
+	toothpaste_picking_message[17] = 	str_tubes_wasted(pick,topts);
+	toothpaste_picking_message[18] = 	str_source(pick,topts);
+	toothpaste_picking_message[19] = 	str_meme(pick,topts);
+	toothpaste_picking_message[20] = 	str_quiet(pick,topts);
 	
 	ti=0;
    if (topts->tpm_template[0] == '*' && topts->tpm_template[1] == '\0') 
@@ -2324,7 +2359,7 @@ tpm_pick_toothpaste(list_node_t* head, toothpaste_pick_options_t* topts, toothpa
 
    
     written = snprintf(csv_ptr, csv_rem, LINE_FORMAT_CSV, 
-                       pick->stats.total_picks, (intmax_t)pick->stats.last_pick_time, 
+                       pick->stats.total_picks, (intmax_t)pick->stats.last_pick_time, pick->coverage_percents, 
                        pick->waste_report, topts->toothpastes_file_path_final, topts->meme_payload);
     
 
@@ -2704,7 +2739,8 @@ do_not_test_me(int argc, char* argv[])
 	{"timezone", required_argument,0, 'z'},
 	{"meme", required_argument,0, 'm'},	
 	{"template", required_argument,0, 'T'},	
-	{"locale", required_argument,0, 'L'},	
+	{"locale", required_argument,0, 'L'},
+	{"first_pick_time", required_argument,0, 'I'},	
     {0, 0, 0, 0} 
 };		
     init_tpm_console();
@@ -2713,7 +2749,7 @@ do_not_test_me(int argc, char* argv[])
 	result=read_config(topts.config_file_path_final,&topts);
 	if (result<0){};
 	topts.config_load_failure=!file_exists_fopen(topts.config_file_path_final);
-	while ((opt = getopt_long(argc, argv, "awjCvxqlrUFf:t:o:c:s:p:i:b:z:d:m:T:L:",long_options,&option_index)) != -1) 
+	while ((opt = getopt_long(argc, argv, "awjCvxqlrUFf:t:o:c:s:p:i:b:z:d:m:T:L:I:",long_options,&option_index)) != -1) 
 	{
         switch (opt) 
 		{
@@ -2811,6 +2847,9 @@ do_not_test_me(int argc, char* argv[])
             break;
 			case 'L':
 				snprintf(topts.tpm_locale, MAX_LOCALE_CODE, "%s", optarg); 
+			break;
+			case 'I':
+				pick.stats.first_pick_time=time(NULL)-SECONDS_PER_DAY*atoi(optarg); 
 			break;
 			case '?': 
 				fprintf(stderr, "%s %s [-awjCvxqlrUF] [-f dental-formula] [-c config_file] [-o pick output file] [-t stats file] [-s total_picks value] [-p pick_type_value] [-i toothpaste_index] [-b brand_string [-z delta_hours] [-d delta_days] [-m meme_payload] [-T output_template] -L locale_code [toothpastes_file] \n",user_strings[MSG_USAGE], argv[0]);
