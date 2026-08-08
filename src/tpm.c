@@ -878,7 +878,6 @@ reset_counters(toothpaste_pick_options_t* opts)
 {
 	FILE* file_ptr;
 	unsigned int zero=0;
-	time_t zero_time =0;
 	time_t cur =time(NULL);
 	
 	
@@ -889,9 +888,9 @@ reset_counters(toothpaste_pick_options_t* opts)
 		return 3;
 	}	
 
-	fwrite(&zero, sizeof(unsigned int), 1, file_ptr);
-	fwrite(&zero_time, sizeof(time_t), 1, file_ptr);
 	fwrite(&cur, sizeof(time_t), 1, file_ptr);	
+	fwrite(&cur, sizeof(time_t), 1, file_ptr);	
+	fwrite(&zero, sizeof(unsigned int), 1, file_ptr);
 	fclose(file_ptr);
 	printf("%s \n", _(user_strings[MSG_PICK_COUNTER_C])); 
 	return 0;
@@ -926,9 +925,9 @@ set_counters(void* opt_arg,toothpaste_pick_options_t* opts)
 	}	
 
 	cur = total_seconds - value*SECONDS_PER_DAY;
-	fwrite(&zero, sizeof(unsigned int), 1, file_ptr);
-	fwrite(&total_seconds, sizeof(time_t), 1, file_ptr);
 	fwrite(&cur, sizeof(time_t), 1, file_ptr);
+	fwrite(&total_seconds, sizeof(time_t), 1, file_ptr);
+	fwrite(&zero, sizeof(unsigned int), 1, file_ptr);
 	fclose(file_ptr);
 	printf("%s \n", _(user_strings[MSG_PICK_COUNTER_S])); 
 
@@ -953,9 +952,11 @@ read_counters(toothpaste_pick_stats_t* stats,int fake_stats,toothpaste_pick_opti
 			return 4;
 		}
 
-		nbytes=fread(&(stats->total_picks), sizeof(unsigned int), 1, file_ptr);
+		nbytes=fread(&(stats->first_pick_time), sizeof(time_t), 1, file_ptr);
 		nbytes+=fread(&(stats->last_pick_time), sizeof(time_t), 1, file_ptr);
-		nbytes+=fread(&(stats->first_pick_time), sizeof(time_t), 1, file_ptr);
+		nbytes+=fread(&(stats->total_picks), sizeof(unsigned int), 1, file_ptr);
+
+
 	   
 		fclose(file_ptr);	
 	}
@@ -999,9 +1000,9 @@ write_counters(toothpaste_pick_stats_t stats,int fake_stats,toothpaste_pick_opti
 			perror(_(error_strings[PICKSTATS_WRITE_FAILED]));
 			return 3;
 		}
-		fwrite(&stats.total_picks, sizeof(unsigned int), 1, file_ptr);
-		fwrite(&stats.last_pick_time, sizeof(time_t), 1, file_ptr);
 		fwrite(&stats.first_pick_time, sizeof(time_t), 1, file_ptr);
+		fwrite(&stats.last_pick_time, sizeof(time_t), 1, file_ptr);
+		fwrite(&stats.total_picks, sizeof(unsigned int), 1, file_ptr);
 		fclose(file_ptr);
 	}
 	return 0;
