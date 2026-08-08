@@ -4,6 +4,8 @@
 /*
 	Any sufficiently complicated C or Fortran program contains an 
 	ad hoc, informally-specified, bug-ridden, slow implementation of half of Common Lisp. 
+
+	The C program to control the toothpastes lists
 */
 #include "tpm.h"
 
