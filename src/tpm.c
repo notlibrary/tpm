@@ -20,6 +20,7 @@
 #define	NO_TOOTHPASTES_AVAILBLE 10
 #define	NULL_CONTEXT 11
 #define TPM_RARE_ERROR 42
+#define INVALID_ARGUMENT 13
 
 static const toothpaste_data_t toothpastes[TOTAL_TOOTHPASTES]={
 	{PASTE_BUILTIN,0,"BUILTIN TOOTHPASTE 1",75,90,"White", "Builtin Toothbrush 1",20,50},
@@ -72,6 +73,8 @@ static const char* error_strings[TOTAL_ERROR_MESSAGES]={
 	gettext_noop("Error 109: Pick is NULL perform pick first"),
 	gettext_noop("Error 110: No toothpastes available."),
 	gettext_noop("Error 111: NULL context")
+	gettext_noop("Rare Error 42: 42")
+	gettext_noop("Error 113: Invalid argument strtoul()")
 };
 static const char* user_strings[TOTAL_USER_MESSAGES]={
 	gettext_noop("Pick counter clear"),
@@ -892,7 +895,6 @@ reset_counters(toothpaste_pick_options_t* opts)
 	return 0;
 }
 
-#define INVALID_ARGUMENT 1
 static int 
 set_counters(void* opt_arg,toothpaste_pick_options_t* opts) 
 {
