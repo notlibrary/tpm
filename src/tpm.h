@@ -127,7 +127,7 @@ memcpy(&x,swap_temp,sizeof(x)); \
 #define LINE_FORMAT_CSV "%u,%jd,%u,%s,%s,%s"
 
 #define TOTAL_TOOTHPASTE_TYPES 5
-#define TOTAL_ERROR_MESSAGES 12
+#define TOTAL_ERROR_MESSAGES 14
 #define TOTAL_USER_MESSAGES 35
 #define TOTAL_USER_ARMOUR 10
 
@@ -206,7 +206,9 @@ typedef enum error_msg_t
 	LAST_PICK_WRITING_FAILED,
 	PICK_NULL,
 	NO_TOOTHPASTES_AVAILBLE,
-	NULL_CONTEXT
+	NULL_CONTEXT,
+	TPM_RARE_ERROR,
+	INVALID_ARGUMENT
 	
 }error_msg_t;
 
