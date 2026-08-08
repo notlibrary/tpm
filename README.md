@@ -343,6 +343,8 @@ It's options:
 
 `LOCALE` set output locale
 
+`FIRST_PICK_TIME` set first pick time days ago today
+
 ## TPM The Toothpastes Picking Manager Configuration Sample
 ```
 [CONSTANTS]

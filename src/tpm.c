@@ -874,6 +874,7 @@ reset_counters(toothpaste_pick_options_t* opts)
 	FILE* file_ptr;
 	unsigned int zero=0;
 	time_t zero_time =0;
+	time_t cur=time(NULL);
 	
 	file_ptr = fopen(opts->stats_file_path_final, "wb");
 	if (file_ptr == NULL) 
@@ -884,6 +885,7 @@ reset_counters(toothpaste_pick_options_t* opts)
 
 	fwrite(&zero, sizeof(unsigned int), 1, file_ptr);
 	fwrite(&zero_time, sizeof(time_t), 1, file_ptr);
+	fwrite(&cur, sizeof(time_t), 1, file_ptr);	
 	fclose(file_ptr);
 	printf("%s \n", _(user_strings[MSG_PICK_COUNTER_C])); 
 	return 0;
@@ -920,6 +922,7 @@ set_counters(void* opt_arg,toothpaste_pick_options_t* opts)
 
 
 	fwrite(&zero, sizeof(unsigned int), 1, file_ptr);
+	fwrite(&total_seconds, sizeof(time_t), 1, file_ptr);
 	fwrite(&total_seconds, sizeof(time_t), 1, file_ptr);
 	fclose(file_ptr);
 	printf("%s \n", _(user_strings[MSG_PICK_COUNTER_S])); 
@@ -2071,15 +2074,8 @@ tpm_pick_toothpaste(list_node_t* head, toothpaste_pick_options_t* topts, toothpa
     }
 
     read_counters(&pick->stats, pick->opts->fake_stats,pick->opts);
-
-
-printf("total_picks = %u\n", pick->stats.total_picks);
-printf("first_pick_time = %jd\n", (intmax_t)pick->stats.first_pick_time);
-printf("last_pick_time = %jd\n", (intmax_t)pick->stats.last_pick_time);
-printf("brush_times_per_day = %u\n",
-
-       pick->opts->formula.brush_times_per_day);
-printf("sizeof(time_t) = %zu\n", sizeof(time_t));
+	if (0!=topts->first_pick_time){pick->stats.first_pick_time=topts->first_pick_time;}
+  
 
 	time_t elapsed = pick->stats.last_pick_time - pick->stats.first_pick_time;
 
@@ -2103,7 +2099,9 @@ printf("sizeof(time_t) = %zu\n", sizeof(time_t));
 /* Optional: clamp to 100% */
 if (pick->coverage_percents > TOTAL_PERCENTS)
     pick->coverage_percents = TOTAL_PERCENTS;
-
+if (0!=topts->first_pick_time){
+	write_counters(pick->stats, pick->opts->fake_stats,pick->opts);
+}
 	pick->waste_report = report_wasted_tubes(head, &pick->stats);
     pick->toothpaste_pick_index = pick->stats.total_picks;
     pick->when = total_seconds;
@@ -2718,9 +2716,15 @@ read_config(const char *src, toothpaste_pick_options_t *opts)
     value = cfg_get_rec(cfg, "SET_COUNTER", &depth);
     if (value != NULL)
         set_counters_v = atoi(value);
-
-    if (set_counters_v)
+	
+    if (set_counters_v) {
         set_counters(&set_counters_v, opts);
+	}
+	
+	value = cfg_get_rec(cfg, "FIRST_PICK_TIME", &depth);
+    if (value != NULL) {
+        opts->first_pick_time=time(NULL)-SECONDS_PER_DAY*atoi(optarg);
+	}
 
 cleanup:
     cfg_free(cfg);
@@ -2881,7 +2885,7 @@ do_not_test_me(int argc, char* argv[])
 				snprintf(topts.tpm_locale, MAX_LOCALE_CODE, "%s", optarg); 
 			break;
 			case 'I':
-				pick.stats.first_pick_time=time(NULL)-SECONDS_PER_DAY*atoi(optarg); 
+				topts.first_pick_time=time(NULL)-SECONDS_PER_DAY*atoi(optarg); 
 			break;
 			case '?': 
 				fprintf(stderr, "%s %s [-awjCvxqlrUF] [-f dental-formula] [-c config_file] [-o pick output file] [-t stats file] [-s total_picks value] [-p pick_type_value] [-i toothpaste_index] [-b brand_string [-z delta_hours] [-d delta_days] [-m meme_payload] [-T output_template] -L locale_code [toothpastes_file] \n",user_strings[MSG_USAGE], argv[0]);

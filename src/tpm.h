@@ -286,6 +286,8 @@ typedef struct toothpaste_pick_options_t
     char* output_file_path_final;
     char* config_file_path_final;
 	
+	time_t first_pick_time;
+	
 	char tpm_locale[MAX_LOCALE_CODE];
 } toothpaste_pick_options_t;
 
