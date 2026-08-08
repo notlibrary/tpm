@@ -2893,7 +2893,7 @@ do_not_test_me(int argc, char* argv[])
 				topts.first_pick_time=time(NULL)-SECONDS_PER_DAY*atoi(optarg); 
 			break;
 			case '?': 
-				fprintf(stderr, "%s %s [-awjCvxqlrUF] [-f dental-formula] [-c config_file] [-o pick output file] [-t stats file] [-s total_picks value] [-p pick_type_value] [-i toothpaste_index] [-b brand_string [-z delta_hours] [-d delta_days] [-m meme_payload] [-T output_template] -L locale_code [toothpastes_file] \n",user_strings[MSG_USAGE], argv[0]);
+				fprintf(stderr, "%s %s [-awjCvxqlrUF] [-f dental-formula] [-c config_file] [-o pick output file] [-t stats file] [-s total_picks value] [-p pick_type_value] [-i toothpaste_index] [-b brand_string [-z delta_hours] [-d delta_days] [-m meme_payload] [-T output_template] [-L locale_code] [-I days_ago] [toothpastes_file] \n",user_strings[MSG_USAGE], argv[0]);
 				exit(EXIT_FAILURE);
 			default:
 				break;
