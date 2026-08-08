@@ -163,11 +163,16 @@ const default_answers: string[] = [
 function generateBinaryPickStats(stats: ToothpastePickStats): Uint8Array {
   const buffer = new ArrayBuffer(20);
   const view = new DataView(buffer);
-  
+
+  // time_t first_pick_time: 8 bytes
   view.setBigUint64(0, BigInt(stats.first_pick_time), true);
-  view.setBigUint64(0, BigInt(stats.last_pick_time), true);
-  view.setUint32(8, stats.total_picks, true);
-  
+
+  // time_t last_pick_time: 8 bytes
+  view.setBigUint64(8, BigInt(stats.last_pick_time), true);
+
+  // unsigned int total_picks: 4 bytes
+  view.setUint32(16, stats.total_picks, true);
+
   return new Uint8Array(buffer);
 }
 
@@ -540,15 +545,20 @@ export default function App() {
           ? generateToothpastesEnhanced(nextAnswers)
           : generateToothpastesNormal(nextAnswers);
         
-        const pickStats: ToothpastePickStats = {
-          last_pick_time: Math.floor(Date.now() / 1000),
-		  first_pick_time: Math.floor(Date.now() / 1000),
-          total_picks: 0
-        };
-        const binaryData = generateBinaryPickStats(pickStats);
-        const hexString = Array.from(binaryData)
-          .map(b => b.toString(16).padStart(2, '0'))
-          .join(' ');
+		const now = Math.floor(Date.now() / 1000);
+		const pickStats: ToothpastePickStats = {
+		  first_pick_time: now,
+		  last_pick_time: now,
+		  total_picks: 0
+		};
+
+		const binaryData = generateBinaryPickStats(pickStats);
+
+		// Always exactly 20 bytes
+		const hexString = Array.from(binaryData)
+		  .map(b => b.toString(16).padStart(2, '0'))
+		  .join(' ');
+
 
         setResult({
           toothpastes: files.toothpastes ? toothpastesStr : null,
