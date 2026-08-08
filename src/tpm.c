@@ -874,7 +874,8 @@ reset_counters(toothpaste_pick_options_t* opts)
 	FILE* file_ptr;
 	unsigned int zero=0;
 	time_t zero_time =0;
-	time_t cur=time(NULL);
+	time_t cur =time(NULL);
+	
 	
 	file_ptr = fopen(opts->stats_file_path_final, "wb");
 	if (file_ptr == NULL) 
@@ -898,7 +899,7 @@ set_counters(void* opt_arg,toothpaste_pick_options_t* opts)
 	FILE* file_ptr;
 	unsigned int zero=0;
 	time_t total_seconds=time(NULL)+opts->delta_hours*SECONDS_PER_HOUR;
-	
+	time_t cur;	
 
 	char *end = NULL;
 	unsigned long value;
@@ -920,10 +921,10 @@ set_counters(void* opt_arg,toothpaste_pick_options_t* opts)
 		return 3;
 	}	
 
-
+	cur = total_seconds - value*SECONDS_PER_DAY;
 	fwrite(&zero, sizeof(unsigned int), 1, file_ptr);
 	fwrite(&total_seconds, sizeof(time_t), 1, file_ptr);
-	fwrite(&total_seconds, sizeof(time_t), 1, file_ptr);
+	fwrite(&cur, sizeof(time_t), 1, file_ptr);
 	fclose(file_ptr);
 	printf("%s \n", _(user_strings[MSG_PICK_COUNTER_S])); 
 
