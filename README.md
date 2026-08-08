@@ -607,7 +607,8 @@ There are 3 different versions of origin of this code pick and like one that fit
 - Russian anykey admin tries to get rid of 3 empty toothpaste tubes in the bathroom then whole thing happens
 
 This is only the main identity vector sure it needs some diversification through identity zoo
-this all is up to you while my business here is almost done
+this all is up to you while my business here is almost done(I am Tom Bombadil like character 
+I hold it for 5 minutes then gave you the whole thing back and quit because do not need it at all)
 
 Another nice take is constant flame debating whether whole this thing is a joke or a serious business
 We don't have an exact answer perhaps you should observe and experience it yourself to form an opinion
