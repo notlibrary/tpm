@@ -128,7 +128,7 @@ jobs:
         run: |
           rm -f *.o
           make -f tpm-wasm.mk tpm.wasm dist
-          mv tpm-wasm-bin-amd64.tar.gz tpm-wasm-bin-amd64-${{ github.ref_name }}.tar.gz
+          mv tpm-wasm-bin.tar.gz tpm-wasm-bin-${{ github.ref_name }}.tar.gz
             
       - name: Upload to Release WASM
         if: runner.os != 'Windows'       
