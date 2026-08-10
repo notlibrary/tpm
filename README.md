@@ -32,7 +32,7 @@ make install
 ```
 
 WASM:
-Unpack `tpm.wasm` from `tpm-wasm-bin-amd64-x.y.z.tar.gz` and run it with preferred runtime
+Unpack `tpm.wasm` from `tpm-wasm-bin-x.y.z.tar.gz` and run it with preferred runtime
 
 1. Define the available(what is in the bathroom) toothpastes in the CSV format file with path `~/tpm/toothpastes`
 see `~/tpm/toothpastes.sample` or `~/tpm/toothpastes-enhanced.sample` below for format details
