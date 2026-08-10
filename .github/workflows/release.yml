@@ -118,7 +118,7 @@ jobs:
           
       - name: Setup WASI SDK
         if: runner.os != 'Windows'
-        uses: bytecodealliance/setup-wasi-sdk-action@v3
+        uses: bytecodealliance/setup-wasi-sdk-action@v1
         with:
           version: '33'
       
