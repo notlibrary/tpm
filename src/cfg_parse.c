@@ -60,12 +60,12 @@ static char* cfg_trim(const char* str)
   char* tstr;
 
   /* advance start pointer to first non-whitespace char */
-  while (isspace(*str))
+ while (isspace((unsigned char)*str))
     str ++;
 
   /* roll back length until we run out of whitespace */
   tlen = strlen(str);
-  while (tlen > 0 && isspace(str[tlen - 1]))
+while (tlen > 0 && isspace((unsigned char)str[tlen - 1]))
     tlen --;
 
   /* copy portion of string to new string */
@@ -84,12 +84,12 @@ static char* cfg_norm_key(const char* key)
   char* tkey;
 
   /* advance start pointer to first non-whitespace char */
-  while (isspace(*key))
+  while (isspace((unsigned char)*key))
     key ++;
 
   /* roll back length until we run out of whitespace */
   tlen = strlen(key);
-  while (tlen > 0 && isspace(key[tlen - 1]))
+while (tlen > 0 && isspace((unsigned char)key[tlen - 1]))
     tlen --;
 
   /* Exclude empty key */
@@ -128,7 +128,7 @@ static struct cfg_node* cfg_create_node(char* key, char* value)
  * performing any further operations.
  * @return Pointer to newly initialized cfg_struct object.
  */
-struct cfg_struct* cfg_init()
+struct cfg_struct* cfg_init(void)
 {
   struct cfg_struct* cfg =
     cfg_malloc(sizeof(struct cfg_struct));

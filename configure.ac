@@ -1,4 +1,4 @@
-AC_INIT([tpm],0.7.4, [yendorium@gmail.com])
+AC_INIT([tpm],0.7.5, [yendorium@gmail.com])
 AM_INIT_AUTOMAKE([foreign subdir-objects])
 AC_PROG_CC
 

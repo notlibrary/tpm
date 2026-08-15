@@ -203,7 +203,7 @@ tpm_init_context(toothpaste_pick_options_t* opts)
 
     memset(opts, 0, sizeof(toothpaste_pick_options_t));
 
-    /* Set defaults */
+    
     opts->ptype = PICK_DEFAULT;
     opts->verbose = 1;
     opts->lat_flag = 0;
@@ -219,7 +219,7 @@ tpm_init_context(toothpaste_pick_options_t* opts)
     opts->toothpastes_list = NULL;
     opts->username = NULL;
 
-    /* Allocate meme and template */
+  
     opts->meme_payload = (char*)malloc(MAX_TOOTHPASTE_LINE);
     opts->tpm_template = (char*)malloc(TOTAL_OUTPUT_STRINGS + 1);
 
@@ -234,18 +234,18 @@ tpm_init_context(toothpaste_pick_options_t* opts)
     memset(opts->meme_payload, 0, MAX_TOOTHPASTE_LINE);
     memset(opts->tpm_template, 0, TOTAL_OUTPUT_STRINGS + 1);
 
-    /* Allocate path buffers */
+    
     opts->stats_file_path_final = (char*)malloc(MAX_PATH);
     opts->toothpastes_file_path_final = (char*)malloc(MAX_PATH);
     opts->output_file_path_final = (char*)malloc(MAX_PATH);
     opts->config_file_path_final = (char*)malloc(MAX_PATH);
 
-    /* Check if any path allocation failed */
+    
     if (!opts->stats_file_path_final ||
         !opts->toothpastes_file_path_final ||
         !opts->output_file_path_final ||
         !opts->config_file_path_final) {
-        /* Free all path buffers that were allocated */
+       
         free(opts->stats_file_path_final);
         free(opts->toothpastes_file_path_final);
         free(opts->output_file_path_final);
@@ -255,7 +255,7 @@ tpm_init_context(toothpaste_pick_options_t* opts)
         opts->output_file_path_final = NULL;
         opts->config_file_path_final = NULL;
 
-        /* Free the already‑allocated meme and template */
+        
         free(opts->meme_payload);
         free(opts->tpm_template);
         opts->meme_payload = NULL;
@@ -264,17 +264,17 @@ tpm_init_context(toothpaste_pick_options_t* opts)
         return MALLOC_FAILED;
     }
 
-    /* Zero out path buffers */
+  
     memset(opts->stats_file_path_final, 0, MAX_PATH);
     memset(opts->toothpastes_file_path_final, 0, MAX_PATH);
     memset(opts->output_file_path_final, 0, MAX_PATH);
     memset(opts->config_file_path_final, 0, MAX_PATH);
 
-    /* Set default template */
+   
     opts->tpm_template[0] = '*';
     opts->tpm_template[1] = '\0';
 
-    /* Get home directory */
+    
     char* user_home_dir = get_user_home_dir();
     char user_home_dir_static[MAX_PATH];
 
@@ -286,9 +286,9 @@ tpm_init_context(toothpaste_pick_options_t* opts)
         strncpy(user_home_dir_static, ".", MAX_PATH - 1);
     }
 
-    /* Append TPM directory */
+    
 #if defined(__EMSCRIPTEN__) || defined(__wasi__)
-    /* Use the current preopened directory */
+   
     user_home_dir_static[0] = '.';
     user_home_dir_static[1] = '/';
     user_home_dir_static[2] = '\0';
@@ -307,7 +307,7 @@ tpm_init_context(toothpaste_pick_options_t* opts)
 
 #endif
 
-    /* Build full paths */
+    
     strncpy(opts->stats_file_path_final, user_home_dir_static, MAX_PATH - 1);
     strncat(opts->stats_file_path_final, stats_file_name, MAX_PATH - strlen(opts->stats_file_path_final) - 1);
 
@@ -924,7 +924,7 @@ set_counters(void* opt_arg,toothpaste_pick_options_t* opts)
 		return 3;
 	}	
 
-	cur = total_seconds - value*SECONDS_PER_DAY;
+	cur = total_seconds - (time_t)(value * SECONDS_PER_DAY);
 	fwrite(&cur, sizeof(time_t), 1, file_ptr);
 	fwrite(&total_seconds, sizeof(time_t), 1, file_ptr);
 	fwrite(&zero, sizeof(unsigned int), 1, file_ptr);
@@ -967,8 +967,8 @@ read_counters(toothpaste_pick_stats_t* stats,int fake_stats,toothpaste_pick_opti
 		uint64_t value = rand_range(0, BRUSHES_PER_LIFETIME);
 
 		if (value > UINT_MAX) {
-			/* Handle impossible/out-of-range value */
-			return 0; /* or another error code */
+			
+			return 0; 
 		}
 
 		stats->total_picks = (unsigned int)value;
@@ -1102,7 +1102,7 @@ get_user_home_dir(void)
 
 #elif defined(__EMSCRIPTEN__) || defined(__wasi__)
 
-    /* Pure WASI/Emscripten has no passwd database. */
+   
     {
         const char *home = getenv("HOME");
 
@@ -1226,6 +1226,16 @@ static void
 version_short(void)
 {
 	printf("%s %u.%u.%u \n",TPM_STRING,TPM_VERSION_MAJOR,TPM_VERSION_MINOR,TPM_VERSION_PATCH);
+	exit(EXIT_SUCCESS);
+	return;
+}
+
+static void
+usage(char* prog_name)
+{
+	fprintf(stderr, "%s %s %s \n",user_strings[MSG_USAGE], prog_name, "[-awjCvxqlrUF] [-f dental-formula] [-c config_file] [-o pick output file] [-t stats file]"
+	"[-s total_picks value] [-p pick_type_value] [-i toothpaste_index] [-b brand_string [-z delta_hours] [-d delta_days]"
+	"[-m meme_payload] [-T output_template] [-L locale_code] [-I days_ago] [toothpastes_file]");
 	exit(EXIT_SUCCESS);
 	return;
 }
@@ -1443,17 +1453,17 @@ eval_username(toothpaste_pick_t *pick, toothpaste_pick_options_t *topts)
     if (pick == NULL || topts == NULL)
         return 1;
 
-    /* 1. Config/command-line username takes precedence */
+    
     if (topts->username != NULL && topts->username[0] != '\0')
     {
         source = topts->username;
     }
-    /* 2. Otherwise use the current OS username */
+    
     else if (get_current_username(username, sizeof(username)) == 0)
     {
         source = username;
     }
-    /* 3. Fallback */
+    
     else
     {
         source = user_strings[MSG_ANON];
@@ -1929,10 +1939,10 @@ str_quiet(toothpaste_pick_t* pick, toothpaste_pick_options_t* topts)
 static int
 check_visibility(int input_id, int new_pick_flag, int toothbrush_flag, int dentist_flag, int verbose) {
     if (input_id == 20) {
-        return verbose ? 0 : 1;   // show only in quiet mode
+        return verbose ? 0 : 1;  
     }
-    if (!verbose) return 0;       // if quiet, hide everything else
-    // verbose = 1: show based on flags
+    if (!verbose) return 0;
+
     if (input_id >= 7 || input_id <= 2) return 1;
     if (input_id == 3 && new_pick_flag) return 1;
     if (input_id == 4 && toothbrush_flag) return 1;
@@ -2088,21 +2098,21 @@ tpm_pick_toothpaste(list_node_t* head, toothpaste_pick_options_t* topts, toothpa
 	if (elapsed < 0)
 		elapsed = 0;
 
-	/* Round up partial days, minimum 1 day */
+	
 	unsigned int days =
 		(unsigned int)((elapsed + SECONDS_PER_DAY - 1) / SECONDS_PER_DAY);
 
 	if (days == 0)
 		days = 1;
 
-	/* Calculate coverage percentage */
+	
 	pick->coverage_percents =
 		(unsigned int)(
 			((uint64_t)TOTAL_PERCENTS * (uint64_t)pick->stats.total_picks) /
 			((uint64_t)days * (uint64_t)pick->opts->formula.brush_times_per_day)
     );
 
-/* Optional: clamp to 100% */
+
 if (pick->coverage_percents > TOTAL_PERCENTS)
     pick->coverage_percents = TOTAL_PERCENTS;
 if (0!=topts->first_pick_time){
@@ -2125,7 +2135,7 @@ if (0!=topts->first_pick_time){
 	time_t rem = pick->day % (time_t)pick->total_toothpastes;
 
 	if (rem < 0 || (uintmax_t)rem > UINT_MAX) {
-		/* Handle error */
+		
 	}
 
 	i = (unsigned int)rem;
@@ -2153,10 +2163,10 @@ if (0!=topts->first_pick_time){
 		uint64_t value = rand_range(0, pick->total_toothpastes);
 
 		if (value >= (uint64_t)pick->total_toothpastes) {
-			/* Should never happen if rand_range() is correct */
+		
 			result=TPM_RARE_ERROR;
 			goto cleanup;
-			return TPM_RARE_ERROR;   /* or handle appropriately */
+			return TPM_RARE_ERROR;   
 		}
 
 		i = (unsigned int)value;
@@ -2223,7 +2233,7 @@ if (0!=topts->first_pick_time){
 	if (rem < 0 || rem > INT_MAX) {
 		result = TPM_RARE_ERROR;
 		goto cleanup;
-		return TPM_RARE_ERROR;   /* or other appropriate action */
+		return TPM_RARE_ERROR;   
 	}
 
 	pick->j = (int)rem;
@@ -2757,7 +2767,7 @@ do_not_test_me(int argc, char* argv[])
 	char* out_JSON=NULL;
 	char* out_CSV=NULL;
 	
-		struct option long_options[] = {
+	struct option long_options[] = {
     {"rating",     no_argument, 0, 'a'},
     {"weight",  no_argument,       0, 'w'},
     {"json",  no_argument, 0, 'j'},
@@ -2784,7 +2794,8 @@ do_not_test_me(int argc, char* argv[])
 	{"locale", required_argument,0, 'L'},
 	{"first_pick_time", required_argument,0, 'I'},	
     {0, 0, 0, 0} 
-};		
+	};
+	
     init_tpm_console();
 	tpm_init_context(&topts); 
 	
@@ -2894,8 +2905,8 @@ do_not_test_me(int argc, char* argv[])
 				topts.first_pick_time=time(NULL)-SECONDS_PER_DAY*atoi(optarg); 
 			break;
 			case '?': 
-				fprintf(stderr, "%s %s [-awjCvxqlrUF] [-f dental-formula] [-c config_file] [-o pick output file] [-t stats file] [-s total_picks value] [-p pick_type_value] [-i toothpaste_index] [-b brand_string [-z delta_hours] [-d delta_days] [-m meme_payload] [-T output_template] [-L locale_code] [-I days_ago] [toothpastes_file] \n",user_strings[MSG_USAGE], argv[0]);
-				exit(EXIT_FAILURE);
+				usage(argv[0]);
+			break;
 			default:
 				break;
         }
