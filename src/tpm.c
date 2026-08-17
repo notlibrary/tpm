@@ -2707,19 +2707,22 @@ cfg_get_rec(const struct cfg_struct* cfg, const char* key, int* depth)
 static int 
 file_exists_fopen(const char *filename) 
 {
-    FILE *file;
-	errno_t err;
-	
-    if ((err = fopen_s(&file,filename, "r"))) 
-	{
-        fclose(file);
-        return 1;
+    FILE *file = NULL;
+    errno_t err;
+    
+    
+    if ((err = fopen_s(&file, filename, "r")) == 0) 
+    {
+        fclose(file); 
+        return 1;   
     } 
-	else 
-	{
-        return 0;
+    else 
+    {
+        
+        return 0;  
     }
 }
+
 
 static dental_formula_t
 parse_dental_formula(const char* formula_str)
