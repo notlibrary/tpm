@@ -127,12 +127,7 @@ static const char config_file_name[MAX_PATH] ="tpm.conf";
 
 #ifndef _MSC_VER
 #define _strdup strdup
-#endif
-
-#ifndef _MSC_VER
-#include <stdio.h>
 #include <stdarg.h>
-#include <string.h>
 
 static inline int gcc_sscanf_s_impl(const char* buf, const char* fmt, ...) {
     va_list args;
@@ -141,7 +136,6 @@ static inline int gcc_sscanf_s_impl(const char* buf, const char* fmt, ...) {
     va_list args_copy;
     va_copy(args_copy, args);
 
-    // ИСПРАВЛЕНО: Объявляем массив указателей на 32 элемента
     void* final_args[32] = { NULL }; 
     int arg_idx = 0;
 
@@ -160,10 +154,10 @@ static inline int gcc_sscanf_s_impl(const char* buf, const char* fmt, ...) {
 
             char type = *p;
 
-            // Извлекаем указатель на целевой буфер
+           
             final_args[arg_idx++] = va_arg(args_copy, void*);
 
-            // Если тип строковый, sscanf_s требует размер. Извлекаем и игнорируем его для обычного sscanf.
+            
             if (type == 's' || type == 'c' || type == ']') {
                 (void)va_arg(args_copy, unsigned int); 
             }
@@ -173,7 +167,7 @@ static inline int gcc_sscanf_s_impl(const char* buf, const char* fmt, ...) {
     }
     va_end(args_copy);
 
-    // Вызываем стандартный sscanf с очищенными аргументами
+
     int res = sscanf(buf, fmt, 
         final_args[0],  final_args[1],  final_args[2],  final_args[3],
         final_args[4],  final_args[5],  final_args[6],  final_args[7],
@@ -195,12 +189,11 @@ static inline int gcc_sscanf_s_impl(const char* buf, const char* fmt, ...) {
 #include <stdio.h>
 #include <errno.h>
 
-/* Проверяем, не определен ли errno_t в текущей стандартной библиотеке */
 #if !defined(__STDC_WANT_LIB_EXT1__) || (__STDC_WANT_LIB_EXT1__ != 1)
 typedef int errno_t;
 #endif
 
-/* static inline предотвращает ошибки дублирования символов и предупреждения о неиспользуемом коде */
+
 static inline errno_t
 fopen_s(FILE** streamptr, const char* filename, const char* mode) 
 {
@@ -212,7 +205,7 @@ fopen_s(FILE** streamptr, const char* filename, const char* mode)
     *streamptr = fopen(filename, mode);
 
     if (*streamptr == NULL) {
-        /* Если fopen не выставил errno, возвращаем ENOENT (файл не найден) или EINVAL */
+       
         return (errno != 0) ? errno : ENOENT;
     }
 
@@ -259,9 +252,6 @@ strncpy_s(char* dest, size_t destsz, const char* src, size_t count)
 typedef int errno_t;
 #define _TRUNCATE ((size_t)-1)
 
-typedef int errno_t;
-#define _TRUNCATE ((size_t)-1)
-
 static errno_t
 strncat_s(char *dest, size_t destsz, const char *src, size_t count)
 {
@@ -282,9 +272,8 @@ strncat_s(char *dest, size_t destsz, const char *src, size_t count)
 
     available = destsz - dest_len - 1U;
 
-    /*
-     * _TRUNCATE means append as much as fits.
-     */
+    
+	
     if (count == _TRUNCATE)
     {
         src_len = strnlen(src, available + 1U);
@@ -296,10 +285,7 @@ strncat_s(char *dest, size_t destsz, const char *src, size_t count)
     {
         src_len = strnlen(src, count);
 
-        /*
-         * Secure CRT behavior: if it doesn't fit, truncate
-         * rather than destroying the destination.
-         */
+        
         if (src_len > available)
             src_len = available;
     }
@@ -513,6 +499,7 @@ tpm_init_context(toothpaste_pick_options_t* opts)
     strncat_s(opts->config_file_path_final,MAX_PATH, config_file_name, MAX_PATH - strlen(opts->config_file_path_final) - 1);
 
     memset(opts->tpm_locale, 0, MAX_LOCALE_CODE );
+	;
 
     return TPM_NO_ERROR;
 }
@@ -2536,6 +2523,7 @@ if (0!=topts->first_pick_time){
             }
         }
     }
+	
 	
     for (ti = 0; ti < TOTAL_OUTPUT_STRINGS; ti++) 
     {

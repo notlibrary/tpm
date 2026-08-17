@@ -18,6 +18,7 @@ extern "C" {
 #undef _CRT_SECURE_NO_WARNINGS
 #define _CRT_SECURE_NO_WARNINGS
 */
+
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
