@@ -12,11 +12,12 @@ extern "C" {
 #define TPM_VERSION_MINOR 7
 #define TPM_VERSION_PATCH 5
 
+/*
 #undef _CRT_NONSTDC_NO_DEPRECATE 
 #define _CRT_NONSTDC_NO_DEPRECATE 
 #undef _CRT_SECURE_NO_WARNINGS
 #define _CRT_SECURE_NO_WARNINGS
-
+*/
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif

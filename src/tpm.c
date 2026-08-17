@@ -125,6 +125,194 @@ static const char toothpastes_file_name[MAX_PATH] ="toothpastes";
 static const char output_file_name[MAX_PATH] ="last_pick";
 static const char config_file_name[MAX_PATH] ="tpm.conf";
 
+#ifndef _MSC_VER
+#define _strdup strdup
+#endif
+
+#ifndef _MSC_VER
+#include <stdio.h>
+#include <stdarg.h>
+#include <string.h>
+
+static inline int gcc_sscanf_s_impl(const char* buf, const char* fmt, ...) {
+    va_list args;
+    va_start(args, fmt);
+
+    va_list args_copy;
+    va_copy(args_copy, args);
+
+    // ИСПРАВЛЕНО: Объявляем массив указателей на 32 элемента
+    void* final_args[32] = { NULL }; 
+    int arg_idx = 0;
+
+    const char* p = fmt;
+    while (*p && arg_idx < 32) {
+        if (*p == '%' && *(p + 1) != '%') {
+            p++; 
+            if (*p == '*') {
+                p++;
+                continue; 
+            }
+            while (*p >= '0' && *p <= '9') p++;
+            if (*p == '[') {
+                while (*p && *p != ']') p++;
+            }
+
+            char type = *p;
+
+            // Извлекаем указатель на целевой буфер
+            final_args[arg_idx++] = va_arg(args_copy, void*);
+
+            // Если тип строковый, sscanf_s требует размер. Извлекаем и игнорируем его для обычного sscanf.
+            if (type == 's' || type == 'c' || type == ']') {
+                (void)va_arg(args_copy, unsigned int); 
+            }
+        } else {
+            p++;
+        }
+    }
+    va_end(args_copy);
+
+    // Вызываем стандартный sscanf с очищенными аргументами
+    int res = sscanf(buf, fmt, 
+        final_args[0],  final_args[1],  final_args[2],  final_args[3],
+        final_args[4],  final_args[5],  final_args[6],  final_args[7],
+        final_args[8],  final_args[9],  final_args[10], final_args[11],
+        final_args[12], final_args[13], final_args[14], final_args[15]
+    );
+
+    va_end(args);
+    return res;
+}
+
+#define sscanf_s gcc_sscanf_s_impl
+#endif
+
+
+
+#ifndef _MSC_VER
+
+#include <stdio.h>
+#include <errno.h>
+
+/* Проверяем, не определен ли errno_t в текущей стандартной библиотеке */
+#if !defined(__STDC_WANT_LIB_EXT1__) || (__STDC_WANT_LIB_EXT1__ != 1)
+typedef int errno_t;
+#endif
+
+/* static inline предотвращает ошибки дублирования символов и предупреждения о неиспользуемом коде */
+static inline errno_t
+fopen_s(FILE** streamptr, const char* filename, const char* mode) 
+{
+    if (streamptr == NULL || filename == NULL || mode == NULL) {
+        return EINVAL; 
+    }
+
+    errno = 0;
+    *streamptr = fopen(filename, mode);
+
+    if (*streamptr == NULL) {
+        /* Если fopen не выставил errno, возвращаем ENOENT (файл не найден) или EINVAL */
+        return (errno != 0) ? errno : ENOENT;
+    }
+
+    return 0;
+}
+
+#endif
+
+
+#ifndef _MSC_VER
+
+typedef int errno_t;
+
+static errno_t 
+strncpy_s(char* dest, size_t destsz, const char* src, size_t count) 
+{
+    if (dest == NULL || src == NULL || destsz == 0) {
+        return EINVAL;
+    }
+
+    size_t src_len = strnlen(src, count);
+    
+    if (count == (size_t)-1) {
+        src_len = strlen(src);
+        if (src_len >= destsz) {
+            src_len = destsz - 1; 
+        }
+    } else if (src_len >= destsz) {
+        dest[0] = '\0';
+        return ERANGE;
+    }
+
+    memcpy(dest, src, src_len);
+    dest[src_len] = '\0';
+
+    return 0; 
+}
+#endif
+
+#ifndef _MSC_VER
+#include <string.h>
+#include <errno.h>
+
+typedef int errno_t;
+#define _TRUNCATE ((size_t)-1)
+
+typedef int errno_t;
+#define _TRUNCATE ((size_t)-1)
+
+static errno_t
+strncat_s(char *dest, size_t destsz, const char *src, size_t count)
+{
+    size_t dest_len;
+    size_t src_len;
+    size_t available;
+
+    if (dest == NULL || src == NULL || destsz == 0)
+        return EINVAL;
+
+    dest_len = strnlen(dest, destsz);
+
+    if (dest_len >= destsz)
+    {
+        dest[0] = '\0';
+        return EINVAL;
+    }
+
+    available = destsz - dest_len - 1U;
+
+    /*
+     * _TRUNCATE means append as much as fits.
+     */
+    if (count == _TRUNCATE)
+    {
+        src_len = strnlen(src, available + 1U);
+
+        if (src_len > available)
+            src_len = available;
+    }
+    else
+    {
+        src_len = strnlen(src, count);
+
+        /*
+         * Secure CRT behavior: if it doesn't fit, truncate
+         * rather than destroying the destination.
+         */
+        if (src_len > available)
+            src_len = available;
+    }
+
+    if (src_len > 0U)
+        memcpy(dest + dest_len, src, src_len);
+
+    dest[dest_len + src_len] = '\0';
+
+    return 0;
+}
+#endif
+
 static int
 init_tpm_console(void)
 {
@@ -132,9 +320,11 @@ init_tpm_console(void)
 	setvbuf(stdout, NULL, _IONBF, 0);
 	SetConsoleOutputCP(CP_UTF8);
     SetConsoleCP(CP_UTF8);
+	FILE* out_stream;
+	FILE* in_stream;
     
-    freopen("CONOUT$", "w", stdout);
-    freopen("CONIN$", "r", stdin);
+	freopen_s(&out_stream,"CONOUT$", "w", stdout);
+    freopen_s(&in_stream,"CONIN$", "r", stdin);
 #elif defined(__EMSCRIPTEN__) || defined(__wasi__)
 	setvbuf(stdout, NULL, _IONBF, 0);
 #endif    
@@ -279,11 +469,11 @@ tpm_init_context(toothpaste_pick_options_t* opts)
     char user_home_dir_static[MAX_PATH];
 
     if (user_home_dir != NULL) {
-        strncpy(user_home_dir_static, user_home_dir, MAX_PATH - 1);
+        strncpy_s(user_home_dir_static, MAX_PATH, user_home_dir, MAX_PATH - 1);
         user_home_dir_static[MAX_PATH - 1] = '\0';
         free(user_home_dir);
     } else {
-        strncpy(user_home_dir_static, ".", MAX_PATH - 1);
+        strncpy_s(user_home_dir_static, MAX_PATH, ".", MAX_PATH - 1);
     }
 
     
@@ -295,30 +485,32 @@ tpm_init_context(toothpaste_pick_options_t* opts)
 
 #elif defined(_WIN32) || defined(_WIN64)
 
-    strncat(user_home_dir_static,
+    strncat_s(user_home_dir_static,
+			MAX_PATH,
             "\\tpm\\",
             MAX_PATH - strlen(user_home_dir_static) - 1);
 
 #else
 
-    strncat(user_home_dir_static,
+    strncat_s(user_home_dir_static,
+			MAX_PATH,
             "/tpm/",
             MAX_PATH - strlen(user_home_dir_static) - 1);
 
 #endif
 
     
-    strncpy(opts->stats_file_path_final, user_home_dir_static, MAX_PATH - 1);
-    strncat(opts->stats_file_path_final, stats_file_name, MAX_PATH - strlen(opts->stats_file_path_final) - 1);
+    strncpy_s(opts->stats_file_path_final, MAX_PATH,user_home_dir_static, MAX_PATH - 1);
+    strncat_s(opts->stats_file_path_final, MAX_PATH, stats_file_name, MAX_PATH - strlen(opts->stats_file_path_final) - 1);
 
-    strncpy(opts->toothpastes_file_path_final, user_home_dir_static, MAX_PATH - 1);
-    strncat(opts->toothpastes_file_path_final, toothpastes_file_name, MAX_PATH - strlen(opts->toothpastes_file_path_final) - 1);
+    strncpy_s(opts->toothpastes_file_path_final, MAX_PATH, user_home_dir_static, MAX_PATH - 1);
+    strncat_s(opts->toothpastes_file_path_final, MAX_PATH, toothpastes_file_name, MAX_PATH - strlen(opts->toothpastes_file_path_final) - 1);
 
-    strncpy(opts->output_file_path_final, user_home_dir_static, MAX_PATH - 1);
-    strncat(opts->output_file_path_final, output_file_name, MAX_PATH - strlen(opts->output_file_path_final) - 1);
+    strncpy_s(opts->output_file_path_final, MAX_PATH, user_home_dir_static, MAX_PATH - 1);
+    strncat_s(opts->output_file_path_final, MAX_PATH, output_file_name, MAX_PATH - strlen(opts->output_file_path_final) - 1);
 
-    strncpy(opts->config_file_path_final, user_home_dir_static, MAX_PATH - 1);
-    strncat(opts->config_file_path_final, config_file_name, MAX_PATH - strlen(opts->config_file_path_final) - 1);
+    strncpy_s(opts->config_file_path_final,MAX_PATH, user_home_dir_static, MAX_PATH - 1);
+    strncat_s(opts->config_file_path_final,MAX_PATH, config_file_name, MAX_PATH - strlen(opts->config_file_path_final) - 1);
 
     memset(opts->tpm_locale, 0, MAX_LOCALE_CODE );
 
@@ -421,9 +613,10 @@ check_enhanced_toothpastes(const char* filename)
 	int i = 0;
 	int total_comas = 0;
 	int found_valid_line = 0; 
+	errno_t err;
 	
-	file = fopen(filename, "r");
-	if (file == NULL) 
+	err = fopen_s(&file, filename, "r");
+	if (err != 0) 
 	{
 		return 0;
 	}
@@ -490,9 +683,10 @@ tpm_load_list_from_file(const char *filename,
     toothpaste_data_t temp_data;
     char line[MAX_LINE_LENGTH];
     char long_line[4 * MAX_LINE_LENGTH];
-
-    file = fopen(filename, "r");
-    if (file == NULL)
+	errno_t err;
+	
+    err = fopen_s(&file,filename, "r");
+    if (err != 0)
     {
         perror(_(error_strings[TOOTHPASTES_FAILED]));
 
@@ -503,15 +697,15 @@ tpm_load_list_from_file(const char *filename,
 
             temp_data.toothpaste_brand =
                 toothpastes[i].toothpaste_brand ?
-                strdup(toothpastes[i].toothpaste_brand) : NULL;
+                _strdup(toothpastes[i].toothpaste_brand) : NULL;
 
             temp_data.toothbrush_brand =
                 toothpastes[i].toothbrush_brand ?
-                strdup(toothpastes[i].toothbrush_brand) : NULL;
+                _strdup(toothpastes[i].toothbrush_brand) : NULL;
 
             temp_data.toothbrush_color =
                 toothpastes[i].toothbrush_color ?
-                strdup(toothpastes[i].toothbrush_color) : NULL;
+                _strdup(toothpastes[i].toothbrush_color) : NULL;
 
             *head = add_to_list(*head, temp_data);
         }
@@ -566,20 +760,22 @@ tpm_load_list_from_file(const char *filename,
 
         if (!opts->enhanced_toothpastes)
         {
-            parsed_items = sscanf(current,
-                                  "%u, %4095[^,],%u,%u",
-                                  &temp_data.index,
-                                  long_line,
-                                  &temp_data.tube_mass_g,
-                                  &temp_data.rating);
+						parsed_items = sscanf_s(current,
+                        "%u, %4095[^,],%u,%u",
+                        &temp_data.index,
+                        long_line,                   
+                        (unsigned int)sizeof(long_line), 
+                        &temp_data.tube_mass_g,     
+                        &temp_data.rating);          
+
 
             if (parsed_items == 4)
             {
-                strncpy(temp_data.toothbrush_color,
+                strncpy_s(temp_data.toothbrush_color,MAX_TOOTHBRUSH_COLOR,
                         toothpastes[0].toothbrush_color,
                         MAX_TOOTHBRUSH_COLOR - 1);
 
-                strncpy(temp_data.toothbrush_brand,
+                strncpy_s(temp_data.toothbrush_brand, MAX_TOOTHPASTE_LINE,
                         toothpastes[0].toothbrush_brand,
                         MAX_TOOTHPASTE_LINE - 1);
 
@@ -591,16 +787,19 @@ tpm_load_list_from_file(const char *filename,
         }
         else
         {
-            parsed_items = sscanf(current,
-                                  "%u, %4095[^,],%u,%u,%32[^,],%128[^,],%u,%u",
-                                  &temp_data.index,
-                                  long_line,
-                                  &temp_data.tube_mass_g,
-                                  &temp_data.rating,
-                                  temp_data.toothbrush_color,
-                                  temp_data.toothbrush_brand,
-                                  &temp_data.toothbrush_length_cm,
-                                  &temp_data.toothbrush_hardness);
+			parsed_items = sscanf_s(current,
+									"%u, %4095[^,],%u,%u,%32[^,],%128[^,],%u,%u",
+									&temp_data.index,
+									long_line,                  
+									(unsigned int)sizeof(long_line), 
+									&temp_data.tube_mass_g,
+									&temp_data.rating,
+									temp_data.toothbrush_color,  
+									(unsigned int)sizeof(temp_data.toothbrush_color),
+									temp_data.toothbrush_brand,  
+									(unsigned int)sizeof(temp_data.toothbrush_brand),
+									&temp_data.toothbrush_length_cm,
+									&temp_data.toothbrush_hardness);
         }
 
         if ((!opts->enhanced_toothpastes && parsed_items == 4) ||
@@ -661,15 +860,15 @@ tpm_load_list_from_file(const char *filename,
 
             temp_data.toothpaste_brand =
                 toothpastes[i].toothpaste_brand ?
-                strdup(toothpastes[i].toothpaste_brand) : NULL;
+                _strdup(toothpastes[i].toothpaste_brand) : NULL;
 
             temp_data.toothbrush_brand =
                 toothpastes[i].toothbrush_brand ?
-                strdup(toothpastes[i].toothbrush_brand) : NULL;
+                _strdup(toothpastes[i].toothbrush_brand) : NULL;
 
             temp_data.toothbrush_color =
                 toothpastes[i].toothbrush_color ?
-                strdup(toothpastes[i].toothbrush_color) : NULL;
+                _strdup(toothpastes[i].toothbrush_color) : NULL;
 
             *head = add_to_list(*head, temp_data);
         }
@@ -720,7 +919,7 @@ display_list(list_node_t* head, toothpaste_pick_t* pick)
 		}
 		
         size_t rem = OUTPUT_BLOCK_SIZE - strlen(pick->message) - 1;
-		strncat(pick->message, line, rem);
+		strncat_s(pick->message,OUTPUT_BLOCK_SIZE, line, rem);
 		
 		current = current->next;
 		cnt++;
@@ -879,10 +1078,10 @@ reset_counters(toothpaste_pick_options_t* opts)
 	FILE* file_ptr;
 	unsigned int zero=0;
 	time_t cur =time(NULL);
+	errno_t err;
 	
-	
-	file_ptr = fopen(opts->stats_file_path_final, "wb");
-	if (file_ptr == NULL) 
+	err = fopen_s(&file_ptr,opts->stats_file_path_final, "wb");
+	if (err != 0) 
 	{
 		perror(_(error_strings[PICKSTATS_WRITE_FAILED]));
 		return 3;
@@ -906,7 +1105,8 @@ set_counters(void* opt_arg,toothpaste_pick_options_t* opts)
 
 	char *end = NULL;
 	unsigned long value;
-
+	errno_t err;
+	
 	errno = 0;
 	value = strtoul(opt_arg, &end, 10);
 
@@ -917,8 +1117,8 @@ set_counters(void* opt_arg,toothpaste_pick_options_t* opts)
 
 	zero = (unsigned int)value;
 
-	file_ptr = fopen(opts->stats_file_path_final, "wb");
-	if (file_ptr == NULL) 
+	err = fopen_s(&file_ptr,opts->stats_file_path_final, "wb");
+	if (err != 0) 
 	{
 		perror(_(error_strings[PICKSTATS_WRITE_FAILED]));
 		return 3;
@@ -939,14 +1139,15 @@ read_counters(toothpaste_pick_stats_t* stats,int fake_stats,toothpaste_pick_opti
 {
 	FILE* file_ptr;
 	size_t nbytes=0;
+	errno_t err;
 	
 	stats->total_picks=0;
 	stats->last_pick_time=0;
 	stats->first_pick_time=0;
 	if (!fake_stats)
 	{	
-		file_ptr = fopen(opts->stats_file_path_final, "rb");
-		if (file_ptr == NULL) 
+		err = fopen_s(&file_ptr,opts->stats_file_path_final, "rb");
+		if (err != 0) 
 		{
 			perror(_(error_strings[PICKSTATS_READ_FAILED]));
 			return 4;
@@ -992,10 +1193,11 @@ static int
 write_counters(toothpaste_pick_stats_t stats,int fake_stats,toothpaste_pick_options_t* opts)
 {
 	FILE* file_ptr;
+	errno_t err;
 	if (!fake_stats)
 	{
-		file_ptr = fopen(opts->stats_file_path_final, "wb");
-		if (file_ptr == NULL) 
+		err = fopen_s(&file_ptr,opts->stats_file_path_final, "wb");
+		if (err != 0) 
 		{
 			perror(_(error_strings[PICKSTATS_WRITE_FAILED]));
 			return 3;
@@ -1107,7 +1309,7 @@ get_user_home_dir(void)
         const char *home = getenv("HOME");
 
         if (home != NULL)
-            home_dir = strdup(home);
+            home_dir = _strdup(home);
     }
 
 #else
@@ -1116,14 +1318,14 @@ get_user_home_dir(void)
 
     if (home != NULL)
     {
-        home_dir = strdup(home);
+        home_dir = _strdup(home);
     }
     else
     {
         struct passwd *pwd = getpwuid(getuid());
 
         if (pwd != NULL)
-            home_dir = strdup(pwd->pw_dir);
+            home_dir = _strdup(pwd->pw_dir);
     }
 
 #endif
@@ -1160,7 +1362,7 @@ get_current_username(char *buffer, size_t buffer_size)
         if (user == NULL)
             return -1;
 
-        strncpy(buffer, user, buffer_size - 1);
+        strncpy_s(buffer, buffer_size, user, buffer_size - 1);
         buffer[buffer_size - 1] = '\0';
 
         return 0;
@@ -1173,7 +1375,7 @@ get_current_username(char *buffer, size_t buffer_size)
 
         if (pw != NULL)
         {
-            strncpy(buffer, pw->pw_name, buffer_size - 1);
+            strncpy_s(buffer, buffer_size, pw->pw_name, buffer_size - 1);
             buffer[buffer_size - 1] = '\0';
             return 0;
         }
@@ -1186,7 +1388,7 @@ get_current_username(char *buffer, size_t buffer_size)
 
             if (user != NULL)
             {
-                strncpy(buffer, user, buffer_size - 1);
+                strncpy_s(buffer, buffer_size, user, buffer_size - 1);
                 buffer[buffer_size - 1] = '\0';
                 return 0;
             }
@@ -1423,7 +1625,10 @@ report_wasted_tubes(list_node_t *head, toothpaste_pick_stats_t *stats)
 
         rem = ((size_t)total_toothpastes * MAX_REPORT_TERM) - used - 1U;
 
-        strncat(report, report_term, rem);
+        (void)strncat_s(report,
+                (size_t)total_toothpastes * MAX_REPORT_TERM,
+                report_term,
+                rem);
     }
 
     free(rip_tubes);
@@ -1473,7 +1678,7 @@ eval_username(toothpaste_pick_t *pick, toothpaste_pick_options_t *topts)
     if (pick->who == NULL)
         return 1;
 
-    strncpy(pick->who, source, UNLEN);
+    strncpy_s(pick->who, UNLEN+1, source, UNLEN);
     pick->who[UNLEN] = '\0';
 
     return 0;
@@ -2024,7 +2229,7 @@ char_to_strnum(char input)
 			return -1;
 			break;
 	}
-	return -1;
+/*	return -1; */
 }
 
 
@@ -2061,8 +2266,8 @@ tpm_pick_toothpaste(list_node_t* head, toothpaste_pick_options_t* topts, toothpa
     if (!pick->message || !pick->JSON || !pick->CSV) {
 		result = MALLOC_FAILED;
 		goto cleanup;
-        free(pick->message); free(pick->JSON); free(pick->CSV);
-        return MALLOC_FAILED; 
+        /*free(pick->message); free(pick->JSON); free(pick->CSV);
+        return MALLOC_FAILED; */
     }
     
     memset(pick->JSON, 0, OUTPUT_BLOCK_SIZE);    
@@ -2086,7 +2291,7 @@ tpm_pick_toothpaste(list_node_t* head, toothpaste_pick_options_t* topts, toothpa
         snprintf(pick->message, OUTPUT_BLOCK_SIZE,"%s", _(error_strings[NO_TOOTHPASTES_AVAILBLE]));
         result = NO_TOOTHPASTES_AVAILBLE;
 		goto cleanup;
-		return NO_TOOTHPASTES_AVAILBLE; 
+		/*return NO_TOOTHPASTES_AVAILBLE;*/ 
     }
 
     read_counters(&pick->stats, pick->opts->fake_stats,pick->opts);
@@ -2123,11 +2328,11 @@ if (0!=topts->first_pick_time){
     pick->when = total_seconds;
 
 
-    if (TOTAL_TIMES_OF_DAY > 0 && (SECONDS_PER_DAY / TOTAL_TIMES_OF_DAY) > 0) {
-        topts->time_of_day_ind = (total_seconds) / (SECONDS_PER_DAY / TOTAL_TIMES_OF_DAY) % (TOTAL_TIMES_OF_DAY);
-    } else {
-        topts->time_of_day_ind = 0;
-    }
+#if defined(TOTAL_TIMES_OF_DAY) && (TOTAL_TIMES_OF_DAY > 0) && ((SECONDS_PER_DAY / TOTAL_TIMES_OF_DAY) > 0)
+    topts->time_of_day_ind = (total_seconds) / (SECONDS_PER_DAY / TOTAL_TIMES_OF_DAY) % (TOTAL_TIMES_OF_DAY);
+#else
+    topts->time_of_day_ind = 0;
+#endif
     
     pick->day = total_seconds / SECONDS_PER_DAY;
     
@@ -2166,7 +2371,7 @@ if (0!=topts->first_pick_time){
 		
 			result=TPM_RARE_ERROR;
 			goto cleanup;
-			return TPM_RARE_ERROR;   
+			/*return TPM_RARE_ERROR;*/   
 		}
 
 		i = (unsigned int)value;
@@ -2233,7 +2438,7 @@ if (0!=topts->first_pick_time){
 	if (rem < 0 || rem > INT_MAX) {
 		result = TPM_RARE_ERROR;
 		goto cleanup;
-		return TPM_RARE_ERROR;   
+		/*return TPM_RARE_ERROR;*/   
 	}
 
 	pick->j = (int)rem;
@@ -2288,7 +2493,7 @@ if (0!=topts->first_pick_time){
 	toothpaste_picking_message[20] = 	str_quiet(pick,topts);
 	
 	ti=0;
-   if (topts->tpm_template[0] == '*' && topts->tpm_template[1] == '\0') 
+    if (topts->tpm_template[0] == '*' && topts->tpm_template[1] == '\0') 
     {
         snprintf(topts->tpm_template, TOTAL_OUTPUT_STRINGS+1, "%s", DEFAULT_OUTPUT_TEMPLATE);
     }
@@ -2296,6 +2501,7 @@ if (0!=topts->first_pick_time){
     pick->message[0] = '\0'; 
 
     ti = 0;
+	
     while (topts->tpm_template[ti] != '\0') 
     {
         current_char = topts->tpm_template[ti++];
@@ -2314,9 +2520,12 @@ if (0!=topts->first_pick_time){
                     if (current_len + 1 < OUTPUT_BLOCK_SIZE) 
                     {
                         remaining_space = OUTPUT_BLOCK_SIZE - current_len - 1;
-                        
-                       
-                        strncat(pick->message, toothpaste_picking_message[str_num], remaining_space);
+
+						strncat_s(pick->message,
+						OUTPUT_BLOCK_SIZE,
+						toothpaste_picking_message[str_num],
+						remaining_space);
+
                     } 
                     else 
                     {
@@ -2327,7 +2536,7 @@ if (0!=topts->first_pick_time){
             }
         }
     }
-
+	
     for (ti = 0; ti < TOTAL_OUTPUT_STRINGS; ti++) 
     {
         if (toothpaste_picking_message[ti] != NULL) 
@@ -2511,8 +2720,9 @@ static int
 file_exists_fopen(const char *filename) 
 {
     FILE *file;
+	errno_t err;
 	
-    if ((file = fopen(filename, "r"))) 
+    if ((err = fopen_s(&file,filename, "r"))) 
 	{
         fclose(file);
         return 1;
@@ -2529,7 +2739,7 @@ parse_dental_formula(const char* formula_str)
 	dental_formula_t formula={2,2,2,2};
 	if (formula_str==NULL) { return formula; }
 	
-	sscanf(formula_str,"%u-%u-%u-%u",&(formula.brush_times_per_day),&(formula.minutes_per_brush),&(formula.swap_toothbrush_times_per_year),&(formula.visit_dentist_times_per_year));
+	sscanf_s(formula_str,"%u-%u-%u-%u",&(formula.brush_times_per_day),&(formula.minutes_per_brush),&(formula.swap_toothbrush_times_per_year),&(formula.visit_dentist_times_per_year));
 	
 	if (formula.swap_toothbrush_times_per_year ==0) { formula.swap_toothbrush_times_per_year=1; }
 	
@@ -2590,7 +2800,7 @@ read_config(const char *src, toothpaste_pick_options_t *opts)
 	if (value != NULL && value[0] != '\0')
 	{
 		free(opts->username);
-		opts->username = strdup(value);
+		opts->username = _strdup(value);
 
 		if (opts->username == NULL)
 			return MALLOC_FAILED;
@@ -2614,21 +2824,25 @@ read_config(const char *src, toothpaste_pick_options_t *opts)
     value = cfg_get_rec(cfg, "MEME", &depth);
     if (value != NULL)
     {
-        strncpy(opts->meme_payload, value, MAX_TOOTHPASTE_LINE - 1);
+        strncpy_s(opts->meme_payload, MAX_TOOTHPASTE_LINE, value, MAX_TOOTHPASTE_LINE - 1);
         opts->meme_payload[MAX_TOOTHPASTE_LINE - 1] = '\0';
     }
 
-    value = cfg_get_rec(cfg, "TEMPLATE", &depth);
-    if (value != NULL)
-    {
-        strncpy(opts->tpm_template, value, TOTAL_OUTPUT_STRINGS);
-        opts->tpm_template[TOTAL_OUTPUT_STRINGS] = '\0';
-    }
+	value = cfg_get_rec(cfg, "TEMPLATE", &depth);
+	if (value != NULL)
+	{
+		(void)strncpy_s(opts->tpm_template,
+						TOTAL_OUTPUT_STRINGS + 1,
+						value,
+						TOTAL_OUTPUT_STRINGS);
+
+		opts->tpm_template[TOTAL_OUTPUT_STRINGS] = '\0';
+	}
 
     value = cfg_get_rec(cfg, "LOCALE", &depth);
     if (value != NULL)
     {
-        strncpy(opts->tpm_locale, value, MAX_LOCALE_CODE - 1);
+        strncpy_s(opts->tpm_locale, MAX_LOCALE_CODE, value, MAX_LOCALE_CODE - 1);
         opts->tpm_locale[MAX_LOCALE_CODE - 1] = '\0';
     }
 
@@ -2647,20 +2861,20 @@ read_config(const char *src, toothpaste_pick_options_t *opts)
     value = cfg_get_rec(cfg, "TOOTHPASTES", &depth);
     if (value != NULL)
     {
-        strncpy(opts->toothpastes_file_path_final, value, MAX_PATH - 1);
+        strncpy_s(opts->toothpastes_file_path_final, MAX_PATH, value, MAX_PATH - 1);
         opts->toothpastes_file_path_final[MAX_PATH - 1] = '\0';
     }
     value = cfg_get_rec(cfg, "LAST_PICK", &depth);
     if (value != NULL)
     {
-        strncpy(opts->output_file_path_final, value, MAX_PATH - 1);
+        strncpy_s(opts->output_file_path_final, MAX_PATH, value, MAX_PATH - 1);
         opts->output_file_path_final[MAX_PATH - 1] = '\0';
     }
 
     value = cfg_get_rec(cfg, "PICK_STATS", &depth);
     if (value != NULL)
     {
-        strncpy(opts->stats_file_path_final, value, MAX_PATH - 1);
+        strncpy_s(opts->stats_file_path_final, MAX_PATH,value, MAX_PATH - 1);
         opts->stats_file_path_final[MAX_PATH - 1] = '\0';
     }
 #endif	
@@ -2710,7 +2924,7 @@ read_config(const char *src, toothpaste_pick_options_t *opts)
     if (value != NULL)
     {
         free(opts->brand_string);
-        opts->brand_string = strdup(value);
+        opts->brand_string = _strdup(value);
         if (opts->brand_string == NULL)
         {
             result = -1;
@@ -2851,10 +3065,10 @@ do_not_test_me(int argc, char* argv[])
 			case 'o':
 				topts.output_to_file=1;
 				if (optarg!=NULL)
-					strncpy(topts.output_file_path_final,optarg, MAX_PATH-1);
+					strncpy_s(topts.output_file_path_final,MAX_PATH,optarg, MAX_PATH-1);
 			break;
 			case 't':
-				strncpy(topts.stats_file_path_final,optarg, MAX_PATH-1);
+				strncpy_s(topts.stats_file_path_final, MAX_PATH, optarg, MAX_PATH-1);
 			break;
 			case 's':
 				set_counters(optarg,&topts);
@@ -2913,21 +3127,23 @@ do_not_test_me(int argc, char* argv[])
 	}
 	if (argv[optind]!=NULL)
 	{
-		strncpy(topts.toothpastes_file_path_final,argv[optind],MAX_PATH-1);
+		strncpy_s(topts.toothpastes_file_path_final,MAX_PATH,argv[optind],MAX_PATH-1);
 	}	
 	init_tpm_locale(topts.tpm_locale,&topts);
 	if (topts.output_to_file)
 	{
 		printf("%s %s \n",_(user_strings[MSG_PICK_FILE]),topts.output_file_path_final);
+		errno_t err;
+		
 		if (topts.csv_flag) 
 		{
-			output_file=fopen(topts.output_file_path_final,"a");
+			err=fopen_s(&output_file,topts.output_file_path_final,"a");
 		}
 		else
 		{
-			output_file=fopen(topts.output_file_path_final,"w");
+			err=fopen_s(&output_file,topts.output_file_path_final,"w");
 		}
-		if (output_file == NULL) 
+		if (err != 0) 
 		{
 			perror(_(error_strings[LAST_PICK_WRITING_FAILED]));
 
@@ -2978,5 +3194,5 @@ do_not_test_me(int argc, char* argv[])
 	}
 	
 	exit(EXIT_SUCCESS);
-	return 0;
+	/*return 0;*/
 }
