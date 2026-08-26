@@ -2704,6 +2704,7 @@ save_default_config(struct cfg_struct* cfg,toothpaste_pick_options_t* opts)
 	cfg_set(cfg,"OUTPUT_JSON","0");
 	cfg_set(cfg,"OUTPUT_CSV","0");
 	cfg_set(cfg,"FAKE_STATS","0");	
+	cfg_set(cfg,"REVERSE_FLAG","0");	
 	cfg_set(cfg,"OUTPUT_FILE","0");
 	cfg_set(cfg,"PICK_INDEX","0");
 	cfg_set(cfg,"BRAND",brand);

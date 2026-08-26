@@ -44,6 +44,7 @@ interface TPMConfig {
     OUTPUT_JSON: boolean;
     OUTPUT_CSV: boolean;
     FAKE_STATS: boolean;
+	REVERSE_FLAG: boolean; 
     OUTPUT_FILE: boolean;
     PICK_INDEX: number;
     RESET_COUNTER: boolean;
@@ -364,6 +365,7 @@ function generateTPMConfig(answers: Record<string, string>, username: string): T
   const outputJson = answers[questions[21]]?.toUpperCase() === "TRUE";
   const outputCsv = answers[questions[22]]?.toUpperCase() === "TRUE";
   const fakeStats = answers[questions[23]]?.toUpperCase() === "TRUE";
+  const reverseFlag = "FALSE";
   const outputFile = answers[questions[24]]?.toUpperCase() === "TRUE";
   const pickIndex = parseInt(answers[questions[25]]) || 0;
   const resetCounter = answers[questions[26]]?.toUpperCase() === "TRUE";
@@ -395,6 +397,7 @@ function generateTPMConfig(answers: Record<string, string>, username: string): T
       OUTPUT_JSON: outputJson,
       OUTPUT_CSV: outputCsv,
       FAKE_STATS: fakeStats,
+	  REVERSE_FLAG: reverseFlag,
       OUTPUT_FILE: outputFile,
       PICK_INDEX: pickIndex,
       RESET_COUNTER: resetCounter,
@@ -429,6 +432,7 @@ function formatConfig(config: TPMConfig): string {
   str += `OUTPUT_JSON=${config.GENERAL.OUTPUT_JSON ? "TRUE" : "FALSE"}\n`;
   str += `OUTPUT_CSV=${config.GENERAL.OUTPUT_CSV ? "TRUE" : "FALSE"}\n`;
   str += `FAKE_STATS=${config.GENERAL.FAKE_STATS ? "TRUE" : "FALSE"}\n`;
+  str += `REVERSE_FLAG=${config.GENERAL.REVERSE_FLAG ? "TRUE" : "FALSE"}\n`;
   str += `OUTPUT_FILE=${config.GENERAL.OUTPUT_FILE ? "TRUE" : "FALSE"}\n`;
   str += `PICK_INDEX=${config.GENERAL.PICK_INDEX}\n`;
   str += `RESET_COUNTER=${config.GENERAL.RESET_COUNTER ? "TRUE" : "FALSE"}\n`;

@@ -261,9 +261,11 @@ Also sometimes is possible to add 5th term toothpaste grams per nurdle but this 
 
 `-F --fake_stats` use PRNG to get total toothpaste picks counter
 
+`-R --reverse` reverse toothpaste list order useful to share 1 bathroom on 2 persons
+
 `-U --UPPER` convert brand string to UPPERCASE
 
-`-f --formula` set the dental formula `dental_formula`
+`-f --formula dental_formula` set the dental formula `dental_formula`
 
 `-o --output pick_output_file` output toothpaste picking message or JSON or CSV to the text file `pick_output_file`
 
@@ -321,6 +323,8 @@ It's options:
 
 `FAKE_STATS` use PRNG to get total toothpaste picks counter
 
+`REVERSE_FLAG` 1 to reverse toothpaste list order useful to share 1 bathroom on 2 persons
+
 `OUTPUT_FILE` 1 to output to the file `~tpm/last_pick`
 
 `PICK_INDEX` pick the toothpaste by this index if `PICK_TYPE=2`
@@ -365,6 +369,7 @@ OUTPUT_JSON=FALSE
 OUTPUT_CSV=FALSE
 OUTPUT_FILE=FALSE
 FAKE_STATS=FALSE
+REVERSE_FLAG=FALSE
 PICK_INDEX=0
 RESET_COUNTER=FALSE
 SET_COUNTER=0
