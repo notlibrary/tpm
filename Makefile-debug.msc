@@ -50,6 +50,8 @@ update-po:
 	@if exist locale\it\tpm.po "C:\Program Files\gettext-iconv\bin\msgfmt.exe" locale\it\tpm.po -o locale\it\LC_MESSAGES\tpm.mo
 	@if exist locale\ja\tpm.po ( if not exist locale\ja\LC_MESSAGES mkdir locale\ja\LC_MESSAGES )
 	@if exist locale\ja\tpm.po "C:\Program Files\gettext-iconv\bin\msgfmt.exe" locale\ja\tpm.po -o locale\ja\LC_MESSAGES\tpm.mo
+	@if exist locale\pl\tpm.po ( if not exist locale\pl\LC_MESSAGES mkdir locale\pl\LC_MESSAGES )
+	@if exist locale\pl\tpm.po "C:\Program Files\gettext-iconv\bin\msgfmt.exe" locale\pl\tpm.po -o locale\pl\LC_MESSAGES\tpm.mo
 
 clean:
 	-del /q tpm.exe tpm.res $(OBJECTS) 2>nul

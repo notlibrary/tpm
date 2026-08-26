@@ -22,6 +22,10 @@ msgstr ""
 msgid "Default(Circular)"
 msgstr "По умолчанию(Циркуляр)"
 
+#: tpm.c:27
+msgid "Reverse"
+msgstr "Реверс"
+
 #: tpm.c:28 tpm.c:37
 msgid "Random"
 msgstr "Случайно"
