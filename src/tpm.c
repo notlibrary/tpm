@@ -89,6 +89,7 @@ static const char* user_strings[TOTAL_USER_MESSAGES]={
 	gettext_noop("Time span over please visit dentist"),
 	gettext_noop("Already picked today"),
 	gettext_noop("Pick type"),
+	gettext_noop("Reverse"),
 	gettext_noop("Toothpaste:"),
 	gettext_noop("Toothbrush:"),
 	gettext_noop("Toothpaste index:"),
@@ -880,9 +881,22 @@ tpm_load_list_from_file(const char *filename,
             *head = add_to_list(*head, temp_data);
         }
     }
-	if (opts->reverse_flag) {*head=reverse_list(*head);}
-    fclose(file);
+	if (opts->reverse_flag) {
+		struct list_node_t* reversed_list = NULL;
+		reversed_list = reverse_list(*head);
+		*head = reversed_list;
 
+		struct list_node_t* tmp = *head;
+		unsigned int new_index = 0;
+		
+		while(tmp) {
+			
+			tmp->data.index = new_index;
+			new_index++;
+			
+			tmp = tmp->next;
+		}
+	}
     return TPM_NO_ERROR;
 }
 
@@ -1820,24 +1834,28 @@ str_already_picked(toothpaste_pick_t* pick, toothpaste_pick_options_t* topts)
 static char*
 str_pick_type(toothpaste_pick_t* pick, toothpaste_pick_options_t* topts)
 {
-    if (topts == NULL || pick == NULL) return NULL;		
+    if (topts == NULL || pick == NULL) return NULL;     
 
     char* line = malloc(MAX_TOOTHPASTE_LINE);
     if (line == NULL) return NULL;
     
-    memset(line, 0, MAX_TOOTHPASTE_LINE);	
+    memset(line, 0, MAX_TOOTHPASTE_LINE);   
 
-    
     const char* label = _(user_strings[MSG_PICK_TYPE]);
 
-    
     const char* raw_pick_str = pick_type_strings[topts->ptype];
     const char* translated_pick = (raw_pick_str != NULL) ? _(raw_pick_str) : "";
 
-    snprintf(line, MAX_TOOTHPASTE_LINE, "%s: %s\n", label, translated_pick);
-		
+    if (topts->reverse_flag) {
+        const char* reverse_str = _(user_strings[MSG_REVERSE_LIST]);
+        snprintf(line, MAX_TOOTHPASTE_LINE, "%s: %s %s\n", label, translated_pick, reverse_str);
+    } else {
+        snprintf(line, MAX_TOOTHPASTE_LINE, "%s: %s\n", label, translated_pick);
+    }
+        
     return line;
 }
+
 
 static char*
 str_toothpaste(toothpaste_pick_t* pick, toothpaste_pick_options_t* topts)
@@ -2588,8 +2606,8 @@ if (0!=topts->first_pick_time){
     int written = 0;
 
 
-    written = snprintf(csv_ptr, csv_rem, "%s,%s,%d,%d,%d,", 
-                       pick->who, pick_type_strings[topts->ptype], 
+    written = snprintf(csv_ptr, csv_rem, "%s,%s,%d,%d,%d,%d,", 
+                       pick->who, pick_type_strings[topts->ptype],topts->reverse_flag, 
                        new_pick_flag, toothbrush_flag, dentist_flag);
     if (written > 0 && (size_t)written < csv_rem) 
 	{

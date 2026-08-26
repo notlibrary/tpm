@@ -209,8 +209,8 @@ still better than being stereotypical rotten teeth open source bum
 There is also third output mode `CSV` for those who want to save pick info
 When active it auto appends current pick info to giant CSV with all picks collection `picks.CSV`
 This is purely optional
-The CSV record format for CSV mode follows default mode total 24 attributes:
-`#username, pick_type, new_pick_flag,new_toothbrush_flag,new_dentist_visit, toothpaste_brand, tube_mass_g, toothpaste_rating,toothbrush_color, toothbrush_brand, toothbrush_length_cm, toothbrush_hardness, toothpaste_index, total_toothpastes, toothpaste_type, dental_formula, day_of_the_week, day_counter,total_picks,last_pick_time,coverage_percent,wasted_tubes_report,toothpastes_file_path,meme_payload `
+The CSV record format for CSV mode follows default mode total 25 attributes:
+`#username,pick_type,reverse_flag,new_pick_flag,new_toothbrush_flag,new_dentist_visit,toothpaste_brand,tube_mass_g,toothpaste_rating,toothbrush_color,toothbrush_brand,toothbrush_length_cm, toothbrush_hardness,toothpaste_index,total_toothpastes,toothpaste_type,dental_formula,day_of_the_week, day_counter,total_picks,last_pick_time,coverage_percent,wasted_tubes_report,toothpastes_file_path,meme_payload`
 
 Unfortunately brushing teeth over the Internets is full of bs anyway you need someone who mastered the matter to finally cut it off 
 
