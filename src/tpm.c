@@ -129,7 +129,9 @@ static const char config_file_name[MAX_PATH] ="tpm.conf";
 #define _strdup strdup
 #include <stdarg.h>
 
-static inline int gcc_sscanf_s_impl(const char* buf, const char* fmt, ...) {
+static inline int 
+gcc_sscanf_s_impl(const char* buf, const char* fmt, ...) 
+{
     va_list args;
     va_start(args, fmt);
 
@@ -385,6 +387,7 @@ tpm_init_context(toothpaste_pick_options_t* opts)
     opts->lat_flag = 0;
     opts->json_flag = 0;
     opts->csv_flag = 0;
+	opts->reverse_flag = 0;
     opts->fake_stats = 0;
     opts->output_to_file = 0;
     opts->upper_brands = 0;
@@ -659,6 +662,23 @@ check_enhanced_toothpastes(const char* filename)
 }
 
 
+static struct list_node_t* 
+reverse_list(struct list_node_t *head) 
+{
+    struct list_node_t* prev = NULL;
+    struct list_node_t* curr = head;
+    struct list_node_t* next = NULL;
+
+    while (curr != NULL) {
+        next = curr->next; 
+        curr->next = prev;  
+        prev = curr;        
+        curr = next;       
+    }
+    
+    return prev; 
+}
+
 int
 tpm_load_list_from_file(const char *filename,
                         toothpaste_pick_options_t *opts,
@@ -860,7 +880,7 @@ tpm_load_list_from_file(const char *filename,
             *head = add_to_list(*head, temp_data);
         }
     }
-
+	if (opts->reverse_flag) {*head=reverse_list(*head);}
     fclose(file);
 
     return TPM_NO_ERROR;
@@ -2883,8 +2903,15 @@ read_config(const char *src, toothpaste_pick_options_t *opts)
         opts->csv_flag = atoi(value);
 
     value = cfg_get_rec(cfg, "FAKE_STATS", &depth);
-    if (value != NULL)
+    if (value != NULL){
         opts->fake_stats = atoi(value);
+	}
+	
+	value = cfg_get_rec(cfg, "REVERSE_FLAG", &depth);
+	if (value != NULL){
+		opts->reverse_flag = atoi(value);
+	}
+	
 
     value = cfg_get_rec(cfg, "OUTPUT_FILE", &depth);
     if (value != NULL)
@@ -2983,6 +3010,7 @@ do_not_test_me(int argc, char* argv[])
     {"list", no_argument,       0, 'l'},
 	{"reset", no_argument,       0, 'r'},
 	{"fake_stats", no_argument,       0, 'F'},
+	{"reverse", no_argument,       0, 'R'},	
     {"formula", required_argument, 0, 'f'},
 	{"output", required_argument,0, 'o'},
 	{"config", required_argument,0, 'c'},		
@@ -3007,7 +3035,7 @@ do_not_test_me(int argc, char* argv[])
 	result=read_config(topts.config_file_path_final,&topts);
 	if (result<0){};
 	topts.config_load_failure=!file_exists_fopen(topts.config_file_path_final);
-	while ((opt = getopt_long(argc, argv, "awjCvxqlrUFf:t:o:c:s:p:i:b:z:d:m:T:L:I:",long_options,&option_index)) != -1) 
+	while ((opt = getopt_long(argc, argv, "awjCvxqlrUFRf:t:o:c:s:p:i:b:z:d:m:T:L:I:",long_options,&option_index)) != -1) 
 	{
         switch (opt) 
 		{
@@ -3046,6 +3074,9 @@ do_not_test_me(int argc, char* argv[])
 			break;
 			case 'F':
 			topts.fake_stats=1;
+			break;
+			case 'R':
+			topts.reverse_flag=1;
 			break;
 			case 'f':
 			topts.formula=parse_dental_formula(optarg);

@@ -490,6 +490,7 @@ A few shell one-liners demonstrating tpm usage
 	tpm -T mmm
 	tpm -T ob toothpastes-enhanced.sample
 	export LANG=fr_FR.UTF-8 && tpm
+	tpm -R && tpm
 	echo "Done" | tpm | nc -u -b 192.168.1.255 12345
 ```
 

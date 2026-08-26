@@ -10,7 +10,7 @@ extern "C" {
 #define TPM_STRING "tpm"
 #define TPM_VERSION_MAJOR 0
 #define TPM_VERSION_MINOR 7
-#define TPM_VERSION_PATCH 5
+#define TPM_VERSION_PATCH 6
 
 /*
 #undef _CRT_NONSTDC_NO_DEPRECATE 
@@ -270,6 +270,8 @@ typedef struct toothpaste_pick_options_t
     int fake_stats;
     int output_to_file;
     int csv_flag;
+	int reverse_flag;
+	
     unsigned int pick_by_index_index;
     char* username;
     char* brand_string;
