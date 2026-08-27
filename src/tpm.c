@@ -897,6 +897,7 @@ tpm_load_list_from_file(const char *filename,
 			tmp = tmp->next;
 		}
 	}
+	fclose(file);
     return TPM_NO_ERROR;
 }
 

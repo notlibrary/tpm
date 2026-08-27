@@ -23,9 +23,9 @@ msgstr "Tipo di scelta: Predefinito (Circolare)"
 
 #: tpm.c:27
 msgid "Reverse"
-msgstr "Invertito
+msgstr "Invertito"
 
-#: tpm.c:28 tpm.c:37
+#: tpm.c:28
 msgid "Random"
 msgstr "Casuale"
 
