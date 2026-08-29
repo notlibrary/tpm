@@ -52,6 +52,6 @@ clean:
 dist: all
 	$(MKDIR) tpm-wasm-bin
 	$(CP) tpm.wasm tpm-wasm-bin
-	$(CP) README.md LICENSE toothpastes.sample tpm.conf.sample tpm-wasm-bin 2>/dev/null || true
+	$(CP) README.md CHANGELOG.md LICENSE toothpastes.sample tpm.conf.sample tpm-wasm-bin 2>/dev/null || true
 	tar -czf tpm-wasm-bin.tar.gz tpm-wasm-bin
 

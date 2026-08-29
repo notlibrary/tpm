@@ -83,7 +83,7 @@ clean:
 dist: all
 	$(RM) -r tpm-linux-bin-amd64
 	$(MKDIR) tpm-linux-bin-amd64
-	$(CP) tpm.conf.sample toothpastes.sample toothpastes-enhanced.sample tpm README.md tpm.1.gz LICENSE tpm-linux-bin-amd64/ 2>/dev/null || true
+	$(CP) tpm.conf.sample toothpastes.sample toothpastes-enhanced.sample tpm README.md CHANGELOG.md tpm.1.gz LICENSE tpm-linux-bin-amd64/ 2>/dev/null || true
 	
 	@if [ -d locale ]; then \
 		find locale -name "*.mo" | while read -r mo_file; do \

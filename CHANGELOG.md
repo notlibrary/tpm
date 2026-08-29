@@ -1,4 +1,4 @@
-# Changelog
+# TPM CHANGELOG
 
 ## [Unreleased]
 
@@ -8,6 +8,7 @@
 
 ### Documentation
 - Documented reverse-list support.
+- Added clean CHANGELOG.md
 
 ### Maintenance
 - Updated list ordering and fixed a memory leak.

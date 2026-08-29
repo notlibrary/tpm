@@ -69,6 +69,10 @@
         <File Id="ReadMe" Source="README.md" KeyPath="yes" />
       </Component>
 
+      <Component Id="ChangeLog" Guid="55A9C4B8-8507-49C4-9383-01B5E92AF278" Bitness="always64">
+        <File Id="ChangeLog" Source="CHANGELOG.md" KeyPath="yes" />
+      </Component>
+
       <Component Id="Toothpastes" Guid="4C5D6E7F-8A9B-0C1D-2E3F-4A5B6C7D8E9F" Bitness="always64">
         <File Id="ToothpastesFile" Source="toothpastes.sample" KeyPath="yes" />
       </Component>
@@ -134,6 +138,7 @@
       <ComponentRef Id="MainExecutable" />
       <ComponentRef Id="AppConfig" />
       <ComponentRef Id="HelpDoc" />
+      <ComponentRef Id="ChangeLog" />
       <ComponentRef Id="Toothpastes" />
       <ComponentRef Id="ToothpastesEnhanced" />
       <ComponentRef Id="AppLicense" />
