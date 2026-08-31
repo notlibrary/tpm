@@ -3,16 +3,24 @@
 ## [Unreleased]
 
 ### Added
+
+### Documentation
+
+### Maintenance
+
+## [0.7.6] - 2026-08-31
+
+### Added
 - Added support for reversing toothpaste lists.
 - Added Polish localization.
 
 ### Documentation
 - Documented reverse-list support.
-- Added clean CHANGELOG.md
+- Added clean portable CHANGELOG.md
 
 ### Maintenance
 - Updated list ordering and fixed a memory leak.
-- Adopted the Conventional Commits format.
+- Adopted the Conventional Commits specification.
 
 ## [0.7.5] - 2026-08-24
 
