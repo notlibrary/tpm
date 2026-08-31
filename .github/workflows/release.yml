@@ -162,7 +162,7 @@ jobs:
       - name: Extract Release Notes
         if: runner.os != 'Windows'
         id: parse_changelog
-        uses: fisand/extract-release-notes@v3.1.0
+        uses: ffurrer2/extract-release-notes@v3.0.1
         with:
           changelog_file: CHANGELOG.md
 
